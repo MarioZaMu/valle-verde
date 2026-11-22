@@ -28,6 +28,7 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 7. Hay una **interfaz funcional mínima** que permite demostrar la historia (botón o panel simple), salvo las historias puramente de dominio, que se demuestran por la capa de aplicación.
 8. Los diagramas y documentos afectados se actualizan **en el mismo commit** si el código cambia el diseño.
 9. Un commit en inglés `feat(area): description (HUxx)` por historia o fase, sin errores de compilación (`mvn clean package` en verde).
+10. Cada clase de producción creada o modificada declara en su Javadoc la línea `Stories: HU-xx, …` y `python tools/traceability.py` termina sin errores (así la matriz de trazabilidad se mantiene al día).
 
 ## 3. Aplicación de INVEST
 

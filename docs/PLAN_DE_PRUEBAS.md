@@ -24,7 +24,7 @@ Las pruebas se escriben **antes** que el código, historia por historia (DoD 1).
 | Solo pruebas de una historia | `mvn test -Dtest='HU01*'` |
 | Incluir pruebas de rendimiento | `mvn verify -Pperf` |
 | Informe de cobertura | `target/site/jacoco/index.html` |
-| Comprobar diagramas y trazabilidad documental | `python tools/check_diagrams.py` · `python tools/check_hu.py` |
+| Comprobar diagramas, historias y trazabilidad | `python tools/check_diagrams.py` · `python tools/check_hu.py` · `python tools/traceability.py [--upto 5.x]` |
 
 > En este equipo Maven no está en el PATH: se usa `tools/apache-maven-3.9.16/bin/mvn` (o el `mvnw` que se generará en la Fase 5.0).
 
@@ -37,6 +37,7 @@ Las pruebas se escriben **antes** que el código, historia por historia (DoD 1).
 - **Reloj:** toda prueba que lo use llama a `GameClock.resetForTests()` en `@BeforeEach` (DT-09).
 - **Repositorios:** `InMemorySaveRepository` (en pruebas) para aceptación; `@TempDir` para infraestructura.
 - **Fallas inyectadas:** servicios y repositorios de prueba que lanzan excepciones para verificar que el controlador devuelve `ERROR_INTERNO` y que el estado no cambia (RNF-07, HU-10 · CA-4).
+- **Trazabilidad:** cada clase de producción lleva `Stories: HU-xx` en su Javadoc y cada método de prueba el prefijo `HUxx_`; `python tools/traceability.py` (con `--upto 5.x` al cerrar una fase) comprueba que cada historia tenga clases y al menos tantas pruebas como criterios.
 - **Mensajes:** las pruebas comparan el **código** de error y, en pocas pruebas dedicadas, el texto en español de RN-35.
 
 ## 4. Pruebas de aceptación por historia

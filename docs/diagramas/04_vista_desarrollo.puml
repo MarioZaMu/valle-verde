@@ -33,9 +33,11 @@ title Vista de desarrollo — Valle Verde (paquetes edu.ucc.farmsim y dependenci
 package "edu.ucc.farmsim" as ROOT #FFFFFF {
 
   class Main <<composición>>
+  class GameInfo
 
   package "ui" as UI #E3F2FD {
     package "screens" as UI_SCR #FFFFFF {
+      class MainWindow
       class StartScreen
       class GameScreen
     }

@@ -2,7 +2,7 @@
 
 > **Versión 0.1 · 2026-11-22 · Fase 4**
 > Formaliza el diseño propuesto en los diagramas ([`DIAGRAMAS.md`](DIAGRAMAS.md)): capas, árbol de paquetes, decisiones técnicas y plan de implementación por fases con sus historias ([`HISTORIAS_DE_USUARIO.md`](HISTORIAS_DE_USUARIO.md) §7). El plan de pruebas está en [`PLAN_DE_PRUEBAS.md`](PLAN_DE_PRUEBAS.md).
-> **Aún no hay código**: la Fase 5 empieza solo con tu visto bueno.
+> **Estado:** la Fase 5.0 (preparación técnica) está hecha; ver §10. La Fase 5.1 empieza solo con tu visto bueno.
 
 ## 1. Estilo arquitectónico
 
@@ -17,7 +17,7 @@
 
 | Regla | Descripción | Cómo se verifica |
 |---|---|---|
-| **AR-1** | `ui → application → domain` e `infrastructure → domain`; ninguna otra dirección | prueba ArchUnit de capas |
+| **AR-1** | `ui → application → domain` e `infrastructure → domain`; ninguna otra dirección. `Main` es la única clase que puede ver todas las capas (raíz de composición) | prueba ArchUnit de capas |
 | **AR-2** | El dominio no importa `javax.swing`, `java.awt`, `com.google.gson` ni E/S de archivos (`java.io`, `java.nio.file`) | prueba ArchUnit |
 | **AR-3** | La UI no importa `domain` ni `infrastructure`: dibuja con DTO inmutables de `application` | prueba ArchUnit |
 | **AR-4** | `GameController` solo orquesta y devuelve un `Result`; nunca lanza excepciones hacia la UI y nunca llama a un repositorio | prueba ArchUnit + prueba de inyección de fallas |
@@ -25,7 +25,8 @@
 | **AR-6** | La UI se actualiza por eventos (Observer), no consultando en bucle | revisión y prueba de `HudPanel` con eventos simulados |
 | **AR-7** | Toda aleatoriedad recibe un `Random` inyectado | prueba: ningún `new Random()` ni `Math.random()` fuera de `Main` |
 | **AR-8** | Sin números mágicos: las RN viven en `GameRules` y en las tablas de catálogo | revisión en cada historia (DoD 4) |
-| **AR-9** | Cada clase de patrón lleva el Javadoc `Pattern: <nombre> — Role: <rol>` | prueba que revisa las fuentes |
+| **AR-9** | Cada clase de patrón lleva el Javadoc `Pattern: <nombre> — Role: <rol>` | `PatternJavadocTest` con un registro (`src/test/resources/patterns.txt`) que cada fase completa |
+| **AR-10** | Toda clase de producción declara en su Javadoc la línea `Stories: HU-xx, …` (o `Stories: none`) | `tools/traceability.py` (alimenta la matriz de trazabilidad) |
 
 ## 2. Responsabilidades por capa
 
@@ -43,8 +44,9 @@ Paquete raíz `edu.ucc.farmsim`. Las clases entre paréntesis se muestran en los
 ```
 edu.ucc.farmsim
 ├─ Main                                 raíz de composición: crea Random, repositorio, servicios, EventBus y ventana
+├─ GameInfo                             nombre visible y versión del juego (única constante, RNF-12)
 ├─ ui
-│  ├─ screens      StartScreen, GameScreen, ScreenRouter
+│  ├─ screens      MainWindow, StartScreen, GameScreen, ScreenRouter
 │  ├─ components   HudPanel, ToolBar, InventoryGrid, MarketDialog, SlotDialog, AchievementsDialog, ToastLayer
 │  ├─ render       MapPanel, MapRenderer, ParticleSystem, DayNightTint
 │  ├─ assets       AssetManager, VectorFallback
@@ -177,3 +179,18 @@ Como en la secuencia [A1](diagramas/A1_secuencia_vender_cosecha.png):
 | C-03 | Se agregan `GameSession` (DT-10), `StateRandom` (DT-07) y `ProgressFacts` | diagramas 03 y 04 |
 | C-04 | RN-32: el archivo guarda el **estado interno del generador** (`StateRandom`) en lugar de «semilla + número de sorteos» | `REGLAS_DE_NEGOCIO.md` |
 | C-05 | RN-35: nuevo código `ERROR_INTERNO` para excepciones inesperadas (DT-02) | `REGLAS_DE_NEGOCIO.md` |
+
+## 10. Estado de la Fase 5.0 (preparación técnica)
+
+| Entregable | Resultado |
+|---|---|
+| `pom.xml` con las versiones de §5, JaCoCo con **dos barreras** (dominio y aplicación ≥ 70 %), perfil `perf` y *shade* | `mvn clean verify` en verde; la barrera se probó en negativo con una clase sin cubrir y el build falló como debía |
+| Esqueleto: 26 `package-info.java` del árbol de §3, `Main`, `GameInfo`, `MainWindow` | la ventana «Valle Verde» abre en 0,5 s |
+| Pruebas: AR-1 a AR-5 y AR-7 (ArchUnit), AR-9 (registro de patrones), `GameInfoTest`, `MainWindowTest` | 12 pruebas en verde |
+| `mvnw` (Maven Wrapper 3.9.16) | `./mvnw -v` funciona sin instalar Maven |
+| `target/farmsim.jar` ejecutable | bytecode versión 61 (Java 17), `Main-Class` correcto; sin pantalla termina con un mensaje claro (código 1) |
+| `tools/traceability.py` y `docs/TRAZABILIDAD.md` | matriz RF → HU → componente → clases → pruebas; el modo `--upto 5.x` exige historias completas |
+| `README.md` | cómo compilar, ejecutar y probar; estructura; tabla de patrones |
+
+Ajustes surgidos al implementar: (1) `Main` se declara como capa «Composition» en AR-1, porque ArchUnit trata como violación que una clase fuera de las capas acceda a la UI; (2) `GameInfo` y `MainWindow` se agregan al árbol y al diagrama de desarrollo; (3) se añade la regla AR-10 (`Stories:` en el Javadoc).
+
