@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  * The crop use cases: sow, water, harvest and clear (RN-06 to RN-10). Each operation checks every rule
  * first and only then changes the game, so a rejection never leaves anything half done.
  *
- * <p>Stories: HU-01, HU-02.
+ * <p>Stories: HU-01, HU-02, HU-04.
  */
 public final class FarmService {
 
@@ -123,6 +123,41 @@ public final class FarmService {
         }
         crop.water();
         energy.trySpend(cost);
+        publishChange(state);
+        return Result.ok(mapper.plot(state, col, row));
+    }
+
+    /**
+     * Harvests a mature crop into the inventory (RN-10): 2 energy and room for one unit. If any rule fails,
+     * nothing changes; in particular a full inventory never costs the crop or the energy.
+     *
+     * @param col column of the plot
+     * @param row row of the plot
+     */
+    public Result<PlotView> harvest(int col, int row) {
+        if (!session.hasGame()) {
+            return Result.failWith(ErrorCode.SIN_PARTIDA);
+        }
+        GameState state = session.current();
+        Crop crop = cropAt(state, col, row);
+        if (crop == null) {
+            return Result.failWith(ErrorCode.SIN_CULTIVO);
+        }
+        if (!crop.isAlive()) {
+            return Result.failWith(ErrorCode.CULTIVO_MARCHITO);
+        }
+        if (!crop.isMature()) {
+            return Result.failWith(ErrorCode.NO_MADURO, crop.daysLeft());
+        }
+        Energy energy = state.energy();
+        if (!energy.canSpend(GameRules.ENERGY_COST_HARVEST)) {
+            return Result.failWith(ErrorCode.SIN_ENERGIA, GameRules.ENERGY_COST_HARVEST, energy.current());
+        }
+        if (!state.inventory().add(ItemType.produceOf(crop.type()), 1)) {
+            return Result.failWith(ErrorCode.INVENTARIO_LLENO);
+        }
+        energy.trySpend(GameRules.ENERGY_COST_HARVEST);
+        state.farm().plotAt(col, row).removeCrop();
         publishChange(state);
         return Result.ok(mapper.plot(state, col, row));
     }

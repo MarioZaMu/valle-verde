@@ -3,10 +3,15 @@ package edu.ucc.farmsim.support;
 import edu.ucc.farmsim.domain.crop.Crop;
 import edu.ucc.farmsim.domain.crop.CropSnapshot;
 import edu.ucc.farmsim.domain.crop.CropType;
+import edu.ucc.farmsim.domain.economy.Inventory;
+import edu.ucc.farmsim.domain.economy.InventorySnapshot;
+import edu.ucc.farmsim.domain.economy.ItemType;
 import edu.ucc.farmsim.domain.game.GameState;
 import edu.ucc.farmsim.domain.time.GameClock;
 import edu.ucc.farmsim.domain.time.GameDate;
 import edu.ucc.farmsim.domain.time.Season;
+import java.util.ArrayList;
+import java.util.List;
 
 /** Helpers that put a game in a known situation without going through the whole day-by-day flow. */
 public final class GameFixtures {
@@ -36,4 +41,19 @@ public final class GameFixtures {
     public static void setDate(int year, Season season, int day) {
         GameClock.getInstance().restore(new GameDate(year, season, day));
     }
+
+    /**
+     * Replaces the inventory with one whose first slot holds the given amount of an item and whose remaining
+     * slots are all full stacks of hay, so nothing else fits.
+     */
+    public static void fillInventoryExcept(GameState state, ItemType item, int amount) {
+        int capacity = state.inventory().capacity();
+        List<Inventory.ItemStack> slots = new ArrayList<>();
+        slots.add(new Inventory.ItemStack(item, amount));
+        for (int i = 1; i < capacity; i++) {
+            slots.add(new Inventory.ItemStack(ItemType.HAY, 99));
+        }
+        state.inventory().restoreFrom(new InventorySnapshot(capacity, slots));
+    }
 }
+
