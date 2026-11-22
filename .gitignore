@@ -1,0 +1,19 @@
+# Build output
+target/
+*.class
+
+# Local tools (downloaded jars)
+tools/*.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# OS / temp
+Thumbs.db
+.DS_Store
+~$*
