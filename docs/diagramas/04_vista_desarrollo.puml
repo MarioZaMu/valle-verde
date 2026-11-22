@@ -38,11 +38,14 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
   package "ui" as UI #E3F2FD {
     package "screens" as UI_SCR #FFFFFF {
       class MainWindow
+      class ScreenRouter
+      class StartScreenPresenter
       class StartScreen
       class GameScreen
     }
     package "components" as UI_CMP #FFFFFF {
       class HudPanel
+      class HudModel
       class InventoryGrid
       class MarketDialog
       class ToastLayer
@@ -55,6 +58,7 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
       class AssetManager
     }
     package "theme" as UI_THM #FFFFFF {
+      class Texts
       class Palette
     }
   }
@@ -69,6 +73,8 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
       class MarketService
       class BuildingService
       class SaveGameService
+      class ProgressService
+      class ViewMapper
       class GameSession
     }
     package "event" as APP_EVT #FFFFFF {
@@ -77,12 +83,14 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
       class GameEvent
     }
     package "dto" as APP_DTO #FFFFFF {
+      class HudView
       class GameView
       class PlotView
     }
     package "result" as APP_RES #FFFFFF {
       class Result
       class ErrorCode
+      class Messages
     }
   }
 
@@ -90,6 +98,8 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
     package "game" as D_GAME #FFFFFF {
       class GameState
       class GameMemento
+      class Energy
+      class DayPipeline
     }
     package "save" as D_SAVE #FFFFFF {
       class SaveRepository
@@ -112,11 +122,13 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
     package "economy" as D_ECO #FFFFFF {
       class Market
       class Inventory
+      class ItemType
     }
     package "time" as D_TIM #FFFFFF {
       class GameClock
       class SeasonState
       class StateRandom
+      class WeatherCycle
     }
     package "progress" as D_PRO #FFFFFF {
       class AchievementTracker
@@ -145,6 +157,8 @@ GameEvent -[hidden]down-> SaveRepository
 ErrorCode -[hidden]down-> SaveRepository
 Animal -[hidden]down-> JsonSaveRepository
 GameClock -[hidden]down-> JsonSaveRepository
+WeatherCycle -[hidden]down-> JsonSaveRepository
+ItemType -[hidden]down-> JsonSaveRepository
 
 ' ---------- Raíz de composición ----------
 Main .down.> UI

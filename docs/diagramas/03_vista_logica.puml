@@ -37,11 +37,18 @@ package "ui  (presentación)" #F5FAFF {
     +onSellClicked(item: String, qty: int): void
   }
   class ToastLayer <<ConcreteObserver>> #BBDEFB
+  class HudModel <<ConcreteObserver>> #BBDEFB {
+    +energyText(): String
+    +energyFraction(): double
+  }
 }
 
 package "application" #F6FBF6 {
   class GameController <<Controller>> {
     +newGame(seed: long): Result
+    +hasGameInProgress(): boolean
+    +hud(): Result
+    +hasSavedGames(): Result
     +plant(col: int, row: int, crop: String): Result
     +water(col: int, row: int): Result
     +harvest(col: int, row: int): Result
@@ -64,6 +71,9 @@ package "application" #F6FBF6 {
     -state: GameState
     +current(): GameState
     +replace(s: GameState): void
+  }
+  class ProgressService {
+    +newGame(seed: long): Result
   }
   class DayService {
     +endDay(): Result
@@ -103,6 +113,19 @@ package "domain" #FFFCF5 {
       +spend(amount: int): boolean
       +earn(amount: int): void
     }
+    class Energy {
+      -current: int
+      +trySpend(cost: int): boolean
+      +restore(): void
+    }
+    interface DayStep {
+      +phase(): DayPhase
+      +apply(s: GameState, r: DayReport): void
+    }
+    class DayPipeline {
+      +add(step: DayStep): DayPipeline
+      +run(s: GameState): DayReport
+    }
     class GameMemento <<Memento>> #F8BBD0 {
       -snapshot: Object
     }
@@ -132,6 +155,11 @@ package "domain" #FFFCF5 {
     class SummerState <<ConcreteState>> #C8E6C9
     class AutumnState <<ConcreteState>> #C8E6C9
     class WinterState <<ConcreteState>> #C8E6C9
+    class WeatherCycle {
+      -today: Weather
+      -forecast: Weather
+      +advance(c: GameClock, rnd: Random): void
+    }
     class StateRandom {
       -state: long
       +state(): long
@@ -260,17 +288,22 @@ package "infrastructure" #FBF5FC {
 EventBus o-- "0..*" GameListener
 EventBus ..> GameEvent : publica
 HudPanel ..|> GameListener
+HudModel ..|> GameListener
 MapPanel ..|> GameListener
 ToastLayer ..|> GameListener
 MapPanel ..> GameController : usa
 MarketDialog ..> GameController : usa
 
 ' ---------- Aplicación ----------
+GameController --> ProgressService
 GameController --> DayService
 GameController --> MarketService
 GameController --> SaveGameService
 GameController ..> Result : devuelve
 DayService --> GameSession
+DayService --> DayPipeline
+ProgressService --> GameSession
+ProgressService --> EventBus
 DayService --> EventBus
 MarketService --> GameSession
 MarketService --> EventBus
@@ -285,6 +318,10 @@ AchievementTracker ..> ProgressFacts : lee
 GameSession --> "1" GameState : actual
 GameState ..> GameClock : usa
 GameState *-- "1" StateRandom
+GameState *-- "1" Energy
+GameState *-- "1" WeatherCycle
+DayPipeline o-- "0..*" DayStep
+WeatherCycle ..> WeatherStrategy : usa
 FarmMap *-- "160" Plot
 FarmMap *-- "0..*" Building
 Plot *-- "0..1" Crop
