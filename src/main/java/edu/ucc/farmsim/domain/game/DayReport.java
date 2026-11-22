@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Facts about one end of the day, filled in by the steps and read by the application layer.
  *
- * <p>Stories: HU-10.
+ * <p>Stories: HU-05, HU-10.
  */
 public final class DayReport {
 
@@ -18,6 +18,7 @@ public final class DayReport {
     private GameDate newDate;
     private Weather todayWeather;
     private Weather forecast;
+    private int witheredCrops;
 
     /** The phases that ran, in execution order. */
     public List<DayPhase> phasesRun() {
@@ -42,6 +43,15 @@ public final class DayReport {
     /** Forecast drawn for the following day, or {@code null} if no forecast step ran. */
     public Weather forecast() {
         return forecast;
+    }
+
+    /** Number of crops that withered during this end of the day. */
+    public int witheredCrops() {
+        return witheredCrops;
+    }
+
+    void addWithered(int count) {
+        witheredCrops += count;
     }
 
     void markRun(DayPhase phase) {

@@ -29,7 +29,7 @@ final class WitheredState implements CropState {
     }
 
     @Override
-    public void onDayEnd(Crop crop) {
+    public void onDayEnd(Crop crop, int dryDaysToWither) {
         // a withered crop neither grows nor needs water
     }
 }

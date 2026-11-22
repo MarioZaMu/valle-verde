@@ -1,9 +1,10 @@
 package edu.ucc.farmsim.domain.game;
 
 /**
- * Step 2 of the end of the day: crops grow if they were watered (RN-03, RN-08).
+ * Step 2 of the end of the day: crops grow if they were watered, count a dry day, or wither (RN-03, RN-08,
+ * RN-09). The weather that counts is today's, before the forecast step replaces it.
  *
- * <p>Stories: HU-03.
+ * <p>Stories: HU-03, HU-05.
  */
 final class GrowthStep implements DayStep {
 
@@ -14,6 +15,6 @@ final class GrowthStep implements DayStep {
 
     @Override
     public void apply(GameState state, DayReport report) {
-        state.farm().growCrops();
+        report.addWithered(state.farm().growCrops(state.weather().today()));
     }
 }

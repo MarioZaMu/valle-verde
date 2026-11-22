@@ -3,6 +3,8 @@ package edu.ucc.farmsim.domain.farm;
 import edu.ucc.farmsim.domain.config.GameRules;
 import edu.ucc.farmsim.domain.crop.Crop;
 import edu.ucc.farmsim.domain.crop.CropSnapshot;
+import edu.ucc.farmsim.domain.time.Season;
+import edu.ucc.farmsim.domain.time.Weather;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -11,7 +13,7 @@ import java.util.List;
  * The farm grid: {@link GameRules#MAP_COLS} x {@link GameRules#MAP_ROWS} plots with coordinates
  * {@code (column, row)}, where {@code (0, 0)} is the top-left corner (RN-04).
  *
- * <p>Stories: HU-01, HU-03, HU-28.
+ * <p>Stories: HU-01, HU-03, HU-05, HU-28.
  */
 public final class FarmMap {
 
@@ -91,15 +93,48 @@ public final class FarmMap {
         return total;
     }
 
-    /** Resolves the end of the day for every crop on the map (step 2 of RN-03). */
-    public void growCrops() {
+    /**
+     * Resolves the end of the day for every crop on the map (step 2 of RN-03): growth, or a dry day, or
+     * withering. A drought lowers the tolerance to dry days (RN-09).
+     *
+     * @param todayWeather weather of the day that ends
+     * @return number of crops that withered now
+     */
+    public int growCrops(Weather todayWeather) {
+        int dryDaysToWither = todayWeather == Weather.DROUGHT
+                ? GameRules.DRY_DAYS_TO_WITHER_IN_DROUGHT
+                : GameRules.DRY_DAYS_TO_WITHER;
+        int withered = 0;
         for (Plot[] line : plots) {
             for (Plot plot : line) {
-                if (plot.crop() != null) {
-                    plot.crop().endOfDay();
+                Crop crop = plot.crop();
+                if (crop != null) {
+                    boolean wasAlive = crop.isAlive();
+                    crop.endOfDay(dryDaysToWither);
+                    if (wasAlive && !crop.isAlive()) {
+                        withered++;
+                    }
                 }
             }
         }
+        return withered;
+    }
+
+    /**
+     * Withers every living crop that is not valid in the given season (RN-09-c, step 5 of RN-03).
+     *
+     * @return number of crops that withered now
+     */
+    public int witherOutOfSeason(Season season) {
+        int withered = 0;
+        for (Plot[] line : plots) {
+            for (Plot plot : line) {
+                if (plot.crop() != null && plot.crop().witherIfOutOfSeason(season)) {
+                    withered++;
+                }
+            }
+        }
+        return withered;
     }
 
     /** Copy of the crops of every plot in row-major order ({@code null} where there is none), for the memento. */

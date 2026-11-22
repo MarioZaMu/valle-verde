@@ -1,12 +1,14 @@
 package edu.ucc.farmsim.domain.crop;
 
+import edu.ucc.farmsim.domain.time.Season;
+
 /**
  * Pattern: State — Role: Context (a plant whose behaviour depends on its growth state).
  *
  * <p>Holds what RN-06 to RN-10 track for a sown plant: days grown, days without water and whether it was
  * watered today. Its stage is derived from the progress and kept as a state object.
  *
- * <p>Stories: HU-01, HU-02, HU-03.
+ * <p>Stories: HU-01, HU-02, HU-03, HU-05.
  */
 public final class Crop {
 
@@ -97,15 +99,32 @@ public final class Crop {
      * Resolves the end of the day for this crop (step 2 of RN-03): the current state decides what happens, and
      * the watered mark is cleared for the next day.
      */
-    public void endOfDay() {
-        state.onDayEnd(this);
+    public void endOfDay(int dryDaysToWither) {
+        state.onDayEnd(this, dryDaysToWither);
         watered = false;
+    }
+
+    /**
+     * Withers the crop if the given season is not one of its valid seasons (RN-09-c), whatever its stage.
+     *
+     * @return {@code true} if it withered now
+     */
+    public boolean witherIfOutOfSeason(Season season) {
+        if (isAlive() && !type.validSeasons().contains(season)) {
+            wither();
+            return true;
+        }
+        return false;
     }
 
     void growOneDay() {
         daysGrown++;
         daysWithoutWater = 0;
         state = CropState.forProgress(type, daysGrown, false);
+    }
+
+    void wither() {
+        state = WitheredState.INSTANCE;
     }
 
     void missWater() {
