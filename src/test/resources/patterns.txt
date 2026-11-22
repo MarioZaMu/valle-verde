@@ -1,0 +1,4 @@
+# Registry of classes that implement a design pattern (checked by PatternJavadocTest, rule AR-9).
+# Format:  fully.qualified.ClassName | Pattern | Role
+# Each phase appends its pattern classes here, for example (phase 5.1):
+#   edu.ucc.farmsim.domain.time.GameClock | Singleton | Single game clock shared by all services
