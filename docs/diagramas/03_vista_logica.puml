@@ -1,0 +1,328 @@
+@startuml 03_vista_logica
+/'
+  Vista 3 — Lógica (diagrama de clases UML) con los 7 patrones de diseño señalados por estereotipo y color.
+  Cubre: RF-01..RF-32 (modelo del juego), HU-01..HU-32; patrones: Singleton (HU-09), State (HU-03/05/21/09),
+  Strategy (HU-11/15), Factory Method (HU-01), Builder (HU-18), Memento (HU-29/30), Observer (HU-34/35/39).
+  Reglas del taller: sin rombos "de adorno"; composición solo cuando el ciclo de vida depende del todo;
+  atributos privados (-); lo heredado no se repite; multiplicidades con "..".
+'/
+skinparam dpi 140
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam classAttributeIconSize 0
+skinparam classFontSize 13
+skinparam stereotypeFontSize 11
+skinparam packageStyle rectangle
+skinparam nodesep 25
+skinparam ranksep 40
+skinparam ArrowColor #333333
+skinparam class {
+  BorderColor #333333
+  BackgroundColor white
+}
+skinparam package {
+  BorderColor #9E9E9E
+  FontStyle bold
+}
+left to right direction
+hide empty members
+
+title Vista lógica — Valle Verde (diagrama de clases y patrones de diseño)\n
+
+package "ui  (presentación)" #F5FAFF {
+  class HudPanel <<ConcreteObserver>> #BBDEFB
+  class MapPanel <<ConcreteObserver>> #BBDEFB
+  class MarketDialog {
+    +onSellClicked(item: String, qty: int): void
+  }
+  class ToastLayer <<ConcreteObserver>> #BBDEFB
+}
+
+package "application" #F6FBF6 {
+  class GameController <<Controller>> {
+    +newGame(seed: long): Result
+    +plant(col: int, row: int, crop: String): Result
+    +water(col: int, row: int): Result
+    +harvest(col: int, row: int): Result
+    +endDay(): Result
+    +sell(item: String, qty: int): Result
+    +build(type: String, col: int, row: int): Result
+    +save(slot: int): Result
+    +load(slot: int): Result
+  }
+  class Result<T> {
+    -ok: boolean
+    -code: ErrorCode
+    -message: String
+    -value: T
+    +isOk(): boolean
+    +{static} ok(value: T): Result<T>
+    +{static} fail(code: ErrorCode, msg: String): Result<T>
+  }
+  class DayService {
+    +endDay(): Result
+  }
+  class MarketService {
+    +sell(item: String, qty: int): Result
+    +buy(item: String, qty: int): Result
+  }
+  class SaveGameService <<Caretaker>> #F8BBD0 {
+    +save(slot: int): Result
+    +load(slot: int): Result
+  }
+  class EventBus <<Subject>> #BBDEFB {
+    -listeners: List<GameListener>
+    +subscribe(l: GameListener): void
+    +publish(e: GameEvent): void
+  }
+  interface GameListener <<Observer>> #BBDEFB {
+    +onEvent(e: GameEvent): void
+  }
+  interface GameEvent
+  note bottom of DayService
+    FarmService, BuildingService,
+    AnimalService y ProgressService
+    son análogos (un servicio por bloque funcional)
+  end note
+}
+
+package "domain" #FFFCF5 {
+
+  package "game" #FFFFFF {
+    class GameState <<Originator>> #F8BBD0 {
+      -money: int
+      -energy: int
+      +createMemento(): GameMemento
+      +restore(m: GameMemento): void
+      +spend(amount: int): boolean
+      +earn(amount: int): void
+    }
+    class GameMemento <<Memento>> #F8BBD0 {
+      -snapshot: Object
+    }
+  }
+
+  package "save" #FFFFFF {
+    interface SaveRepository <<Port>> {
+      +save(slot: int, m: GameMemento): void
+      +load(slot: int): GameMemento
+    }
+  }
+
+  package "time" #FFFFFF {
+    class GameClock <<Singleton>> #FFCCBC {
+      -{static} instance: GameClock
+      -day: int
+      -year: int
+      -season: SeasonState
+      +{static} getInstance(): GameClock
+      +advanceDay(): void
+    }
+    interface SeasonState <<State>> #C8E6C9 {
+      +next(): SeasonState
+      +weatherStrategy(): WeatherStrategy
+    }
+    class SpringState <<ConcreteState>> #C8E6C9
+    class SummerState <<ConcreteState>> #C8E6C9
+    class AutumnState <<ConcreteState>> #C8E6C9
+    class WinterState <<ConcreteState>> #C8E6C9
+    interface WeatherStrategy <<Strategy>> #FFF9C4 {
+      +nextWeather(day: int, rnd: Random): Weather
+    }
+    class SeasonalWeatherStrategy <<ConcreteStrategy>> #FFF9C4
+    class FixedWeatherStrategy <<ConcreteStrategy>> #FFF9C4
+  }
+
+  package "farm" #FFFFFF {
+    class FarmMap {
+      -cols: int
+      -rows: int
+      +plotAt(col: int, row: int): Plot
+    }
+    class Plot {
+      -terrain: Terrain
+      +isFree(): boolean
+    }
+  }
+
+  package "crop" #FFFFFF {
+    class Crop <<Context>> #C8E6C9 {
+      -daysGrown: int
+      -daysWithoutWater: int
+      -watered: boolean
+      +water(): void
+      +endOfDay(w: Weather, s: SeasonState): void
+    }
+    interface CropState <<State>> #C8E6C9 {
+      +onDayEnd(c: Crop): void
+      +canHarvest(): boolean
+    }
+    class SeedState <<ConcreteState>> #C8E6C9
+    class SproutState <<ConcreteState>> #C8E6C9
+    class GrowingState <<ConcreteState>> #C8E6C9
+    class MatureState <<ConcreteState>> #C8E6C9
+    class WitheredState <<ConcreteState>> #C8E6C9
+    abstract class CropFactory <<FactoryMethod>> #E1BEE7 {
+      +{abstract} createCrop(): Crop
+    }
+    class CarrotFactory <<ConcreteCreator>> #E1BEE7
+    class PumpkinFactory <<ConcreteCreator>> #E1BEE7
+  }
+
+  package "building" #FFFFFF {
+    class Building <<Product>> #B2DFDB {
+      -col: int
+      -row: int
+      -width: int
+      -height: int
+      +addAnimal(a: Animal): boolean
+      +collectProducts(): int
+    }
+    interface BuildingBuilder <<Builder>> #B2DFDB {
+      +at(col: int, row: int): BuildingBuilder
+      +build(): Building
+    }
+    class CoopBuilder <<ConcreteBuilder>> #B2DFDB
+    class GreenhouseBuilder <<ConcreteBuilder>> #B2DFDB
+    class BuildingDirector <<Director>> #B2DFDB {
+      +construct(type: String, col: int, row: int): Building
+    }
+  }
+
+  package "animal" #FFFFFF {
+    class Animal <<Context>> #C8E6C9 {
+      -daysWithoutFood: int
+      -fedToday: boolean
+      -pending: int
+      +feed(): void
+      +heal(): void
+    }
+    interface AnimalState <<State>> #C8E6C9 {
+      +onDayEnd(a: Animal): void
+      +canProduce(): boolean
+    }
+    class HealthyState <<ConcreteState>> #C8E6C9
+    class HungryState <<ConcreteState>> #C8E6C9
+    class SickState <<ConcreteState>> #C8E6C9
+  }
+
+  package "economy" #FFFFFF {
+    class Inventory {
+      -capacity: int
+      +add(item: String, qty: int): boolean
+      +remove(item: String, qty: int): boolean
+      +count(item: String): int
+    }
+    class Market <<Context>> #FFF9C4 {
+      -demand: Map<String, Integer>
+      +unitPrice(item: String): int
+      +sellUnit(item: String): int
+      +recoverDemand(): void
+    }
+    interface PricingStrategy <<Strategy>> #FFF9C4 {
+      +price(item: String, demand: int, s: SeasonState): int
+    }
+    class CropPricing <<ConcreteStrategy>> #FFF9C4
+    class FlatPricing <<ConcreteStrategy>> #FFF9C4
+  }
+
+  package "progress" #FFFFFF {
+    class AchievementTracker {
+      -counters: Map<String, Integer>
+      +evaluate(s: GameState): List<String>
+    }
+  }
+}
+
+package "infrastructure" #FBF5FC {
+  class JsonSaveRepository
+}
+
+' ---------- Observer ----------
+EventBus o-- "0..*" GameListener
+EventBus ..> GameEvent : publica
+HudPanel ..|> GameListener
+MapPanel ..|> GameListener
+ToastLayer ..|> GameListener
+MapPanel ..> GameController : usa
+MarketDialog ..> GameController : usa
+
+' ---------- Aplicación ----------
+GameController --> DayService
+GameController --> MarketService
+GameController --> SaveGameService
+GameController ..> Result : devuelve
+DayService --> GameState
+DayService --> EventBus
+MarketService --> GameState
+MarketService --> EventBus
+
+' ---------- Dominio: agregado ----------
+GameState *-- "1" FarmMap
+GameState *-- "1" Inventory
+GameState *-- "1" Market
+GameState *-- "1" AchievementTracker
+GameState ..> GameClock : usa
+FarmMap *-- "160" Plot
+FarmMap *-- "0..*" Building
+Plot *-- "0..1" Crop
+Building *-- "0..4" Animal
+
+' ---------- Singleton / State (estación) / Strategy (clima) ----------
+GameClock o-- "1" SeasonState
+SeasonState <|.. SpringState
+SeasonState <|.. SummerState
+SeasonState <|.. AutumnState
+SeasonState <|.. WinterState
+SeasonState ..> WeatherStrategy : elige
+WeatherStrategy <|.. SeasonalWeatherStrategy
+WeatherStrategy <|.. FixedWeatherStrategy
+
+' ---------- State (cultivo) + Factory Method ----------
+Crop o-- "1" CropState
+CropState <|.. SeedState
+CropState <|.. SproutState
+CropState <|.. GrowingState
+CropState <|.. MatureState
+CropState <|.. WitheredState
+CropFactory <|-- CarrotFactory
+CropFactory <|-- PumpkinFactory
+CropFactory ..> Crop : «create»
+
+' ---------- State (animal) ----------
+Animal o-- "1" AnimalState
+AnimalState <|.. HealthyState
+AnimalState <|.. HungryState
+AnimalState <|.. SickState
+
+' ---------- Builder ----------
+BuildingBuilder <|.. CoopBuilder
+BuildingBuilder <|.. GreenhouseBuilder
+BuildingBuilder ..> Building : «create»
+BuildingDirector o-- "1" BuildingBuilder
+
+' ---------- Strategy (precios) ----------
+Market o-- "1" PricingStrategy
+PricingStrategy <|.. CropPricing
+PricingStrategy <|.. FlatPricing
+
+' ---------- Memento ----------
+GameState ..> GameMemento : «create»
+SaveGameService --> GameState
+SaveGameService ..> GameMemento : conserva
+SaveGameService --> SaveRepository
+JsonSaveRepository ..|> SaveRepository
+SaveRepository ..> GameMemento
+
+legend right
+  <b>Patrones (color)</b>
+  <back:#FFCCBC>  Singleton  </back>
+  <back:#C8E6C9>  State  </back>
+  <back:#FFF9C4>  Strategy  </back>
+  <back:#E1BEE7>  Factory Method  </back>
+  <back:#B2DFDB>  Builder  </back>
+  <back:#F8BBD0>  Memento  </back>
+  <back:#BBDEFB>  Observer  </back>
+endlegend
+@enduml
