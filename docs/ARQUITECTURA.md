@@ -2,7 +2,7 @@
 
 > **Versión 0.1 · 2026-11-22 · Fase 4**
 > Formaliza el diseño propuesto en los diagramas ([`DIAGRAMAS.md`](DIAGRAMAS.md)): capas, árbol de paquetes, decisiones técnicas y plan de implementación por fases con sus historias ([`HISTORIAS_DE_USUARIO.md`](HISTORIAS_DE_USUARIO.md) §7). El plan de pruebas está en [`PLAN_DE_PRUEBAS.md`](PLAN_DE_PRUEBAS.md).
-> **Estado:** la Fase 5.0 (preparación técnica) está hecha; ver §10. La Fase 5.1 empieza solo con tu visto bueno.
+> **Estado:** las Fases 5.0 (§10) y 5.1 (§11) están hechas. La Fase 5.2 empieza solo con tu visto bueno.
 
 ## 1. Estilo arquitectónico
 
@@ -147,11 +147,11 @@ Como en la secuencia [A1](diagramas/A1_secuencia_vender_cosecha.png):
 | Fase | Historias (puntos) | Trabajo técnico principal | UI funcional mínima | Patrones | Pruebas críticas |
 |---|---|---|---|---|---|
 | **5.0** Preparación técnica | — | `pom.xml`, esqueleto de paquetes, `Main` (ventana vacía), pruebas de arquitectura (AR-1 a AR-5), JaCoCo, `mvnw`, README inicial | ventana vacía | — | arquitectura |
-| **5.1** Núcleo del turno | HU-13, 09, 08, 11, 28, 10, 33, 34 (**25**) | `GameRules`, `Inventory`, calendario (`GameClock`, `SeasonState`), `StateRandom`, clima (`WeatherStrategy`), `GameState`, `DayPipeline` con pasos de calendario, pronóstico y energía, `GameSession`, `DayService`, `Result/Messages`, `EventBus` | pantalla de inicio, HUD con etiquetas y botón «Terminar día» | Singleton, State (estación), Strategy (clima), Observer | determinismo de 112 días |
+| **5.1** Núcleo del turno | HU-13, 09, 08, 11, 28, 10, 33, 34 (**25**) | `GameRules`, `Inventory`, calendario (`GameClock`, `SeasonState`), `StateRandom`, clima (`WeatherStrategy`), `GameState`, `DayPipeline` con pasos de calendario, pronóstico y energía, `GameSession`, `DayService`, `Result/Messages`, `EventBus` | pantalla de inicio, HUD con etiquetas y botón «Terminar día» | Singleton, State (estación), Strategy (clima), Observer, Memento (versión mínima en memoria, para HU-10 · CA-4) | determinismo de 112 días |
 | **5.2** Cultivo | HU-01 a 07, 35, 36 (**29**) | `FarmMap`, `Plot`, `Crop`, `CropState` ×5, `CropFactory` ×5, `FarmService`, pasos de crecimiento y marchitamiento, DTO de parcela, mapa Java2D en vectores, barra de herramientas, tooltips | mapa con parcelas, herramientas 1–5 y clic | State (cultivo), Factory Method | **1** (fuera de estación), **2** (inventario lleno) |
 | **5.3** Clima y economía | HU-12, 37, 14, 15, 16, 38 (**23**) | efectos del clima en el *pipeline*, `Market`, `PricingStrategy` ×2, `MarketService`, paso de mercado, `InventoryGrid`, `MarketDialog` | inventario en grilla y mercado modal | Strategy (precios) | **3** (helada), **4** (saturación) |
 | **5.4** Construcción y animales | HU-18 a 23, 17 (**21**) | `Building`, `BuildingBuilder` ×4, `BuildingDirector`, `Animal`, `AnimalState` ×3, `BuildingService`, `AnimalService`, paso de animales, `DaySummary` | diálogo de construcción y panel del edificio (alimentar, recolectar, curar) | Builder, State (animal) | **5** (animal enfermo no produce) |
-| **5.5** Progresión y persistencia | HU-26, 27, 24, 29, 30, 31, 32 (**24**) | `AchievementTracker`, `ProgressFacts`, desbloqueos, `GameMemento`, `GameStateValidator`, `SaveRepository`, `JsonSaveRepository`, `SaveFileCodec`, `Checksum`, `SaveGameService`; **pruebas de rendimiento a plena carga** (HU-10 · CA-3, HU-29 · CA-4, HU-30 · CA-4) | diálogos de ranuras, logros y atajos `F5`/`F9` | Memento | **6** (guardar → cargar idéntico), **7** (archivo corrupto o inexistente) |
+| **5.5** Progresión y persistencia | HU-26, 27, 24, 29, 30, 31, 32 (**24**) | `AchievementTracker`, `ProgressFacts`, desbloqueos, `GameMemento`, `GameStateValidator`, `SaveRepository`, `JsonSaveRepository`, `SaveFileCodec`, `Checksum`, `SaveGameService`; **pruebas de rendimiento a plena carga** (HU-10 · CA-3, HU-29 · CA-4, HU-30 · CA-4) | diálogos de ranuras, logros y atajos `F5`/`F9` | Memento (completo: archivo) | **6** (guardar → cargar idéntico), **7** (archivo corrupto o inexistente) |
 | **5.6** Interfaz visual y extras *(recortable)* | HU-39, 42, 25, 40, 41 (**19**) | `ToastLayer`, `AssetManager` y respaldo vectorial, invernadero, efectos (`ParticleSystem`, `DayNightTint`), animaciones con `Timer`; `docs/ASSETS.md`, README final y matriz de trazabilidad completa; decisión sobre FlatLaf | pulido visual | Observer (completado) | — |
 
 **Qué se actualiza al cerrar cada fase:** el diagrama de clases si aparecen clases nuevas con responsabilidad estructural, el de desarrollo si cambia un paquete o una dependencia (lo comprueba `tools/check_diagrams.py`) y la matriz de trazabilidad (RF → HU → diagrama → clases → pruebas).
@@ -193,4 +193,40 @@ Como en la secuencia [A1](diagramas/A1_secuencia_vender_cosecha.png):
 | `README.md` | cómo compilar, ejecutar y probar; estructura; tabla de patrones |
 
 Ajustes surgidos al implementar: (1) `Main` se declara como capa «Composition» en AR-1, porque ArchUnit trata como violación que una clase fuera de las capas acceda a la UI; (2) `GameInfo` y `MainWindow` se agregan al árbol y al diagrama de desarrollo; (3) se añade la regla AR-10 (`Stories:` en el Javadoc).
+
+## 11. Estado de la Fase 5.1 (núcleo del turno)
+
+**Historias cerradas (8 historias, 25 puntos):** HU-13, 09, 08, 11, 28, 10, 33 y 34. `python tools/traceability.py --upto 5.1` termina sin errores: cada historia tiene sus clases (`Stories:`) y al menos tantas pruebas `HUxx_` como criterios.
+
+| Resultado | Valor |
+|---|---|
+| Pruebas | 78 en verde (61 con prefijo `HUxx_`), 1 deshabilitada con motivo (HU-10 · CA-3, rendimiento a plena carga, fase 5.5) |
+| Cobertura de líneas (JaCoCo) | **dominio 97,4 %**, **aplicación 93,2 %**, infraestructura 100 %, UI 92,8 % (barrera: 70 % en dominio y aplicación) |
+| Patrones aplicados | Singleton (`GameClock`), State (`SeasonState` y 4 estados), Strategy (`WeatherStrategy`: estacional y fija), Observer (`EventBus`, `GameListener`, `HudModel`, `HudPanel`), Memento mínimo (`GameState`, `GameMemento`), todos registrados en `patterns.txt` (AR-9) |
+| Prueba de integración Swing | clic en «Nueva partida» y «Terminar día» sobre las pantallas reales: el HUD muestra «500 m», «Día 1» y luego «Día 2» |
+| Arranque real | la ventana «Valle Verde» aparece en 0,53 s |
+
+**Decisiones tomadas al implementar (ajustes al plan):**
+
+| # | Decisión | Motivo |
+|---|---|---|
+| D-01 | El **Memento** se adelanta a la 5.1 en su forma mínima (en memoria) | HU-10 · CA-4 exige que una falla interna deje el estado idéntico; `DayService` toma una instantánea y la restaura. La 5.5 lo completa con archivo, validación y las partes que traigan las fases |
+| D-02 | `ProgressService.newGame` crea las partidas | RF-28 pertenece al componente *Progreso* de la vista funcional |
+| D-03 | **Presentadores sin Swing** (`StartScreenPresenter`, `GameScreenPresenter`, `HudModel`) | La lógica de las pantallas se prueba sin pantalla (RT-04); Swing solo pinta |
+| D-04 | `DayPipeline` ordena los pasos por `DayPhase`, sin importar el orden de registro | El orden de RN-03 no puede romperse al agregar un paso |
+| D-05 | `SaveRepository` nace con un solo método (`slotExists`) y `JsonSaveRepository` con su implementación real mínima | HU-33 · CA-3 («Cargar» sin partidas) la necesita; la 5.5 agrega guardar, cargar y listar |
+| D-06 | Código `SIN_PARTIDA` agregado a RN-35 | Terminar el día sin partida en curso necesitaba un mensaje propio |
+
+**Criterios cubiertos en parte (se completan donde nace lo que falta):**
+
+| Criterio | Qué falta | Fase |
+|---|---|---|
+| HU-28 · CA-1 | demanda 100 de todos los productos y logros bloqueados con contadores en 0 | 5.3 y 5.5 |
+| HU-10 · CA-2 | marcas de riego de las parcelas limpiadas al terminar el día | 5.2 (HU-03) |
+| HU-10 · CA-3 | rendimiento a plena carga (prueba `@Disabled`) | 5.5 |
+| HU-08 · CA-2 | el rechazo `SIN_ENERGIA` al sembrar (hoy se prueba en `Energy` y en `Messages`) | 5.2 (HU-01) |
+| HU-34 · CA-2 | el evento `EnergyChanged` lo publicará una acción real (hoy se simula en la prueba) | 5.2 |
+| HU-33 · CA-3 | cargar cuando sí hay una partida guardada | 5.5 (HU-30) |
+
+**Diagramas:** el diagrama lógico y el de desarrollo incluyen ahora las clases reales de la fase. Además de `tools/check_diagrams.py`, se comprobó una vez contra los `import` reales del dominio: no falta ninguna dependencia en el dibujo (las flechas dibujadas que aún no existen en el código corresponden a fases siguientes).
 

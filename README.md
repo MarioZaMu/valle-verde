@@ -11,9 +11,10 @@ Simulador de granja 2D **por turnos** (un turno = un día), hecho en Java con Sw
 |---|---|---|
 | 0 a 4 | Lectura de insumos, requerimientos, historias de usuario, diagramas y arquitectura | hechas (ver [`docs/`](docs/)) |
 | **5.0** | Preparación técnica: `pom.xml`, esqueleto de paquetes, pruebas de arquitectura, cobertura | **hecha** |
-| 5.1 a 5.6 | Implementación incremental, historia por historia | pendientes |
+| **5.1** | Núcleo del turno: inventario, calendario, energía, clima, nueva partida, terminar día, pantalla de inicio y HUD (8 historias) | **hecha** |
+| 5.2 a 5.6 | Cultivos, economía, animales y edificios, guardado y pulido visual | pendientes |
 
-Hoy el juego solo abre una **ventana vacía**: las historias se implementan desde la fase 5.1.
+Hoy el juego abre la **pantalla de inicio** (Nueva partida, Cargar, Salir) y una pantalla de juego con la barra superior (dinero, fecha, clima, pronóstico y energía) y el botón «Terminar día». El mapa de la granja y las herramientas llegan con la fase 5.2.
 
 ## Requisitos
 
@@ -60,17 +61,20 @@ edu.ucc.farmsim
 
 ## Patrones de diseño
 
-| Patrón | Clases | Historias | Fase |
+| Patrón | Clases | Historias | Estado |
 |---|---|---|---|
-| Singleton | `GameClock` | HU-09 | 5.1 |
-| State | `SeasonState`, `CropState`, `AnimalState` (y sus estados concretos) | HU-09, HU-03, HU-05, HU-21 | 5.1, 5.2, 5.4 |
-| Strategy | `WeatherStrategy`, `PricingStrategy` | HU-11, HU-15 | 5.1, 5.3 |
+| Singleton | `GameClock` | HU-09 | hecho (5.1) |
+| State | `SeasonState` con `SpringState`, `SummerState`, `AutumnState`, `WinterState` | HU-09 | hecho (5.1) |
+| State | `CropState`, `AnimalState` y sus estados concretos | HU-03, HU-05, HU-21 | 5.2 y 5.4 |
+| Strategy | `WeatherStrategy` con `SeasonalWeatherStrategy` y `FixedWeatherStrategy` | HU-11 | hecho (5.1) |
+| Strategy | `PricingStrategy` | HU-15 | 5.3 |
+| Observer | `EventBus`, `GameListener`, `HudModel`, `HudPanel` | HU-10, HU-34 | hecho (5.1) |
+| Observer | `MapPanel`, `ToastLayer` | HU-35, HU-39 | 5.2 y 5.6 |
+| Memento | `GameState` (originador), `GameMemento` | HU-10 | en memoria (5.1); guardado en archivo en 5.5 |
 | Factory Method | `CropFactory` y sus creadores | HU-01 | 5.2 |
 | Builder | `BuildingBuilder`, `BuildingDirector` | HU-18 | 5.4 |
-| Memento | `GameState`, `GameMemento`, `SaveGameService` | HU-29, HU-30, HU-31 | 5.5 |
-| Observer | `EventBus`, `GameListener`, paneles de la UI | HU-34, HU-35, HU-39 | 5.1, 5.6 |
 
-> Las clases se irán creando fase por fase; cada una llevará el Javadoc `Pattern: <nombre> — Role: <rol>` y se registrará en `src/test/resources/patterns.txt`. Esta tabla se completa con los nombres reales al cerrar cada fase.
+> Cada clase de patrón lleva el Javadoc `Pattern: <nombre> — Role: <rol>` y está registrada en `src/test/resources/patterns.txt` (una prueba lo verifica). La tabla se actualiza al cerrar cada fase.
 
 ## Documentación
 
