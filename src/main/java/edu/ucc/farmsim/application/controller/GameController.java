@@ -1,6 +1,7 @@
 package edu.ucc.farmsim.application.controller;
 
 import edu.ucc.farmsim.application.dto.HudView;
+import edu.ucc.farmsim.application.dto.MapView;
 import edu.ucc.farmsim.application.dto.PlotView;
 import edu.ucc.farmsim.application.result.ErrorCode;
 import edu.ucc.farmsim.application.result.Result;
@@ -21,7 +22,7 @@ import java.util.logging.Logger;
  * No exception ever reaches the UI: anything unexpected becomes {@code ERROR_INTERNO} (R-03, RNF-07), and
  * it never touches repositories (AR-4).
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-28, HU-33.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-28, HU-33, HU-35.
  */
 public final class GameController {
 
@@ -117,6 +118,11 @@ public final class GameController {
      */
     public Result<PlotView> inspect(int col, int row) {
         return guard(() -> farm.inspect(col, row));
+    }
+
+    /** The whole farm map, for drawing it. A pure query. */
+    public Result<MapView> map() {
+        return guard(farm::map);
     }
 
     /** True if at least one of the save slots holds a game. */

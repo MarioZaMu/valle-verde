@@ -1,5 +1,6 @@
 package edu.ucc.farmsim.application.service;
 
+import edu.ucc.farmsim.application.dto.MapView;
 import edu.ucc.farmsim.application.dto.PlotView;
 import edu.ucc.farmsim.application.event.EventBus;
 import edu.ucc.farmsim.application.event.GameEvent;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
  * The crop use cases: sow, water, harvest and clear (RN-06 to RN-10). Each operation checks every rule
  * first and only then changes the game, so a rejection never leaves anything half done.
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-35.
  */
 public final class FarmService {
 
@@ -174,6 +175,14 @@ public final class FarmService {
             return Result.failWith(ErrorCode.SIN_PARTIDA);
         }
         return Result.ok(mapper.plot(session.current(), col, row));
+    }
+
+    /** The whole farm map, for drawing it. A pure query. */
+    public Result<MapView> map() {
+        if (!session.hasGame()) {
+            return Result.failWith(ErrorCode.SIN_PARTIDA);
+        }
+        return Result.ok(mapper.map(session.current()));
     }
 
     private Result<PlotView> clear(GameState state, int col, int row) {

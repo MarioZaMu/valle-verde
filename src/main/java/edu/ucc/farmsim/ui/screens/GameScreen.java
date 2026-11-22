@@ -3,18 +3,17 @@ package edu.ucc.farmsim.ui.screens;
 import edu.ucc.farmsim.application.controller.GameController;
 import edu.ucc.farmsim.application.event.EventBus;
 import edu.ucc.farmsim.ui.components.HudPanel;
+import edu.ucc.farmsim.ui.render.MapPanel;
 import edu.ucc.farmsim.ui.theme.Texts;
 import java.awt.BorderLayout;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 
 /**
- * The main game screen: the top bar (HUD), a placeholder where the farm map will be drawn, and the buttons
+ * The main game screen: the top bar (HUD), the farm map, and the buttons
  * "End day" and "Menu". The map and the tools are added by the following stories.
  *
- * <p>Stories: HU-33, HU-34.
+ * <p>Stories: HU-33, HU-34, HU-35.
  */
 public final class GameScreen extends JPanel {
 
@@ -32,7 +31,7 @@ public final class GameScreen extends JPanel {
         GameScreenPresenter presenter = new GameScreenPresenter(controller, navigator::showMessage);
 
         add(new HudPanel(bus), BorderLayout.NORTH);
-        add(new JLabel(Texts.MAP_PLACEHOLDER, SwingConstants.CENTER), BorderLayout.CENTER);
+        add(new MapPanel(controller, bus, (col, row) -> { }), BorderLayout.CENTER);
 
         JPanel bottom = new JPanel();
         JButton endDay = new JButton(Texts.END_DAY);
