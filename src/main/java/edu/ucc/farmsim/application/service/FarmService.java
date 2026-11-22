@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  * The crop use cases: sow, water, harvest and clear (RN-06 to RN-10). Each operation checks every rule
  * first and only then changes the game, so a rejection never leaves anything half done.
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-06.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07.
  */
 public final class FarmService {
 
@@ -161,6 +161,19 @@ public final class FarmService {
         state.farm().plotAt(col, row).removeCrop();
         publishChange(state);
         return Result.ok(mapper.plot(state, col, row));
+    }
+
+    /**
+     * Describes a plot without changing anything (HU-07): terrain, crop, stage, watered and days left.
+     *
+     * @param col column of the plot
+     * @param row row of the plot
+     */
+    public Result<PlotView> inspect(int col, int row) {
+        if (!session.hasGame()) {
+            return Result.failWith(ErrorCode.SIN_PARTIDA);
+        }
+        return Result.ok(mapper.plot(session.current(), col, row));
     }
 
     private Result<PlotView> clear(GameState state, int col, int row) {

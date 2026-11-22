@@ -6,7 +6,7 @@ import java.util.Map;
  * Spanish display names for the ids the application hands to the UI (seasons, weather, crops, growth stages),
  * so messages and screens always use the same words. Unknown ids are returned unchanged.
  *
- * <p>Stories: HU-01.
+ * <p>Stories: HU-01, HU-07.
  */
 public final class Names {
 
@@ -19,6 +19,9 @@ public final class Names {
             "CARROT", "Zanahoria", "POTATO", "Papa", "TOMATO", "Tomate", "CORN", "Maíz", "PUMPKIN", "Calabaza");
     private static final Map<String, String> STAGES = Map.of(
             "SEED", "Semilla", "SPROUT", "Brote", "GROWING", "Crecimiento", "MATURE", "Maduro", "WITHERED", "Marchito");
+
+    private static final Map<String, String> TERRAINS = Map.of(
+            "SOIL", "Tierra de cultivo", "GRASS", "Hierba", "WATER", "Agua", "OBSTACLE", "Obstáculo");
 
     private Names() {
         // static helpers only
@@ -43,4 +46,10 @@ public final class Names {
     public static String stage(String id) {
         return STAGES.getOrDefault(id, id);
     }
+
+    /** Terrain name, for example {@code SOIL} to {@code Tierra de cultivo}. */
+    public static String terrain(String id) {
+        return TERRAINS.getOrDefault(id, id);
+    }
 }
+
