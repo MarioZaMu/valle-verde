@@ -14,9 +14,10 @@ Simulador de granja 2D **por turnos** (un turno = un día), hecho en Java con Sw
 | **5.1** | Núcleo del turno: inventario, calendario, energía, clima, nueva partida, terminar día, pantalla de inicio y HUD (8 historias) | **hecha** |
 | **5.2** | Cultivo: sembrar, regar, crecer, cosechar, marchitar y limpiar, con el mapa Java2D, herramientas y atajos (9 historias) | **hecha** |
 | **5.2b** | Migración a Spring Boot: servidor con API REST, cliente Swing por HTTP y partidas en MongoDB | **hecha** |
-| 5.3 a 5.6 | Economía, animales y edificios, guardado y pulido visual | pendientes |
+| **5.3** | Clima y economía: efectos del clima, mercado con precios dinámicos, tendencia, inventario en grilla y mercado modal (6 historias) | **hecha** |
+| 5.4 a 5.6 | Construcción y animales, progresión y guardado, pulido visual | pendientes |
 
-Hoy el juego abre la **pantalla de inicio** (Nueva partida, Cargar, Salir) y una pantalla de juego con la barra superior (dinero, fecha, clima, pronóstico y energía) y el botón «Terminar día». Desde la fase 5.2 también tiene el **mapa de la granja**: eliges una herramienta (teclas `1` a `5` o la barra), eliges la semilla y haces clic en una parcela de tierra para sembrar, regar y cosechar; `Enter` termina el día. El mercado, los animales y el guardado llegan en las fases siguientes.
+Hoy el juego abre la **pantalla de inicio** (Nueva partida, Cargar, Salir) y una pantalla de juego con la barra superior (dinero, fecha, clima, pronóstico y energía) y el botón «Terminar día». Desde la fase 5.2 también tiene el **mapa de la granja**: eliges una herramienta (teclas `1` a `5` o la barra), eliges la semilla y haces clic en una parcela de tierra para sembrar, regar y cosechar; `Enter` termina el día. Desde la 5.3 el clima importa (la lluvia riega, la helada marchita), `I` abre el **inventario** en grilla (clic en una semilla para elegirla) y `M` el **mercado** con las pestañas Comprar y Vender, precios que cambian con la temporada y la saturación, y la tendencia ▲ ▼ ▬. Los animales y el guardado llegan en las fases siguientes.
 
 ## Requisitos
 
@@ -77,11 +78,12 @@ edu.ucc.farmsim
 | State | `CropState` con `SeedState`, `SproutState`, `GrowingState`, `MatureState`, `WitheredState` (contexto `Crop`) | HU-03, HU-05 | hecho (5.2) |
 | State | `AnimalState` y sus estados concretos | HU-21 | 5.4 |
 | Strategy | `WeatherStrategy` con `SeasonalWeatherStrategy` y `FixedWeatherStrategy` | HU-11 | hecho (5.1) |
-| Strategy | `PricingStrategy` | HU-15 | 5.3 |
+| Strategy | `PricingStrategy` con `CropPricing` y `FlatPricing` | HU-15 | hecho (5.3) |
 | Observer | `EventBus`, `GameListener`, `HudModel`, `HudPanel` | HU-10, HU-34 | hecho (5.1) |
 | Observer | `MapPanel` | HU-35 | hecho (5.2) |
 | Observer | `ToastLayer` | HU-39 | 5.6 |
 | Memento | `GameState` (originador), `GameMemento` | HU-10 | en memoria (5.1); guardado en MongoDB en 5.5 |
+| Observer | `InventoryModel` | HU-37 | hecho (5.3) |
 | Observer | `EventCollector` (el servidor guarda los eventos para la respuesta) | RNF-15 | hecho (5.2b) |
 | Factory Method | `CropFactory` con `CarrotFactory`, `PotatoFactory`, `TomatoFactory`, `CornFactory`, `PumpkinFactory` | HU-01 | hecho (5.2) |
 | Builder | `BuildingBuilder`, `BuildingDirector` | HU-18 | 5.4 |

@@ -1,6 +1,6 @@
 # API REST — Valle Verde
 
-> **Versión 0.1 · 2026-11-22 · Fase 5.2b**
+> **Versión 0.2 · 2026-11-22 · Fase 5.3**
 > Describe las rutas que el servidor Spring Boot ofrece al cliente Swing (RNF-15, AR-12). El servidor escucha solo en `127.0.0.1`; con `java -jar farmsim.jar` el puerto es libre y lo conoce el cliente, y con `--server --port 8080` es el indicado. Hay **una partida por servidor** y no hay sesión de usuario.
 
 ## 1. Convenciones
@@ -28,11 +28,16 @@ Las columnas de tipo usan los *records* de `application.dto` (`HudView`, `PlotVi
 | `POST /api/farm/plots/{col}/{row}/crop` | `plant(col, row, seedId)` | `{ "seedId": "CARROT_SEED" }` | `PlotView` | `201` |
 | `POST /api/farm/plots/{col}/{row}/watering` | `water(col, row)` | — | `PlotView` | `200` |
 | `POST /api/farm/plots/{col}/{row}/harvest` | `harvest(col, row)` | — | `PlotView` | `200` |
+| `GET /api/market` | `market()` | — | `MarketView` (qué se vende y con qué tendencia, y el catálogo de compra) | `200` |
+| `POST /api/market/purchases` | `buy(itemId, quantity)` | `{ "itemId": "CORN_SEED", "quantity": 5 }` | total pagado (m) | `200` |
+| `POST /api/market/sales` | `sell(itemId, quantity)` | `{ "itemId": "CARROT", "quantity": 3 }` | total recibido (m) | `200` |
+| `GET /api/market/quotes?itemId=CARROT&quantity=3` | `quote(itemId, quantity)` | — | total previsto (m), sin vender | `200` |
+| `GET /api/inventory` | `inventory()` | — | `InventoryView` (capacidad y casillas ocupadas) | `200` |
 | `GET /api/saves/any` | `hasSavedGames()` | — | `true` / `false` | `200` |
 
 `hasGameInProgress()` no tiene ruta propia: el cliente lo deduce de `GET /api/game` (`404 SIN_PARTIDA` = no hay partida).
 
-**Rutas planificadas** (se agregan con su historia, siempre con endpoint y prueba, DoD 11): `POST /api/market/sales` (HU-15, vender), `/api/market`, `/api/buildings`, `/api/animals` y `/api/saves/{slot}` (HU-29 a HU-32, con `PUT` para guardar y `POST …/load` para cargar).
+**Rutas planificadas** (se agregan con su historia, siempre con endpoint y prueba, DoD 11): `/api/buildings` y `/api/animals` (Fase 5.4) y `/api/saves/{slot}` (HU-29 a HU-32, con `PUT` para guardar y `POST …/load` para cargar).
 
 ### Ejemplo
 

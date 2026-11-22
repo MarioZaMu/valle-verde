@@ -2,7 +2,7 @@
 
 > **Versión 0.2 · 2026-11-22 · Fase 5.2b (migración a Spring Boot)**
 > Formaliza el diseño propuesto en los diagramas ([`DIAGRAMAS.md`](DIAGRAMAS.md)): capas, árbol de paquetes, decisiones técnicas y plan de implementación por fases con sus historias ([`HISTORIAS_DE_USUARIO.md`](HISTORIAS_DE_USUARIO.md) §7). El plan de pruebas está en [`PLAN_DE_PRUEBAS.md`](PLAN_DE_PRUEBAS.md).
-> **Estado:** las Fases 5.0 (§10), 5.1 (§11), 5.2 (§12) y 5.2b (§13, migración a servidor Spring Boot con API REST, cliente Swing por HTTP y persistencia en MongoDB) están hechas. La Fase 5.3 empieza solo con tu visto bueno.
+> **Estado:** las Fases 5.0 (§10), 5.1 (§11), 5.2 (§12) y 5.2b (§13, migración a servidor Spring Boot con API REST, cliente Swing por HTTP y persistencia en MongoDB) y 5.3 (§14) están hechas. La Fase 5.4 empieza solo con tu visto bueno.
 
 ## 1. Estilo arquitectónico
 
@@ -328,4 +328,44 @@ Ajustes surgidos al implementar: (1) `Main` se declara como capa «Composition»
 **Pendiente de la persistencia (5.5):** guardar, cargar y listar (`PUT`/`POST /api/saves/{slot}`), `SaveCodec` con Jackson, `Checksum` y `GameStateValidator`. El adaptador y el formato de documento (`SaveDocument`) ya existen.
 
 **Diagramas:** las 6 vistas se actualizaron (MongoDB, cliente, API REST, paquetes `client`/`api`/`config`, despliegue con servidor y cliente dentro de la JVM, y la secuencia A1 con el salto HTTP); `check_diagrams.py` y `check_imports.py` terminan sin errores.
+
+## 14. Estado de la Fase 5.3 (clima y economía)
+
+**Historias cerradas (6 historias, 23 puntos):** HU-12, 14, 15, 16, 37 y 38. `python tools/traceability.py --upto 5.3` termina sin errores.
+
+| Resultado | Valor |
+|---|---|
+| Pruebas | 280 en verde y 2 omitidas con aviso (las de MongoDB real); 194 con prefijo `HUxx_` |
+| Cobertura de líneas (JaCoCo) | **dominio 97,7 %**, **aplicación 96,9 %**, UI 90,7 %, API 95,2 %, cliente 89,3 % (barrera: 70 % en dominio y aplicación) |
+| Patrones aplicados | Strategy: `PricingStrategy` con `CropPricing` y `FlatPricing`; Observer: `InventoryModel`; todos registrados en `patterns.txt` |
+| Pruebas críticas cerradas | **3** `HU12_ca2_frostWithersEveryCropInTheOpenEvenAMatureOne` y **4** `HU15_ca2_afterTenCarrotsTheNextOnePaysOnly22` con `HU15_ca3_theDemandNeverFallsBelow50` |
+| Arranque | 4,1 a 4,3 s con la máquina libre (5.2b); al medir de nuevo con el servidor de Java de VS Code indexando el proyecto subió a 5 a 7,5 s: el límite de RNF-02 (≤ 5 s) depende de la carga del equipo (RT-09) y conviene medirlo otra vez en el cierre del proyecto |
+| API nueva | `GET /api/market`, `POST /api/market/purchases`, `POST /api/market/sales`, `GET /api/market/quotes`, `GET /api/inventory` (ver [`API.md`](API.md)) |
+
+**Decisiones tomadas al implementar:**
+
+| # | Decisión | Motivo |
+|---|---|---|
+| D-24 | El paso de efectos del clima (`WeatherEffectsStep`) es el primero del *pipeline* y el de mercado (`MarketStep`) el cuarto | Es exactamente el orden de RN-03 |
+| D-25 | `CropType` conoce el precio de semilla y la venta base (tabla de RN-05); `ItemType` sigue sin conocer a `CropType` hacia atrás | Una sola tabla por cultivo; sin ciclo `crop ↔ economy` (D-07) |
+| D-26 | Precio = `máx(1, ⌊(base × factor × demanda + 5 000) / 10 000⌋)` con enteros | Es el redondeo half-up de RN-17 sin números decimales |
+| D-27 | La tendencia (RN-19) guarda «precio anterior = 0» al inicio, que se muestra como ▬; `MarketSnapshot` lo conserva en el memento | «Al inicio todos muestran ▬» sin inventar un precio previo |
+| D-28 | `GET /api/market/quotes` calcula el «total previsto» en el servidor | El total depende de la demanda que baja unidad a unidad (79 m, no 3 × 27) |
+| D-29 | Sembrar y cosechar publican `InventoryChanged`; el modelo del inventario recarga y limpia la semilla elegida si se agota | HU-37 · CA-3 por eventos (Observer), sin consultar en bucle |
+| D-30 | El inventario y el mercado son diálogos modales (`I`, `M`; `Esc` cierra) y la lógica vive en `InventoryModel` y `MarketPresenter`, sin Swing | RT-04: se prueba sin pantalla; el modal impide clics en el mapa (HU-38 · CA-1) |
+| D-31 | Las compras y ventas responden `200` (no `201`) | Son órdenes sobre el mercado, no recursos que se consulten después |
+| D-32 | Ante una semilla o un producto que no corresponde (vender una semilla, comprar una cosecha) el servidor responde `500 ERROR_INTERNO` | Como D-22: la UI nunca lo envía y RN-35 no tiene código para ello |
+
+**Criterios cubiertos en parte (se completan donde nace lo que falta):**
+
+| Criterio | Qué falta | Fase |
+|---|---|---|
+| HU-28 · CA-1 | solo falta que los logros bloqueados empiecen con contadores en 0 (la demanda 100 ya se prueba) | 5.5 |
+| HU-37 · CA-2 | la grilla ya refleja la capacidad que informe el inventario; construir el Almacén (+12) llega con HU-20 | 5.4 |
+| HU-38 · CA-3 | el ejemplo de la Vaca (800 m): el catálogo de compra solo tiene semillas, heno y medicina; las compras de Gallina y Vaca llegan con los edificios. La prueba usa Medicina | 5.4 |
+| HU-10 · CA-3, HU-33 · CA-3 | rendimiento a plena carga y cargar una partida guardada | 5.5 |
+| HU-35 · CA-3, HU-36 · CA-4 | dibujar edificios y animales; recolectar sus productos con «Cosechar» | 5.4 |
+| HU-36 · CA-5 | los atajos `L`, `F5` y `F9` aún responden que llegarán (`M` e `I` ya abren su función) | 5.5 |
+
+**Diagramas:** `04_vista_desarrollo` incluye las clases nuevas; el resto de vistas ya tenían el diseño de la economía (Strategy de precios, `MarketService`, `MarketDialog`). `check_diagrams.py` y `check_imports.py` terminan sin errores.
 
