@@ -1,5 +1,9 @@
 package edu.ucc.farmsim.domain.farm;
 
+import edu.ucc.farmsim.domain.building.Building;
+import edu.ucc.farmsim.domain.building.BuildingDirector;
+import edu.ucc.farmsim.domain.building.BuildingSnapshot;
+import edu.ucc.farmsim.domain.building.BuildingType;
 import edu.ucc.farmsim.domain.config.GameRules;
 import edu.ucc.farmsim.domain.crop.Crop;
 import edu.ucc.farmsim.domain.crop.CropSnapshot;
@@ -13,11 +17,12 @@ import java.util.List;
  * The farm grid: {@link GameRules#MAP_COLS} x {@link GameRules#MAP_ROWS} plots with coordinates
  * {@code (column, row)}, where {@code (0, 0)} is the top-left corner (RN-04).
  *
- * <p>Stories: HU-01, HU-03, HU-05, HU-28.
+ * <p>Stories: HU-01, HU-03, HU-05, HU-18, HU-28.
  */
 public final class FarmMap {
 
     private final Plot[][] plots;
+    private final List<Building> buildings = new ArrayList<>();
 
     private FarmMap(Plot[][] plots) {
         this.plots = plots;
@@ -78,6 +83,58 @@ public final class FarmMap {
             throw new IllegalArgumentException("outside the map: (" + col + ", " + row + ")");
         }
         return plots[row][col];
+    }
+
+    /** The buildings in the order they were built; the index of a building is its id. */
+    public List<Building> buildings() {
+        return Collections.unmodifiableList(buildings);
+    }
+
+    /** How many buildings of the type have been built. */
+    public int countBuildings(BuildingType type) {
+        return (int) buildings.stream().filter(b -> b.type() == type).count();
+    }
+
+    /** The building that covers a plot, or {@code null}. */
+    public Building buildingAt(int col, int row) {
+        return contains(col, row) ? plots[row][col].building() : null;
+    }
+
+    /**
+     * True if a building of the type fits with its top-left plot at the given place: every plot of the area is
+     * inside the map, is grass and is free (RN-21 point 1).
+     */
+    public boolean canPlace(BuildingType type, int col, int row) {
+        for (int r = row; r < row + type.height(); r++) {
+            for (int c = col; c < col + type.width(); c++) {
+                if (!contains(c, r) || plots[r][c].terrain() != Terrain.GRASS || plots[r][c].building() != null) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Builds a building and marks its plots as occupied.
+     *
+     * @throws IllegalStateException if the area is not free grass inside the map
+     */
+    public Building place(BuildingType type, int col, int row) {
+        if (!canPlace(type, col, row)) {
+            throw new IllegalStateException("Cannot build " + type + " at (" + col + ", " + row + ")");
+        }
+        return attach(BuildingDirector.construct(type, buildings.size(), col, row));
+    }
+
+    private Building attach(Building building) {
+        for (int r = building.row(); r < building.row() + building.height(); r++) {
+            for (int c = building.col(); c < building.col() + building.width(); c++) {
+                plots[r][c].setBuilding(building);
+            }
+        }
+        buildings.add(building);
+        return building;
     }
 
     /** Number of plots with the given terrain. */
@@ -176,17 +233,23 @@ public final class FarmMap {
                 crops.add(plot.crop() == null ? null : plot.crop().snapshot());
             }
         }
-        return new FarmMapSnapshot(Collections.unmodifiableList(crops));
+        return new FarmMapSnapshot(Collections.unmodifiableList(crops),
+                buildings.stream().map(Building::snapshot).toList());
     }
 
-    /** Puts every plot's crop back as it was when the snapshot was taken. */
+    /** Puts every crop and every building back as it was when the snapshot was taken. */
     public void restoreFrom(FarmMapSnapshot snapshot) {
         int index = 0;
         for (Plot[] line : plots) {
             for (Plot plot : line) {
                 CropSnapshot saved = snapshot.crops().get(index++);
                 plot.restoreCrop(saved == null ? null : Crop.fromSnapshot(saved));
+                plot.setBuilding(null);
             }
+        }
+        buildings.clear();
+        for (BuildingSnapshot saved : snapshot.buildings()) {
+            attach(Building.fromSnapshot(saved));
         }
     }
 }

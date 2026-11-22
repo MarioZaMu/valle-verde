@@ -4,6 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import edu.ucc.farmsim.application.dto.BuildingActionView;
+import edu.ucc.farmsim.application.dto.BuildingView;
+import edu.ucc.farmsim.application.dto.BuildingsView;
 import edu.ucc.farmsim.application.dto.HudView;
 import edu.ucc.farmsim.application.dto.InventoryView;
 import edu.ucc.farmsim.application.dto.MapView;
@@ -207,6 +210,33 @@ class RemoteGameClientTest {
                 new GameEvent.MoneyChanged(559), new GameEvent.InventoryChanged()), events);
     }
 
+    @Test
+    void buildingsAnimalsAndTheDaySummaryTravelThroughTheClient() {
+        client.newGame(TestApp.SEED);
+        session.current().inventory().add(ItemType.HAY, 3);
+        session.current().earn(500);
+        events.clear();
+
+        Result<BuildingView> built = client.build("COOP", 2, 7);
+        Result<BuildingView> bought = client.buyAnimal("HEN");
+        Result<BuildingActionView> fed = client.feed(0);
+        Result<BuildingsView> all = client.buildings();
+        Result<MapView> map = client.map();
+        client.endDay();
+        Result<BuildingActionView> collected = client.collect(0);
+
+        assertTrue(built.isOk());
+        assertEquals("Gallinero", built.value().name());
+        assertEquals(1, bought.value().animals().size());
+        assertEquals(1, fed.value().amount());
+        assertEquals(1, all.value().buildings().size());
+        assertEquals(1, map.value().buildings().size());
+        assertEquals(0, map.value().buildingAt(3, 8).id());
+        assertEquals(1, collected.value().amount());
+        assertEquals(1, events.stream().filter(GameEvent.DaySummaryReady.class::isInstance).count());
+        assertEquals(ErrorCode.UBICACION_INVALIDA, client.build("COOP", 3, 2).code());
+    }
+
     /** The same sequence of orders, recording every result and then the events each one caused. */
     private static List<Object> script(edu.ucc.farmsim.application.controller.GameCommands game, List<GameEvent> seen) {
         List<Object> log = new ArrayList<>();
@@ -228,6 +258,16 @@ class RemoteGameClientTest {
         log.add(describe(game.quote("CARROT", 1)));
         log.add(describe(game.market()));
         log.add(describe(game.inventory()));
+        log.add(describe(game.build("COOP", 2, 7)));
+        log.add(describe(game.build("COOP", 3, 2)));
+        log.add(describe(game.build("BARN", 8, 7)));
+        log.add(describe(game.buyAnimal("HEN")));
+        log.add(describe(game.buyAnimal("COW")));
+        log.add(describe(game.feed(0)));
+        log.add(describe(game.collect(0)));
+        log.add(describe(game.cure(0, 0)));
+        log.add(describe(game.buildings()));
+        log.add(describe(game.endDay()));
         log.add(List.copyOf(seen));
         return log;
     }

@@ -1,5 +1,11 @@
 package edu.ucc.farmsim.support;
 
+import edu.ucc.farmsim.domain.animal.Animal;
+import edu.ucc.farmsim.domain.animal.AnimalCondition;
+import edu.ucc.farmsim.domain.animal.AnimalSnapshot;
+import edu.ucc.farmsim.domain.animal.AnimalType;
+import edu.ucc.farmsim.domain.building.Building;
+import edu.ucc.farmsim.domain.building.BuildingType;
 import edu.ucc.farmsim.domain.crop.Crop;
 import edu.ucc.farmsim.domain.crop.CropSnapshot;
 import edu.ucc.farmsim.domain.crop.CropType;
@@ -7,7 +13,9 @@ import edu.ucc.farmsim.domain.economy.Inventory;
 import edu.ucc.farmsim.domain.economy.InventorySnapshot;
 import edu.ucc.farmsim.domain.economy.ItemType;
 import edu.ucc.farmsim.domain.economy.MarketSnapshot;
+import edu.ucc.farmsim.domain.game.GameMemento;
 import edu.ucc.farmsim.domain.game.GameState;
+import edu.ucc.farmsim.domain.progress.Achievement;
 import edu.ucc.farmsim.domain.time.GameClock;
 import edu.ucc.farmsim.domain.time.GameDate;
 import edu.ucc.farmsim.domain.time.Season;
@@ -22,6 +30,10 @@ public final class GameFixtures {
     /** A soil plot inside the starting soil block. */
     public static final int SOIL_COL = 5;
     public static final int SOIL_ROW = 3;
+
+    /** Top-left plot of a free grass area where a 2 x 2 or 3 x 2 building fits. */
+    public static final int GRASS_COL = 2;
+    public static final int GRASS_ROW = 7;
 
     private GameFixtures() {
         // static helpers only
@@ -40,6 +52,36 @@ public final class GameFixtures {
         return plant(state, col, row, type, daysGrown, 0, false, false);
     }
 
+    /** Puts a building on the map without paying for it or checking its unlock. */
+    public static Building build(GameState state, BuildingType type, int col, int row) {
+        return state.farm().place(type, col, row);
+    }
+
+    /** Puts a coop on the free grass at the bottom left. */
+    public static Building coop(GameState state) {
+        return build(state, BuildingType.COOP, GRASS_COL, GRASS_ROW);
+    }
+
+    /** Houses an animal in a building in the given situation, bypassing purchase and feeding. */
+    public static Animal house(Building building, AnimalType type, AnimalCondition condition, int daysWithoutFeed,
+                               boolean fedToday, int pending) {
+        Animal animal = Animal.fromSnapshot(new AnimalSnapshot(type, condition, daysWithoutFeed, fedToday, pending));
+        if (!building.addAnimal(animal)) {
+            throw new IllegalStateException("The building has no room");
+        }
+        return animal;
+    }
+
+    /** Houses a healthy hen that has not eaten. */
+    public static Animal hen(Building coop) {
+        return house(coop, AnimalType.HEN, AnimalCondition.HEALTHY, 0, false, 0);
+    }
+
+    /** Grants an achievement without playing for it. */
+    public static void unlock(GameState state, Achievement achievement) {
+        state.progress().unlock(achievement);
+    }
+
     /** Sets the demand of a product (percent) without selling anything. */
     public static void setDemand(GameState state, ItemType item, int demand) {
         MarketSnapshot now = state.market().snapshot();
@@ -51,11 +93,9 @@ public final class GameFixtures {
 
     /** Sets the player's money. */
     public static void setMoney(GameState state, int money) {
-        if (money > state.money()) {
-            state.earn(money - state.money());
-        } else {
-            state.spend(state.money() - money);
-        }
+        GameMemento now = state.createMemento();
+        state.restore(new GameMemento(now.date(), money, now.energy(), now.inventory(), now.farm(), now.today(),
+                now.forecast(), now.randomState(), now.market(), now.ledger(), now.achievements()));
     }
 
     /** Moves the calendar to a date. */

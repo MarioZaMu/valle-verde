@@ -6,6 +6,7 @@ import edu.ucc.farmsim.application.event.GameEvent;
 import edu.ucc.farmsim.application.result.ErrorCode;
 import edu.ucc.farmsim.application.result.Result;
 import edu.ucc.farmsim.domain.game.DayPipeline;
+import edu.ucc.farmsim.domain.game.DayReport;
 import edu.ucc.farmsim.domain.game.GameMemento;
 import edu.ucc.farmsim.domain.game.GameState;
 import java.util.logging.Level;
@@ -18,7 +19,7 @@ import org.springframework.stereotype.Service;
  * <p>Before running the steps it takes a snapshot; if any step fails the snapshot is restored, so a failed
  * end of the day leaves the game exactly as it was and publishes nothing (HU-10 · CA-4).
  *
- * <p>Stories: HU-10.
+ * <p>Stories: HU-10, HU-17.
  */
 @Service
 public final class DayService {
@@ -52,8 +53,9 @@ public final class DayService {
         }
         GameState state = session.current();
         GameMemento before = state.createMemento();
+        DayReport report;
         try {
-            pipeline.run(state);
+            report = pipeline.run(state);
         } catch (RuntimeException e) {
             state.restore(before);
             LOG.log(Level.SEVERE, "The end of the day failed; the state was restored", e);
@@ -61,6 +63,7 @@ public final class DayService {
         }
         HudView hud = mapper.hud(state);
         events.publish(new GameEvent.DayEnded(hud));
+        events.publish(new GameEvent.DaySummaryReady(mapper.summary(state, report)));
         return Result.ok(hud);
     }
 }

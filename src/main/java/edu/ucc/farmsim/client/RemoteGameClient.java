@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.ucc.farmsim.application.controller.GameCommands;
+import edu.ucc.farmsim.application.dto.BuildingActionView;
+import edu.ucc.farmsim.application.dto.BuildingView;
+import edu.ucc.farmsim.application.dto.BuildingsView;
 import edu.ucc.farmsim.application.dto.HudView;
 import edu.ucc.farmsim.application.dto.InventoryView;
 import edu.ucc.farmsim.application.dto.MapView;
@@ -33,7 +36,7 @@ import java.util.logging.Logger;
  * <p>Orders are sent synchronously from the calling thread with a time limit (DT-20). It never throws: an
  * unreachable server, a timeout or an unreadable answer becomes {@code ERROR_INTERNO}.
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-28, HU-33, HU-35, HU-37, HU-38.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-28, HU-33, HU-35, HU-37, HU-38.
  */
 public final class RemoteGameClient implements GameCommands {
 
@@ -131,6 +134,38 @@ public final class RemoteGameClient implements GameCommands {
     @Override
     public Result<InventoryView> inventory() {
         return send("GET", "/api/inventory", null, InventoryView.class);
+    }
+
+    @Override
+    public Result<BuildingsView> buildings() {
+        return send("GET", "/api/buildings", null, BuildingsView.class);
+    }
+
+    @Override
+    public Result<BuildingView> build(String buildingId, int col, int row) {
+        return send("POST", "/api/buildings", Map.of("buildingId", buildingId, "col", col, "row", row),
+                BuildingView.class);
+    }
+
+    @Override
+    public Result<BuildingView> buyAnimal(String animalId) {
+        return send("POST", "/api/animals", Map.of("animalId", animalId), BuildingView.class);
+    }
+
+    @Override
+    public Result<BuildingActionView> feed(int buildingId) {
+        return send("POST", "/api/buildings/" + buildingId + "/feeding", null, BuildingActionView.class);
+    }
+
+    @Override
+    public Result<BuildingActionView> collect(int buildingId) {
+        return send("POST", "/api/buildings/" + buildingId + "/collection", null, BuildingActionView.class);
+    }
+
+    @Override
+    public Result<BuildingActionView> cure(int buildingId, int animalIndex) {
+        return send("POST", "/api/buildings/" + buildingId + "/animals/" + animalIndex + "/treatment", null,
+                BuildingActionView.class);
     }
 
     private static String plot(int col, int row) {

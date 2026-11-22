@@ -3,6 +3,8 @@ package edu.ucc.farmsim.support;
 import edu.ucc.farmsim.application.controller.GameController;
 import edu.ucc.farmsim.application.event.EventBus;
 import edu.ucc.farmsim.application.event.GameEvent;
+import edu.ucc.farmsim.application.service.AnimalService;
+import edu.ucc.farmsim.application.service.BuildingService;
 import edu.ucc.farmsim.application.service.DayService;
 import edu.ucc.farmsim.application.service.FarmService;
 import edu.ucc.farmsim.application.service.GameSession;
@@ -76,6 +78,9 @@ public final class TestApp {
         SaveGameService saves = new SaveGameService(repository);
         FarmService farm = new FarmService(session, mapper, bus);
         MarketService market = new MarketService(session, bus);
-        return new TestApp(session, bus, new GameController(session, mapper, progress, day, saves, farm, market));
+        BuildingService buildings = new BuildingService(session, mapper, bus);
+        AnimalService animals = new AnimalService(session, mapper, bus);
+        return new TestApp(session, bus,
+                new GameController(session, mapper, progress, day, saves, farm, market, buildings, animals));
     }
 }

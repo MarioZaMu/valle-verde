@@ -189,6 +189,61 @@ public final class GameRules {
     /** Maximum number of units in one stack. */
     public static final int MAX_STACK = 99;
 
+    // ---- RN-20, RN-21, RN-22: buildings ----
+
+    /** Cost in m of a coop. */
+    public static final int COOP_COST = 400;
+
+    /** Largest number of coops. */
+    public static final int COOP_MAX = 2;
+
+    /** Cost in m of a barn. */
+    public static final int BARN_COST = 1000;
+
+    /** Largest number of barns. */
+    public static final int BARN_MAX = 2;
+
+    /** Cost in m of a warehouse. */
+    public static final int WAREHOUSE_COST = 300;
+
+    /** Largest number of warehouses. */
+    public static final int WAREHOUSE_MAX = 1;
+
+    /** Inventory slots a warehouse adds. */
+    public static final int WAREHOUSE_EXTRA_SLOTS = 12;
+
+    /** Cost in m of a greenhouse. */
+    public static final int GREENHOUSE_COST = 1500;
+
+    /** Largest number of greenhouses. */
+    public static final int GREENHOUSE_MAX = 1;
+
+    /** Plots a greenhouse protects (3 x 3). */
+    public static final int GREENHOUSE_PROTECTED_PLOTS = 9;
+
+    // ---- RN-23 to RN-27: animals ----
+
+    /** Animals a coop or a barn can house. */
+    public static final int ANIMALS_PER_BUILDING = 4;
+
+    /** Price in m of a hen. */
+    public static final int PRICE_HEN = 150;
+
+    /** Price in m of a cow. */
+    public static final int PRICE_COW = 800;
+
+    /** Hay each animal eats per day. */
+    public static final int HAY_PER_ANIMAL = 1;
+
+    /** Consecutive days without eating after which an animal falls sick. */
+    public static final int DAYS_WITHOUT_FEED_TO_SICK = 3;
+
+    /** Units of product one animal can have waiting to be collected. */
+    public static final int MAX_PENDING_PER_ANIMAL = 2;
+
+    /** Medicines one cure uses. */
+    public static final int MEDICINE_PER_CURE = 1;
+
     private GameRules() {
         // constants holder
     }

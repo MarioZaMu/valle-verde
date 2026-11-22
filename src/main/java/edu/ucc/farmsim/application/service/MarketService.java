@@ -1,5 +1,6 @@
 package edu.ucc.farmsim.application.service;
 
+import edu.ucc.farmsim.application.dto.AnimalOfferView;
 import edu.ucc.farmsim.application.dto.BuyOfferView;
 import edu.ucc.farmsim.application.dto.InventoryView;
 import edu.ucc.farmsim.application.dto.MarketView;
@@ -10,6 +11,7 @@ import edu.ucc.farmsim.application.event.GameEvent;
 import edu.ucc.farmsim.application.result.ErrorCode;
 import edu.ucc.farmsim.application.result.Names;
 import edu.ucc.farmsim.application.result.Result;
+import edu.ucc.farmsim.domain.animal.AnimalType;
 import edu.ucc.farmsim.domain.config.GameRules;
 import edu.ucc.farmsim.domain.economy.Inventory;
 import edu.ucc.farmsim.domain.economy.ItemType;
@@ -24,7 +26,7 @@ import org.springframework.stereotype.Service;
  * The economy use cases: buying at fixed prices (RN-16), selling at the dynamic price (RN-17, RN-18), the
  * previsional total of a sale, the market and inventory views. Every rejection leaves the game untouched.
  *
- * <p>Stories: HU-14, HU-15, HU-16, HU-37, HU-38.
+ * <p>Stories: HU-14, HU-15, HU-16, HU-19, HU-37, HU-38.
  */
 @Service
 public final class MarketService {
@@ -131,7 +133,13 @@ public final class MarketService {
         for (ItemType item : Market.purchasableItems()) {
             buys.add(new BuyOfferView(item.name(), Names.item(item.name()), Market.buyPrice(item)));
         }
-        return Result.ok(new MarketView(sells, buys));
+        List<AnimalOfferView> animals = new ArrayList<>();
+        for (AnimalType type : AnimalType.values()) {
+            int free = state.farm().buildings().stream().filter(b -> b.species() == type)
+                    .mapToInt(b -> b.animalCapacity() - b.animals().size()).sum();
+            animals.add(new AnimalOfferView(type.name(), Names.animal(type.name()), type.price(), free));
+        }
+        return Result.ok(new MarketView(sells, buys, animals));
     }
 
     /** The inventory as a grid. */

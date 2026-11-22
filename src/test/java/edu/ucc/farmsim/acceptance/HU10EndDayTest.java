@@ -63,7 +63,8 @@ class HU10EndDayTest {
         for (DayPhase phase : DayPhase.values()) {
             expected.add("step:" + phase.name());
         }
-        expected.add("event");
+        expected.add("event"); // DayEnded
+        expected.add("event"); // DaySummaryReady
         assertEquals(expected, log);
         assertEquals(List.of(DayPhase.WEATHER_EFFECTS, DayPhase.GROWTH, DayPhase.ANIMALS, DayPhase.MARKET,
                 DayPhase.CALENDAR, DayPhase.FORECAST, DayPhase.ENERGY, DayPhase.ACHIEVEMENTS),
@@ -188,8 +189,9 @@ class HU10EndDayTest {
 
         Result<HudView> result = app.controller.endDay();
 
-        assertEquals(1, app.events.size());
+        assertEquals(2, app.events.size());
         assertEquals(new GameEvent.DayEnded(result.value()), app.events.get(0));
+        assertTrue(app.events.get(1) instanceof GameEvent.DaySummaryReady);
     }
 
     @Test

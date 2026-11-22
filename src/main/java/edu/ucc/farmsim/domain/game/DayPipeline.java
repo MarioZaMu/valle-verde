@@ -10,17 +10,21 @@ import java.util.List;
  * <p>Steps can be registered in any order: the pipeline always runs them sorted by {@link DayPhase}, so
  * the order of RN-03 cannot be broken by whoever adds a step. Each story adds its own step.
  *
- * <p>Stories: HU-03, HU-10.
+ * <p>It also closes the daily ledger: the money of the day is recorded in the report and the counters start
+ * again at zero for the next day (HU-17).
+ *
+ * <p>Stories: HU-03, HU-10, HU-17.
  */
 public final class DayPipeline {
 
     private final List<DayStep> steps = new ArrayList<>();
 
-    /** The pipeline with every step implemented so far (growth, calendar, forecast and energy). */
+    /** The pipeline with every step implemented so far. */
     public static DayPipeline standard() {
         return new DayPipeline()
                 .add(new WeatherEffectsStep())
                 .add(new GrowthStep())
+                .add(new AnimalsStep())
                 .add(new MarketStep())
                 .add(new CalendarStep())
                 .add(new ForecastStep())
@@ -54,6 +58,8 @@ public final class DayPipeline {
             step.apply(state, report);
             report.markRun(step.phase());
         }
+        report.recordMoney(state.money(), state.ledger().income(), state.ledger().expenses());
+        state.ledger().reset();
         return report;
     }
 }

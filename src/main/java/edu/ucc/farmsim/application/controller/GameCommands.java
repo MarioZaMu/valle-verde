@@ -1,5 +1,8 @@
 package edu.ucc.farmsim.application.controller;
 
+import edu.ucc.farmsim.application.dto.BuildingActionView;
+import edu.ucc.farmsim.application.dto.BuildingView;
+import edu.ucc.farmsim.application.dto.BuildingsView;
 import edu.ucc.farmsim.application.dto.HudView;
 import edu.ucc.farmsim.application.dto.InventoryView;
 import edu.ucc.farmsim.application.dto.MapView;
@@ -14,7 +17,7 @@ import edu.ucc.farmsim.application.result.Result;
  *
  * <p>Every operation answers with a {@link Result}; none of them throws (R-03, RNF-07).
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-28, HU-33, HU-35, HU-37, HU-38.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-28, HU-33, HU-35, HU-37, HU-38.
  */
 public interface GameCommands {
 
@@ -99,4 +102,46 @@ public interface GameCommands {
 
     /** The inventory as a grid. A pure query. */
     Result<InventoryView> inventory();
+
+    /** The buildings of the farm and the catalogue of what can be built. A pure query. */
+    Result<BuildingsView> buildings();
+
+    /**
+     * Builds a building with its top-left plot at the given place (RN-20, RN-21).
+     *
+     * @param buildingId building id, for example {@code COOP}
+     * @param col        column of the top-left plot
+     * @param row        row of the top-left plot
+     */
+    Result<BuildingView> build(String buildingId, int col, int row);
+
+    /**
+     * Buys an animal and houses it in the first compatible building with room (RN-23).
+     *
+     * @param animalId animal id, for example {@code HEN}
+     * @return the building where it lives now
+     */
+    Result<BuildingView> buyAnimal(String animalId);
+
+    /**
+     * Feeds the animals of a building that can eat and have not eaten today (RN-24).
+     *
+     * @param buildingId id of the building
+     */
+    Result<BuildingActionView> feed(int buildingId);
+
+    /**
+     * Collects the products waiting in a building (RN-26).
+     *
+     * @param buildingId id of the building
+     */
+    Result<BuildingActionView> collect(int buildingId);
+
+    /**
+     * Cures a sick animal with medicine (RN-27).
+     *
+     * @param buildingId  id of the building
+     * @param animalIndex position of the animal inside the building
+     */
+    Result<BuildingActionView> cure(int buildingId, int animalIndex);
 }

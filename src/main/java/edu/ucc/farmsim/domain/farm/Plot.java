@@ -1,10 +1,11 @@
 package edu.ucc.farmsim.domain.farm;
 
+import edu.ucc.farmsim.domain.building.Building;
 import edu.ucc.farmsim.domain.crop.Crop;
 
 /**
- * One square of the farm map: its terrain and, on soil, the crop growing in it. Buildings are added by the
- * construction stories.
+ * One square of the farm map: its terrain, the crop growing in it (on soil) or the building that covers it
+ * (on grass).
  *
  * <p>Stories: HU-01, HU-28.
  */
@@ -12,6 +13,7 @@ public final class Plot {
 
     private final Terrain terrain;
     private Crop crop;
+    private Building building;
 
     /**
      * Creates a plot.
@@ -55,6 +57,15 @@ public final class Plot {
     /** Removes the crop (harvest or clearing). */
     public void removeCrop() {
         this.crop = null;
+    }
+
+    /** The building that covers this plot, or {@code null}. */
+    public Building building() {
+        return building;
+    }
+
+    void setBuilding(Building covering) {
+        this.building = covering;
     }
 
     void restoreCrop(Crop restored) {

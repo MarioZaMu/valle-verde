@@ -5,6 +5,7 @@ import edu.ucc.farmsim.domain.economy.Inventory;
 import edu.ucc.farmsim.domain.economy.ItemType;
 import edu.ucc.farmsim.domain.economy.Market;
 import edu.ucc.farmsim.domain.farm.FarmMap;
+import edu.ucc.farmsim.domain.progress.Progress;
 import edu.ucc.farmsim.domain.time.GameClock;
 import edu.ucc.farmsim.domain.time.GameDate;
 import edu.ucc.farmsim.domain.time.StateRandom;
@@ -18,7 +19,7 @@ import edu.ucc.farmsim.domain.time.WeatherCycle;
  * {@link #createMemento()} and {@link #restore(GameMemento)} undo a failed end of the day (HU-10) and
  * will back saving and loading (HU-29, HU-30).
  *
- * <p>Stories: HU-01, HU-10, HU-14, HU-15, HU-28.
+ * <p>Stories: HU-01, HU-10, HU-14, HU-15, HU-17, HU-18, HU-28.
  */
 public final class GameState {
 
@@ -29,6 +30,8 @@ public final class GameState {
     private final WeatherCycle weather;
     private final StateRandom random;
     private final Market market;
+    private final DayLedger ledger = new DayLedger();
+    private final Progress progress = new Progress();
 
     private GameState(int money, Energy energy, Inventory inventory, FarmMap farm,
                       WeatherCycle weather, StateRandom random, Market market) {
@@ -69,6 +72,7 @@ public final class GameState {
             throw new IllegalArgumentException("amount must not be negative: " + amount);
         }
         money += amount;
+        ledger.addIncome(amount);
     }
 
     /**
@@ -84,7 +88,18 @@ public final class GameState {
             return false;
         }
         money -= amount;
+        ledger.addExpense(amount);
         return true;
+    }
+
+    /** What was earned and spent today. */
+    public DayLedger ledger() {
+        return ledger;
+    }
+
+    /** The achievements unlocked. */
+    public Progress progress() {
+        return progress;
     }
 
     /** The market: demand, prices and trends. */
@@ -120,7 +135,8 @@ public final class GameState {
     /** Takes an immutable snapshot of everything that changes during play. */
     public GameMemento createMemento() {
         return new GameMemento(date(), money, energy.current(), inventory.snapshot(),
-                farm.snapshot(), weather.today(), weather.forecast(), random.state(), market.snapshot());
+                farm.snapshot(), weather.today(), weather.forecast(), random.state(), market.snapshot(),
+                ledger.snapshot(), progress.snapshot());
     }
 
     /** Puts the state back exactly as it was when the snapshot was taken. */
@@ -133,6 +149,8 @@ public final class GameState {
         weather.restore(memento.today(), memento.forecast());
         random.restore(memento.randomState());
         market.restoreFrom(memento.market());
+        ledger.restoreFrom(memento.ledger());
+        progress.restoreFrom(memento.achievements());
     }
 
     /** Current calendar date. */

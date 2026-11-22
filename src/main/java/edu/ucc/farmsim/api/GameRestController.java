@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * <p>There is one game per server (S-01), so every order runs under the same lock (DT-20). The events an
  * order causes travel in the response (DT-19). The routes are documented in {@code docs/API.md}.
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-28, HU-33, HU-35, HU-37, HU-38.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-28, HU-33, HU-35, HU-37, HU-38.
  */
 @RestController
 @RequestMapping("/api")
@@ -54,6 +54,12 @@ public class GameRestController {
 
     /** Body of {@code POST /api/market/purchases} and {@code POST /api/market/sales}. */
     public record TradeRequest(@NotBlank String itemId, @NotNull Integer quantity) { }
+
+    /** Body of {@code POST /api/buildings}. */
+    public record BuildRequest(@NotBlank String buildingId, @NotNull Integer col, @NotNull Integer row) { }
+
+    /** Body of {@code POST /api/animals}. */
+    public record AnimalPurchaseRequest(@NotBlank String animalId) { }
 
     /** Starts a new game (RN-30). */
     @PostMapping("/game")
@@ -138,6 +144,42 @@ public class GameRestController {
     @GetMapping("/inventory")
     public ResponseEntity<?> inventory() {
         return run(game::inventory, HttpStatus.OK);
+    }
+
+    /** The buildings built and the catalogue of what can be built. */
+    @GetMapping("/buildings")
+    public ResponseEntity<?> buildings() {
+        return run(game::buildings, HttpStatus.OK);
+    }
+
+    /** Builds a building on free grass (RN-20, RN-21). */
+    @PostMapping("/buildings")
+    public ResponseEntity<?> build(@Valid @RequestBody BuildRequest request) {
+        return run(() -> game.build(request.buildingId(), request.col(), request.row()), HttpStatus.CREATED);
+    }
+
+    /** Buys an animal and houses it in the first compatible building with room (RN-23). */
+    @PostMapping("/animals")
+    public ResponseEntity<?> buyAnimal(@Valid @RequestBody AnimalPurchaseRequest request) {
+        return run(() -> game.buyAnimal(request.animalId()), HttpStatus.CREATED);
+    }
+
+    /** Feeds the animals of a building (RN-24). */
+    @PostMapping("/buildings/{id}/feeding")
+    public ResponseEntity<?> feed(@PathVariable int id) {
+        return run(() -> game.feed(id), HttpStatus.OK);
+    }
+
+    /** Collects the products waiting in a building (RN-26). */
+    @PostMapping("/buildings/{id}/collection")
+    public ResponseEntity<?> collect(@PathVariable int id) {
+        return run(() -> game.collect(id), HttpStatus.OK);
+    }
+
+    /** Cures a sick animal of a building (RN-27). */
+    @PostMapping("/buildings/{id}/animals/{index}/treatment")
+    public ResponseEntity<?> cure(@PathVariable int id, @PathVariable int index) {
+        return run(() -> game.cure(id, index), HttpStatus.OK);
     }
 
     private <T> ResponseEntity<?> run(Supplier<Result<T>> order, HttpStatus success) {

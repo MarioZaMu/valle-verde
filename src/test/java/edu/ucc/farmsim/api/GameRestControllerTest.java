@@ -314,4 +314,120 @@ class GameRestControllerTest {
                 .andExpect(jsonPath("$.data.slots[0].itemId").value("CARROT_SEED"))
                 .andExpect(jsonPath("$.data.slots[0].amount").value(10));
     }
+
+    private ResultActions build(String buildingId, int col, int row) throws Exception {
+        return mvc.perform(post("/api/buildings").contentType(MediaType.APPLICATION_JSON)
+                .content("{\"buildingId\": \"" + buildingId + "\", \"col\": " + col + ", \"row\": " + row + "}"));
+    }
+
+    private ResultActions buyAnimal(String animalId) throws Exception {
+        return mvc.perform(post("/api/animals").contentType(MediaType.APPLICATION_JSON)
+                .content("{\"animalId\": \"" + animalId + "\"}"));
+    }
+
+    @Test
+    void POST_buildings_buildsAndReturnsCreatedWithTheEventsOfTheOrder() throws Exception {
+        newGame();
+        build("COOP", 2, 7).andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.name").value("Gallinero"))
+                .andExpect(jsonPath("$.data.capacity").value(4))
+                .andExpect(jsonPath("$.events[?(@.type == 'MoneyChanged')].data.money").value(100))
+                .andExpect(jsonPath("$.events[?(@.type == 'MapChanged')]").isNotEmpty());
+    }
+
+    @Test
+    void POST_buildings_rejectionsKeepTheirRn35CodesAndStatus() throws Exception {
+        newGame();
+        build("COOP", 3, 2).andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("UBICACION_INVALIDA"));
+        build("BARN", 2, 7).andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("EDIFICIO_BLOQUEADO"))
+                .andExpect(jsonPath("$.message").value("Edificio bloqueado: requiere el logro «Manos a la tierra»."));
+        build("COOP", 2, 7);
+        build("COOP", 8, 7).andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("SIN_FONDOS"));
+    }
+
+    @Test
+    void POST_buildings_withoutBodyFieldsIsABadRequestAndWithoutAGameIsNotFound() throws Exception {
+        mvc.perform(post("/api/buildings").contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("SOLICITUD_INVALIDA"));
+        build("COOP", 2, 7).andExpect(status().isNotFound()).andExpect(jsonPath("$.code").value("SIN_PARTIDA"));
+    }
+
+    @Test
+    void GET_buildings_listsWhatIsBuiltAndTheCatalogue() throws Exception {
+        newGame();
+        session.current().farm().place(edu.ucc.farmsim.domain.building.BuildingType.COOP, 2, 7);
+        mvc.perform(get("/api/buildings")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.buildings", hasSize(1)))
+                .andExpect(jsonPath("$.data.catalog", hasSize(4)))
+                .andExpect(jsonPath("$.data.catalog[1].unlocked").value(false))
+                .andExpect(jsonPath("$.data.catalog[1].requirement").value("Manos a la tierra"));
+    }
+
+    @Test
+    void POST_animals_buysAHenAndReturnsTheBuildingThatHousesIt() throws Exception {
+        newGame();
+        build("COOP", 2, 7);
+        session.current().earn(2000);
+        buyAnimal("HEN").andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.animals", hasSize(1)))
+                .andExpect(jsonPath("$.data.animals[0].condition").value("HEALTHY"));
+        buyAnimal("COW").andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("SIN_ESPACIO_ANIMALES"));
+    }
+
+    @Test
+    void POST_feeding_collection_and_treatment_workOnTheBuildingAndItsAnimals() throws Exception {
+        newGame();
+        build("COOP", 2, 7);
+        var coop = session.current().farm().buildings().get(0);
+        coop.addAnimal(new edu.ucc.farmsim.domain.animal.Animal(edu.ucc.farmsim.domain.animal.AnimalType.HEN));
+        coop.addAnimal(edu.ucc.farmsim.domain.animal.Animal.fromSnapshot(new edu.ucc.farmsim.domain.animal.AnimalSnapshot(
+                edu.ucc.farmsim.domain.animal.AnimalType.HEN, edu.ucc.farmsim.domain.animal.AnimalCondition.SICK, 3, false, 0)));
+        session.current().inventory().add(ItemType.HAY, 2);
+        session.current().inventory().add(ItemType.MEDICINE, 1);
+
+        mvc.perform(post("/api/buildings/0/feeding")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.amount").value(1))
+                .andExpect(jsonPath("$.data.notice").value("Hay animales enfermos: cúralos con Medicina."));
+        mvc.perform(post("/api/buildings/0/animals/1/treatment")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.building.animals[1].condition").value("HEALTHY"));
+        mvc.perform(post("/api/buildings/0/collection")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.amount").value(0))
+                .andExpect(jsonPath("$.data.notice").value("No hay productos que recoger."));
+    }
+
+    @Test
+    void POST_feeding_rejectionsAreConflictsAndAnUnknownBuildingIsAnInternalError() throws Exception {
+        newGame();
+        build("COOP", 2, 7);
+        session.current().farm().buildings().get(0).addAnimal(
+                new edu.ucc.farmsim.domain.animal.Animal(edu.ucc.farmsim.domain.animal.AnimalType.HEN));
+
+        mvc.perform(post("/api/buildings/0/feeding")).andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("SIN_HENO"));
+        mvc.perform(post("/api/buildings/9/feeding")).andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.code").value("ERROR_INTERNO"));
+        mvc.perform(post("/api/buildings/0/animals/0/treatment")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.notice").value("Este animal no está enfermo."));
+    }
+
+    @Test
+    void POST_days_alsoReturnsTheDaySummaryAsAnEvent() throws Exception {
+        newGame();
+        mvc.perform(post("/api/game/days")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.events[?(@.type == 'DaySummaryReady')].data.summary.highlights[0]")
+                        .value("Sin novedades"));
+    }
+
+    @Test
+    void GET_market_includesTheAnimalsForSale() throws Exception {
+        newGame();
+        mvc.perform(get("/api/market")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.animals", hasSize(2)))
+                .andExpect(jsonPath("$.data.animals[1].name").value("Vaca"))
+                .andExpect(jsonPath("$.data.animals[1].price").value(800));
+    }
 }

@@ -2,6 +2,7 @@ package edu.ucc.farmsim.domain.economy;
 
 import edu.ucc.farmsim.domain.config.GameRules;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -44,6 +45,17 @@ public final class Inventory {
     /** Number of slots. */
     public int capacity() {
         return types.length;
+    }
+
+    /**
+     * Adds empty slots (a warehouse, RN-20). Nothing already stored moves.
+     *
+     * @param extra how many slots to add
+     */
+    public void addSlots(int extra) {
+        requirePositive(extra);
+        types = Arrays.copyOf(types, types.length + extra);
+        amounts = Arrays.copyOf(amounts, amounts.length + extra);
     }
 
     /** Number of slots currently occupied. */

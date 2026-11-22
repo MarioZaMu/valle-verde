@@ -1,5 +1,8 @@
 package edu.ucc.farmsim.application.controller;
 
+import edu.ucc.farmsim.application.dto.BuildingActionView;
+import edu.ucc.farmsim.application.dto.BuildingView;
+import edu.ucc.farmsim.application.dto.BuildingsView;
 import edu.ucc.farmsim.application.dto.HudView;
 import edu.ucc.farmsim.application.dto.InventoryView;
 import edu.ucc.farmsim.application.dto.MapView;
@@ -7,6 +10,8 @@ import edu.ucc.farmsim.application.dto.MarketView;
 import edu.ucc.farmsim.application.dto.PlotView;
 import edu.ucc.farmsim.application.result.ErrorCode;
 import edu.ucc.farmsim.application.result.Result;
+import edu.ucc.farmsim.application.service.AnimalService;
+import edu.ucc.farmsim.application.service.BuildingService;
 import edu.ucc.farmsim.application.service.DayService;
 import edu.ucc.farmsim.application.service.FarmService;
 import edu.ucc.farmsim.application.service.GameSession;
@@ -27,7 +32,7 @@ import org.springframework.stereotype.Component;
  * RNF-07), and it never touches repositories (AR-4). It is not the REST controller: the {@code api} package
  * translates HTTP into calls to this class.
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-28, HU-33, HU-35, HU-37, HU-38.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-28, HU-33, HU-35, HU-37, HU-38.
  */
 @Component
 public final class GameController implements GameCommands {
@@ -41,6 +46,8 @@ public final class GameController implements GameCommands {
     private final SaveGameService saves;
     private final FarmService farm;
     private final MarketService market;
+    private final BuildingService buildings;
+    private final AnimalService animals;
 
     /**
      * Creates the controller.
@@ -52,9 +59,12 @@ public final class GameController implements GameCommands {
      * @param saves    knows about the save slots
      * @param farm     crop use cases
      * @param market   buying, selling and the market and inventory views
+     * @param buildings construction
+     * @param animals  animal care
      */
     public GameController(GameSession session, ViewMapper mapper, ProgressService progress, DayService day,
-                          SaveGameService saves, FarmService farm, MarketService market) {
+                          SaveGameService saves, FarmService farm, MarketService market,
+                          BuildingService buildings, AnimalService animals) {
         this.session = session;
         this.mapper = mapper;
         this.progress = progress;
@@ -62,6 +72,8 @@ public final class GameController implements GameCommands {
         this.saves = saves;
         this.farm = farm;
         this.market = market;
+        this.buildings = buildings;
+        this.animals = animals;
     }
 
     /** True if a game is in progress (the UI asks for confirmation before discarding it). */
@@ -182,6 +194,36 @@ public final class GameController implements GameCommands {
     @Override
     public Result<InventoryView> inventory() {
         return guard(market::inventory);
+    }
+
+    @Override
+    public Result<BuildingsView> buildings() {
+        return guard(buildings::buildings);
+    }
+
+    @Override
+    public Result<BuildingView> build(String buildingId, int col, int row) {
+        return guard(() -> buildings.build(buildingId, col, row));
+    }
+
+    @Override
+    public Result<BuildingView> buyAnimal(String animalId) {
+        return guard(() -> animals.buyAnimal(animalId));
+    }
+
+    @Override
+    public Result<BuildingActionView> feed(int buildingId) {
+        return guard(() -> animals.feed(buildingId));
+    }
+
+    @Override
+    public Result<BuildingActionView> collect(int buildingId) {
+        return guard(() -> animals.collect(buildingId));
+    }
+
+    @Override
+    public Result<BuildingActionView> cure(int buildingId, int animalIndex) {
+        return guard(() -> animals.cure(buildingId, animalIndex));
     }
 
     private <T> Result<T> guard(Supplier<Result<T>> operation) {

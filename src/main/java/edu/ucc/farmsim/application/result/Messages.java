@@ -12,6 +12,18 @@ import java.util.Map;
  */
 public final class Messages {
 
+    /** Shown when feeding a building where no animal needs food. */
+    public static final String NOTHING_TO_FEED = "No hay animales por alimentar.";
+
+    /** Shown when collecting from a building with nothing waiting. */
+    public static final String NOTHING_TO_COLLECT = "No hay productos que recoger.";
+
+    /** Shown when curing an animal that is not sick. */
+    public static final String NOT_SICK = "Este animal no está enfermo.";
+
+    /** The only line of the day summary when nothing happened. */
+    public static final String NO_NEWS = "Sin novedades";
+
     private static final Locale SPANISH = Locale.forLanguageTag("es");
     private static final Map<ErrorCode, String> TEMPLATES = new EnumMap<>(ErrorCode.class);
 

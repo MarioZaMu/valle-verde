@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Facts about one end of the day, filled in by the steps and read by the application layer.
  *
- * <p>Stories: HU-05, HU-10.
+ * <p>Stories: HU-05, HU-10, HU-17, HU-21, HU-22.
  */
 public final class DayReport {
 
@@ -19,6 +19,12 @@ public final class DayReport {
     private Weather todayWeather;
     private Weather forecast;
     private int witheredCrops;
+    private int sickAnimals;
+    private int products;
+    private int balanceBefore;
+    private int balanceAfter;
+    private int income;
+    private int expenses;
 
     /** The phases that ran, in execution order. */
     public List<DayPhase> phasesRun() {
@@ -48,6 +54,51 @@ public final class DayReport {
     /** Number of crops that withered during this end of the day. */
     public int witheredCrops() {
         return witheredCrops;
+    }
+
+    /** Animals that fell sick during this end of the day. */
+    public int sickAnimals() {
+        return sickAnimals;
+    }
+
+    /** Units of product the animals made during this end of the day. */
+    public int products() {
+        return products;
+    }
+
+    /** Money at the start of the day that ended. */
+    public int balanceBefore() {
+        return balanceBefore;
+    }
+
+    /** Money at the end of the day that ended. */
+    public int balanceAfter() {
+        return balanceAfter;
+    }
+
+    /** m earned during the day that ended. */
+    public int income() {
+        return income;
+    }
+
+    /** m spent during the day that ended. */
+    public int expenses() {
+        return expenses;
+    }
+
+    void addSickAnimal() {
+        sickAnimals++;
+    }
+
+    void addProducts(int units) {
+        products += units;
+    }
+
+    void recordMoney(int after, int earned, int spent) {
+        this.balanceBefore = after - earned + spent;
+        this.balanceAfter = after;
+        this.income = earned;
+        this.expenses = spent;
     }
 
     void addWithered(int count) {
