@@ -70,7 +70,7 @@ else cantidad válida (camino exitoso)
   Inventory --> MarketService : true
   deactivate Inventory
   MarketService -> GameState : earn(79)
-  MarketService -> AchievementTracker : evaluate(estado)
+  MarketService -> AchievementTracker : evaluate(hechos)
   activate AchievementTracker
   AchievementTracker --> MarketService : logros nuevos (p. ej. LG-04 al llegar a 50 unidades)
   deactivate AchievementTracker

@@ -67,6 +67,7 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
       class MarketService
       class BuildingService
       class SaveGameService
+      class GameSession
     }
     package "event" as APP_EVT #FFFFFF {
       class EventBus
@@ -113,9 +114,11 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
     package "time" as D_TIM #FFFFFF {
       class GameClock
       class SeasonState
+      class StateRandom
     }
     package "progress" as D_PRO #FFFFFF {
       class AchievementTracker
+      class ProgressFacts
     }
     package "config" as D_CFG #FFFFFF {
       class GameRules
@@ -175,6 +178,7 @@ D_GAME .down.> D_PRO
 D_SAVE .down.> D_GAME
 D_FARM .down.> D_CROP
 D_FARM .down.> D_BLD
+D_FARM .down.> D_TIM
 D_BLD .down.> D_ANI
 D_CROP .down.> D_TIM
 D_ECO .down.> D_CROP

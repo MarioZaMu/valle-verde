@@ -60,6 +60,11 @@ package "application" #F6FBF6 {
     +{static} ok(value: T): Result<T>
     +{static} fail(code: ErrorCode, msg: String): Result<T>
   }
+  class GameSession {
+    -state: GameState
+    +current(): GameState
+    +replace(s: GameState): void
+  }
   class DayService {
     +endDay(): Result
   }
@@ -127,6 +132,11 @@ package "domain" #FFFCF5 {
     class SummerState <<ConcreteState>> #C8E6C9
     class AutumnState <<ConcreteState>> #C8E6C9
     class WinterState <<ConcreteState>> #C8E6C9
+    class StateRandom {
+      -state: long
+      +state(): long
+      +restore(s: long): void
+    }
     interface WeatherStrategy <<Strategy>> #FFF9C4 {
       +nextWeather(day: int, rnd: Random): Weather
     }
@@ -139,6 +149,7 @@ package "domain" #FFFCF5 {
       -cols: int
       -rows: int
       +plotAt(col: int, row: int): Plot
+      +advanceDay(w: Weather, s: SeasonState): void
     }
     class Plot {
       -terrain: Terrain
@@ -230,7 +241,13 @@ package "domain" #FFFCF5 {
   package "progress" #FFFFFF {
     class AchievementTracker {
       -counters: Map<String, Integer>
-      +evaluate(s: GameState): List<String>
+      +evaluate(f: ProgressFacts): List<String>
+    }
+    class ProgressFacts <<ValueObject>> {
+      -money: int
+      -harvests: int
+      -unitsSold: int
+      -year: int
     }
   }
 }
@@ -253,9 +270,9 @@ GameController --> DayService
 GameController --> MarketService
 GameController --> SaveGameService
 GameController ..> Result : devuelve
-DayService --> GameState
+DayService --> GameSession
 DayService --> EventBus
-MarketService --> GameState
+MarketService --> GameSession
 MarketService --> EventBus
 
 ' ---------- Dominio: agregado ----------
@@ -263,7 +280,11 @@ GameState *-- "1" FarmMap
 GameState *-- "1" Inventory
 GameState *-- "1" Market
 GameState *-- "1" AchievementTracker
+GameState ..> ProgressFacts : «create»
+AchievementTracker ..> ProgressFacts : lee
+GameSession --> "1" GameState : actual
 GameState ..> GameClock : usa
+GameState *-- "1" StateRandom
 FarmMap *-- "160" Plot
 FarmMap *-- "0..*" Building
 Plot *-- "0..1" Crop
@@ -276,6 +297,7 @@ SeasonState <|.. SummerState
 SeasonState <|.. AutumnState
 SeasonState <|.. WinterState
 SeasonState ..> WeatherStrategy : elige
+SeasonalWeatherStrategy ..> StateRandom : sortea con
 WeatherStrategy <|.. SeasonalWeatherStrategy
 WeatherStrategy <|.. FixedWeatherStrategy
 
@@ -309,7 +331,7 @@ PricingStrategy <|.. FlatPricing
 
 ' ---------- Memento ----------
 GameState ..> GameMemento : «create»
-SaveGameService --> GameState
+SaveGameService --> GameSession
 SaveGameService ..> GameMemento : conserva
 SaveGameService --> SaveRepository
 JsonSaveRepository ..|> SaveRepository
