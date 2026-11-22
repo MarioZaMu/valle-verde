@@ -28,6 +28,7 @@ public final class Messages {
         TEMPLATES.put(ErrorCode.YA_REGADO, "El cultivo ya está regado hoy.");
         TEMPLATES.put(ErrorCode.NO_MADURO, "El cultivo aún no está maduro: faltan %d días.");
         TEMPLATES.put(ErrorCode.SIN_CULTIVO, "No hay ningún cultivo en esta parcela.");
+        TEMPLATES.put(ErrorCode.CULTIVO_MARCHITO, "El cultivo está marchito: límpialo para poder sembrar de nuevo.");
         TEMPLATES.put(ErrorCode.EDIFICIO_BLOQUEADO, "Edificio bloqueado: requiere el logro «%s».");
         TEMPLATES.put(ErrorCode.UBICACION_INVALIDA,
                 "No se puede construir aquí: el área debe ser hierba libre dentro del mapa.");

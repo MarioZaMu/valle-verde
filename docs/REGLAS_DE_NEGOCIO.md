@@ -397,6 +397,7 @@ El *tooltip* de una parcela aparece tras **300 ms** de reposo del cursor y muest
 | `YA_REGADO` | «El cultivo ya está regado hoy.» |
 | `NO_MADURO` | «El cultivo aún no está maduro: faltan {n} días.» |
 | `SIN_CULTIVO` | «No hay ningún cultivo en esta parcela.» |
+| `CULTIVO_MARCHITO` | «El cultivo está marchito: límpialo para poder sembrar de nuevo.» |
 | `EDIFICIO_BLOQUEADO` | «Edificio bloqueado: requiere el logro «{logro}».» |
 | `UBICACION_INVALIDA` | «No se puede construir aquí: el área debe ser hierba libre dentro del mapa.» |
 | `LIMITE_EDIFICIOS` | «Ya tienes el máximo de {edificio}.» |

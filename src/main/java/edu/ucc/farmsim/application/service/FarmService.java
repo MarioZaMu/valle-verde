@@ -7,6 +7,7 @@ import edu.ucc.farmsim.application.result.ErrorCode;
 import edu.ucc.farmsim.application.result.Names;
 import edu.ucc.farmsim.application.result.Result;
 import edu.ucc.farmsim.domain.config.GameRules;
+import edu.ucc.farmsim.domain.crop.Crop;
 import edu.ucc.farmsim.domain.crop.CropFactory;
 import edu.ucc.farmsim.domain.crop.CropType;
 import edu.ucc.farmsim.domain.economy.ItemType;
@@ -16,13 +17,14 @@ import edu.ucc.farmsim.domain.farm.Terrain;
 import edu.ucc.farmsim.domain.game.Energy;
 import edu.ucc.farmsim.domain.game.GameState;
 import edu.ucc.farmsim.domain.time.Season;
+import edu.ucc.farmsim.domain.time.Weather;
 import java.util.stream.Collectors;
 
 /**
  * The crop use cases: sow, water, harvest and clear (RN-06 to RN-10). Each operation checks every rule
  * first and only then changes the game, so a rejection never leaves anything half done.
  *
- * <p>Stories: HU-01.
+ * <p>Stories: HU-01, HU-02.
  */
 public final class FarmService {
 
@@ -89,6 +91,45 @@ public final class FarmService {
         plot.plant(CropFactory.forType(type).createCrop());
         publishChange(state);
         return Result.ok(mapper.plot(state, col, row));
+    }
+
+    /**
+     * Waters the crop of a plot (RN-07): 1 energy, or 2 when the weather of the day is Drought.
+     *
+     * @param col column of the plot
+     * @param row row of the plot
+     */
+    public Result<PlotView> water(int col, int row) {
+        if (!session.hasGame()) {
+            return Result.failWith(ErrorCode.SIN_PARTIDA);
+        }
+        GameState state = session.current();
+        Crop crop = cropAt(state, col, row);
+        if (crop == null) {
+            return Result.failWith(ErrorCode.SIN_CULTIVO);
+        }
+        if (!crop.isAlive()) {
+            return Result.failWith(ErrorCode.CULTIVO_MARCHITO);
+        }
+        if (crop.isWatered()) {
+            return Result.failWith(ErrorCode.YA_REGADO);
+        }
+        int cost = state.weather().today() == Weather.DROUGHT
+                ? GameRules.ENERGY_COST_WATER_IN_DROUGHT
+                : GameRules.ENERGY_COST_WATER;
+        Energy energy = state.energy();
+        if (!energy.canSpend(cost)) {
+            return Result.failWith(ErrorCode.SIN_ENERGIA, cost, energy.current());
+        }
+        crop.water();
+        energy.trySpend(cost);
+        publishChange(state);
+        return Result.ok(mapper.plot(state, col, row));
+    }
+
+    private static Crop cropAt(GameState state, int col, int row) {
+        FarmMap farm = state.farm();
+        return farm.contains(col, row) ? farm.plotAt(col, row).crop() : null;
     }
 
     private void publishChange(GameState state) {

@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  * No exception ever reaches the UI: anything unexpected becomes {@code ERROR_INTERNO} (R-03, RNF-07), and
  * it never touches repositories (AR-4).
  *
- * <p>Stories: HU-01, HU-10, HU-28, HU-33.
+ * <p>Stories: HU-01, HU-02, HU-10, HU-28, HU-33.
  */
 public final class GameController {
 
@@ -87,6 +87,16 @@ public final class GameController {
      */
     public Result<PlotView> plant(int col, int row, String seedId) {
         return guard(() -> farm.plant(col, row, seedId));
+    }
+
+    /**
+     * Waters the crop of a plot (RN-07).
+     *
+     * @param col column of the plot
+     * @param row row of the plot
+     */
+    public Result<PlotView> water(int col, int row) {
+        return guard(() -> farm.water(col, row));
     }
 
     /** True if at least one of the save slots holds a game. */
