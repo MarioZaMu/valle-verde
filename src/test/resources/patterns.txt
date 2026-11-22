@@ -2,3 +2,9 @@
 # Format:  fully.qualified.ClassName | Pattern | Role
 # Each phase appends its pattern classes here, for example (phase 5.1):
 #   edu.ucc.farmsim.domain.time.GameClock | Singleton | Single game clock shared by all services
+edu.ucc.farmsim.domain.time.GameClock | Singleton | Singleton instance (the game's only calendar)
+edu.ucc.farmsim.domain.time.SeasonState | State | State interface (the behaviour that changes with the season)
+edu.ucc.farmsim.domain.time.SpringState | State | ConcreteState (spring)
+edu.ucc.farmsim.domain.time.SummerState | State | ConcreteState (summer)
+edu.ucc.farmsim.domain.time.AutumnState | State | ConcreteState (autumn)
+edu.ucc.farmsim.domain.time.WinterState | State | ConcreteState (winter)
