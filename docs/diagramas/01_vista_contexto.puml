@@ -1,0 +1,29 @@
+@startdot
+/'
+  Vista 1 — Contexto (DFD nivel 0)  ·  Cubre: OBJ-01, alcance de VISION_ALCANCE §4-5
+  Reglas (guía del curso): un solo círculo, sin nada dentro; una caja por entidad externa;
+  una flecha por dato y dirección rotulada con sustantivo; sin flechas entre entidades externas.
+  Posiciones fijadas a mano (layout=neato, pos="x,y!") para que ningún rótulo se superponga.
+'/
+digraph contexto {
+  graph [layout=neato, splines=true, pad=0.6, fontname="Arial", dpi=150, outputorder=edgesfirst, forcelabels=true,
+         label="Vista de contexto — Valle Verde (DFD nivel 0)\n ", labelloc=t, fontsize=24];
+  node  [fontname="Arial", fontsize=15];
+  edge  [fontname="Arial", fontsize=13, arrowsize=1.1, penwidth=1.6];
+
+  jugador [label="Jugador", shape=box, width=2.34, height=0.9, pos="5.5,7.2!", style=filled, fillcolor="#FFF8E1"];
+  assets  [label="Paquete de assets\ngráficos\n(CC0 / CC-BY)", shape=box, width=2.6, height=1.1, pos="-0.5,2.2!", style=filled, fillcolor="#FFF8E1"];
+  archivos[label="Sistema de archivos\nlocal", shape=box, width=2.6, height=1.1, pos="12,2.2!", style=filled, fillcolor="#FFF8E1"];
+
+  sistema [label="Valle Verde\n\nSimulador de granja\npor turnos", shape=circle, width=3.3, fixedsize=true,
+           pos="5.5,2.2!", style=filled, fillcolor="#E8F5E9", penwidth=2.6, fontsize=18];
+
+  jugador:sw -> sistema:nw [label="Órdenes de juego   \n(herramienta + clic,   \nterminar día, compras y ventas)   ", fontsize=13];
+  sistema:ne -> jugador:se [label="   Estado y notificaciones\n   (mapa, HUD, inventario,\n   logros y errores)"];
+
+  assets:e -> sistema:w [label="Sprites e iconos", labelfloat=false];
+
+  sistema:ne -> archivos:nw [label="  Partida (JSON + checksum)  "];
+  archivos:sw -> sistema:se [xlabel="Partida guardada  "];
+}
+@enddot
