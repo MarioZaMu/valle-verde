@@ -6,7 +6,7 @@ package edu.ucc.farmsim.domain.config;
  * <p>The values mirror docs/REGLAS_DE_NEGOCIO.md; if a rule changes there, it changes here only.
  * This class depends on nothing (it holds primitives), so every domain package may use it.
  *
- * <p>Stories: HU-08, HU-09, HU-11, HU-13.
+ * <p>Stories: HU-08, HU-09, HU-11, HU-13, HU-28.
  */
 public final class GameRules {
 
@@ -73,6 +73,54 @@ public final class GameRules {
 
     /** Energy cost of curing an animal. */
     public static final int ENERGY_COST_CURE = 1;
+
+    // ---- RN-04: farm map (16 x 10 = 160 plots) ----
+
+    /** Number of plot columns. */
+    public static final int MAP_COLS = 16;
+
+    /** Number of plot rows. */
+    public static final int MAP_ROWS = 10;
+
+    /** Column of the top-left plot of the soil block (8 x 5 = 40 soil plots). */
+    public static final int SOIL_COL = 4;
+
+    /** Row of the top-left plot of the soil block. */
+    public static final int SOIL_ROW = 2;
+
+    /** Width of the soil block. */
+    public static final int SOIL_WIDTH = 8;
+
+    /** Height of the soil block. */
+    public static final int SOIL_HEIGHT = 5;
+
+    /** Column of the top-left plot of the pond (3 x 2 = 6 water plots). */
+    public static final int POND_COL = 13;
+
+    /** Row of the top-left plot of the pond. */
+    public static final int POND_ROW = 0;
+
+    /** Width of the pond. */
+    public static final int POND_WIDTH = 3;
+
+    /** Height of the pond. */
+    public static final int POND_HEIGHT = 2;
+
+    /** Fixed positions {column, row} of the 12 obstacles (trees and rocks). */
+    public static final int[][] OBSTACLES = {
+        {0, 0}, {1, 0}, {0, 1}, {8, 0}, {0, 5}, {15, 5}, {0, 9}, {1, 9}, {7, 9}, {14, 9}, {15, 9}, {15, 8}
+    };
+
+    // ---- RN-30: new game ----
+
+    /** Money at the start of a game. */
+    public static final int START_MONEY = 500;
+
+    /** Carrot seeds in the starting inventory. */
+    public static final int START_CARROT_SEEDS = 10;
+
+    /** Potato seeds in the starting inventory. */
+    public static final int START_POTATO_SEEDS = 5;
 
     // ---- RN-15: inventory ----
 
