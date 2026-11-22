@@ -3,6 +3,7 @@ package edu.ucc.farmsim.support;
 import edu.ucc.farmsim.application.controller.GameController;
 import edu.ucc.farmsim.application.event.EventBus;
 import edu.ucc.farmsim.application.event.GameEvent;
+import edu.ucc.farmsim.application.service.AchievementService;
 import edu.ucc.farmsim.application.service.AnimalService;
 import edu.ucc.farmsim.application.service.BuildingService;
 import edu.ucc.farmsim.application.service.DayService;
@@ -16,6 +17,7 @@ import edu.ucc.farmsim.domain.game.DayPipeline;
 import edu.ucc.farmsim.domain.game.GameState;
 import edu.ucc.farmsim.domain.save.SaveRepository;
 import edu.ucc.farmsim.domain.time.GameClock;
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +26,10 @@ public final class TestApp {
 
     /** Fixed seed used by tests that do not care about it. */
     public static final long SEED = 2026L;
+
+    /** The moment every save made through a test graph is stamped with: 2026-11-22 10:30 UTC. */
+    public static final Clock FIXED_CLOCK = Clock.fixed(java.time.Instant.parse("2026-11-22T10:30:00Z"),
+            java.time.ZoneOffset.UTC);
 
     public final GameSession session;
     public final EventBus bus;
@@ -70,17 +76,24 @@ public final class TestApp {
 
     /** Creates the graph around a given session and save repository. */
     public static TestApp create(GameSession session, DayPipeline pipeline, SaveRepository repository) {
+        return create(session, pipeline, repository, FIXED_CLOCK);
+    }
+
+    /** Creates the graph around a given session, save repository and clock (the clock stamps the saves). */
+    public static TestApp create(GameSession session, DayPipeline pipeline, SaveRepository repository, Clock clock) {
         GameClock.getInstance().resetForTests();
         ViewMapper mapper = new ViewMapper();
         EventBus bus = new EventBus();
         ProgressService progress = new ProgressService(session, mapper, bus);
-        DayService day = new DayService(session, pipeline, mapper, bus);
-        SaveGameService saves = new SaveGameService(repository);
-        FarmService farm = new FarmService(session, mapper, bus);
-        MarketService market = new MarketService(session, bus);
-        BuildingService buildings = new BuildingService(session, mapper, bus);
-        AnimalService animals = new AnimalService(session, mapper, bus);
+        AchievementService achievements = new AchievementService(session, bus);
+        DayService day = new DayService(session, pipeline, mapper, bus, achievements);
+        SaveGameService saves = new SaveGameService(repository, session, mapper, bus, clock);
+        FarmService farm = new FarmService(session, mapper, bus, achievements);
+        MarketService market = new MarketService(session, bus, achievements);
+        BuildingService buildings = new BuildingService(session, mapper, bus, achievements);
+        AnimalService animals = new AnimalService(session, mapper, bus, achievements);
         return new TestApp(session, bus,
-                new GameController(session, mapper, progress, day, saves, farm, market, buildings, animals));
+                new GameController(session, mapper, progress, day, saves, farm, market, buildings, animals,
+                        achievements));
     }
 }

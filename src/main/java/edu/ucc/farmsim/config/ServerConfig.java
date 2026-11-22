@@ -2,6 +2,7 @@ package edu.ucc.farmsim.config;
 
 import edu.ucc.farmsim.application.event.EventBus;
 import edu.ucc.farmsim.domain.game.DayPipeline;
+import java.time.Clock;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,6 +19,12 @@ public class ServerConfig {
     @Bean
     public EventBus eventBus() {
         return new EventBus();
+    }
+
+    /** The clock the saves are stamped with. */
+    @Bean
+    public Clock clock() {
+        return Clock.systemDefaultZone();
     }
 
     /** The ordered steps that run when a day ends (RN-03). */

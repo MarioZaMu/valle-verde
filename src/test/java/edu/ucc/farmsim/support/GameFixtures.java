@@ -16,13 +16,16 @@ import edu.ucc.farmsim.domain.economy.MarketSnapshot;
 import edu.ucc.farmsim.domain.game.GameMemento;
 import edu.ucc.farmsim.domain.game.GameState;
 import edu.ucc.farmsim.domain.progress.Achievement;
+import edu.ucc.farmsim.domain.progress.ProgressSnapshot;
 import edu.ucc.farmsim.domain.time.GameClock;
 import edu.ucc.farmsim.domain.time.GameDate;
 import edu.ucc.farmsim.domain.time.Season;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /** Helpers that put a game in a known situation without going through the whole day-by-day flow. */
 public final class GameFixtures {
@@ -79,7 +82,34 @@ public final class GameFixtures {
 
     /** Grants an achievement without playing for it. */
     public static void unlock(GameState state, Achievement achievement) {
-        state.progress().unlock(achievement);
+        GameMemento now = state.createMemento();
+        ProgressSnapshot progress = now.progress();
+        Set<Achievement> unlocked = EnumSet.noneOf(Achievement.class);
+        unlocked.addAll(progress.unlocked());
+        unlocked.add(achievement);
+        if (harvestsFor(achievement) > 1) {
+            unlocked.add(Achievement.FIRST_HARVEST);
+        }
+        if (achievement == Achievement.BIG_HARVESTER) {
+            unlocked.add(Achievement.GREEN_THUMB);
+        }
+        // keep the counters coherent with what is unlocked, as a real game would have them
+        ProgressSnapshot coherent = new ProgressSnapshot(unlocked,
+                Math.max(progress.harvests(), harvestsFor(achievement)),
+                Math.max(progress.unitsSold(), achievement == Achievement.TRADER ? 50 : 0),
+                Math.max(progress.buildingsBuilt(), achievement == Achievement.BUILDER ? 1 : 0),
+                Math.max(progress.animalsCured(), achievement == Achievement.VETERINARIAN ? 1 : 0));
+        state.restore(new GameMemento(now.date(), now.money(), now.energy(), now.inventory(), now.farm(),
+                now.today(), now.forecast(), now.randomState(), now.market(), now.ledger(), coherent));
+    }
+
+    private static int harvestsFor(Achievement achievement) {
+        return switch (achievement) {
+            case FIRST_HARVEST -> 1;
+            case GREEN_THUMB -> 25;
+            case BIG_HARVESTER -> 100;
+            default -> 0;
+        };
     }
 
     /** Sets the demand of a product (percent) without selling anything. */
@@ -95,7 +125,7 @@ public final class GameFixtures {
     public static void setMoney(GameState state, int money) {
         GameMemento now = state.createMemento();
         state.restore(new GameMemento(now.date(), money, now.energy(), now.inventory(), now.farm(), now.today(),
-                now.forecast(), now.randomState(), now.market(), now.ledger(), now.achievements()));
+                now.forecast(), now.randomState(), now.market(), now.ledger(), now.progress()));
     }
 
     /** Moves the calendar to a date. */

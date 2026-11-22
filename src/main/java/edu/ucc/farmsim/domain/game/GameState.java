@@ -5,11 +5,15 @@ import edu.ucc.farmsim.domain.economy.Inventory;
 import edu.ucc.farmsim.domain.economy.ItemType;
 import edu.ucc.farmsim.domain.economy.Market;
 import edu.ucc.farmsim.domain.farm.FarmMap;
+import edu.ucc.farmsim.domain.progress.Achievement;
 import edu.ucc.farmsim.domain.progress.AchievementTracker;
+import edu.ucc.farmsim.domain.progress.ProgressFacts;
 import edu.ucc.farmsim.domain.time.GameClock;
 import edu.ucc.farmsim.domain.time.GameDate;
 import edu.ucc.farmsim.domain.time.StateRandom;
 import edu.ucc.farmsim.domain.time.WeatherCycle;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Pattern: Memento — Role: Originator (creates and restores snapshots of itself).
@@ -19,7 +23,7 @@ import edu.ucc.farmsim.domain.time.WeatherCycle;
  * {@link #createMemento()} and {@link #restore(GameMemento)} undo a failed end of the day (HU-10) and
  * will back saving and loading (HU-29, HU-30).
  *
- * <p>Stories: HU-01, HU-10, HU-14, HU-15, HU-17, HU-18, HU-28.
+ * <p>Stories: HU-01, HU-10, HU-14, HU-15, HU-17, HU-18, HU-26, HU-28.
  */
 public final class GameState {
 
@@ -61,6 +65,16 @@ public final class GameState {
                 WeatherCycle.startNewGame(clock, random), random, Market.standard());
     }
 
+    /**
+     * Builds a game from a snapshot read from a save. The snapshot must already be valid (see
+     * {@link GameStateValidator}); the calendar is set to its date.
+     */
+    public static GameState fromMemento(GameMemento memento) {
+        GameState state = newGame(0L);
+        state.restore(memento);
+        return state;
+    }
+
     /** Money the player has. */
     public int money() {
         return money;
@@ -100,6 +114,32 @@ public final class GameState {
     /** The achievements unlocked. */
     public AchievementTracker progress() {
         return progress;
+    }
+
+    /** Numbers the achievements look at, taken from the game as it is now. */
+    public ProgressFacts facts() {
+        int animals = farm.buildings().stream().mapToInt(b -> b.animals().size()).sum();
+        return new ProgressFacts(money, progress.harvests(), progress.unitsSold(), progress.buildingsBuilt(),
+                animals, progress.animalsCured(), date().year());
+    }
+
+    /**
+     * Unlocks every achievement whose condition is met and pays its reward (RN-28). A reward can itself meet
+     * another condition (the balance), so it repeats until nothing new unlocks.
+     *
+     * @return the achievements unlocked now, in order
+     */
+    public List<Achievement> evaluateAchievements() {
+        List<Achievement> all = new ArrayList<>();
+        List<Achievement> fresh = progress.evaluate(facts());
+        while (!fresh.isEmpty()) {
+            for (Achievement achievement : fresh) {
+                earn(achievement.reward());
+            }
+            all.addAll(fresh);
+            fresh = progress.evaluate(facts());
+        }
+        return all;
     }
 
     /** The market: demand, prices and trends. */
@@ -150,7 +190,7 @@ public final class GameState {
         random.restore(memento.randomState());
         market.restoreFrom(memento.market());
         ledger.restoreFrom(memento.ledger());
-        progress.restoreFrom(memento.achievements());
+        progress.restoreFrom(memento.progress());
     }
 
     /** Current calendar date. */

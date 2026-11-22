@@ -48,6 +48,13 @@ class HU28NewGameTest {
         assertEquals(5, state.inventory().count(ItemType.POTATO_SEED));
         assertEquals(2, state.inventory().usedSlots());
 
+        // And no buildings, no animals, locked achievements and every counter at 0
+        assertTrue(state.farm().buildings().isEmpty());
+        assertEquals(new edu.ucc.farmsim.domain.progress.ProgressSnapshot(java.util.Set.of(), 0, 0, 0, 0),
+                state.progress().snapshot());
+        assertTrue(app.controller.achievements().value().stream()
+                .noneMatch(edu.ucc.farmsim.application.dto.AchievementView::unlocked));
+
         // And the view the screen draws shows the same values
         HudView hud = result.value();
         assertEquals(500, hud.money());

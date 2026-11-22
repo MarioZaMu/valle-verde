@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
  * The crop use cases: sow, water, harvest and clear (RN-06 to RN-10). Each operation checks every rule
  * first and only then changes the game, so a rejection never leaves anything half done.
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-35.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-26, HU-35.
  */
 @Service
 public final class FarmService {
@@ -36,6 +36,7 @@ public final class FarmService {
     private final GameSession session;
     private final ViewMapper mapper;
     private final EventBus events;
+    private final AchievementService achievements;
 
     /**
      * Creates the service.
@@ -43,11 +44,13 @@ public final class FarmService {
      * @param session the game in progress
      * @param mapper  builds the views the UI draws
      * @param events  where events are published
+     * @param achievements evaluates the achievements after each harvest
      */
-    public FarmService(GameSession session, ViewMapper mapper, EventBus events) {
+    public FarmService(GameSession session, ViewMapper mapper, EventBus events, AchievementService achievements) {
         this.session = session;
         this.mapper = mapper;
         this.events = events;
+        this.achievements = achievements;
     }
 
     /**
@@ -163,8 +166,10 @@ public final class FarmService {
         }
         energy.trySpend(GameRules.ENERGY_COST_HARVEST);
         state.farm().plotAt(col, row).removeCrop();
+        state.progress().recordHarvest();
         publishChange(state);
         events.publish(new GameEvent.InventoryChanged());
+        achievements.check(state);
         return Result.ok(mapper.plot(state, col, row));
     }
 

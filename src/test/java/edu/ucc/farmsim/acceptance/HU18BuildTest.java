@@ -28,15 +28,17 @@ class HU18BuildTest {
         // When the player builds a coop there
         Result<BuildingView> result = app.controller.build("COOP", 2, 7);
 
-        // Then the balance is 100 m and the four plots are occupied
+        // Then 400 m are charged (the first building then pays LG-06: 100 m) and the four plots are occupied
         assertTrue(result.isOk(), String.valueOf(result.message()));
         assertEquals("Gallinero", result.value().name());
-        assertEquals(100, app.state().money());
+        assertEquals(500 - 400 + 100, app.state().money());
         for (int[] plot : new int[][] {{2, 7}, {3, 7}, {2, 8}, {3, 8}}) {
             assertNotNull(app.state().farm().buildingAt(plot[0], plot[1]));
         }
         assertNull(app.state().farm().buildingAt(4, 7));
-        assertEquals(List.of(new GameEvent.MoneyChanged(100), new GameEvent.MapChanged()), app.events);
+        assertEquals(List.of(new GameEvent.MoneyChanged(100), new GameEvent.MapChanged(),
+                new GameEvent.AchievementUnlocked("LG-06", "Constructor", 100), new GameEvent.MoneyChanged(200)),
+                app.events);
     }
 
     @Test
@@ -107,7 +109,7 @@ class HU18BuildTest {
         Result<BuildingView> result = app.controller.build("BARN", 2, 7);
 
         assertTrue(result.isOk(), String.valueOf(result.message()));
-        assertEquals(0, app.state().money());
+        assertEquals(100, app.state().money()); // 1000 - 1000 + 100 of LG-06
         assertEquals(3, result.value().width());
         assertEquals(2, result.value().height());
     }

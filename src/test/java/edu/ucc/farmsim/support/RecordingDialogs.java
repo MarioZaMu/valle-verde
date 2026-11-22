@@ -34,6 +34,16 @@ public final class RecordingDialogs implements GameDialogs {
     }
 
     @Override
+    public void showAchievements() {
+        opened.add("achievements");
+    }
+
+    @Override
+    public void showSlots(boolean saving) {
+        opened.add(saving ? "slots:save" : "slots:load");
+    }
+
+    @Override
     public void showSummary(DaySummaryView summary) {
         summaries.add(summary);
     }

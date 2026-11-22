@@ -111,6 +111,10 @@ public final class ViewMapper {
             highlights.add(report.products() == 1 ? "Los animales produjeron 1 unidad."
                     : "Los animales produjeron " + report.products() + " unidades.");
         }
+        for (Achievement achievement : report.unlocked()) {
+            highlights.add("Logro desbloqueado: «" + Names.achievement(achievement.name()) + "» (+"
+                    + achievement.reward() + " m).");
+        }
         if (highlights.isEmpty()) {
             highlights.add(Messages.NO_NEWS);
         }

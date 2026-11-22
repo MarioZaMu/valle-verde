@@ -1,5 +1,6 @@
 package edu.ucc.farmsim.application.controller;
 
+import edu.ucc.farmsim.application.dto.AchievementView;
 import edu.ucc.farmsim.application.dto.BuildingActionView;
 import edu.ucc.farmsim.application.dto.BuildingView;
 import edu.ucc.farmsim.application.dto.BuildingsView;
@@ -8,8 +9,10 @@ import edu.ucc.farmsim.application.dto.InventoryView;
 import edu.ucc.farmsim.application.dto.MapView;
 import edu.ucc.farmsim.application.dto.MarketView;
 import edu.ucc.farmsim.application.dto.PlotView;
+import edu.ucc.farmsim.application.dto.SaveSlotView;
 import edu.ucc.farmsim.application.result.ErrorCode;
 import edu.ucc.farmsim.application.result.Result;
+import edu.ucc.farmsim.application.service.AchievementService;
 import edu.ucc.farmsim.application.service.AnimalService;
 import edu.ucc.farmsim.application.service.BuildingService;
 import edu.ucc.farmsim.application.service.DayService;
@@ -19,6 +22,7 @@ import edu.ucc.farmsim.application.service.MarketService;
 import edu.ucc.farmsim.application.service.ProgressService;
 import edu.ucc.farmsim.application.service.SaveGameService;
 import edu.ucc.farmsim.application.service.ViewMapper;
+import java.util.List;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,7 +36,7 @@ import org.springframework.stereotype.Component;
  * RNF-07), and it never touches repositories (AR-4). It is not the REST controller: the {@code api} package
  * translates HTTP into calls to this class.
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-28, HU-33, HU-35, HU-37, HU-38.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-26, HU-28, HU-29, HU-30, HU-31, HU-32, HU-33, HU-35, HU-37, HU-38.
  */
 @Component
 public final class GameController implements GameCommands {
@@ -48,6 +52,7 @@ public final class GameController implements GameCommands {
     private final MarketService market;
     private final BuildingService buildings;
     private final AnimalService animals;
+    private final AchievementService achievements;
 
     /**
      * Creates the controller.
@@ -61,10 +66,12 @@ public final class GameController implements GameCommands {
      * @param market   buying, selling and the market and inventory views
      * @param buildings construction
      * @param animals  animal care
+     * @param achievements the achievements and their progress
      */
     public GameController(GameSession session, ViewMapper mapper, ProgressService progress, DayService day,
                           SaveGameService saves, FarmService farm, MarketService market,
-                          BuildingService buildings, AnimalService animals) {
+                          BuildingService buildings, AnimalService animals,
+                          AchievementService achievements) {
         this.session = session;
         this.mapper = mapper;
         this.progress = progress;
@@ -74,6 +81,7 @@ public final class GameController implements GameCommands {
         this.market = market;
         this.buildings = buildings;
         this.animals = animals;
+        this.achievements = achievements;
     }
 
     /** True if a game is in progress (the UI asks for confirmation before discarding it). */
@@ -224,6 +232,26 @@ public final class GameController implements GameCommands {
     @Override
     public Result<BuildingActionView> cure(int buildingId, int animalIndex) {
         return guard(() -> animals.cure(buildingId, animalIndex));
+    }
+
+    @Override
+    public Result<List<AchievementView>> achievements() {
+        return guard(achievements::achievements);
+    }
+
+    @Override
+    public Result<List<SaveSlotView>> saveSlots() {
+        return guard(saves::slots);
+    }
+
+    @Override
+    public Result<SaveSlotView> save(int slot) {
+        return guard(() -> saves.save(slot));
+    }
+
+    @Override
+    public Result<HudView> load(int slot) {
+        return guard(() -> saves.load(slot));
     }
 
     private <T> Result<T> guard(Supplier<Result<T>> operation) {

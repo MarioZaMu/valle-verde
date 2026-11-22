@@ -166,16 +166,55 @@ class HU36ToolsAndClicksTest {
     }
 
     @Test
-    void HU36_ca5_enterEndsTheDayAndTheShortcutsOfLaterPhasesExplainThemselves() {
+    void HU36_ca5_enterEndsTheDayAndLOpensTheAchievements() {
         TestApp app = TestApp.startedGame();
+        edu.ucc.farmsim.support.RecordingDialogs dialogs = new edu.ucc.farmsim.support.RecordingDialogs();
+        GameScreenPresenter presenter = new GameScreenPresenter(app.controller, tools, messages::add, dialogs);
 
-        presenter(app).onShortcut(Shortcut.END_DAY);
+        presenter.onShortcut(Shortcut.END_DAY);
+        presenter.onShortcut(Shortcut.ACHIEVEMENTS);
+
         assertEquals(2, app.controller.hud().value().day());
         assertTrue(messages.stream().allMatch(String::isBlank));
+        assertEquals(List.of("achievements"), dialogs.opened);
+    }
 
-        messages.clear();
-        presenter(app).onShortcut(Shortcut.ACHIEVEMENTS);
-        assertEquals(List.of(Texts.SHORTCUT_NOT_AVAILABLE_YET), messages);
+    @Test
+    void HU36_ca5_f5AndF9OpenTheSlotsTheFirstTimeAndThenUseTheSlotUsedLast() {
+        TestApp app = TestApp.startedGame();
+        edu.ucc.farmsim.support.RecordingDialogs dialogs = new edu.ucc.farmsim.support.RecordingDialogs();
+        GameScreenPresenter presenter = new GameScreenPresenter(app.controller, tools, messages::add, dialogs);
+
+        presenter.onShortcut(Shortcut.QUICK_SAVE);
+        presenter.onShortcut(Shortcut.QUICK_LOAD);
+        assertEquals(List.of("slots:save", "slots:load"), dialogs.opened);
+
+        presenter.useSlot(2);
+        presenter.onShortcut(Shortcut.QUICK_SAVE);
+        app.controller.endDay();
+        presenter.onShortcut(Shortcut.QUICK_LOAD);
+
+        assertEquals(List.of("Partida guardada en la ranura 2.", "Partida cargada de la ranura 2."), messages);
+        assertEquals(1, app.controller.hud().value().day());
+        assertEquals(2, presenter.lastSlot());
+    }
+
+    @Test
+    void HU36_quickSaveAndLoadShowTheRn35MessageWhenTheStorageFails() {
+        edu.ucc.farmsim.support.FakeSaveRepository repository = new edu.ucc.farmsim.support.FakeSaveRepository();
+        TestApp app = TestApp.create(new edu.ucc.farmsim.application.service.GameSession(),
+                edu.ucc.farmsim.domain.game.DayPipeline.standard(), repository);
+        app.controller.newGame(TestApp.SEED);
+        GameScreenPresenter presenter = new GameScreenPresenter(app.controller, tools, messages::add,
+                new edu.ucc.farmsim.support.RecordingDialogs());
+        presenter.useSlot(1);
+        repository.unreachable();
+
+        presenter.onShortcut(Shortcut.QUICK_SAVE);
+        presenter.onShortcut(Shortcut.QUICK_LOAD);
+
+        assertEquals(List.of("No se pudo acceder a las partidas guardadas: MongoDB no respondió.",
+                "No se pudo acceder a las partidas guardadas: MongoDB no respondió."), messages);
     }
 
     @Test

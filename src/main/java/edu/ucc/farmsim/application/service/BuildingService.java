@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
  * The construction use cases (RN-20, RN-21): build a building on free grass, and list what is built and what
  * can be built. The rules are checked in the order of RN-21 and a rejection never changes the game.
  *
- * <p>Stories: HU-18, HU-24.
+ * <p>Stories: HU-18, HU-24, HU-26.
  */
 @Service
 public final class BuildingService {
@@ -25,6 +25,7 @@ public final class BuildingService {
     private final GameSession session;
     private final ViewMapper mapper;
     private final EventBus events;
+    private final AchievementService achievements;
 
     /**
      * Creates the service.
@@ -32,11 +33,13 @@ public final class BuildingService {
      * @param session the game in progress
      * @param mapper  builds the views the UI draws
      * @param events  where events are published
+     * @param achievements evaluates the achievements after each construction
      */
-    public BuildingService(GameSession session, ViewMapper mapper, EventBus events) {
+    public BuildingService(GameSession session, ViewMapper mapper, EventBus events, AchievementService achievements) {
         this.session = session;
         this.mapper = mapper;
         this.events = events;
+        this.achievements = achievements;
     }
 
     /**
@@ -74,6 +77,8 @@ public final class BuildingService {
         }
         events.publish(new GameEvent.MoneyChanged(state.money()));
         events.publish(new GameEvent.MapChanged());
+        state.progress().recordBuild();
+        achievements.check(state);
         return Result.ok(mapper.building(building));
     }
 

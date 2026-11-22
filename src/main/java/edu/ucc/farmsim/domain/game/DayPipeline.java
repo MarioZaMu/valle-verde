@@ -28,7 +28,8 @@ public final class DayPipeline {
                 .add(new MarketStep())
                 .add(new CalendarStep())
                 .add(new ForecastStep())
-                .add(new EnergyResetStep());
+                .add(new EnergyResetStep())
+                .add(new AchievementsStep());
     }
 
     /**

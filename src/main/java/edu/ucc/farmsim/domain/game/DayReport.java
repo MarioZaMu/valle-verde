@@ -1,5 +1,6 @@
 package edu.ucc.farmsim.domain.game;
 
+import edu.ucc.farmsim.domain.progress.Achievement;
 import edu.ucc.farmsim.domain.time.GameDate;
 import edu.ucc.farmsim.domain.time.Weather;
 import java.util.ArrayList;
@@ -9,7 +10,7 @@ import java.util.List;
 /**
  * Facts about one end of the day, filled in by the steps and read by the application layer.
  *
- * <p>Stories: HU-05, HU-10, HU-17, HU-21, HU-22.
+ * <p>Stories: HU-05, HU-10, HU-17, HU-21, HU-22, HU-26.
  */
 public final class DayReport {
 
@@ -21,6 +22,7 @@ public final class DayReport {
     private int witheredCrops;
     private int sickAnimals;
     private int products;
+    private final List<Achievement> unlocked = new ArrayList<>();
     private int balanceBefore;
     private int balanceAfter;
     private int income;
@@ -54,6 +56,15 @@ public final class DayReport {
     /** Number of crops that withered during this end of the day. */
     public int witheredCrops() {
         return witheredCrops;
+    }
+
+    /** Achievements unlocked during this end of the day (step 8). */
+    public List<Achievement> unlocked() {
+        return Collections.unmodifiableList(unlocked);
+    }
+
+    void addUnlocked(List<Achievement> achievements) {
+        unlocked.addAll(achievements);
     }
 
     /** Animals that fell sick during this end of the day. */

@@ -42,6 +42,13 @@ public final class Names {
             "BUILDER", "Constructor", "BARNYARD_FARMER", "Granjero de corral", "VETERINARIAN", "Veterinario",
             "ONE_YEAR_IN_THE_VALLEY", "Un año en el valle");
 
+    private static final Map<String, String> ACHIEVEMENT_TEXTS = Map.of(
+            "FIRST_HARVEST", "Cosecha 1 cultivo.", "GREEN_THUMB", "Cosecha 25 cultivos en total.",
+            "BIG_HARVESTER", "Cosecha 100 cultivos en total.", "TRADER", "Vende 50 unidades en total.",
+            "CAPITALIST", "Ten un saldo de 3.000 m o más.", "BUILDER", "Construye tu primer edificio.",
+            "BARNYARD_FARMER", "Ten 4 animales a la vez.", "VETERINARIAN", "Cura a un animal enfermo.",
+            "ONE_YEAR_IN_THE_VALLEY", "Llega al Año 2.");
+
     private static final Map<String, String> TERRAINS = Map.of(
             "SOIL", "Tierra de cultivo", "GRASS", "Hierba", "WATER", "Agua", "OBSTACLE", "Obstáculo");
 
@@ -102,6 +109,11 @@ public final class Names {
     /** Name of an achievement, for example {@code GREEN_THUMB} to {@code Manos a la tierra}. */
     public static String achievement(String id) {
         return ACHIEVEMENTS.getOrDefault(id, id);
+    }
+
+    /** What an achievement asks for, in Spanish. */
+    public static String achievementDescription(String id) {
+        return ACHIEVEMENT_TEXTS.getOrDefault(id, id);
     }
 
     /** Terrain name, for example {@code SOIL} to {@code Tierra de cultivo}. */

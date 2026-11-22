@@ -20,6 +20,15 @@ public interface ScreenNavigator {
     /** Asks a yes/no question; returns {@code true} if the player accepts. */
     boolean confirm(String text);
 
+    /**
+     * Asks the player to pick one of the lines (the save slots).
+     *
+     * @param title   what the player is choosing
+     * @param options the lines, one per slot, in order
+     * @return the number of the line chosen, from 1, or 0 if the player cancelled
+     */
+    int choose(String title, java.util.List<String> options);
+
     /** Closes the application. */
     void exit();
 }

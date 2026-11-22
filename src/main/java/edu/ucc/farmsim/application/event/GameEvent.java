@@ -7,7 +7,7 @@ import edu.ucc.farmsim.application.dto.HudView;
  * Something that happened in the game and the screen may want to show. Events carry immutable views, never
  * domain objects, so the UI can react without importing the domain.
  *
- * <p>Stories: HU-01, HU-10, HU-14, HU-15, HU-17, HU-34.
+ * <p>Stories: HU-01, HU-10, HU-14, HU-15, HU-17, HU-26, HU-34.
  */
 public sealed interface GameEvent {
 
@@ -16,6 +16,9 @@ public sealed interface GameEvent {
 
     /** The day ended; the HUD shows the new date, weather and energy. */
     record DayEnded(HudView hud) implements GameEvent { }
+
+    /** An achievement was unlocked and its reward paid (RN-28). */
+    record AchievementUnlocked(String code, String name, int reward) implements GameEvent { }
 
     /** The summary of the day that just ended (HU-17). */
     record DaySummaryReady(DaySummaryView summary) implements GameEvent { }

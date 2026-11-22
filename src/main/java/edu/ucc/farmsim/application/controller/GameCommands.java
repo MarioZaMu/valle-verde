@@ -1,5 +1,6 @@
 package edu.ucc.farmsim.application.controller;
 
+import edu.ucc.farmsim.application.dto.AchievementView;
 import edu.ucc.farmsim.application.dto.BuildingActionView;
 import edu.ucc.farmsim.application.dto.BuildingView;
 import edu.ucc.farmsim.application.dto.BuildingsView;
@@ -8,7 +9,9 @@ import edu.ucc.farmsim.application.dto.InventoryView;
 import edu.ucc.farmsim.application.dto.MapView;
 import edu.ucc.farmsim.application.dto.MarketView;
 import edu.ucc.farmsim.application.dto.PlotView;
+import edu.ucc.farmsim.application.dto.SaveSlotView;
 import edu.ucc.farmsim.application.result.Result;
+import java.util.List;
 
 /**
  * Everything the player interface can ask the game to do. It is the only thing the UI knows about the game
@@ -17,7 +20,7 @@ import edu.ucc.farmsim.application.result.Result;
  *
  * <p>Every operation answers with a {@link Result}; none of them throws (R-03, RNF-07).
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-28, HU-33, HU-35, HU-37, HU-38.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-26, HU-28, HU-29, HU-30, HU-31, HU-32, HU-33, HU-35, HU-37, HU-38.
  */
 public interface GameCommands {
 
@@ -144,4 +147,25 @@ public interface GameCommands {
      * @param animalIndex position of the animal inside the building
      */
     Result<BuildingActionView> cure(int buildingId, int animalIndex);
+
+    /** Every achievement with the player's progress. A pure query. */
+    Result<List<AchievementView>> achievements();
+
+    /** What each save slot holds. A pure query. */
+    Result<List<SaveSlotView>> saveSlots();
+
+    /**
+     * Saves the game in progress in a slot, replacing what it held (RN-31).
+     *
+     * @param slot slot number, 1 to 3
+     * @return the slot as it is now
+     */
+    Result<SaveSlotView> save(int slot);
+
+    /**
+     * Loads a slot and makes it the game in progress; if the slot is rejected the game does not change (RN-33).
+     *
+     * @param slot slot number, 1 to 3
+     */
+    Result<HudView> load(int slot);
 }

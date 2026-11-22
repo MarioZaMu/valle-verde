@@ -237,6 +237,41 @@ class RemoteGameClientTest {
         assertEquals(ErrorCode.UBICACION_INVALIDA, client.build("COOP", 3, 2).code());
     }
 
+    @Test
+    void achievementsSlotsSavingAndLoadingTravelThroughTheClient() {
+        client.newGame(TestApp.SEED);
+        events.clear();
+
+        Result<java.util.List<edu.ucc.farmsim.application.dto.AchievementView>> achievements = client.achievements();
+        Result<edu.ucc.farmsim.application.dto.SaveSlotView> saved = client.save(1);
+        client.endDay();
+        Result<java.util.List<edu.ucc.farmsim.application.dto.SaveSlotView>> slots = client.saveSlots();
+        events.clear();
+        Result<HudView> loaded = client.load(1);
+
+        assertEquals(9, achievements.value().size());
+        assertEquals("OK", saved.value().status());
+        assertEquals(java.util.List.of("OK", "EMPTY", "EMPTY"),
+                slots.value().stream().map(edu.ucc.farmsim.application.dto.SaveSlotView::status).toList());
+        assertEquals(1, loaded.value().day());
+        assertTrue(events.stream().anyMatch(GameEvent.GameStarted.class::isInstance));
+        assertEquals(ErrorCode.ARCHIVO_INEXISTENTE, client.load(3).code());
+        assertEquals("No existe una partida en la ranura 3.", client.load(3).message());
+    }
+
+    @Test
+    void anAchievementUnlockedOnTheServerIsRepublishedOnTheLocalBus() {
+        client.newGame(TestApp.SEED);
+        session.current().inventory().add(ItemType.CARROT, 1);
+        events.clear();
+        session.current().progress().recordHarvest();
+        GameFixtures.plant(session.current(), COL, ROW, edu.ucc.farmsim.domain.crop.CropType.CARROT, 4);
+
+        client.harvest(COL, ROW);
+
+        assertTrue(events.contains(new GameEvent.AchievementUnlocked("LG-01", "Primera cosecha", 50)));
+    }
+
     /** The same sequence of orders, recording every result and then the events each one caused. */
     private static List<Object> script(edu.ucc.farmsim.application.controller.GameCommands game, List<GameEvent> seen) {
         List<Object> log = new ArrayList<>();
@@ -268,6 +303,11 @@ class RemoteGameClientTest {
         log.add(describe(game.cure(0, 0)));
         log.add(describe(game.buildings()));
         log.add(describe(game.endDay()));
+        log.add(describe(game.achievements()));
+        log.add(game.save(2).isOk()); // the time of the save differs between the two clocks
+        log.add(game.saveSlots().value().stream().map(edu.ucc.farmsim.application.dto.SaveSlotView::status).toList());
+        log.add(describe(game.load(2)));
+        log.add(describe(game.load(3)));
         log.add(List.copyOf(seen));
         return log;
     }

@@ -6,7 +6,7 @@ import edu.ucc.farmsim.application.dto.DaySummaryView;
  * What the game screen logic needs to open its dialogs (market, inventory, construction, a building and the
  * summary of the day). The real one opens Swing dialogs; tests use a fake, so no display is needed.
  *
- * <p>Stories: HU-17, HU-18, HU-37, HU-38.
+ * <p>Stories: HU-17, HU-18, HU-26, HU-29, HU-30, HU-37, HU-38.
  */
 public interface GameDialogs {
 
@@ -30,6 +30,17 @@ public interface GameDialogs {
      * @param buildingId id of the building
      */
     void showBuilding(int buildingId);
+
+    /** Opens the achievements dialog (shortcut L). */
+    void showAchievements();
+
+    /**
+     * Opens the save slots dialog.
+     *
+     * @param saving {@code true} when the player came to save, {@code false} to load (it only changes which
+     *               button is the natural one; both are available)
+     */
+    void showSlots(boolean saving);
 
     /** Shows the summary of the day that just ended. */
     void showSummary(DaySummaryView summary);

@@ -48,3 +48,4 @@ edu.ucc.farmsim.domain.building.BarnBuilder | Builder | ConcreteBuilder (barn: f
 edu.ucc.farmsim.domain.building.WarehouseBuilder | Builder | ConcreteBuilder (warehouse: twelve more inventory slots)
 edu.ucc.farmsim.domain.building.GreenhouseBuilder | Builder | ConcreteBuilder (greenhouse: nine protected plots)
 edu.ucc.farmsim.domain.building.BuildingDirector | Builder | Director (knows the order of the steps and which builder each type needs)
+edu.ucc.farmsim.application.service.SaveGameService | Memento | Caretaker (keeps the snapshots of the game; it never looks inside them)

@@ -26,23 +26,26 @@ import org.springframework.stereotype.Service;
  * The economy use cases: buying at fixed prices (RN-16), selling at the dynamic price (RN-17, RN-18), the
  * previsional total of a sale, the market and inventory views. Every rejection leaves the game untouched.
  *
- * <p>Stories: HU-14, HU-15, HU-16, HU-19, HU-37, HU-38.
+ * <p>Stories: HU-14, HU-15, HU-16, HU-19, HU-26, HU-37, HU-38.
  */
 @Service
 public final class MarketService {
 
     private final GameSession session;
     private final EventBus events;
+    private final AchievementService achievements;
 
     /**
      * Creates the service.
      *
      * @param session the game in progress
      * @param events  where events are published
+     * @param achievements evaluates the achievements after each sale
      */
-    public MarketService(GameSession session, EventBus events) {
+    public MarketService(GameSession session, EventBus events, AchievementService achievements) {
         this.session = session;
         this.events = events;
+        this.achievements = achievements;
     }
 
     /**
@@ -98,8 +101,10 @@ public final class MarketService {
         }
         state.inventory().remove(item, quantity);
         state.earn(total);
+        state.progress().recordSale(quantity);
         events.publish(new GameEvent.MoneyChanged(state.money()));
         events.publish(new GameEvent.InventoryChanged());
+        achievements.check(state);
         return Result.ok(total);
     }
 

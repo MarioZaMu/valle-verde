@@ -60,6 +60,13 @@ public final class ScreenRouter extends JPanel implements ScreenNavigator {
     }
 
     @Override
+    public int choose(String title, java.util.List<String> options) {
+        Object picked = JOptionPane.showInputDialog(this, title, GameInfo.NAME, JOptionPane.QUESTION_MESSAGE, null,
+                options.toArray(), options.isEmpty() ? null : options.get(0));
+        return picked == null ? 0 : options.indexOf(picked) + 1;
+    }
+
+    @Override
     public void exit() {
         Window window = SwingUtilities.getWindowAncestor(this);
         if (window != null) {

@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
  * <p>Before running the steps it takes a snapshot; if any step fails the snapshot is restored, so a failed
  * end of the day leaves the game exactly as it was and publishes nothing (HU-10 · CA-4).
  *
- * <p>Stories: HU-10, HU-17.
+ * <p>Stories: HU-10, HU-17, HU-26.
  */
 @Service
 public final class DayService {
@@ -30,6 +30,7 @@ public final class DayService {
     private final DayPipeline pipeline;
     private final ViewMapper mapper;
     private final EventBus events;
+    private final AchievementService achievements;
 
     /**
      * Creates the service.
@@ -38,12 +39,15 @@ public final class DayService {
      * @param pipeline the steps of the end of the day
      * @param mapper   builds the views the UI draws
      * @param events   where events are published
+     * @param achievements announces the achievements unlocked at the end of the day
      */
-    public DayService(GameSession session, DayPipeline pipeline, ViewMapper mapper, EventBus events) {
+    public DayService(GameSession session, DayPipeline pipeline, ViewMapper mapper, EventBus events,
+                      AchievementService achievements) {
         this.session = session;
         this.pipeline = pipeline;
         this.mapper = mapper;
         this.events = events;
+        this.achievements = achievements;
     }
 
     /** Ends the day of the game in progress and returns the new top bar. */
@@ -63,6 +67,7 @@ public final class DayService {
         }
         HudView hud = mapper.hud(state);
         events.publish(new GameEvent.DayEnded(hud));
+        achievements.announce(state, report.unlocked());
         events.publish(new GameEvent.DaySummaryReady(mapper.summary(state, report)));
         return Result.ok(hud);
     }

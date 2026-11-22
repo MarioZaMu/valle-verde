@@ -3,13 +3,14 @@ package edu.ucc.farmsim.ui.screens;
 import edu.ucc.farmsim.application.controller.GameCommands;
 import edu.ucc.farmsim.application.dto.HudView;
 import edu.ucc.farmsim.application.result.Result;
+import edu.ucc.farmsim.ui.components.SlotsPresenter;
 import edu.ucc.farmsim.ui.theme.Texts;
 import java.util.function.LongSupplier;
 
 /**
  * Logic of the start screen, with no Swing: what happens when each button is pressed.
  *
- * <p>Stories: HU-33, HU-28.
+ * <p>Stories: HU-28, HU-30, HU-33.
  */
 public final class StartScreenPresenter {
 
@@ -43,7 +44,7 @@ public final class StartScreenPresenter {
         }
     }
 
-    /** "Load": tells the player when there is nothing to load (loading itself arrives with HU-30). */
+    /** "Load": tells the player when there is nothing to load, or lets them choose a slot and loads it. */
     public void onLoad() {
         Result<Boolean> saved = controller.hasSavedGames();
         if (!saved.isOk()) {
@@ -51,7 +52,25 @@ public final class StartScreenPresenter {
         } else if (!saved.value()) {
             navigator.showMessage(Texts.NO_SAVED_GAMES);
         } else {
-            navigator.showMessage(Texts.LOAD_NOT_AVAILABLE_YET);
+            chooseAndLoad();
+        }
+    }
+
+    private void chooseAndLoad() {
+        SlotsPresenter slots = new SlotsPresenter(controller);
+        if (!slots.error().isEmpty()) {
+            navigator.showMessage(slots.error());
+            return;
+        }
+        int slot = navigator.choose(Texts.CHOOSE_SLOT, slots.lines());
+        if (slot == 0) {
+            return;
+        }
+        Result<HudView> result = slots.load(slot);
+        if (result.isOk()) {
+            navigator.showGame();
+        } else {
+            navigator.showMessage(result.message());
         }
     }
 

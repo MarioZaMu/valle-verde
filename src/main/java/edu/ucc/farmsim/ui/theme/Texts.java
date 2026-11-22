@@ -24,9 +24,6 @@ public final class Texts {
     /** Shown when "Load" is chosen and no slot holds a game. */
     public static final String NO_SAVED_GAMES = "No hay partidas guardadas.";
 
-    /** Shown when "Load" is chosen, a saved game exists, but loading is not implemented yet. */
-    public static final String LOAD_NOT_AVAILABLE_YET = "La carga de partidas todavía no está disponible.";
-
     /** Asked before discarding a game in progress. */
     public static final String CONFIRM_DISCARD_GAME =
             "Ya hay una partida en curso. ¿Descartarla y empezar una nueva?";
@@ -39,9 +36,6 @@ public final class Texts {
 
     /** Game screen: temporary text where the farm map will be drawn. */
     public static final String MAP_PLACEHOLDER = "Aquí aparecerá el mapa de la granja.";
-
-    /** Shown when a tool whose feature does not exist yet is used. */
-    public static final String TOOL_NOT_AVAILABLE_YET = "Esta herramienta estará disponible en una fase posterior.";
 
     /** Shown when the Sow tool is used and no seed is chosen. */
     public static final String NO_SEED_SELECTED = "Elige una semilla en la barra o en el inventario (I).";
@@ -78,9 +72,6 @@ public final class Texts {
 
     /** Table column: trend. */
     public static final String COL_TREND = "Tendencia";
-
-    /** Shown when a shortcut whose feature does not exist yet is pressed. */
-    public static final String SHORTCUT_NOT_AVAILABLE_YET = "Esa función estará disponible en una fase posterior.";
 
     /** Label of the seed chooser next to the tools. */
     public static final String SEED_LABEL = "Semilla:";
@@ -142,6 +133,48 @@ public final class Texts {
     /** No. */
     public static final String NO = "no";
 
+    /** Title of the achievements dialog. */
+    public static final String ACHIEVEMENTS_TITLE = "Logros";
+
+    /** Table column: achievement. */
+    public static final String COL_ACHIEVEMENT = "Logro";
+
+    /** Table column: what it asks for. */
+    public static final String COL_CONDITION = "Condición";
+
+    /** Table column: reward. */
+    public static final String COL_REWARD = "Recompensa";
+
+    /** State of an unlocked achievement. */
+    public static final String UNLOCKED = "Desbloqueado";
+
+    /** Title of the save slots dialog. */
+    public static final String SLOTS_TITLE = "Partidas guardadas";
+
+    /** Button that saves. */
+    public static final String SAVE = "Guardar";
+
+    /** Button that loads. */
+    public static final String LOAD = "Cargar";
+
+    /** A slot with nothing. */
+    public static final String SLOT_EMPTY = "Vacía";
+
+    /** A slot whose document cannot be read. */
+    public static final String SLOT_DAMAGED = "Dañada";
+
+    /** Asked before replacing an occupied slot. */
+    public static final String CONFIRM_OVERWRITE = "La ranura ya tiene una partida. ¿Reemplazarla?";
+
+    /** Start of the message after saving; the slot number follows. */
+    public static final String SAVED_IN_SLOT = "Partida guardada en la ranura ";
+
+    /** Start of the message after loading; the slot number follows. */
+    public static final String LOADED_FROM_SLOT = "Partida cargada de la ranura ";
+
+    /** Title of the list shown to choose the slot to load. */
+    public static final String CHOOSE_SLOT = "Elige la ranura que quieres cargar";
+
     /** Shown in the top bar when there is no game yet. */
     public static final String NO_VALUE = "—";
 
@@ -160,6 +193,11 @@ public final class Texts {
             case BUILD -> "Construir";
             case FEED -> "Alimentar";
         };
+    }
+
+    /** Shown in the status bar when an achievement is unlocked. */
+    public static String achievementUnlocked(String name, int reward) {
+        return "¡Logro desbloqueado: " + name + "! +" + money(reward);
     }
 
     /** Size of a building, for example {@code 2 × 2}. */

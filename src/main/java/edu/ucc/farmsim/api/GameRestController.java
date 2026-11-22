@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
  * <p>There is one game per server (S-01), so every order runs under the same lock (DT-20). The events an
  * order causes travel in the response (DT-19). The routes are documented in {@code docs/API.md}.
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-28, HU-33, HU-35, HU-37, HU-38.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-26, HU-28, HU-29, HU-30, HU-31, HU-32, HU-33, HU-35, HU-37, HU-38.
  */
 @RestController
 @RequestMapping("/api")
@@ -60,6 +61,30 @@ public class GameRestController {
 
     /** Body of {@code POST /api/animals}. */
     public record AnimalPurchaseRequest(@NotBlank String animalId) { }
+
+    /** Every achievement with the player's progress. */
+    @GetMapping("/achievements")
+    public ResponseEntity<?> achievements() {
+        return run(game::achievements, HttpStatus.OK);
+    }
+
+    /** What each save slot holds. */
+    @GetMapping("/saves")
+    public ResponseEntity<?> saveSlots() {
+        return run(game::saveSlots, HttpStatus.OK);
+    }
+
+    /** Saves the game in progress in a slot, replacing what it held (RN-31). */
+    @PutMapping("/saves/{slot}")
+    public ResponseEntity<?> save(@PathVariable int slot) {
+        return run(() -> game.save(slot), HttpStatus.OK);
+    }
+
+    /** Loads a slot and makes it the game in progress (RN-33). */
+    @PostMapping("/saves/{slot}/load")
+    public ResponseEntity<?> load(@PathVariable int slot) {
+        return run(() -> game.load(slot), HttpStatus.OK);
+    }
 
     /** Starts a new game (RN-30). */
     @PostMapping("/game")

@@ -3,10 +3,9 @@ package edu.ucc.farmsim.domain.game;
 import edu.ucc.farmsim.domain.economy.InventorySnapshot;
 import edu.ucc.farmsim.domain.economy.MarketSnapshot;
 import edu.ucc.farmsim.domain.farm.FarmMapSnapshot;
-import edu.ucc.farmsim.domain.progress.Achievement;
+import edu.ucc.farmsim.domain.progress.ProgressSnapshot;
 import edu.ucc.farmsim.domain.time.GameDate;
 import edu.ucc.farmsim.domain.time.Weather;
-import java.util.Set;
 
 /**
  * Pattern: Memento — Role: Memento (immutable snapshot of the game state).
@@ -15,7 +14,7 @@ import java.util.Set;
  * from it. It holds everything that changes during play: crops, buildings and animals, the market, the daily
  * ledger and the achievements.
  *
- * <p>Stories: HU-01, HU-10, HU-15, HU-16, HU-17, HU-18.
+ * <p>Stories: HU-01, HU-10, HU-15, HU-16, HU-17, HU-18, HU-26.
  *
  * @param date        calendar date
  * @param money       coins
@@ -27,8 +26,8 @@ import java.util.Set;
  * @param randomState internal state of the random generator
  * @param market       demand and previous prices
  * @param ledger       what was earned and spent today
- * @param achievements the achievements unlocked
+ * @param progress     the achievements unlocked and their counters
  */
 public record GameMemento(GameDate date, int money, int energy, InventorySnapshot inventory,
                           FarmMapSnapshot farm, Weather today, Weather forecast, long randomState,
-                          MarketSnapshot market, LedgerSnapshot ledger, Set<Achievement> achievements) { }
+                          MarketSnapshot market, LedgerSnapshot ledger, ProgressSnapshot progress) { }

@@ -25,7 +25,7 @@ class HU24WarehouseTest {
         Result<BuildingView> result = app.controller.build("WAREHOUSE", 2, 7);
 
         assertTrue(result.isOk(), String.valueOf(result.message()));
-        assertEquals(200, app.state().money());
+        assertEquals(300, app.state().money()); // 500 - 300 + 100 of LG-06
         assertEquals(36, app.state().inventory().capacity());
         assertEquals(36, app.controller.inventory().value().capacity());
     }

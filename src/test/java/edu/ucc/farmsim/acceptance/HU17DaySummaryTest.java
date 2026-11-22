@@ -67,6 +67,21 @@ class HU17DaySummaryTest {
     }
 
     @Test
+    void HU17_ca2_anAchievementUnlockedAtTheEndOfTheDayIsListedWithItsReward() {
+        TestApp app = TestApp.startedGame();
+        GameFixtures.setDate(1, edu.ucc.farmsim.domain.time.Season.WINTER, 28);
+
+        app.controller.endDay();
+
+        DaySummaryView summary = summaryOf(app);
+        assertEquals(List.of("Logro desbloqueado: «Un año en el valle» (+500 m)."), summary.highlights());
+        assertEquals(500, summary.income());
+        assertEquals(1000, summary.balanceAfter());
+        assertEquals(500, summary.balanceBefore());
+        assertTrue(app.events.contains(new GameEvent.AchievementUnlocked("LG-09", "Un año en el valle", 500)));
+    }
+
+    @Test
     void HU17_ca3_aDayWithoutMovementsSaysSinNovedades() {
         TestApp app = TestApp.startedGame();
 

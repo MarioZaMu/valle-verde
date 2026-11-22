@@ -221,6 +221,53 @@ public final class GameRules {
     /** Plots a greenhouse protects (3 x 3). */
     public static final int GREENHOUSE_PROTECTED_PLOTS = 9;
 
+    // ---- RN-28: achievements ----
+
+    /** Reward in m of LG-01, first harvest. */
+    public static final int REWARD_FIRST_HARVEST = 50;
+
+    /** Harvests that grant LG-02. */
+    public static final int HARVESTS_GREEN_THUMB = 25;
+
+    /** Reward in m of LG-02. */
+    public static final int REWARD_GREEN_THUMB = 150;
+
+    /** Harvests that grant LG-03. */
+    public static final int HARVESTS_BIG_HARVESTER = 100;
+
+    /** Reward in m of LG-03. */
+    public static final int REWARD_BIG_HARVESTER = 400;
+
+    /** Units sold that grant LG-04. */
+    public static final int UNITS_SOLD_TRADER = 50;
+
+    /** Reward in m of LG-04. */
+    public static final int REWARD_TRADER = 100;
+
+    /** Balance in m that grants LG-05. */
+    public static final int BALANCE_CAPITALIST = 3000;
+
+    /** Reward in m of LG-05. */
+    public static final int REWARD_CAPITALIST = 200;
+
+    /** Reward in m of LG-06, first building. */
+    public static final int REWARD_BUILDER = 100;
+
+    /** Animals at the same time that grant LG-07. */
+    public static final int ANIMALS_BARNYARD_FARMER = 4;
+
+    /** Reward in m of LG-07. */
+    public static final int REWARD_BARNYARD_FARMER = 150;
+
+    /** Reward in m of LG-08, first animal cured. */
+    public static final int REWARD_VETERINARIAN = 80;
+
+    /** Year that grants LG-09. */
+    public static final int YEAR_ONE_YEAR_IN_THE_VALLEY = 2;
+
+    /** Reward in m of LG-09. */
+    public static final int REWARD_ONE_YEAR_IN_THE_VALLEY = 500;
+
     // ---- RN-23 to RN-27: animals ----
 
     /** Animals a coop or a barn can house. */

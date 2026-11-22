@@ -33,11 +33,18 @@ class HU33StartScreenTest {
     private static final class FakeNavigator implements ScreenNavigator {
         final List<String> calls = new ArrayList<>();
         boolean answerToConfirmation = true;
+        int chosenSlot;
+        List<String> offered = List.of();
 
         @Override public void showStart() { calls.add("start"); }
         @Override public void showGame() { calls.add("game"); }
         @Override public void showMessage(String text) { calls.add("message:" + text); }
         @Override public boolean confirm(String text) { calls.add("confirm:" + text); return answerToConfirmation; }
+        @Override public int choose(String title, List<String> options) {
+            calls.add("choose:" + title);
+            offered = options;
+            return chosenSlot;
+        }
         @Override public void exit() { calls.add("exit"); }
     }
 
@@ -81,13 +88,44 @@ class HU33StartScreenTest {
     }
 
     @Test
-    void HU33_ca3_loadWithASavedGameExplainsThatLoadingIsNotAvailableYet() {
+    void HU33_ca3_loadWithASavedGameOffersTheSlotsAndCancellingChangesNothing() {
         TestApp app = TestApp.create(new GameSession(), DayPipeline.standard(), new FakeSaveRepository().withSlot(2));
         FakeNavigator navigator = new FakeNavigator();
 
         new StartScreenPresenter(app.controller, navigator, () -> 1L).onLoad();
 
-        assertEquals(List.of("message:" + Texts.LOAD_NOT_AVAILABLE_YET), navigator.calls);
+        assertEquals(List.of("choose:" + Texts.CHOOSE_SLOT), navigator.calls);
+        assertEquals(3, navigator.offered.size());
+        assertFalse(app.controller.hasGameInProgress());
+    }
+
+    @Test
+    void HU30_ca3_choosingASavedSlotLoadsItAndShowsTheGameScreen() {
+        FakeSaveRepository repository = new FakeSaveRepository();
+        TestApp app = TestApp.create(new GameSession(), DayPipeline.standard(), repository);
+        app.controller.newGame(1L);
+        app.controller.endDay();
+        app.controller.save(3);
+        app.controller.newGame(2L);
+        FakeNavigator navigator = new FakeNavigator();
+        navigator.chosenSlot = 3;
+
+        new StartScreenPresenter(app.controller, navigator, () -> 1L).onLoad();
+
+        assertEquals(List.of("choose:" + Texts.CHOOSE_SLOT, "game"), navigator.calls);
+        assertEquals(2, app.controller.hud().value().day());
+    }
+
+    @Test
+    void HU31_choosingAnEmptySlotShowsTheRn35MessageAndStaysOnTheStartScreen() {
+        TestApp app = TestApp.create(new GameSession(), DayPipeline.standard(), new FakeSaveRepository().withSlot(1));
+        FakeNavigator navigator = new FakeNavigator();
+        navigator.chosenSlot = 3;
+
+        new StartScreenPresenter(app.controller, navigator, () -> 1L).onLoad();
+
+        assertEquals(List.of("choose:" + Texts.CHOOSE_SLOT, "message:No existe una partida en la ranura 3."),
+                navigator.calls);
     }
 
     @Test

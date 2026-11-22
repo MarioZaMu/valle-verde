@@ -4,6 +4,8 @@ import edu.ucc.farmsim.application.controller.GameCommands;
 import edu.ucc.farmsim.application.dto.DaySummaryView;
 import edu.ucc.farmsim.application.event.EventBus;
 import edu.ucc.farmsim.application.event.GameEvent;
+import edu.ucc.farmsim.ui.components.AchievementsDialog;
+import edu.ucc.farmsim.ui.components.AchievementsPresenter;
 import edu.ucc.farmsim.ui.components.BuildingDialog;
 import edu.ucc.farmsim.ui.components.BuildingPresenter;
 import edu.ucc.farmsim.ui.components.ConstructionDialog;
@@ -15,6 +17,8 @@ import edu.ucc.farmsim.ui.components.InventoryModel;
 import edu.ucc.farmsim.ui.components.MarketDialog;
 import edu.ucc.farmsim.ui.components.MarketPresenter;
 import edu.ucc.farmsim.ui.components.Shortcut;
+import edu.ucc.farmsim.ui.components.SlotsDialog;
+import edu.ucc.farmsim.ui.components.SlotsPresenter;
 import edu.ucc.farmsim.ui.components.Tool;
 import edu.ucc.farmsim.ui.components.ToolBar;
 import edu.ucc.farmsim.ui.components.ToolModel;
@@ -38,7 +42,7 @@ import javax.swing.SwingUtilities;
  * buttons "End day" and "Menu". Keys 1 to 5 pick a tool, Escape deselects it, and the shortcuts of RN-34 work
  * anywhere on the screen.
  *
- * <p>Stories: HU-17, HU-18, HU-20, HU-22, HU-23, HU-33, HU-34, HU-35, HU-36, HU-37, HU-38.
+ * <p>Stories: HU-17, HU-18, HU-20, HU-22, HU-23, HU-26, HU-29, HU-30, HU-33, HU-34, HU-35, HU-36, HU-37, HU-38.
  */
 public final class GameScreen extends JPanel {
 
@@ -59,6 +63,7 @@ public final class GameScreen extends JPanel {
         InventoryModel inventory = new InventoryModel(controller, tools);
         bus.subscribe(inventory);
         inventory.refresh();
+        GameScreenPresenter[] presenterRef = new GameScreenPresenter[1];
         GameDialogs dialogs = new GameDialogs() {
             @Override
             public void showMarket() {
@@ -84,14 +89,30 @@ public final class GameScreen extends JPanel {
             }
 
             @Override
+            public void showAchievements() {
+                new AchievementsDialog(SwingUtilities.getWindowAncestor(GameScreen.this),
+                        new AchievementsPresenter(controller)).setVisible(true);
+            }
+
+            @Override
+            public void showSlots(boolean saving) {
+                new SlotsDialog(SwingUtilities.getWindowAncestor(GameScreen.this), new SlotsPresenter(controller),
+                        slot -> presenterRef[0].useSlot(slot), () -> status.setText(Texts.LOADED_FROM_SLOT
+                        + presenterRef[0].lastSlot() + ".")).setVisible(true);
+            }
+
+            @Override
             public void showSummary(DaySummaryView summary) {
                 new DaySummaryDialog(SwingUtilities.getWindowAncestor(GameScreen.this), summary).setVisible(true);
             }
         };
         GameScreenPresenter presenter = new GameScreenPresenter(controller, tools, status::setText, dialogs);
+        presenterRef[0] = presenter;
         bus.subscribe(event -> {
             if (event instanceof GameEvent.DaySummaryReady ready) {
                 presenter.onSummary(ready.summary());
+            } else if (event instanceof GameEvent.AchievementUnlocked unlocked) {
+                status.setText(Texts.achievementUnlocked(unlocked.name(), unlocked.reward()));
             }
         });
 

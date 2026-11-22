@@ -1,9 +1,12 @@
 package edu.ucc.farmsim.client;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.ucc.farmsim.application.controller.GameCommands;
+import com.fasterxml.jackson.core.type.TypeReference;
+import edu.ucc.farmsim.application.dto.AchievementView;
 import edu.ucc.farmsim.application.dto.BuildingActionView;
 import edu.ucc.farmsim.application.dto.BuildingView;
 import edu.ucc.farmsim.application.dto.BuildingsView;
@@ -12,6 +15,7 @@ import edu.ucc.farmsim.application.dto.InventoryView;
 import edu.ucc.farmsim.application.dto.MapView;
 import edu.ucc.farmsim.application.dto.MarketView;
 import edu.ucc.farmsim.application.dto.PlotView;
+import edu.ucc.farmsim.application.dto.SaveSlotView;
 import edu.ucc.farmsim.application.event.EventBus;
 import edu.ucc.farmsim.application.event.GameEvent;
 import edu.ucc.farmsim.application.result.ErrorCode;
@@ -23,6 +27,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,7 +41,7 @@ import java.util.logging.Logger;
  * <p>Orders are sent synchronously from the calling thread with a time limit (DT-20). It never throws: an
  * unreachable server, a timeout or an unreadable answer becomes {@code ERROR_INTERNO}.
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-28, HU-33, HU-35, HU-37, HU-38.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-26, HU-28, HU-29, HU-30, HU-31, HU-32, HU-33, HU-35, HU-37, HU-38.
  */
 public final class RemoteGameClient implements GameCommands {
 
@@ -168,11 +173,39 @@ public final class RemoteGameClient implements GameCommands {
                 BuildingActionView.class);
     }
 
+    @Override
+    public Result<List<AchievementView>> achievements() {
+        return send("GET", "/api/achievements", null, new TypeReference<List<AchievementView>>() { });
+    }
+
+    @Override
+    public Result<List<SaveSlotView>> saveSlots() {
+        return send("GET", "/api/saves", null, new TypeReference<List<SaveSlotView>>() { });
+    }
+
+    @Override
+    public Result<SaveSlotView> save(int slot) {
+        return send("PUT", "/api/saves/" + slot, null, SaveSlotView.class);
+    }
+
+    @Override
+    public Result<HudView> load(int slot) {
+        return send("POST", "/api/saves/" + slot + "/load", null, HudView.class);
+    }
+
     private static String plot(int col, int row) {
         return "/api/farm/plots/" + col + "/" + row;
     }
 
     private <T> Result<T> send(String method, String path, Object body, Class<T> type) {
+        return send(method, path, body, mapper.constructType(type));
+    }
+
+    private <T> Result<T> send(String method, String path, Object body, TypeReference<T> type) {
+        return send(method, path, body, mapper.constructType(type));
+    }
+
+    private <T> Result<T> send(String method, String path, Object body, JavaType type) {
         try {
             HttpRequest.BodyPublisher publisher = body == null
                     ? HttpRequest.BodyPublishers.noBody()
@@ -196,14 +229,14 @@ public final class RemoteGameClient implements GameCommands {
         }
     }
 
-    private <T> Result<T> rebuild(HttpResponse<String> response, Class<T> type) throws IOException {
+    private <T> Result<T> rebuild(HttpResponse<String> response, JavaType type) throws IOException {
         JsonNode root = mapper.readTree(response.body());
         if (root == null || root.isMissingNode() || !root.isObject()) {
             LOG.warning("The server answered " + response.statusCode() + " without a JSON body");
             return Result.failWith(ErrorCode.ERROR_INTERNO);
         }
         if (response.statusCode() / 100 == 2) {
-            T value = mapper.treeToValue(root.get("data"), type);
+            T value = mapper.readerFor(type).readValue(root.get("data"));
             for (GameEvent event : decoder.decode(root.get("events"))) {
                 bus.publish(event);
             }

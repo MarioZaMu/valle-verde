@@ -7,6 +7,7 @@ import edu.ucc.farmsim.application.dto.DaySummaryView;
 import edu.ucc.farmsim.application.dto.HudView;
 import edu.ucc.farmsim.application.dto.MapView;
 import edu.ucc.farmsim.application.dto.PlotView;
+import edu.ucc.farmsim.application.dto.SaveSlotView;
 import edu.ucc.farmsim.application.result.Result;
 import edu.ucc.farmsim.ui.components.Shortcut;
 import edu.ucc.farmsim.ui.components.Tool;
@@ -18,7 +19,7 @@ import java.util.function.Consumer;
  * Logic of the game screen, with no Swing: what happens when the player clicks a plot, presses a button or
  * uses a shortcut. Messages go to a sink (the status bar in production); an empty string clears the bar.
  *
- * <p>Stories: HU-10, HU-17, HU-18, HU-20, HU-22, HU-34, HU-36.
+ * <p>Stories: HU-10, HU-17, HU-18, HU-20, HU-22, HU-26, HU-29, HU-30, HU-34, HU-36.
  */
 public final class GameScreenPresenter {
 
@@ -28,6 +29,7 @@ public final class GameScreenPresenter {
     private final ToolModel tools;
     private final Consumer<String> messages;
     private final GameDialogs dialogs;
+    private int lastSlot;
 
     /**
      * Creates the presenter.
@@ -118,16 +120,47 @@ public final class GameScreenPresenter {
         return map.isOk() ? map.value().buildingAt(col, row) : null;
     }
 
-    /** A keyboard shortcut. Only "end day" exists in this phase; the others explain that they will come. */
+    /** The slot saved or loaded last, or 0 if none has been used. */
+    public int lastSlot() {
+        return lastSlot;
+    }
+
+    /** Remembers the slot the player saved or loaded last, for the quick keys. */
+    public void useSlot(int slot) {
+        this.lastSlot = slot;
+    }
+
+    /**
+     * A keyboard shortcut (RN-34): end the day, open the market, the inventory or the achievements, and save or
+     * load quickly in the slot used last (the slots dialog opens if none has been used yet).
+     */
     public void onShortcut(Shortcut shortcut) {
-        if (shortcut == Shortcut.END_DAY) {
-            onEndDay();
-        } else if (shortcut == Shortcut.MARKET) {
-            dialogs.showMarket();
-        } else if (shortcut == Shortcut.INVENTORY) {
-            dialogs.showInventory();
-        } else {
-            messages.accept(Texts.SHORTCUT_NOT_AVAILABLE_YET);
+        switch (shortcut) {
+            case END_DAY -> onEndDay();
+            case MARKET -> dialogs.showMarket();
+            case INVENTORY -> dialogs.showInventory();
+            case ACHIEVEMENTS -> dialogs.showAchievements();
+            case QUICK_SAVE -> quickSave();
+            case QUICK_LOAD -> quickLoad();
+            default -> throw new IllegalStateException("Unhandled shortcut " + shortcut);
         }
+    }
+
+    private void quickSave() {
+        if (lastSlot == 0) {
+            dialogs.showSlots(true);
+            return;
+        }
+        Result<SaveSlotView> result = controller.save(lastSlot);
+        messages.accept(result.isOk() ? Texts.SAVED_IN_SLOT + lastSlot + "." : result.message());
+    }
+
+    private void quickLoad() {
+        if (lastSlot == 0) {
+            dialogs.showSlots(false);
+            return;
+        }
+        Result<HudView> result = controller.load(lastSlot);
+        messages.accept(result.isOk() ? Texts.LOADED_FROM_SLOT + lastSlot + "." : result.message());
     }
 }

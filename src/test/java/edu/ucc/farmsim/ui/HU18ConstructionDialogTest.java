@@ -85,8 +85,8 @@ class HU18ConstructionDialogTest {
 
         assertEquals("Construiste: Gallinero.", message);
         assertEquals(0, presenter.lastBuilt().orElseThrow().id());
-        assertEquals(100, app.state().money());
-        assertEquals("100 m", presenter.moneyText());
+        assertEquals(200, app.state().money()); // 500 - 400 + 100 of LG-06
+        assertEquals("200 m", presenter.moneyText());
     }
 
     @Test

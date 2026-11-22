@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
  * a sick animal (RN-27). Every operation checks all its rules first and only then changes the game, so a
  * rejection never leaves anything half done.
  *
- * <p>Stories: HU-19, HU-20, HU-22, HU-23.
+ * <p>Stories: HU-19, HU-20, HU-22, HU-23, HU-26.
  */
 @Service
 public final class AnimalService {
@@ -31,6 +31,7 @@ public final class AnimalService {
     private final GameSession session;
     private final ViewMapper mapper;
     private final EventBus events;
+    private final AchievementService achievements;
 
     /**
      * Creates the service.
@@ -38,11 +39,13 @@ public final class AnimalService {
      * @param session the game in progress
      * @param mapper  builds the views the UI draws
      * @param events  where events are published
+     * @param achievements evaluates the achievements after buying and curing
      */
-    public AnimalService(GameSession session, ViewMapper mapper, EventBus events) {
+    public AnimalService(GameSession session, ViewMapper mapper, EventBus events, AchievementService achievements) {
         this.session = session;
         this.mapper = mapper;
         this.events = events;
+        this.achievements = achievements;
     }
 
     /**
@@ -68,6 +71,7 @@ public final class AnimalService {
         home.addAnimal(new Animal(type));
         events.publish(new GameEvent.MoneyChanged(state.money()));
         events.publish(new GameEvent.MapChanged());
+        achievements.check(state);
         return Result.ok(mapper.building(home));
     }
 
@@ -163,7 +167,9 @@ public final class AnimalService {
         state.inventory().remove(ItemType.MEDICINE, GameRules.MEDICINE_PER_CURE);
         energy.trySpend(GameRules.ENERGY_COST_CURE);
         animal.cure();
+        state.progress().recordCure();
         publishChange(state, true);
+        achievements.check(state);
         return Result.ok(new BuildingActionView(mapper.building(building), 1, null));
     }
 

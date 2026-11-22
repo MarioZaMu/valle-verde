@@ -3,6 +3,7 @@ package edu.ucc.farmsim.api;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -331,7 +332,8 @@ class GameRestControllerTest {
         build("COOP", 2, 7).andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data.name").value("Gallinero"))
                 .andExpect(jsonPath("$.data.capacity").value(4))
-                .andExpect(jsonPath("$.events[?(@.type == 'MoneyChanged')].data.money").value(100))
+                .andExpect(jsonPath("$.events[?(@.type == 'MoneyChanged')].data.money").value(org.hamcrest.Matchers.contains(100, 200)))
+                .andExpect(jsonPath("$.events[?(@.type == 'AchievementUnlocked')].data.code").value("LG-06"))
                 .andExpect(jsonPath("$.events[?(@.type == 'MapChanged')]").isNotEmpty());
     }
 
@@ -429,5 +431,55 @@ class GameRestControllerTest {
                 .andExpect(jsonPath("$.data.animals", hasSize(2)))
                 .andExpect(jsonPath("$.data.animals[1].name").value("Vaca"))
                 .andExpect(jsonPath("$.data.animals[1].price").value(800));
+    }
+
+    @Test
+    void GET_achievements_listsTheNineWithTheirProgress() throws Exception {
+        newGame();
+        mvc.perform(get("/api/achievements")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", hasSize(9)))
+                .andExpect(jsonPath("$.data[0].code").value("LG-01"))
+                .andExpect(jsonPath("$.data[0].unlocked").value(false))
+                .andExpect(jsonPath("$.data[1].target").value(25));
+    }
+
+    @Test
+    void PUT_saves_savesAndGET_saves_listsTheSlotsAndPOST_load_loadsIt() throws Exception {
+        newGame();
+        mvc.perform(put("/api/saves/2")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.slot").value(2))
+                .andExpect(jsonPath("$.data.status").value("OK"));
+        mvc.perform(post("/api/game/days"));
+        mvc.perform(get("/api/saves")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", hasSize(3)))
+                .andExpect(jsonPath("$.data[0].status").value("EMPTY"))
+                .andExpect(jsonPath("$.data[1].status").value("OK"));
+        mvc.perform(post("/api/saves/2/load")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.day").value(1))
+                .andExpect(jsonPath("$.events[?(@.type == 'GameStarted')]").isNotEmpty());
+    }
+
+    @Test
+    void POST_load_ofAnEmptyDamagedOrUnreachableSlotKeepsItsRn35CodeAndStatus() throws Exception {
+        newGame();
+        mvc.perform(post("/api/saves/3/load")).andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("ARCHIVO_INEXISTENTE"))
+                .andExpect(jsonPath("$.message").value("No existe una partida en la ranura 3."));
+        saves.withDamagedSlot(1);
+        mvc.perform(post("/api/saves/1/load")).andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.code").value("ARCHIVO_CORRUPTO"));
+        saves.unreachable();
+        mvc.perform(put("/api/saves/1")).andExpect(status().isServiceUnavailable())
+                .andExpect(jsonPath("$.code").value("ERROR_ES"));
+        mvc.perform(get("/api/saves")).andExpect(status().isServiceUnavailable());
+    }
+
+    @Test
+    void PUT_saves_withoutAGameIsNotFoundAndASlotOutOfRangeIsAnInternalError() throws Exception {
+        mvc.perform(put("/api/saves/1")).andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("SIN_PARTIDA"));
+        newGame();
+        mvc.perform(put("/api/saves/7")).andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.code").value("ERROR_INTERNO"));
     }
 }
