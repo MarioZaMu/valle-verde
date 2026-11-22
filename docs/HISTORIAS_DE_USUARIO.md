@@ -62,7 +62,7 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 **Como** jugador **quiero** sembrar una semilla de mi inventario en una parcela de tierra libre **para** empezar a producir cosechas que pueda vender.
 
 **Criterios de aceptación**
-- **CA-1 · Siembra exitosa.** **Dado** que es Primavera, tengo 10 semillas de Zanahoria, 100 de energía y la parcela (2,3) es TIERRA libre, **Cuando** siembro Zanahoria en ella, **Entonces** la parcela contiene una Zanahoria en etapa *Semilla* (`díasCrecidos = 0`), me quedan 9 semillas y mi energía es 98.
+- **CA-1 · Siembra exitosa.** **Dado** que es Primavera, tengo 10 semillas de Zanahoria, 100 de energía y la parcela (5,3) es TIERRA libre, **Cuando** siembro Zanahoria en ella, **Entonces** la parcela contiene una Zanahoria en etapa *Semilla* (`díasCrecidos = 0`), me quedan 9 semillas y mi energía es 98.
 - **CA-2 · Fuera de estación (negativo).** **Dado** que es Primavera y tengo 5 semillas de Calabaza (válida solo en Otoño), **Cuando** intento sembrarla, **Entonces** se rechaza con `FUERA_DE_ESTACION` («No se puede sembrar Calabaza en Primavera: solo en Otoño.»), conservo las 5 semillas y mi energía sigue en 100.
 - **CA-3 · Parcela no apta (negativo).** **Dado** una parcela de HIERBA y otra de TIERRA que ya tiene un cultivo, **Cuando** intento sembrar en cada una, **Entonces** se rechaza con `PARCELA_NO_CULTIVABLE` y `PARCELA_OCUPADA` respectivamente, sin gastar semillas ni energía.
 - **CA-4 · Sin semillas (borde).** **Dado** que tengo 0 semillas de Maíz en Verano, **Cuando** intento sembrar Maíz, **Entonces** se rechaza con `SIN_SEMILLAS` y la parcela sigue libre.
@@ -264,7 +264,7 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 **Como** jugador **quiero** construir edificios sobre hierba libre **para** ampliar mi granja.
 
 **Criterios de aceptación**
-- **CA-1 · Construcción exitosa.** **Dado** 500 m y un área de 2 × 2 de HIERBA libre con esquina en (4,6), **Cuando** construyo un Gallinero (400 m), **Entonces** mi saldo es 100 m y esas 4 parcelas quedan ocupadas.
+- **CA-1 · Construcción exitosa.** **Dado** 500 m y un área de 2 × 2 de HIERBA libre con esquina en (2,7), **Cuando** construyo un Gallinero (400 m), **Entonces** mi saldo es 100 m y esas 4 parcelas quedan ocupadas.
 - **CA-2 · Ubicación inválida (negativo).** **Dado** un área que incluye una parcela de TIERRA, o que sobresale del mapa (esquina en la columna 15 con ancho 2), **Cuando** intento construir, **Entonces** se rechaza con `UBICACION_INVALIDA` y nada cambia.
 - **CA-3 · Fondos insuficientes (negativo).** **Dado** 399 m, **Cuando** intento construir un Gallinero, **Entonces** se rechaza con `SIN_FONDOS` («faltan 1 m»).
 - **CA-4 · Límite por tipo (borde).** **Dado** 2 Gallineros ya construidos, **Cuando** intento un tercero, **Entonces** se rechaza con `LIMITE_EDIFICIOS`.
