@@ -19,6 +19,12 @@ public final class MainWindow extends JFrame {
     /** Minimum window height in pixels. */
     public static final int MIN_HEIGHT = 768;
 
+    /** Opening width: room for the map at twice the size of its 32-pixel sprites plus the bars around it. */
+    public static final int DEFAULT_WIDTH = 1100;
+
+    /** Opening height: the map at twice the size (640 px) plus the top bar, tool bar and buttons. */
+    public static final int DEFAULT_HEIGHT = 860;
+
     private static final long serialVersionUID = 1L;
 
     /**
@@ -29,9 +35,8 @@ public final class MainWindow extends JFrame {
     public MainWindow(String title) {
         super(title);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        Dimension size = new Dimension(MIN_WIDTH, MIN_HEIGHT);
-        setMinimumSize(size);
-        setSize(size);
+        setMinimumSize(new Dimension(MIN_WIDTH, MIN_HEIGHT));
+        setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
         setLocationRelativeTo(null);
     }
 }

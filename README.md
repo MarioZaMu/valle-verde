@@ -110,7 +110,7 @@ edu.ucc.farmsim
 
 ## Assets gráficos
 
-No hay imágenes: el juego se dibuja con gráficos vectoriales y, si se agregan sprites (el `AssetManager` los usa y, si falta alguno, dibuja el vector), serán únicamente de licencia **CC0 o CC-BY** y se registrarán en [`docs/ASSETS.md`](docs/ASSETS.md). No se usan sprites ni nombres de juegos comerciales.
+Los 90 sprites (32 × 32 px, estilo pixel-art de granja) son **trabajo propio**, generados por `tools/gen_sprites.py`, y constan en [`docs/ASSETS.md`](docs/ASSETS.md); no hay ningún sprite de otro juego. Si falta alguno, el `AssetManager` lo avisa y el mapa dibuja el gráfico vectorial de respaldo. No se usan sprites ni nombres de juegos comerciales.
 
 ## Convenciones
 

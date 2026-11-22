@@ -12,7 +12,7 @@ import edu.ucc.farmsim.ui.theme.Texts;
  * Spanish texts to show. The Swing {@link HudPanel} only paints these texts, so the HUD logic is tested
  * without a display and the screen is updated by events, never by polling.
  *
- * <p>Stories: HU-34.
+ * <p>Stories: HU-34, HU-48.
  */
 public class HudModel implements GameListener {
 
@@ -48,6 +48,21 @@ public class HudModel implements GameListener {
     /** Forecast for tomorrow, for example {@code Mañana: Lluvioso}. */
     public String forecastText() {
         return hud == null ? Texts.NO_VALUE : Texts.forecast(hud.forecast());
+    }
+
+    /** Id of the season, for example {@code SPRING}, or {@code null} before a game starts. */
+    public String seasonId() {
+        return hud == null ? null : hud.season();
+    }
+
+    /** Id of today's weather, for example {@code RAINY}, or {@code null} before a game starts. */
+    public String weatherId() {
+        return hud == null ? null : hud.weather();
+    }
+
+    /** Id of tomorrow's weather, or {@code null} before a game starts. */
+    public String forecastId() {
+        return hud == null ? null : hud.forecast();
     }
 
     /** Energy as text, for example {@code 98/100}: the information never depends on a color alone. */

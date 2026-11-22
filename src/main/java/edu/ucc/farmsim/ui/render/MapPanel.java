@@ -42,7 +42,7 @@ public final class MapPanel extends JPanel implements GameListener {
     public static final int FRAME_DELAY_MS = 33;
 
     private static final long serialVersionUID = 1L;
-    private static final Dimension PREFERRED = new Dimension(1024, 600);
+    private static final Dimension PREFERRED = new Dimension(1024, 640);
     private static final String GREENHOUSE = "GREENHOUSE";
     private static final long PARTICLE_SEED = 20_261_122L;
 

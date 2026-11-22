@@ -138,7 +138,7 @@ class HU42AssetManagerTest {
 
     @Test
     void HU42_ca3_withoutAnyImageTheGameIsDrawnCompletelyWithVectors() {
-        BufferedImage image = paint(new MapRenderer());
+        BufferedImage image = paint(new MapRenderer(AssetManager.vectorOnly()));
 
         var geometry = MapGeometry.fit(16, 10, 1024, 600);
         var cell = geometry.cellBounds(5, 3);

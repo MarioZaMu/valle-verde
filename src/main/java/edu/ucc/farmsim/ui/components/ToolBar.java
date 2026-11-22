@@ -1,6 +1,7 @@
 package edu.ucc.farmsim.ui.components;
 
 import edu.ucc.farmsim.application.result.Names;
+import edu.ucc.farmsim.ui.assets.AssetManager;
 import edu.ucc.farmsim.ui.theme.Texts;
 import java.awt.FlowLayout;
 import javax.swing.ButtonGroup;
@@ -13,7 +14,7 @@ import javax.swing.JToggleButton;
  * The tool bar: one toggle button per tool (labelled with its key) and the seed chooser of the Sow tool.
  * It reads and writes the shared {@link ToolModel}, so the keys and the buttons always agree.
  *
- * <p>Stories: HU-36.
+ * <p>Stories: HU-36, HU-48.
  */
 public final class ToolBar extends JPanel {
 
@@ -31,12 +32,23 @@ public final class ToolBar extends JPanel {
      * @param model the shared tool selection
      */
     public ToolBar(ToolModel model) {
+        this(model, AssetManager.shared());
+    }
+
+    /**
+     * Builds the bar with icons from the given assets (text only if they are missing).
+     *
+     * @param model  the shared tool selection
+     * @param assets where the tool icons come from
+     */
+    public ToolBar(ToolModel model, AssetManager assets) {
         super(new FlowLayout(FlowLayout.LEFT));
         this.model = model;
         ButtonGroup group = new ButtonGroup();
         for (Tool tool : Tool.values()) {
             JToggleButton button = new JToggleButton(tool.key() + " " + Texts.tool(tool));
             button.setFocusable(false);
+            assets.icon("icons/" + tool.name() + ".png").ifPresent(button::setIcon);
             button.addActionListener(event -> {
                 if (!updating) {
                     model.select(tool);

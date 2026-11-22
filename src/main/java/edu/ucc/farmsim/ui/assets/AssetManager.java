@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 
 /**
  * Loads the sprites of the game once and keeps them (HU-42 · CA-1). A sprite that does not exist or cannot be
@@ -21,7 +22,7 @@ import javax.imageio.ImageIO;
  * {@code animals/HEN_0.png}. Every package of images must be listed in {@code docs/ASSETS.md} with its source
  * and licence (CC0 or CC-BY).
  *
- * <p>Stories: HU-42.
+ * <p>Stories: HU-42, HU-44, HU-48.
  */
 public final class AssetManager {
 
@@ -40,8 +41,11 @@ public final class AssetManager {
         InputStream open(String name) throws IOException;
     }
 
+    private static AssetManager shared;
+
     private final Source source;
     private final Map<String, Optional<BufferedImage>> cache = new HashMap<>();
+    private final Map<String, Optional<ImageIcon>> icons = new HashMap<>();
     private int reads;
     private boolean warned;
 
@@ -65,6 +69,14 @@ public final class AssetManager {
         });
     }
 
+    /** The manager the whole interface shares, so every sprite is read once for the whole game. */
+    public static synchronized AssetManager shared() {
+        if (shared == null) {
+            shared = fromClasspath();
+        }
+        return shared;
+    }
+
     /** A manager with no images at all: everything is drawn with vectors. */
     public static AssetManager vectorOnly() {
         return new AssetManager(name -> {
@@ -86,6 +98,20 @@ public final class AssetManager {
         Optional<BufferedImage> loaded = load(name);
         cache.put(name, loaded);
         return loaded;
+    }
+
+    /**
+     * The sprite as a Swing icon whose description is its name, read once; empty if it is missing.
+     *
+     * @param name relative path of the sprite, for example {@code icons/SOW.png}
+     */
+    public synchronized Optional<ImageIcon> icon(String name) {
+        Optional<ImageIcon> known = icons.get(name);
+        if (known == null) {
+            known = sprite(name).map(image -> new ImageIcon(image, name));
+            icons.put(name, known);
+        }
+        return known;
     }
 
     /** How many files were asked of the source (a sprite requested again does not count). */

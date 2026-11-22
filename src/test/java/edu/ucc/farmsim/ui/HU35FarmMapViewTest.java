@@ -38,7 +38,7 @@ class HU35FarmMapViewTest {
     private static BufferedImage paint(MapView map, CellPos hover) {
         BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = image.createGraphics();
-        new MapRenderer().render(g, map, WIDTH, HEIGHT, hover);
+        new MapRenderer(edu.ucc.farmsim.ui.assets.AssetManager.vectorOnly()).render(g, map, WIDTH, HEIGHT, hover);
         g.dispose();
         return image;
     }

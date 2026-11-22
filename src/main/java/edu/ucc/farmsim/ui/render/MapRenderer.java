@@ -22,7 +22,7 @@ import java.util.Optional;
  * palette of the season, the weather, the night tint and the animations (HU-40, HU-41). It works on any
  * {@link Graphics2D}, including one of an image, so it is tested without a display.
  *
- * <p>Stories: HU-18, HU-19, HU-25, HU-35, HU-40, HU-41, HU-42.
+ * <p>Stories: HU-18, HU-19, HU-25, HU-35, HU-40, HU-41, HU-42, HU-44.
  */
 public final class MapRenderer {
 
@@ -41,7 +41,7 @@ public final class MapRenderer {
 
     /** Creates a renderer that looks for sprites in the {@code assets} folder of the class path. */
     public MapRenderer() {
-        this(AssetManager.fromClasspath());
+        this(AssetManager.shared());
     }
 
     /**
@@ -79,13 +79,15 @@ public final class MapRenderer {
     public void render(Graphics2D g, MapView map, int width, int height, CellPos hover, VisualEffects effects) {
         VisualEffects fx = effects != null && effects.isEnabled() ? effects : null;
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
         g.setColor(Palette.BACKGROUND);
         g.fillRect(0, 0, width, height);
         MapGeometry geometry = MapGeometry.fit(map.cols(), map.rows(), width, height);
         Color grass = fx == null ? Palette.GRASS : SeasonPalette.grass(fx.season());
+        String season = fx == null ? "SPRING" : fx.season();
         for (PlotView plot : map.plots()) {
             Rectangle cell = geometry.cellBounds(plot.col(), plot.row());
-            drawTerrain(g, plot, cell, grass);
+            drawTerrain(g, plot, cell, grass, season);
             if (plot.crop() != null && !plot.sheltered()) {
                 drawCrop(g, plot, cell, fx);
             }
@@ -167,6 +169,13 @@ public final class MapRenderer {
         Rectangle area = first.union(last);
         int inset = Math.max(2, area.height / 16);
         Rectangle body = new Rectangle(area.x + inset, area.y + inset, area.width - 2 * inset, area.height - 2 * inset);
+        Optional<BufferedImage> sheet = assets.sprite("buildings/" + building.type() + ".png");
+        if (sheet.isPresent()) {
+            g.drawImage(sheet.get(), area.x, area.y, area.width, area.height, null);
+            drawAnimalSprites(g, building, area, fx);
+            drawPending(g, building, area);
+            return;
+        }
         if ("GREENHOUSE".equals(building.type())) {
             g.setColor(Palette.GREENHOUSE_GLASS);
             g.fillRect(body.x, body.y, body.width, body.height);
@@ -190,12 +199,51 @@ public final class MapRenderer {
         g.setColor(Palette.BUILDING_OUTLINE);
         g.drawRect(body.x, body.y, body.width, body.height);
         drawAnimals(g, building, body, fx);
+        drawPending(g, building, area);
+    }
+
+    private void drawPending(Graphics2D g, BuildingView building, Rectangle area) {
         if (building.pendingProducts() > 0) {
             int r = Math.max(4, area.width / 12);
             g.setColor(Palette.PENDING);
             g.fillOval(area.x + area.width - 2 * r, area.y, 2 * r, 2 * r);
             g.setColor(Palette.BUILDING_OUTLINE);
             g.drawOval(area.x + area.width - 2 * r, area.y, 2 * r, 2 * r);
+        }
+    }
+
+    /** Animals in front of a building drawn with a sprite: one tile-sized sprite each, with a badge if not well. */
+    private void drawAnimalSprites(Graphics2D g, BuildingView building, Rectangle area, VisualEffects fx) {
+        int slots = Math.max(1, building.capacity());
+        int d = Math.max(8, Math.min(area.width / slots, area.height / 2));
+        for (AnimalView animal : building.animals()) {
+            int frame = fx == null ? 0 : fx.animalFrame(animal.index());
+            Optional<BufferedImage> sprite = assets.sprite("animals/" + animal.type() + "_" + frame + ".png");
+            int x = area.x + animal.index() * area.width / slots + (area.width / slots - d) / 2;
+            int y = area.y + area.height - d - Math.max(1, area.height / 32);
+            if (sprite.isPresent()) {
+                g.drawImage(sprite.get(), x, y, d, d, null);
+            } else {
+                drawAnimalVector(g, animal, x, y, d, frame);
+            }
+            drawBadge(g, animal, x + d, y, d);
+        }
+    }
+
+    private static void drawBadge(Graphics2D g, AnimalView animal, int right, int top, int d) {
+        boolean sick = "SICK".equals(animal.condition());
+        if (!sick && !"HUNGRY".equals(animal.condition())) {
+            return;
+        }
+        int r = Math.max(3, d / 5);
+        int x = right - 2 * r;
+        g.setColor(sick ? Palette.ANIMAL_SICK : Palette.ANIMAL_HUNGRY);
+        g.fillOval(x, top, 2 * r, 2 * r);
+        g.setColor(Palette.BUILDING_OUTLINE);
+        g.drawOval(x, top, 2 * r, 2 * r);
+        if (sick) {
+            g.drawLine(x + r, top + r / 2, x + r, top + 2 * r - r / 2);
+            g.drawLine(x + r / 2, top + r, x + 2 * r - r / 2, top + r);
         }
     }
 
@@ -224,15 +272,28 @@ public final class MapRenderer {
                 case "HUNGRY" -> Palette.ANIMAL_HUNGRY;
                 default -> Palette.ANIMAL_HEALTHY;
             });
-            if ("COW".equals(animal.type())) {
-                g.fillOval(x - d / 4, y, d + d / 2, d);
-                g.setColor(Palette.BUILDING_OUTLINE);
-                g.fillOval(x + d / 4, y + d / 4, d / 3, d / 3);
-            } else {
-                g.fillOval(x, y, d, d);
-                g.setColor(Palette.BARN_WALL);
-                g.fillOval(x + d / 3, y - d / 5, d / 3, d / 3);
-            }
+            paintVectorAnimal(g, animal, x, y, d);
+        }
+    }
+
+    private static void drawAnimalVector(Graphics2D g, AnimalView animal, int x, int y, int d, int frame) {
+        g.setColor(switch (animal.condition()) {
+            case "SICK" -> Palette.ANIMAL_SICK;
+            case "HUNGRY" -> Palette.ANIMAL_HUNGRY;
+            default -> Palette.ANIMAL_HEALTHY;
+        });
+        paintVectorAnimal(g, animal, x, y - bob(frame, d), d);
+    }
+
+    private static void paintVectorAnimal(Graphics2D g, AnimalView animal, int x, int y, int d) {
+        if ("COW".equals(animal.type())) {
+            g.fillOval(x - d / 4, y, d + d / 2, d);
+            g.setColor(Palette.BUILDING_OUTLINE);
+            g.fillOval(x + d / 4, y + d / 4, d / 3, d / 3);
+        } else {
+            g.fillOval(x, y, d, d);
+            g.setColor(Palette.BARN_WALL);
+            g.fillOval(x + d / 3, y - d / 5, d / 3, d / 3);
         }
     }
 
@@ -245,7 +306,18 @@ public final class MapRenderer {
         };
     }
 
-    private void drawTerrain(Graphics2D g, PlotView plot, Rectangle c, Color grass) {
+    private void drawTerrain(Graphics2D g, PlotView plot, Rectangle c, Color grass, String season) {
+        String name = switch (plot.terrain()) {
+            case "SOIL" -> plot.watered() ? "terrain/SOIL_WATERED.png" : "terrain/SOIL.png";
+            case "WATER" -> "terrain/WATER.png";
+            case "OBSTACLE" -> "terrain/OBSTACLE.png";
+            default -> "terrain/GRASS_" + season + ".png";
+        };
+        Optional<BufferedImage> sprite = assets.sprite(name);
+        if (sprite.isPresent()) {
+            g.drawImage(sprite.get(), c.x, c.y, c.width, c.height, null);
+            return;
+        }
         switch (plot.terrain()) {
             case "SOIL" -> {
                 g.setColor(plot.watered() ? Palette.SOIL_WATERED : Palette.SOIL);

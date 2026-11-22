@@ -84,7 +84,7 @@ RF-33 a RF-41
 RF-43, 48 | Contrast, Main, Palette, UiTheme | HU-43: 5 |
 | RF-44 | Should | HU-44 | Gestor de assets
 (AssetManager)
-RF-42, 44 | pendiente | HU-44: 0 |
+RF-42, 44 | AssetManager, MapGeometry, MapRenderer | HU-44: 7 |
 | RF-45 | Should | HU-45 | Avatar y personajes
 (NPC y encargos)
 RF-45 a RF-47 | pendiente | HU-45: 0 |
@@ -97,7 +97,7 @@ RF-45 a RF-47 | pendiente | HU-47: 0 |
 | RF-48 | Should | HU-48 | Interfaz de usuario
 (Swing + FlatLaf)
 RF-33 a RF-41
-RF-43, 48 | pendiente | HU-48: 0 |
+RF-43, 48 | AssetManager, HudModel, HudPanel, InventoryGrid, ToolBar | HU-48: 5 |
 
 ## 2. Por historia de usuario
 
@@ -146,10 +146,10 @@ RF-43, 48 | pendiente | HU-48: 0 |
 | HU-41 · Animaciones suaves | 5.6 | Could | 4 | 7 | completa | GameScreen, MapPanel, MapRenderer, VisualEffects |
 | HU-42 · Carga de sprites con respaldo vectorial | 5.6 | Should | 4 | 8 | completa | AssetManager, MapRenderer |
 | HU-43 · Tema visual profesional con FlatLaf | 5.7 | Should | 4 | 5 | completa | Contrast, Main, Palette, UiTheme |
-| HU-44 · Sprites pixel-art propios de 32 × 32 | 5.7 | Should | 5 | 0 | sin pruebas | pendiente |
+| HU-44 · Sprites pixel-art propios de 32 × 32 | 5.7 | Should | 5 | 7 | completa | AssetManager, MapGeometry, MapRenderer |
 | HU-45 · Mover el avatar por la granja | 5.7 | Should | 5 | 0 | sin pruebas | pendiente |
 | HU-46 · Hablar con los NPC | 5.7 | Should | 5 | 0 | sin pruebas | pendiente |
 | HU-47 · Encargos de los NPC | 5.7 | Could | 4 | 0 | sin pruebas | pendiente |
-| HU-48 · Interfaz con aspecto de granja | 5.7 | Should | 5 | 0 | sin pruebas | pendiente |
+| HU-48 · Interfaz con aspecto de granja | 5.7 | Should | 5 | 5 | completa | AssetManager, HudModel, HudPanel, InventoryGrid, ToolBar |
 
-**Resumen:** 43 de 48 historias con todas sus pruebas; 376 pruebas `HUxx_` en total.
+**Resumen:** 45 de 48 historias con todas sus pruebas; 388 pruebas `HUxx_` en total.

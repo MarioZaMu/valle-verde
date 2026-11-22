@@ -1,26 +1,39 @@
 # Recursos gráficos y licencias — Valle Verde
 
-> **Versión 1.0 · Fase 5.6 · HU-42**
+> **Versión 2.0 · Fase 5.7c · HU-42, HU-44**
 
-## 1. Qué se usa hoy
+## 1. Qué se usa
 
-**Ningún paquete de imágenes.** Todo lo que se ve en el juego (terrenos, cultivos, edificios, animales, lluvia, nieve, avisos) se dibuja con formas vectoriales de Java2D en `MapRenderer`; los colores están en `Palette`. Por eso el repositorio no incluye ni sprites de terceros ni imágenes con licencia que cumplir, y el juego se puede jugar completo sin ninguna imagen (HU-42 · CA-3).
+Todos los sprites son **trabajo propio**: pixel-art dibujado por el equipo con el script [`tools/gen_sprites.py`](../tools/gen_sprites.py) (Pillow, semilla fija, salida idéntica en cada ejecución). **Ningún sprite viene de otro juego** (en particular, ninguno de Stardew Valley, cuyos gráficos tienen copyright de su autor): solo se tomó como referencia el *estilo* de granja pixel-art con paleta cálida.
 
-## 2. Cómo se agregan sprites
+- Cada imagen mide **32 × 32 px**; los edificios son hojas de tiles enteros (Gallinero y Almacén 64 × 64, Establo 96 × 64, Invernadero 96 × 96).
+- El mapa se amplía con un **factor entero** (×2 = 64 px por parcela a 1024 × 640) y con interpolación de vecino más cercano, para que los píxeles queden nítidos; si no cabe un factor entero sin desperdiciar más de un cuarto del espacio, se usa la escala que cabe, también sin suavizar.
+- Si falta cualquier imagen, el `AssetManager` lo registra y se dibuja el gráfico vectorial de respaldo (HU-42): el juego sigue siendo completo sin ninguna imagen.
 
-El `AssetManager` busca, dentro de `src/main/resources/assets/`, los archivos siguientes; si no existe uno, el renderizador usa el gráfico vectorial y deja un aviso en el registro (HU-42 · CA-2). Cada archivo se lee una sola vez y se guarda en memoria (CA-1).
+## 2. Paquetes de imágenes y licencia (HU-42 · CA-4, HU-44 · CA-5)
 
-| Qué | Nombre del archivo | Ejemplo |
+Todo paquete debe constar aquí **en el mismo commit** que lo agrega. Solo se aceptan obra propia, **CC0** o **CC-BY** con su atribución. La prueba `HU42_ca4_everyImagePackageInTheResourcesIsListedInAssetsMd` falla si hay un archivo en `assets/` cuya carpeta no aparece en la tabla.
+
+| Carpeta | Contenido | Autor y fuente | Licencia |
+|---|---|---|---|
+| `terrain/` | hierba de las 4 estaciones, tierra seca y regada, agua, árbol | trabajo propio, `tools/gen_sprites.py` | CC0 |
+| `crops/` | 5 cultivos × 5 etapas (semilla, brote, creciendo, maduro, marchito) | trabajo propio, `tools/gen_sprites.py` | CC0 |
+| `animals/` | gallina y vaca, 3 cuadros de animación cada una | trabajo propio, `tools/gen_sprites.py` | CC0 |
+| `buildings/` | Gallinero, Establo, Almacén e Invernadero | trabajo propio, `tools/gen_sprites.py` | CC0 |
+| `items/` | iconos de semillas, cosechas, huevo, leche, heno y medicina | trabajo propio, `tools/gen_sprites.py` | CC0 |
+| `characters/` | avatar (4 direcciones × 3 cuadros) y 4 personajes (Marta, Don Tomás, Dra. Lucía, Inés) | trabajo propio, `tools/gen_sprites.py` | CC0 |
+| `icons/` | herramientas, monedas, energía, estaciones y clima | trabajo propio, `tools/gen_sprites.py` | CC0 |
+
+## 3. Nombres que lee el `AssetManager`
+
+| Qué | Nombre | Ejemplo |
 |---|---|---|
-| Cultivo en una etapa | `crops/<CULTIVO>_<ETAPA>.png` | `crops/CARROT_MATURE.png` |
-| Animal en un cuadro de su animación (0, 1 o 2) | `animals/<ANIMAL>_<CUADRO>.png` | `animals/HEN_0.png` |
+| Terreno | `terrain/<TERRENO>.png`, `terrain/GRASS_<ESTACIÓN>.png` | `terrain/SOIL_WATERED.png` |
+| Cultivo | `crops/<CULTIVO>_<ETAPA>.png` | `crops/CARROT_MATURE.png` |
+| Animal | `animals/<ANIMAL>_<CUADRO>.png` | `animals/HEN_1.png` |
+| Edificio | `buildings/<EDIFICIO>.png` | `buildings/BARN.png` |
+| Ítem | `items/<ÍTEM>.png` | `items/CARROT_SEED.png` |
+| Personaje | `characters/AVATAR_<DIRECCIÓN>_<CUADRO>.png`, `characters/<NPC>.png` | `characters/MARTA.png` |
+| Icono | `icons/<ID>.png` | `icons/RAINY.png` |
 
-## 3. Regla de licencias (HU-42 · CA-4)
-
-Todo paquete de imágenes que se agregue debe quedar en la tabla siguiente **en el mismo commit**, con su fuente y su licencia. Solo se aceptan **CC0** o **CC-BY** (con la atribución que pida el autor); no se usan sprites de otros juegos comerciales. La prueba `HU42_ca4_everyImagePackageInTheResourcesIsListedInAssetsMd` falla si hay un archivo en `assets/` que no aparece aquí.
-
-| Carpeta | Autor y fuente | Licencia |
-|---|---|---|
-| — | Ningún paquete incluido | — |
-
-Licencia del código y de los gráficos vectoriales del proyecto: trabajo propio del equipo.
+Para regenerar o comprobar: `python tools/gen_sprites.py` y `python tools/gen_sprites.py --check`.
