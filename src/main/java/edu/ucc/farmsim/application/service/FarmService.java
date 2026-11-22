@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  * The crop use cases: sow, water, harvest and clear (RN-06 to RN-10). Each operation checks every rule
  * first and only then changes the game, so a rejection never leaves anything half done.
  *
- * <p>Stories: HU-01, HU-02, HU-04.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06.
  */
 public final class FarmService {
 
@@ -128,8 +128,9 @@ public final class FarmService {
     }
 
     /**
-     * Harvests a mature crop into the inventory (RN-10): 2 energy and room for one unit. If any rule fails,
-     * nothing changes; in particular a full inventory never costs the crop or the energy.
+     * The harvest tool (RN-10, RN-34): a mature crop is harvested into the inventory (2 energy and room for
+     * one unit); a withered crop is cleared (1 energy, nothing collected). If any rule fails, nothing changes;
+     * in particular a full inventory never costs the crop or the energy.
      *
      * @param col column of the plot
      * @param row row of the plot
@@ -144,7 +145,7 @@ public final class FarmService {
             return Result.failWith(ErrorCode.SIN_CULTIVO);
         }
         if (!crop.isAlive()) {
-            return Result.failWith(ErrorCode.CULTIVO_MARCHITO);
+            return clear(state, col, row);
         }
         if (!crop.isMature()) {
             return Result.failWith(ErrorCode.NO_MADURO, crop.daysLeft());
@@ -157,6 +158,17 @@ public final class FarmService {
             return Result.failWith(ErrorCode.INVENTARIO_LLENO);
         }
         energy.trySpend(GameRules.ENERGY_COST_HARVEST);
+        state.farm().plotAt(col, row).removeCrop();
+        publishChange(state);
+        return Result.ok(mapper.plot(state, col, row));
+    }
+
+    private Result<PlotView> clear(GameState state, int col, int row) {
+        Energy energy = state.energy();
+        if (!energy.canSpend(GameRules.ENERGY_COST_CLEAN)) {
+            return Result.failWith(ErrorCode.SIN_ENERGIA, GameRules.ENERGY_COST_CLEAN, energy.current());
+        }
+        energy.trySpend(GameRules.ENERGY_COST_CLEAN);
         state.farm().plotAt(col, row).removeCrop();
         publishChange(state);
         return Result.ok(mapper.plot(state, col, row));

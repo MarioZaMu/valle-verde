@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  * No exception ever reaches the UI: anything unexpected becomes {@code ERROR_INTERNO} (R-03, RNF-07), and
  * it never touches repositories (AR-4).
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-10, HU-28, HU-33.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-10, HU-28, HU-33.
  */
 public final class GameController {
 
@@ -100,7 +100,7 @@ public final class GameController {
     }
 
     /**
-     * Harvests the crop of a plot (RN-10).
+     * The harvest tool (RN-10, RN-34): harvests a mature crop, or clears a withered one.
      *
      * @param col column of the plot
      * @param row row of the plot
