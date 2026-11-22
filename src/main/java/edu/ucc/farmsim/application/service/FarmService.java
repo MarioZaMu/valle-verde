@@ -93,6 +93,7 @@ public final class FarmService {
         energy.trySpend(GameRules.ENERGY_COST_SOW);
         plot.plant(CropFactory.forType(type).createCrop());
         publishChange(state);
+        events.publish(new GameEvent.InventoryChanged());
         return Result.ok(mapper.plot(state, col, row));
     }
 
@@ -163,6 +164,7 @@ public final class FarmService {
         energy.trySpend(GameRules.ENERGY_COST_HARVEST);
         state.farm().plotAt(col, row).removeCrop();
         publishChange(state);
+        events.publish(new GameEvent.InventoryChanged());
         return Result.ok(mapper.plot(state, col, row));
     }
 

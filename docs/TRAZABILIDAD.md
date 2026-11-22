@@ -11,18 +11,18 @@
 | RF-02 | Must | HU-02 | Cultivo | Crop, FarmService, GameCommands, GameController, GameRestController, RemoteGameClient | HU-02: 9 |
 | RF-03 | Must | HU-03 | Cultivo | Crop, CropState, DayPipeline, FarmMap, GrowingPhaseState, GrowingState, GrowthStep, MatureState, SeedState, SproutState, WitheredState | HU-03: 5 |
 | RF-04 | Must | HU-04 | Cultivo | FarmService, GameCommands, GameController, GameRestController, RemoteGameClient | HU-04: 9 |
-| RF-05 | Must | HU-05, HU-12 | Cultivo | CalendarStep, Crop, CropState, DayReport, FarmMap, GameRules, GrowingPhaseState, GrowthStep | HU-05: 9, HU-12: 0 |
+| RF-05 | Must | HU-05, HU-12 | Cultivo | CalendarStep, Crop, CropState, DayReport, FarmMap, GameRules, GrowingPhaseState, GrowthStep, WeatherEffectsStep | HU-05: 9, HU-12: 6 |
 | RF-06 | Should | HU-06 | Cultivo | FarmService, GameCommands, GameController, GameRestController, RemoteGameClient | HU-06: 6 |
 | RF-07 | Must | HU-07 | Cultivo | FarmService, GameCommands, GameController, GameRestController, MapPanel, Names, PlotText, PlotView, RemoteGameClient | HU-07: 10 |
 | RF-08 | Must | HU-10 | Tiempo y clima | CalendarStep, DayPhase, DayPipeline, DayReport, DayService, DayStep, EnergyResetStep, EventBus, ForecastStep, GameCommands, GameController, GameEvent, GameListener, GameMemento, GameRestController, GameScreenPresenter, GameState, Inventory, InventorySnapshot, RemoteGameClient | HU-10: 12 |
 | RF-09 | Must | HU-09 | Tiempo y clima | AutumnState, GameClock, GameDate, GameRules, Season, SeasonState, SpringState, SummerState, WinterState | HU-09: 8 |
 | RF-10 | Must | HU-11 | Tiempo y clima | AutumnState, FixedWeatherStrategy, GameRules, SeasonState, SeasonalWeatherStrategy, SpringState, StateRandom, SummerState, Weather, WeatherCycle, WeatherStrategy, WinterState | HU-11: 8 |
-| RF-11 | Must | HU-12 | Tiempo y clima | pendiente | HU-12: 0 |
+| RF-11 | Must | HU-12 | Tiempo y clima | WeatherEffectsStep | HU-12: 6 |
 | RF-12 | Must | HU-08 | Tiempo y clima | Energy, ErrorCode, GameRules, Messages | HU-08: 6 |
 | RF-13 | Must | HU-13 | Economía | GameRules, Inventory, ItemType | HU-13: 5 |
-| RF-14 | Must | HU-14 | Economía | pendiente | HU-14: 0 |
-| RF-15 | Must | HU-15 | Economía | pendiente | HU-15: 0 |
-| RF-16 | Should | HU-16 | Economía | pendiente | HU-16: 0 |
+| RF-14 | Must | HU-14 | Economía | BuyOfferView, GameCommands, GameController, GameEvent, GameRestController, GameState, Market, MarketDialog, MarketPresenter, MarketService, MarketView, RemoteGameClient | HU-14: 7 |
+| RF-15 | Must | HU-15 | Economía | CropPricing, FlatPricing, GameCommands, GameController, GameEvent, GameMemento, GameRestController, GameState, Market, MarketDialog, MarketPresenter, MarketService, MarketSnapshot, MarketStep, MarketView, PricingStrategy, RemoteGameClient, SellOfferView | HU-15: 12 |
+| RF-16 | Should | HU-16 | Economía | GameCommands, GameController, GameMemento, GameRestController, Market, MarketDialog, MarketPresenter, MarketService, MarketSnapshot, MarketStep, MarketView, RemoteGameClient, SellOfferView, Trend | HU-16: 6 |
 | RF-17 | Could | HU-17 | Tiempo y clima | pendiente | HU-17: 0 |
 | RF-18 | Must | HU-18 | Construcción y | pendiente | HU-18: 0 |
 | RF-19 | Must | HU-19 | Construcción y | pendiente | HU-19: 0 |
@@ -34,7 +34,7 @@
 | RF-25 | Should | HU-24 | Construcción y | pendiente | HU-24: 0 |
 | RF-26 | Must | HU-26 | Progreso | pendiente | HU-26: 0 |
 | RF-27 | Should | HU-27 | Progreso | pendiente | HU-27: 0 |
-| RF-28 | Must | HU-28 | Progreso | FarmMap, GameCommands, GameController, GameRestController, GameRules, GameSession, GameState, HudView, Plot, ProgressService, RemoteGameClient, Result, StartScreenPresenter, Terrain, ViewMapper | HU-28: 7 |
+| RF-28 | Must | HU-28 | Progreso | FarmMap, GameCommands, GameController, GameRestController, GameRules, GameSession, GameState, HudView, Plot, ProgressService, RemoteGameClient, Result, StartScreenPresenter, Terrain, ViewMapper | HU-28: 8 |
 | RF-29 | Must | HU-29 | Guardado | pendiente | HU-29: 0 |
 | RF-30 | Must | HU-30 | Guardado | pendiente | HU-30: 0 |
 | RF-31 | Must | HU-31 | Guardado | pendiente | HU-31: 0 |
@@ -43,8 +43,8 @@
 | RF-34 | Must | HU-34 | Interfaz de usuario | GameEvent, GameScreen, GameScreenPresenter, HudModel, HudPanel, HudView, Texts, ViewMapper | HU-34: 8 |
 | RF-35 | Must | HU-35 | Interfaz de usuario | CellPos, FarmService, GameCommands, GameController, GameRestController, GameScreen, MapGeometry, MapPanel, MapRenderer, MapView, Palette, PlotClickListener, RemoteGameClient, ViewMapper | HU-35: 10 |
 | RF-36 | Must | HU-36 | Interfaz de usuario | GameScreen, GameScreenPresenter, Shortcut, Texts, Tool, ToolBar, ToolModel | HU-36: 13 |
-| RF-37 | Must | HU-37 | Interfaz de usuario | pendiente | HU-37: 0 |
-| RF-38 | Must | HU-38 | Interfaz de usuario | pendiente | HU-38: 0 |
+| RF-37 | Must | HU-37 | Interfaz de usuario | GameCommands, GameController, GameDialogs, GameRestController, GameScreen, InventoryDialog, InventoryGrid, InventoryModel, InventoryView, MarketService, RemoteGameClient, SlotView | HU-37: 8 |
+| RF-38 | Must | HU-38 | Interfaz de usuario | BuyOfferView, GameCommands, GameController, GameDialogs, GameRestController, GameScreen, MarketDialog, MarketPresenter, MarketService, MarketView, RemoteGameClient, SellOfferView | HU-38: 8 |
 | RF-39 | Should | HU-39 | Interfaz de usuario | pendiente | HU-39: 0 |
 | RF-40 | Could | HU-40 | Interfaz de usuario | pendiente | HU-40: 0 |
 | RF-41 | Could | HU-41 | Interfaz de usuario | pendiente | HU-41: 0 |
@@ -65,11 +65,11 @@
 | HU-09 · Calendario y estaciones | 5.1 | Must | 4 | 8 | completa | AutumnState, GameClock, GameDate, GameRules, Season, SeasonState, SpringState, SummerState, WinterState |
 | HU-10 · Terminar el día | 5.1 | Must | 4 | 12 | completa | CalendarStep, DayPhase, DayPipeline, DayReport, DayService, DayStep, EnergyResetStep, EventBus, ForecastStep, GameCommands, GameController, GameEvent, GameListener, GameMemento, GameRestController, GameScreenPresenter, GameState, Inventory, InventorySnapshot, RemoteGameClient |
 | HU-11 · Sorteo de clima y pronóstico | 5.1 | Must | 4 | 8 | completa | AutumnState, FixedWeatherStrategy, GameRules, SeasonState, SeasonalWeatherStrategy, SpringState, StateRandom, SummerState, Weather, WeatherCycle, WeatherStrategy, WinterState |
-| HU-12 · Efectos del clima en los cultivos | 5.3 | Must | 4 | 0 | sin pruebas | pendiente |
+| HU-12 · Efectos del clima en los cultivos | 5.3 | Must | 4 | 6 | completa | WeatherEffectsStep |
 | HU-13 · Administrar el inventario | 5.1 | Must | 4 | 5 | completa | GameRules, Inventory, ItemType |
-| HU-14 · Comprar en el mercado | 5.3 | Must | 4 | 0 | sin pruebas | pendiente |
-| HU-15 · Vender con precio dinámico | 5.3 | Must | 6 | 0 | sin pruebas | pendiente |
-| HU-16 · Tendencia de precio | 5.3 | Should | 4 | 0 | sin pruebas | pendiente |
+| HU-14 · Comprar en el mercado | 5.3 | Must | 4 | 7 | completa | BuyOfferView, GameCommands, GameController, GameEvent, GameRestController, GameState, Market, MarketDialog, MarketPresenter, MarketService, MarketView, RemoteGameClient |
+| HU-15 · Vender con precio dinámico | 5.3 | Must | 6 | 12 | completa | CropPricing, FlatPricing, GameCommands, GameController, GameEvent, GameMemento, GameRestController, GameState, Market, MarketDialog, MarketPresenter, MarketService, MarketSnapshot, MarketStep, MarketView, PricingStrategy, RemoteGameClient, SellOfferView |
+| HU-16 · Tendencia de precio | 5.3 | Should | 4 | 6 | completa | GameCommands, GameController, GameMemento, GameRestController, Market, MarketDialog, MarketPresenter, MarketService, MarketSnapshot, MarketStep, MarketView, RemoteGameClient, SellOfferView, Trend |
 | HU-17 · Resumen del día | 5.4 | Could | 4 | 0 | sin pruebas | pendiente |
 | HU-18 · Construir edificios | 5.4 | Must | 6 | 0 | sin pruebas | pendiente |
 | HU-19 · Comprar animales | 5.4 | Must | 4 | 0 | sin pruebas | pendiente |
@@ -81,7 +81,7 @@
 | HU-25 · Construir y usar el invernadero | 5.6 | Could | 5 | 0 | sin pruebas | pendiente |
 | HU-26 · Registrar logros | 5.5 | Must | 5 | 0 | sin pruebas | pendiente |
 | HU-27 · Desbloquear edificios por logros | 5.5 | Should | 4 | 0 | sin pruebas | pendiente |
-| HU-28 · Iniciar nueva partida | 5.1 | Must | 4 | 7 | completa | FarmMap, GameCommands, GameController, GameRestController, GameRules, GameSession, GameState, HudView, Plot, ProgressService, RemoteGameClient, Result, StartScreenPresenter, Terrain, ViewMapper |
+| HU-28 · Iniciar nueva partida | 5.1 | Must | 4 | 8 | completa | FarmMap, GameCommands, GameController, GameRestController, GameRules, GameSession, GameState, HudView, Plot, ProgressService, RemoteGameClient, Result, StartScreenPresenter, Terrain, ViewMapper |
 | HU-29 · Guardar partida | 5.5 | Must | 4 | 0 | sin pruebas | pendiente |
 | HU-30 · Cargar partida | 5.5 | Must | 4 | 0 | sin pruebas | pendiente |
 | HU-31 · Rechazar partidas inválidas sin alterar la partida | 5.5 | Must | 5 | 0 | sin pruebas | pendiente |
@@ -90,11 +90,11 @@
 | HU-34 · HUD superior | 5.1 | Must | 4 | 8 | completa | GameEvent, GameScreen, GameScreenPresenter, HudModel, HudPanel, HudView, Texts, ViewMapper |
 | HU-35 · Mapa de la granja | 5.2 | Must | 5 | 10 | completa | CellPos, FarmService, GameCommands, GameController, GameRestController, GameScreen, MapGeometry, MapPanel, MapRenderer, MapView, Palette, PlotClickListener, RemoteGameClient, ViewMapper |
 | HU-36 · Herramientas y clic sobre parcelas | 5.2 | Must | 5 | 13 | completa | GameScreen, GameScreenPresenter, Shortcut, Texts, Tool, ToolBar, ToolModel |
-| HU-37 · Inventario en grilla | 5.3 | Must | 4 | 0 | sin pruebas | pendiente |
-| HU-38 · Mercado modal | 5.3 | Must | 4 | 0 | sin pruebas | pendiente |
+| HU-37 · Inventario en grilla | 5.3 | Must | 4 | 8 | completa | GameCommands, GameController, GameDialogs, GameRestController, GameScreen, InventoryDialog, InventoryGrid, InventoryModel, InventoryView, MarketService, RemoteGameClient, SlotView |
+| HU-38 · Mercado modal | 5.3 | Must | 4 | 8 | completa | BuyOfferView, GameCommands, GameController, GameDialogs, GameRestController, GameScreen, MarketDialog, MarketPresenter, MarketService, MarketView, RemoteGameClient, SellOfferView |
 | HU-39 · Notificaciones (toasts) | 5.6 | Should | 4 | 0 | sin pruebas | pendiente |
 | HU-40 · Efectos visuales de estación y clima | 5.6 | Could | 4 | 0 | sin pruebas | pendiente |
 | HU-41 · Animaciones suaves | 5.6 | Could | 4 | 0 | sin pruebas | pendiente |
 | HU-42 · Carga de sprites con respaldo vectorial | 5.6 | Should | 4 | 0 | sin pruebas | pendiente |
 
-**Resumen:** 17 de 42 historias con todas sus pruebas; 146 pruebas `HUxx_` en total.
+**Resumen:** 23 de 42 historias con todas sus pruebas; 194 pruebas `HUxx_` en total.

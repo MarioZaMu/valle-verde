@@ -43,6 +43,42 @@ public final class Texts {
     /** Shown when a tool whose feature does not exist yet is used. */
     public static final String TOOL_NOT_AVAILABLE_YET = "Esta herramienta estará disponible en una fase posterior.";
 
+    /** Shown when the Sow tool is used and no seed is chosen. */
+    public static final String NO_SEED_SELECTED = "Elige una semilla en la barra o en el inventario (I).";
+
+    /** Title of the inventory dialog. */
+    public static final String INVENTORY_TITLE = "Inventario";
+
+    /** Title of the market dialog. */
+    public static final String MARKET_TITLE = "Mercado";
+
+    /** Tab to buy. */
+    public static final String TAB_BUY = "Comprar";
+
+    /** Tab to sell. */
+    public static final String TAB_SELL = "Vender";
+
+    /** Label of the quantity chooser. */
+    public static final String QUANTITY = "Cantidad:";
+
+    /** Button that buys. */
+    public static final String BUY = "Comprar";
+
+    /** Button that sells. */
+    public static final String SELL = "Vender";
+
+    /** Table column: product. */
+    public static final String COL_PRODUCT = "Producto";
+
+    /** Table column: price. */
+    public static final String COL_PRICE = "Precio";
+
+    /** Table column: units owned. */
+    public static final String COL_OWNED = "En inventario";
+
+    /** Table column: trend. */
+    public static final String COL_TREND = "Tendencia";
+
     /** Shown when a shortcut whose feature does not exist yet is pressed. */
     public static final String SHORTCUT_NOT_AVAILABLE_YET = "Esa función estará disponible en una fase posterior.";
 
@@ -80,6 +116,15 @@ public final class Texts {
     }
 
     /** Money with thousands separator and the coin symbol, for example {@code 1.250 m}. */
+    /** The trend of a price as a symbol and a word, so colour is never the only cue (HU-16 · CA-4). */
+    public static String trend(String trendId) {
+        return switch (trendId) {
+            case "UP" -> "▲ sube";
+            case "DOWN" -> "▼ baja";
+            default -> "▬ igual";
+        };
+    }
+
     public static String money(int amount) {
         return String.format(SPANISH, "%,d m", amount);
     }

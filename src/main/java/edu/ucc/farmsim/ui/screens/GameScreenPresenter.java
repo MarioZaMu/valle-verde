@@ -23,6 +23,7 @@ public final class GameScreenPresenter {
     private final GameCommands controller;
     private final ToolModel tools;
     private final Consumer<String> messages;
+    private final GameDialogs dialogs;
 
     /**
      * Creates the presenter.
@@ -31,10 +32,12 @@ public final class GameScreenPresenter {
      * @param tools      the selected tool and seed
      * @param messages   where messages for the player are sent
      */
-    public GameScreenPresenter(GameCommands controller, ToolModel tools, Consumer<String> messages) {
+    public GameScreenPresenter(GameCommands controller, ToolModel tools, Consumer<String> messages,
+                               GameDialogs dialogs) {
         this.controller = controller;
         this.tools = tools;
         this.messages = messages;
+        this.dialogs = dialogs;
     }
 
     /** "End day": the top bar updates through the events; a message appears only if the day could not end. */
@@ -47,6 +50,10 @@ public final class GameScreenPresenter {
     public void onPlotClicked(int col, int row) {
         Tool tool = tools.current();
         if (tool == null) {
+            return;
+        }
+        if (tool == Tool.SOW && tools.selectedSeed() == null) {
+            messages.accept(Texts.NO_SEED_SELECTED);
             return;
         }
         Result<PlotView> result = switch (tool) {
@@ -66,6 +73,10 @@ public final class GameScreenPresenter {
     public void onShortcut(Shortcut shortcut) {
         if (shortcut == Shortcut.END_DAY) {
             onEndDay();
+        } else if (shortcut == Shortcut.MARKET) {
+            dialogs.showMarket();
+        } else if (shortcut == Shortcut.INVENTORY) {
+            dialogs.showInventory();
         } else {
             messages.accept(Texts.SHORTCUT_NOT_AVAILABLE_YET);
         }

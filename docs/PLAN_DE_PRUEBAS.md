@@ -108,8 +108,8 @@ Total: **178 criterios** → **136** de dominio/aplicación y **42** de interfaz
 |---|---|---|---|---|
 | 1 | Sembrar fuera de estación | HU-01 · CA-2 | `HU01_ca2_rejectsSowingOutOfSeason` | 5.2 |
 | 2 | Cosechar con inventario lleno | HU-04 · CA-2 | `HU04_ca2_keepsCropMatureWhenInventoryIsFull` | 5.2 |
-| 3 | Helada que marchita cultivos | HU-12 · CA-2 | `HU12_ca2_frostWithersOutdoorCrops` | 5.3 |
-| 4 | Saturación de precios al vender mucho | HU-15 · CA-2 y CA-3 | `HU15_ca2_priceDropsAfterManySales`, `HU15_ca3_demandNeverFallsBelowFloor` | 5.3 |
+| 3 | Helada que marchita cultivos | HU-12 · CA-2 | `HU12_ca2_frostWithersEveryCropInTheOpenEvenAMatureOne` | 5.3 |
+| 4 | Saturación de precios al vender mucho | HU-15 · CA-2 y CA-3 | `HU15_ca2_afterTenCarrotsTheNextOnePaysOnly22`, `HU15_ca3_theDemandNeverFallsBelow50` | 5.3 |
 | 5 | Animal enfermo que no produce | HU-22 · CA-2 (y HU-21 · CA-3) | `HU22_ca2_sickAnimalDoesNotProduce` | 5.4 |
 | 6 | Guardar → cargar devuelve estado idéntico | HU-30 · CA-1 | `HU30_ca1_loadedStateEqualsSavedState` | 5.5 |
 | 7 | Cargar una partida dañada o inexistente sin alterar la partida | HU-31 · CA-1 y CA-2 | `HU31_ca1_missingSaveLeavesGameUntouched`, `HU31_ca2_corruptSaveLeavesGameUntouched` | 5.5 |

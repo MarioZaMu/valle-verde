@@ -30,6 +30,18 @@ import org.junit.jupiter.api.Test;
  */
 class HU34HudTest {
 
+    private static final edu.ucc.farmsim.ui.screens.GameDialogs NO_DIALOGS = new edu.ucc.farmsim.ui.screens.GameDialogs() {
+        @Override
+        public void showMarket() {
+            // not needed here
+        }
+
+        @Override
+        public void showInventory() {
+            // not needed here
+        }
+    };
+
     @Test
     void HU34_ca1_aNewGameShowsMoneyDateWeatherForecastAndFullEnergy() {
         // Given a HUD listening to the event bus
@@ -139,7 +151,7 @@ class HU34HudTest {
     void HU10_theEndDayButtonLogicShowsAMessageOnlyWhenTheDayCouldNotEnd() {
         TestApp app = TestApp.create();
         List<String> messages = new ArrayList<>();
-        GameScreenPresenter presenter = new GameScreenPresenter(app.controller, new edu.ucc.farmsim.ui.components.ToolModel(), messages::add);
+        GameScreenPresenter presenter = new GameScreenPresenter(app.controller, new edu.ucc.farmsim.ui.components.ToolModel(), messages::add, NO_DIALOGS);
 
         presenter.onEndDay(); // no game in progress
         assertEquals(List.of("No hay una partida en curso."), messages);

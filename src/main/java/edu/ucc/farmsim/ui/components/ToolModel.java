@@ -71,6 +71,12 @@ public final class ToolModel {
     }
 
     /** Registers something to run after every change of the selection. */
+    /** Forgets the chosen seed, for example when the last one has been sown (HU-37 · CA-3). */
+    public void clearSeed() {
+        this.selectedSeed = null;
+        fireChanged();
+    }
+
     public void addChangeListener(Runnable listener) {
         listeners.add(listener);
     }

@@ -28,6 +28,18 @@ import org.junit.jupiter.api.Test;
  */
 class HU36ToolsAndClicksTest {
 
+    private static final edu.ucc.farmsim.ui.screens.GameDialogs NO_DIALOGS = new edu.ucc.farmsim.ui.screens.GameDialogs() {
+        @Override
+        public void showMarket() {
+            // not needed here
+        }
+
+        @Override
+        public void showInventory() {
+            // not needed here
+        }
+    };
+
     private static final int COL = GameFixtures.SOIL_COL;
     private static final int ROW = GameFixtures.SOIL_ROW;
 
@@ -35,7 +47,7 @@ class HU36ToolsAndClicksTest {
     private final ToolModel tools = new ToolModel();
 
     private GameScreenPresenter presenter(TestApp app) {
-        return new GameScreenPresenter(app.controller, tools, messages::add);
+        return new GameScreenPresenter(app.controller, tools, messages::add, NO_DIALOGS);
     }
 
     @Test
@@ -186,7 +198,7 @@ class HU36ToolsAndClicksTest {
         assertTrue(messages.stream().allMatch(String::isBlank));
 
         messages.clear();
-        presenter(app).onShortcut(Shortcut.MARKET);
+        presenter(app).onShortcut(Shortcut.ACHIEVEMENTS);
         assertEquals(List.of(Texts.SHORTCUT_NOT_AVAILABLE_YET), messages);
     }
 

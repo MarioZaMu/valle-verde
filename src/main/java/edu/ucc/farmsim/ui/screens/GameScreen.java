@@ -3,6 +3,10 @@ package edu.ucc.farmsim.ui.screens;
 import edu.ucc.farmsim.application.controller.GameCommands;
 import edu.ucc.farmsim.application.event.EventBus;
 import edu.ucc.farmsim.ui.components.HudPanel;
+import edu.ucc.farmsim.ui.components.InventoryDialog;
+import edu.ucc.farmsim.ui.components.InventoryModel;
+import edu.ucc.farmsim.ui.components.MarketDialog;
+import edu.ucc.farmsim.ui.components.MarketPresenter;
 import edu.ucc.farmsim.ui.components.Shortcut;
 import edu.ucc.farmsim.ui.components.Tool;
 import edu.ucc.farmsim.ui.components.ToolBar;
@@ -20,13 +24,14 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 
 /**
  * The main game screen: the top bar (HUD), the farm map, the tool bar, a status line for messages and the
  * buttons "End day" and "Menu". Keys 1 to 5 pick a tool, Escape deselects it, and the shortcuts of RN-34 work
  * anywhere on the screen.
  *
- * <p>Stories: HU-33, HU-34, HU-35, HU-36.
+ * <p>Stories: HU-33, HU-34, HU-35, HU-36, HU-37, HU-38.
  */
 public final class GameScreen extends JPanel {
 
@@ -44,7 +49,22 @@ public final class GameScreen extends JPanel {
         super(new BorderLayout());
         ToolModel tools = new ToolModel();
         JLabel status = new JLabel(" ");
-        GameScreenPresenter presenter = new GameScreenPresenter(controller, tools, status::setText);
+        InventoryModel inventory = new InventoryModel(controller, tools);
+        bus.subscribe(inventory);
+        inventory.refresh();
+        GameDialogs dialogs = new GameDialogs() {
+            @Override
+            public void showMarket() {
+                new MarketDialog(SwingUtilities.getWindowAncestor(GameScreen.this), new MarketPresenter(controller))
+                        .setVisible(true);
+            }
+
+            @Override
+            public void showInventory() {
+                new InventoryDialog(SwingUtilities.getWindowAncestor(GameScreen.this), inventory).setVisible(true);
+            }
+        };
+        GameScreenPresenter presenter = new GameScreenPresenter(controller, tools, status::setText, dialogs);
 
         add(new HudPanel(bus), BorderLayout.NORTH);
         add(new MapPanel(controller, bus, presenter::onPlotClicked), BorderLayout.CENTER);

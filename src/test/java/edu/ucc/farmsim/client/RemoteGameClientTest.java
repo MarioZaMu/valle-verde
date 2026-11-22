@@ -90,7 +90,8 @@ class RemoteGameClientTest {
 
         assertTrue(result.isOk());
         assertEquals("CARROT", result.value().crop());
-        assertEquals(List.of(new GameEvent.MapChanged(), new GameEvent.EnergyChanged(98, 100)), events);
+        assertEquals(List.of(new GameEvent.MapChanged(), new GameEvent.EnergyChanged(98, 100),
+                new GameEvent.InventoryChanged()), events);
     }
 
     @Test
