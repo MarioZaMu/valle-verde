@@ -19,6 +19,7 @@ public final class DayPipeline {
     /** The pipeline with every step implemented so far (growth, calendar, forecast and energy). */
     public static DayPipeline standard() {
         return new DayPipeline()
+                .add(new WeatherEffectsStep())
                 .add(new GrowthStep())
                 .add(new CalendarStep())
                 .add(new ForecastStep())

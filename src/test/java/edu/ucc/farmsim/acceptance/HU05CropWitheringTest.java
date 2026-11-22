@@ -20,6 +20,12 @@ class HU05CropWitheringTest {
     private static final int COL = GameFixtures.SOIL_COL;
     private static final int ROW = GameFixtures.SOIL_ROW;
 
+    /** Ends the day with a Cloudy day, so the random weather (rain would water the crops) does not interfere. */
+    private static void endCloudyDay(TestApp app) {
+        app.state().weather().restore(Weather.CLOUDY, Weather.CLOUDY);
+        app.controller.endDay();
+    }
+
     private static Crop cropOf(TestApp app) {
         return app.state().farm().plotAt(COL, ROW).crop();
     }
@@ -32,13 +38,13 @@ class HU05CropWitheringTest {
         assertEquals(CropStage.GROWING, cropOf(app).stage());
 
         // When 2 days pass without watering it, it is still alive with 2 dry days
-        app.controller.endDay();
-        app.controller.endDay();
+        endCloudyDay(app);
+        endCloudyDay(app);
         assertTrue(cropOf(app).isAlive());
         assertEquals(2, cropOf(app).daysWithoutWater());
 
         // And when the third day passes, it withers
-        app.controller.endDay();
+        endCloudyDay(app);
         assertEquals(CropStage.WITHERED, cropOf(app).stage());
     }
 
@@ -138,9 +144,9 @@ class HU05CropWitheringTest {
         TestApp app = TestApp.startedGame();
         assertTrue(app.controller.plant(COL, ROW, "CARROT_SEED").isOk());
 
-        app.controller.endDay();
-        app.controller.endDay();
-        app.controller.endDay();
+        endCloudyDay(app);
+        endCloudyDay(app);
+        endCloudyDay(app);
 
         assertEquals(CropStage.WITHERED, cropOf(app).stage());
     }

@@ -121,6 +121,37 @@ public final class FarmMap {
     }
 
     /**
+     * Rain waters every living crop in the open (step 1 of RN-03). There is no greenhouse yet, so every crop is
+     * in the open.
+     */
+    public void rainOnCrops() {
+        for (Plot[] line : plots) {
+            for (Plot plot : line) {
+                if (plot.crop() != null) {
+                    plot.crop().water();
+                }
+            }
+        }
+    }
+
+    /**
+     * A frost withers every living crop in the open, whatever its stage (RN-09-b).
+     *
+     * @return how many crops withered now
+     */
+    public int frostCrops() {
+        int withered = 0;
+        for (Plot[] line : plots) {
+            for (Plot plot : line) {
+                if (plot.crop() != null && plot.crop().witherByFrost()) {
+                    withered++;
+                }
+            }
+        }
+        return withered;
+    }
+
+    /**
      * Withers every living crop that is not valid in the given season (RN-09-c, step 5 of RN-03).
      *
      * @return number of crops that withered now

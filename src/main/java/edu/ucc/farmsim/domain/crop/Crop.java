@@ -105,6 +105,19 @@ public final class Crop {
     }
 
     /**
+     * Withers the crop because of a frost in the open (RN-09-b), whatever its stage.
+     *
+     * @return {@code true} if it withered now; {@code false} if it already was
+     */
+    public boolean witherByFrost() {
+        if (!isAlive()) {
+            return false;
+        }
+        wither();
+        return true;
+    }
+
+    /**
      * Withers the crop if the given season is not one of its valid seasons (RN-09-c), whatever its stage.
      *
      * @return {@code true} if it withered now
