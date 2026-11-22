@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -24,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * <p>There is one game per server (S-01), so every order runs under the same lock (DT-20). The events an
  * order causes travel in the response (DT-19). The routes are documented in {@code docs/API.md}.
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-28, HU-33, HU-35.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-28, HU-33, HU-35, HU-37, HU-38.
  */
 @RestController
 @RequestMapping("/api")
@@ -50,6 +51,9 @@ public class GameRestController {
 
     /** Body of {@code POST /api/farm/plots/{col}/{row}/crop}. */
     public record SowRequest(@NotBlank String seedId) { }
+
+    /** Body of {@code POST /api/market/purchases} and {@code POST /api/market/sales}. */
+    public record TradeRequest(@NotBlank String itemId, @NotNull Integer quantity) { }
 
     /** Starts a new game (RN-30). */
     @PostMapping("/game")
@@ -104,6 +108,36 @@ public class GameRestController {
     @GetMapping("/saves/any")
     public ResponseEntity<?> hasSavedGames() {
         return run(game::hasSavedGames, HttpStatus.OK);
+    }
+
+    /** Prices, trends and the purchase catalogue. */
+    @GetMapping("/market")
+    public ResponseEntity<?> market() {
+        return run(game::market, HttpStatus.OK);
+    }
+
+    /** Buys units at the fixed price (RN-16). */
+    @PostMapping("/market/purchases")
+    public ResponseEntity<?> buy(@Valid @RequestBody TradeRequest request) {
+        return run(() -> game.buy(request.itemId(), request.quantity()), HttpStatus.OK);
+    }
+
+    /** Sells units at the dynamic price (RN-17, RN-18). */
+    @PostMapping("/market/sales")
+    public ResponseEntity<?> sell(@Valid @RequestBody TradeRequest request) {
+        return run(() -> game.sell(request.itemId(), request.quantity()), HttpStatus.OK);
+    }
+
+    /** What selling the quantity would pay now, without selling. */
+    @GetMapping("/market/quotes")
+    public ResponseEntity<?> quote(@RequestParam String itemId, @RequestParam int quantity) {
+        return run(() -> game.quote(itemId, quantity), HttpStatus.OK);
+    }
+
+    /** The inventory as a grid. */
+    @GetMapping("/inventory")
+    public ResponseEntity<?> inventory() {
+        return run(game::inventory, HttpStatus.OK);
     }
 
     private <T> ResponseEntity<?> run(Supplier<Result<T>> order, HttpStatus success) {

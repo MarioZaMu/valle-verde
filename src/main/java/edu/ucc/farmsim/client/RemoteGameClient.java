@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.ucc.farmsim.application.controller.GameCommands;
 import edu.ucc.farmsim.application.dto.HudView;
+import edu.ucc.farmsim.application.dto.InventoryView;
 import edu.ucc.farmsim.application.dto.MapView;
+import edu.ucc.farmsim.application.dto.MarketView;
 import edu.ucc.farmsim.application.dto.PlotView;
 import edu.ucc.farmsim.application.event.EventBus;
 import edu.ucc.farmsim.application.event.GameEvent;
@@ -31,7 +33,7 @@ import java.util.logging.Logger;
  * <p>Orders are sent synchronously from the calling thread with a time limit (DT-20). It never throws: an
  * unreachable server, a timeout or an unreadable answer becomes {@code ERROR_INTERNO}.
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-28, HU-33, HU-35.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-28, HU-33, HU-35, HU-37, HU-38.
  */
 public final class RemoteGameClient implements GameCommands {
 
@@ -104,6 +106,31 @@ public final class RemoteGameClient implements GameCommands {
     @Override
     public Result<Boolean> hasSavedGames() {
         return send("GET", "/api/saves/any", null, Boolean.class);
+    }
+
+    @Override
+    public Result<Integer> buy(String itemId, int quantity) {
+        return send("POST", "/api/market/purchases", Map.of("itemId", itemId, "quantity", quantity), Integer.class);
+    }
+
+    @Override
+    public Result<Integer> sell(String itemId, int quantity) {
+        return send("POST", "/api/market/sales", Map.of("itemId", itemId, "quantity", quantity), Integer.class);
+    }
+
+    @Override
+    public Result<Integer> quote(String itemId, int quantity) {
+        return send("GET", "/api/market/quotes?itemId=" + itemId + "&quantity=" + quantity, null, Integer.class);
+    }
+
+    @Override
+    public Result<MarketView> market() {
+        return send("GET", "/api/market", null, MarketView.class);
+    }
+
+    @Override
+    public Result<InventoryView> inventory() {
+        return send("GET", "/api/inventory", null, InventoryView.class);
     }
 
     private static String plot(int col, int row) {

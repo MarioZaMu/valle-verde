@@ -1,7 +1,9 @@
 package edu.ucc.farmsim.application.controller;
 
 import edu.ucc.farmsim.application.dto.HudView;
+import edu.ucc.farmsim.application.dto.InventoryView;
 import edu.ucc.farmsim.application.dto.MapView;
+import edu.ucc.farmsim.application.dto.MarketView;
 import edu.ucc.farmsim.application.dto.PlotView;
 import edu.ucc.farmsim.application.result.Result;
 
@@ -12,7 +14,7 @@ import edu.ucc.farmsim.application.result.Result;
  *
  * <p>Every operation answers with a {@link Result}; none of them throws (R-03, RNF-07).
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-28, HU-33, HU-35.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-28, HU-33, HU-35, HU-37, HU-38.
  */
 public interface GameCommands {
 
@@ -70,4 +72,31 @@ public interface GameCommands {
 
     /** True if at least one of the save slots holds a game. */
     Result<Boolean> hasSavedGames();
+
+    /**
+     * Buys units of a seed, hay or medicine at the fixed price (RN-16).
+     *
+     * @param itemId   item id, for example {@code CORN_SEED}
+     * @param quantity 1 to 99
+     * @return the total paid in m
+     */
+    Result<Integer> buy(String itemId, int quantity);
+
+    /**
+     * Sells units of a crop, egg or milk at the dynamic price (RN-17, RN-18).
+     *
+     * @param itemId   item id, for example {@code CARROT}
+     * @param quantity 1 up to the units owned
+     * @return the total received in m
+     */
+    Result<Integer> sell(String itemId, int quantity);
+
+    /** What selling the quantity would pay now. A pure query. */
+    Result<Integer> quote(String itemId, int quantity);
+
+    /** Prices, trends and the purchase catalogue. A pure query. */
+    Result<MarketView> market();
+
+    /** The inventory as a grid. A pure query. */
+    Result<InventoryView> inventory();
 }

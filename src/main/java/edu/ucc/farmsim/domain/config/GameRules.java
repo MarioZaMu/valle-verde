@@ -122,6 +122,47 @@ public final class GameRules {
     /** Potato seeds in the starting inventory. */
     public static final int START_POTATO_SEEDS = 5;
 
+    // ---- RN-16, RN-17, RN-18: market ----
+
+    /** Price in m of one ration of hay. */
+    public static final int PRICE_HAY = 5;
+
+    /** Price in m of one medicine. */
+    public static final int PRICE_MEDICINE = 40;
+
+    /** Base selling price in m of an egg. */
+    public static final int BASE_PRICE_EGG = 20;
+
+    /** Base selling price in m of a bottle of milk. */
+    public static final int BASE_PRICE_MILK = 60;
+
+    /** Season factor, in percent, of a crop sold in one of its valid seasons. */
+    public static final int SEASON_FACTOR_IN_SEASON = 90;
+
+    /** Season factor, in percent, of a crop sold out of its valid seasons. */
+    public static final int SEASON_FACTOR_OUT_OF_SEASON = 120;
+
+    /** Season factor, in percent, of animal products. */
+    public static final int SEASON_FACTOR_FLAT = 100;
+
+    /** Smallest quantity of one transaction. */
+    public static final int MIN_TRANSACTION = 1;
+
+    /** Largest quantity of one purchase. */
+    public static final int MAX_TRANSACTION = 99;
+
+    /** Demand of every product when a game starts, and its ceiling, in percent. */
+    public static final int DEMAND_MAX = 100;
+
+    /** Lowest demand a product can fall to, in percent. */
+    public static final int DEMAND_MIN = 50;
+
+    /** Demand lost by each unit sold. */
+    public static final int DEMAND_DROP_PER_UNIT = 2;
+
+    /** Demand recovered when a day ends. */
+    public static final int DEMAND_RECOVERY_PER_DAY = 5;
+
     // ---- RN-31: save slots ----
 
     /** Number of save slots. */

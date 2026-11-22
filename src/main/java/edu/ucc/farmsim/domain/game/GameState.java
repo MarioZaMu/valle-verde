@@ -3,6 +3,7 @@ package edu.ucc.farmsim.domain.game;
 import edu.ucc.farmsim.domain.config.GameRules;
 import edu.ucc.farmsim.domain.economy.Inventory;
 import edu.ucc.farmsim.domain.economy.ItemType;
+import edu.ucc.farmsim.domain.economy.Market;
 import edu.ucc.farmsim.domain.farm.FarmMap;
 import edu.ucc.farmsim.domain.time.GameClock;
 import edu.ucc.farmsim.domain.time.GameDate;
@@ -17,7 +18,7 @@ import edu.ucc.farmsim.domain.time.WeatherCycle;
  * {@link #createMemento()} and {@link #restore(GameMemento)} undo a failed end of the day (HU-10) and
  * will back saving and loading (HU-29, HU-30).
  *
- * <p>Stories: HU-01, HU-10, HU-28.
+ * <p>Stories: HU-01, HU-10, HU-14, HU-15, HU-28.
  */
 public final class GameState {
 
@@ -27,15 +28,17 @@ public final class GameState {
     private final FarmMap farm;
     private final WeatherCycle weather;
     private final StateRandom random;
+    private final Market market;
 
     private GameState(int money, Energy energy, Inventory inventory, FarmMap farm,
-                      WeatherCycle weather, StateRandom random) {
+                      WeatherCycle weather, StateRandom random, Market market) {
         this.money = money;
         this.energy = energy;
         this.inventory = inventory;
         this.farm = farm;
         this.weather = weather;
         this.random = random;
+        this.market = market;
     }
 
     /**
@@ -52,12 +55,41 @@ public final class GameState {
         inventory.add(ItemType.CARROT_SEED, GameRules.START_CARROT_SEEDS);
         inventory.add(ItemType.POTATO_SEED, GameRules.START_POTATO_SEEDS);
         return new GameState(GameRules.START_MONEY, new Energy(), inventory, FarmMap.initial(),
-                WeatherCycle.startNewGame(clock, random), random);
+                WeatherCycle.startNewGame(clock, random), random, Market.standard());
     }
 
     /** Money the player has. */
     public int money() {
         return money;
+    }
+
+    /** Adds money (a sale, a reward). */
+    public void earn(int amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("amount must not be negative: " + amount);
+        }
+        money += amount;
+    }
+
+    /**
+     * Takes money if there is enough; the balance never goes below zero (RN-14).
+     *
+     * @return {@code true} if it was spent; {@code false} (and nothing changed) if the balance is smaller
+     */
+    public boolean spend(int amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("amount must not be negative: " + amount);
+        }
+        if (amount > money) {
+            return false;
+        }
+        money -= amount;
+        return true;
+    }
+
+    /** The market: demand, prices and trends. */
+    public Market market() {
+        return market;
     }
 
     /** The player's daily energy. */
@@ -88,7 +120,7 @@ public final class GameState {
     /** Takes an immutable snapshot of everything that changes during play. */
     public GameMemento createMemento() {
         return new GameMemento(date(), money, energy.current(), inventory.snapshot(),
-                farm.snapshot(), weather.today(), weather.forecast(), random.state());
+                farm.snapshot(), weather.today(), weather.forecast(), random.state(), market.snapshot());
     }
 
     /** Puts the state back exactly as it was when the snapshot was taken. */
@@ -100,6 +132,7 @@ public final class GameState {
         farm.restoreFrom(memento.farm());
         weather.restore(memento.today(), memento.forecast());
         random.restore(memento.randomState());
+        market.restoreFrom(memento.market());
     }
 
     /** Current calendar date. */

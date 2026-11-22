@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import edu.ucc.farmsim.application.service.GameSession;
 import edu.ucc.farmsim.config.ServerApplication;
+import edu.ucc.farmsim.domain.economy.ItemType;
 import edu.ucc.farmsim.domain.time.GameClock;
 import edu.ucc.farmsim.support.FakeSaveRepository;
 import edu.ucc.farmsim.support.GameFixtures;
@@ -228,5 +229,89 @@ class GameRestControllerTest {
     void aPlotCoordinateThatIsNotANumberIsABadRequest() throws Exception {
         mvc.perform(get("/api/farm/plots/x/1")).andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("SOLICITUD_INVALIDA"));
+    }
+
+    private ResultActions trade(String route, String itemId, int quantity) throws Exception {
+        return mvc.perform(post("/api/market/" + route).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"itemId\": \"" + itemId + "\", \"quantity\": " + quantity + "}"));
+    }
+
+    @Test
+    void GET_market_listsWhatCanBeSoldWithTheirTrendAndWhatCanBeBought() throws Exception {
+        newGame();
+        mvc.perform(get("/api/market")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.sells", hasSize(7)))
+                .andExpect(jsonPath("$.data.sells[?(@.itemId == 'CARROT')].unitPrice").value(27))
+                .andExpect(jsonPath("$.data.sells[?(@.itemId == 'CARROT')].trend").value("SAME"))
+                .andExpect(jsonPath("$.data.buys", hasSize(7)));
+    }
+
+    @Test
+    void GET_market_withoutAGameIsNotFound() throws Exception {
+        mvc.perform(get("/api/market")).andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("SIN_PARTIDA"));
+    }
+
+    @Test
+    void POST_purchases_buysAndReportsTheMoneyAndInventoryEvents() throws Exception {
+        newGame();
+        trade("purchases", "CORN_SEED", 5).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").value(150))
+                .andExpect(jsonPath("$.events[?(@.type == 'MoneyChanged')].data.money").value(350))
+                .andExpect(jsonPath("$.events[?(@.type == 'InventoryChanged')]").isNotEmpty());
+    }
+
+    @Test
+    void POST_purchases_withoutEnoughMoneyIsAConflict() throws Exception {
+        newGame();
+        trade("purchases", "MEDICINE", 99).andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("SIN_FONDOS"));
+    }
+
+    @Test
+    void POST_purchases_withAQuantityOutOfRangeIsABadRequest() throws Exception {
+        newGame();
+        trade("purchases", "HAY", 100).andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("CANTIDAD_INVALIDA"));
+    }
+
+    @Test
+    void POST_sales_sellsAtTheDynamicPriceAndQuotesItBeforehand() throws Exception {
+        newGame();
+        session.current().inventory().add(ItemType.CARROT, 3);
+
+        mvc.perform(get("/api/market/quotes").param("itemId", "CARROT").param("quantity", "3"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data").value(79));
+        trade("sales", "CARROT", 3).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").value(79))
+                .andExpect(jsonPath("$.events[?(@.type == 'MoneyChanged')].data.money").value(579));
+    }
+
+    @Test
+    void POST_sales_moreThanOwnedIsABadRequestWithTheRange() throws Exception {
+        newGame();
+        session.current().inventory().add(ItemType.CARROT, 2);
+
+        trade("sales", "CARROT", 5).andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("CANTIDAD_INVALIDA"))
+                .andExpect(jsonPath("$.message").value("La cantidad debe estar entre 1 y 2."));
+    }
+
+    @Test
+    void POST_sales_withoutBodyFieldsIsABadRequest() throws Exception {
+        newGame();
+        mvc.perform(post("/api/market/sales").contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("SOLICITUD_INVALIDA"));
+    }
+
+    @Test
+    void GET_inventory_returnsTheSlotsOfTheGrid() throws Exception {
+        newGame();
+        mvc.perform(get("/api/inventory")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.capacity").value(24))
+                .andExpect(jsonPath("$.data.slots", hasSize(2)))
+                .andExpect(jsonPath("$.data.slots[0].itemId").value("CARROT_SEED"))
+                .andExpect(jsonPath("$.data.slots[0].amount").value(10));
     }
 }

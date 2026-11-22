@@ -21,6 +21,7 @@ public final class DayPipeline {
         return new DayPipeline()
                 .add(new WeatherEffectsStep())
                 .add(new GrowthStep())
+                .add(new MarketStep())
                 .add(new CalendarStep())
                 .add(new ForecastStep())
                 .add(new EnergyResetStep());

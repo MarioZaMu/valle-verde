@@ -6,12 +6,15 @@ import edu.ucc.farmsim.domain.crop.CropType;
 import edu.ucc.farmsim.domain.economy.Inventory;
 import edu.ucc.farmsim.domain.economy.InventorySnapshot;
 import edu.ucc.farmsim.domain.economy.ItemType;
+import edu.ucc.farmsim.domain.economy.MarketSnapshot;
 import edu.ucc.farmsim.domain.game.GameState;
 import edu.ucc.farmsim.domain.time.GameClock;
 import edu.ucc.farmsim.domain.time.GameDate;
 import edu.ucc.farmsim.domain.time.Season;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 /** Helpers that put a game in a known situation without going through the whole day-by-day flow. */
 public final class GameFixtures {
@@ -35,6 +38,24 @@ public final class GameFixtures {
     /** Puts a crop that is alive, unwatered and has grown for the given number of days. */
     public static Crop plant(GameState state, int col, int row, CropType type, int daysGrown) {
         return plant(state, col, row, type, daysGrown, 0, false, false);
+    }
+
+    /** Sets the demand of a product (percent) without selling anything. */
+    public static void setDemand(GameState state, ItemType item, int demand) {
+        MarketSnapshot now = state.market().snapshot();
+        Map<ItemType, Integer> changed = new EnumMap<>(ItemType.class);
+        changed.putAll(now.demand());
+        changed.put(item, demand);
+        state.market().restoreFrom(new MarketSnapshot(changed, now.previousPrice()));
+    }
+
+    /** Sets the player's money. */
+    public static void setMoney(GameState state, int money) {
+        if (money > state.money()) {
+            state.earn(money - state.money());
+        } else {
+            state.spend(state.money() - money);
+        }
     }
 
     /** Moves the calendar to a date. */

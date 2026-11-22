@@ -33,3 +33,6 @@ edu.ucc.farmsim.domain.crop.CornFactory | Factory Method | ConcreteCreator (corn
 edu.ucc.farmsim.domain.crop.PumpkinFactory | Factory Method | ConcreteCreator (pumpkin)
 edu.ucc.farmsim.ui.render.MapPanel | Observer | ConcreteObserver (the farm map, repainted when a map event arrives)
 edu.ucc.farmsim.api.EventCollector | Observer | ConcreteObserver (keeps the events of the current request so they travel in the response)
+edu.ucc.farmsim.domain.economy.PricingStrategy | Strategy | Strategy interface (how the price of one unit is worked out)
+edu.ucc.farmsim.domain.economy.CropPricing | Strategy | ConcreteStrategy (crops: 90 % in season, 120 % out of season)
+edu.ucc.farmsim.domain.economy.FlatPricing | Strategy | ConcreteStrategy (animal products: the season does not matter)

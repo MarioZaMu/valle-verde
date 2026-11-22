@@ -6,6 +6,7 @@ import edu.ucc.farmsim.application.event.GameEvent;
 import edu.ucc.farmsim.application.service.DayService;
 import edu.ucc.farmsim.application.service.FarmService;
 import edu.ucc.farmsim.application.service.GameSession;
+import edu.ucc.farmsim.application.service.MarketService;
 import edu.ucc.farmsim.application.service.ProgressService;
 import edu.ucc.farmsim.application.service.SaveGameService;
 import edu.ucc.farmsim.application.service.ViewMapper;
@@ -74,6 +75,7 @@ public final class TestApp {
         DayService day = new DayService(session, pipeline, mapper, bus);
         SaveGameService saves = new SaveGameService(repository);
         FarmService farm = new FarmService(session, mapper, bus);
-        return new TestApp(session, bus, new GameController(session, mapper, progress, day, saves, farm));
+        MarketService market = new MarketService(session, bus);
+        return new TestApp(session, bus, new GameController(session, mapper, progress, day, saves, farm, market));
     }
 }

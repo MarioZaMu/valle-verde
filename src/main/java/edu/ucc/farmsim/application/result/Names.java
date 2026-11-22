@@ -20,6 +20,14 @@ public final class Names {
     private static final Map<String, String> STAGES = Map.of(
             "SEED", "Semilla", "SPROUT", "Brote", "GROWING", "Crecimiento", "MATURE", "Maduro", "WITHERED", "Marchito");
 
+    private static final Map<String, String> ITEMS = Map.ofEntries(
+            Map.entry("CARROT_SEED", "Semilla de Zanahoria"), Map.entry("POTATO_SEED", "Semilla de Papa"),
+            Map.entry("TOMATO_SEED", "Semilla de Tomate"), Map.entry("CORN_SEED", "Semilla de Maíz"),
+            Map.entry("PUMPKIN_SEED", "Semilla de Calabaza"), Map.entry("CARROT", "Zanahoria"),
+            Map.entry("POTATO", "Papa"), Map.entry("TOMATO", "Tomate"), Map.entry("CORN", "Maíz"),
+            Map.entry("PUMPKIN", "Calabaza"), Map.entry("EGG", "Huevo"), Map.entry("MILK", "Leche"),
+            Map.entry("HAY", "Heno"), Map.entry("MEDICINE", "Medicina"));
+
     private static final Map<String, String> TERRAINS = Map.of(
             "SOIL", "Tierra de cultivo", "GRASS", "Hierba", "WATER", "Agua", "OBSTACLE", "Obstáculo");
 
@@ -48,6 +56,11 @@ public final class Names {
     }
 
     /** Terrain name, for example {@code SOIL} to {@code Tierra de cultivo}. */
+    /** Spanish name of an item (seed, harvest, animal product or supply). */
+    public static String item(String id) {
+        return ITEMS.getOrDefault(id, id);
+    }
+
     public static String terrain(String id) {
         return TERRAINS.getOrDefault(id, id);
     }

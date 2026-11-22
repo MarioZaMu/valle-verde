@@ -5,7 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.ucc.farmsim.application.dto.HudView;
+import edu.ucc.farmsim.application.dto.InventoryView;
 import edu.ucc.farmsim.application.dto.MapView;
+import edu.ucc.farmsim.application.dto.MarketView;
 import edu.ucc.farmsim.application.dto.PlotView;
 import edu.ucc.farmsim.application.event.EventBus;
 import edu.ucc.farmsim.application.event.GameEvent;
@@ -13,6 +15,7 @@ import edu.ucc.farmsim.application.result.ErrorCode;
 import edu.ucc.farmsim.application.result.Result;
 import edu.ucc.farmsim.application.service.GameSession;
 import edu.ucc.farmsim.config.ServerApplication;
+import edu.ucc.farmsim.domain.economy.ItemType;
 import edu.ucc.farmsim.domain.time.GameClock;
 import edu.ucc.farmsim.support.FakeSaveRepository;
 import edu.ucc.farmsim.support.GameFixtures;
@@ -181,6 +184,28 @@ class RemoteGameClientTest {
         assertEquals(inProcess, remote);
     }
 
+    @Test
+    void sellingBuyingAndTheMarketAndInventoryViewsTravelThroughTheClient() {
+        client.newGame(TestApp.SEED);
+        session.current().inventory().add(ItemType.CARROT, 3);
+        events.clear();
+
+        Result<Integer> quote = client.quote("CARROT", 3);
+        Result<Integer> sale = client.sell("CARROT", 3);
+        Result<Integer> purchase = client.buy("HAY", 4);
+        Result<MarketView> market = client.market();
+        Result<InventoryView> inventory = client.inventory();
+
+        assertEquals(79, quote.value());
+        assertEquals(79, sale.value());
+        assertEquals(20, purchase.value());
+        assertEquals(7, market.value().sells().size());
+        assertEquals("Heno", market.value().buys().stream().filter(o -> o.itemId().equals("HAY")).findFirst().orElseThrow().name());
+        assertEquals(24, inventory.value().capacity());
+        assertEquals(List.of(new GameEvent.MoneyChanged(579), new GameEvent.InventoryChanged(),
+                new GameEvent.MoneyChanged(559), new GameEvent.InventoryChanged()), events);
+    }
+
     /** The same sequence of orders, recording every result and then the events each one caused. */
     private static List<Object> script(edu.ucc.farmsim.application.controller.GameCommands game, List<GameEvent> seen) {
         List<Object> log = new ArrayList<>();
@@ -195,6 +220,13 @@ class RemoteGameClientTest {
         log.add(describe(game.endDay()));
         log.add(describe(game.inspect(COL, ROW)));
         log.add(describe(game.map()));
+        log.add(describe(game.buy("CORN_SEED", 5)));
+        log.add(describe(game.buy("MEDICINE", 99)));
+        log.add(describe(game.buy("HAY", 0)));
+        log.add(describe(game.sell("CARROT", 1)));
+        log.add(describe(game.quote("CARROT", 1)));
+        log.add(describe(game.market()));
+        log.add(describe(game.inventory()));
         log.add(List.copyOf(seen));
         return log;
     }

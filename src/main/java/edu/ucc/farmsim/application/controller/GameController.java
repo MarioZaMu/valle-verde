@@ -1,13 +1,16 @@
 package edu.ucc.farmsim.application.controller;
 
 import edu.ucc.farmsim.application.dto.HudView;
+import edu.ucc.farmsim.application.dto.InventoryView;
 import edu.ucc.farmsim.application.dto.MapView;
+import edu.ucc.farmsim.application.dto.MarketView;
 import edu.ucc.farmsim.application.dto.PlotView;
 import edu.ucc.farmsim.application.result.ErrorCode;
 import edu.ucc.farmsim.application.result.Result;
 import edu.ucc.farmsim.application.service.DayService;
 import edu.ucc.farmsim.application.service.FarmService;
 import edu.ucc.farmsim.application.service.GameSession;
+import edu.ucc.farmsim.application.service.MarketService;
 import edu.ucc.farmsim.application.service.ProgressService;
 import edu.ucc.farmsim.application.service.SaveGameService;
 import edu.ucc.farmsim.application.service.ViewMapper;
@@ -24,7 +27,7 @@ import org.springframework.stereotype.Component;
  * RNF-07), and it never touches repositories (AR-4). It is not the REST controller: the {@code api} package
  * translates HTTP into calls to this class.
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-28, HU-33, HU-35.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-28, HU-33, HU-35, HU-37, HU-38.
  */
 @Component
 public final class GameController implements GameCommands {
@@ -37,6 +40,7 @@ public final class GameController implements GameCommands {
     private final DayService day;
     private final SaveGameService saves;
     private final FarmService farm;
+    private final MarketService market;
 
     /**
      * Creates the controller.
@@ -47,15 +51,17 @@ public final class GameController implements GameCommands {
      * @param day      ends days
      * @param saves    knows about the save slots
      * @param farm     crop use cases
+     * @param market   buying, selling and the market and inventory views
      */
     public GameController(GameSession session, ViewMapper mapper, ProgressService progress, DayService day,
-                          SaveGameService saves, FarmService farm) {
+                          SaveGameService saves, FarmService farm, MarketService market) {
         this.session = session;
         this.mapper = mapper;
         this.progress = progress;
         this.day = day;
         this.saves = saves;
         this.farm = farm;
+        this.market = market;
     }
 
     /** True if a game is in progress (the UI asks for confirmation before discarding it). */
@@ -151,6 +157,31 @@ public final class GameController implements GameCommands {
             }
             return Result.ok(mapper.hud(session.current()));
         });
+    }
+
+    @Override
+    public Result<Integer> buy(String itemId, int quantity) {
+        return guard(() -> market.buy(itemId, quantity));
+    }
+
+    @Override
+    public Result<Integer> sell(String itemId, int quantity) {
+        return guard(() -> market.sell(itemId, quantity));
+    }
+
+    @Override
+    public Result<Integer> quote(String itemId, int quantity) {
+        return guard(() -> market.quote(itemId, quantity));
+    }
+
+    @Override
+    public Result<MarketView> market() {
+        return guard(market::market);
+    }
+
+    @Override
+    public Result<InventoryView> inventory() {
+        return guard(market::inventory);
     }
 
     private <T> Result<T> guard(Supplier<Result<T>> operation) {
