@@ -6,6 +6,7 @@ import edu.ucc.farmsim.application.result.Result;
 import edu.ucc.farmsim.application.service.DayService;
 import edu.ucc.farmsim.application.service.GameSession;
 import edu.ucc.farmsim.application.service.ProgressService;
+import edu.ucc.farmsim.application.service.SaveGameService;
 import edu.ucc.farmsim.application.service.ViewMapper;
 import java.util.function.Supplier;
 import java.util.logging.Level;
@@ -18,7 +19,7 @@ import java.util.logging.Logger;
  * No exception ever reaches the UI: anything unexpected becomes {@code ERROR_INTERNO} (R-03, RNF-07), and
  * it never touches repositories (AR-4).
  *
- * <p>Stories: HU-10, HU-28.
+ * <p>Stories: HU-10, HU-28, HU-33.
  */
 public final class GameController {
 
@@ -28,6 +29,7 @@ public final class GameController {
     private final ViewMapper mapper;
     private final ProgressService progress;
     private final DayService day;
+    private final SaveGameService saves;
 
     /**
      * Creates the controller.
@@ -36,12 +38,15 @@ public final class GameController {
      * @param mapper   builds the views the UI draws
      * @param progress starts games
      * @param day      ends days
+     * @param saves    knows about the save slots
      */
-    public GameController(GameSession session, ViewMapper mapper, ProgressService progress, DayService day) {
+    public GameController(GameSession session, ViewMapper mapper, ProgressService progress, DayService day,
+                          SaveGameService saves) {
         this.session = session;
         this.mapper = mapper;
         this.progress = progress;
         this.day = day;
+        this.saves = saves;
     }
 
     /** True if a game is in progress (the UI asks for confirmation before discarding it). */
@@ -66,6 +71,11 @@ public final class GameController {
     /** Ends the day: effects are resolved in the order of RN-03 and the new top bar is returned. */
     public Result<HudView> endDay() {
         return guard(day::endDay);
+    }
+
+    /** True if at least one of the save slots holds a game. */
+    public Result<Boolean> hasSavedGames() {
+        return guard(() -> Result.ok(saves.hasAnySave()));
     }
 
     /** The top bar of the game in progress. */

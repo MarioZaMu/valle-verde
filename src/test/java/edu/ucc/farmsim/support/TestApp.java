@@ -6,8 +6,10 @@ import edu.ucc.farmsim.application.event.GameEvent;
 import edu.ucc.farmsim.application.service.DayService;
 import edu.ucc.farmsim.application.service.GameSession;
 import edu.ucc.farmsim.application.service.ProgressService;
+import edu.ucc.farmsim.application.service.SaveGameService;
 import edu.ucc.farmsim.application.service.ViewMapper;
 import edu.ucc.farmsim.domain.game.DayPipeline;
+import edu.ucc.farmsim.domain.save.SaveRepository;
 import edu.ucc.farmsim.domain.time.GameClock;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,11 +47,17 @@ public final class TestApp {
 
     /** Creates the graph around a given session (tests that need a faulty session). */
     public static TestApp create(GameSession session, DayPipeline pipeline) {
+        return create(session, pipeline, new FakeSaveRepository());
+    }
+
+    /** Creates the graph around a given session and save repository. */
+    public static TestApp create(GameSession session, DayPipeline pipeline, SaveRepository repository) {
         GameClock.getInstance().resetForTests();
         ViewMapper mapper = new ViewMapper();
         EventBus bus = new EventBus();
         ProgressService progress = new ProgressService(session, mapper, bus);
         DayService day = new DayService(session, pipeline, mapper, bus);
-        return new TestApp(session, bus, new GameController(session, mapper, progress, day));
+        SaveGameService saves = new SaveGameService(repository);
+        return new TestApp(session, bus, new GameController(session, mapper, progress, day, saves));
     }
 }

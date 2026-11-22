@@ -1,19 +1,32 @@
 package edu.ucc.farmsim;
 
+import edu.ucc.farmsim.application.controller.GameController;
+import edu.ucc.farmsim.application.event.EventBus;
+import edu.ucc.farmsim.application.service.DayService;
+import edu.ucc.farmsim.application.service.GameSession;
+import edu.ucc.farmsim.application.service.ProgressService;
+import edu.ucc.farmsim.application.service.SaveGameService;
+import edu.ucc.farmsim.application.service.ViewMapper;
+import edu.ucc.farmsim.domain.game.DayPipeline;
+import edu.ucc.farmsim.domain.save.SaveRepository;
+import edu.ucc.farmsim.infrastructure.persistence.JsonSaveRepository;
 import edu.ucc.farmsim.ui.screens.MainWindow;
+import edu.ucc.farmsim.ui.screens.ScreenRouter;
 import java.awt.GraphicsEnvironment;
+import java.nio.file.Path;
 import javax.swing.SwingUtilities;
 
 /**
- * Composition root: the only place that will create the {@code StateRandom}, the repository, the
- * services, the event bus and the window (phase 5.1 onwards).
+ * Composition root: the only place that creates the services, the event bus, the repository and the window
+ * and wires them together. The random seed of each new game comes from the clock.
  *
- * <p>In phase 5.0 it only opens an empty window, or exits cleanly when there is no display.
- * Stories: none (technical setup, phase 5.0).
+ * <p>Stories: HU-33.
  */
 public final class Main {
 
     private static final int EXIT_NO_DISPLAY = 1;
+    private static final String SAVE_FOLDER = ".farmsim";
+    private static final String SAVE_SUBFOLDER = "saves";
 
     private Main() {
         // entry point only
@@ -30,6 +43,22 @@ public final class Main {
             System.exit(EXIT_NO_DISPLAY);
             return;
         }
-        SwingUtilities.invokeLater(() -> new MainWindow(GameInfo.NAME).setVisible(true));
+        GameController controller = buildController(new EventBus());
+        SwingUtilities.invokeLater(() -> {
+            MainWindow window = new MainWindow(GameInfo.NAME);
+            window.setContentPane(new ScreenRouter(controller, System::currentTimeMillis));
+            window.setVisible(true);
+        });
+    }
+
+    private static GameController buildController(EventBus bus) {
+        GameSession session = new GameSession();
+        ViewMapper mapper = new ViewMapper();
+        Path saves = Path.of(System.getProperty("user.home"), SAVE_FOLDER, SAVE_SUBFOLDER);
+        SaveRepository repository = new JsonSaveRepository(saves);
+        return new GameController(session, mapper,
+                new ProgressService(session, mapper, bus),
+                new DayService(session, DayPipeline.standard(), mapper, bus),
+                new SaveGameService(repository));
     }
 }
