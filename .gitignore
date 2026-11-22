@@ -2,8 +2,9 @@
 target/
 *.class
 
-# Local tools (downloaded jars)
+# Local tools (downloaded jars and portable Maven)
 tools/*.jar
+tools/apache-maven-*/
 
 # IDE
 .idea/
