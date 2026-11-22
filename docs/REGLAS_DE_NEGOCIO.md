@@ -350,7 +350,7 @@ Después se pone `alimentadoHoy = falso`.
 
 ### RN-32 · Formato e integridad del archivo
 - JSON UTF-8 con `schemaVersion` (= **1**), `savedAt`, `state` y `checksum` (**SHA-256** en hexadecimal del bloque `state`).
-- `state` incluye: calendario, energía, dinero, inventario, parcelas y cultivos, edificios y animales (con pendientes), mercado (demanda y precio anterior), clima y pronóstico, logros y contadores, y la **semilla del generador aleatorio con el número de sorteos realizados** (para continuar la misma secuencia al cargar).
+- `state` incluye: calendario, energía, dinero, inventario, parcelas y cultivos, edificios y animales (con pendientes), mercado (demanda y precio anterior), clima y pronóstico, logros y contadores, y el **estado interno del generador aleatorio** (un entero de 64 bits que expone `StateRandom`), para continuar exactamente la misma secuencia al cargar.
 - Tamaño típico ≤ 200 KB.
 - **Guardar → cargar devuelve un estado idéntico** al original (igualdad estructural, incluida la secuencia futura de sorteos).
 
@@ -391,6 +391,7 @@ El *tooltip* de una parcela aparece tras **300 ms** de reposo del cursor y muest
 | `INVENTARIO_LLENO` | «Inventario lleno: libera espacio o construye un Almacén.» |
 | `SIN_SEMILLAS` | «No tienes semillas de {cultivo}.» |
 | `CANTIDAD_INVALIDA` | «La cantidad debe estar entre 1 y {máx}.» (compra: máx 99; venta: máx = existencia) |
+| `ERROR_INTERNO` | «Ocurrió un error inesperado. Tu partida no cambió.» |
 | `PARCELA_NO_CULTIVABLE` / `PARCELA_OCUPADA` | «Esta parcela no es de tierra de cultivo.» / «La parcela ya está ocupada.» |
 | `YA_REGADO` | «El cultivo ya está regado hoy.» |
 | `NO_MADURO` | «El cultivo aún no está maduro: faltan {n} días.» |
