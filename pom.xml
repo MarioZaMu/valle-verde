@@ -31,6 +31,8 @@
     <jacoco.version>0.8.16</jacoco.version>
     <compiler.plugin.version>3.16.0</compiler.plugin.version>
     <surefire.plugin.version>3.6.1</surefire.plugin.version>
+    <!-- look and feel of the Swing window (HU-43) -->
+    <flatlaf.version>3.6.1</flatlaf.version>
 
     <main.class>edu.ucc.farmsim.Main</main.class>
     <!-- fast build by default; the "perf" profile also runs @Tag("perf") tests -->
@@ -55,6 +57,13 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-mongodb</artifactId>
+    </dependency>
+
+    <!-- Swing theme (HU-43); the game runs with the default look if it cannot be installed -->
+    <dependency>
+      <groupId>com.formdev</groupId>
+      <artifactId>flatlaf</artifactId>
+      <version>${flatlaf.version}</version>
     </dependency>
 
     <dependency>

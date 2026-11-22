@@ -6,7 +6,7 @@ import java.awt.Color;
  * The colors of the game drawn with Java2D. Every terrain and crop stage has its own color or shape so the map
  * never depends on color alone (RNF-14).
  *
- * <p>Stories: HU-35.
+ * <p>Stories: HU-35, HU-39, HU-43.
  */
 public final class Palette {
 
@@ -68,6 +68,33 @@ public final class Palette {
 
     /** Marker of products waiting to be collected. */
     public static final Color PENDING = new Color(0xFFD23F);
+
+    /** Text on a notice (HU-39, HU-43). */
+    public static final Color TOAST_TEXT = new Color(0xFFFFFF);
+
+    /** Background of an error notice. */
+    public static final Color TOAST_ERROR = new Color(0xA33A32);
+
+    /** Background of a success notice. */
+    public static final Color TOAST_SUCCESS = new Color(0x2E7D4F);
+
+    /** Background of an achievement notice. */
+    public static final Color TOAST_ACHIEVEMENT = new Color(0x8A6A12);
+
+    /** Background of an information notice. */
+    public static final Color TOAST_INFO = new Color(0x2F4F6F);
+
+    /** Text of the top bar. */
+    public static final Color HUD_TEXT = new Color(0xFFF4D6);
+
+    /** Background of the top bar. */
+    public static final Color HUD_BACKGROUND = new Color(0x3B2F1E);
+
+    /** Text of dialogs. */
+    public static final Color DIALOG_TEXT = new Color(0x2B2118);
+
+    /** Background of dialogs. */
+    public static final Color DIALOG_BACKGROUND = new Color(0xFFF8E7);
 
     private Palette() {
         // constants holder

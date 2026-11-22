@@ -1,5 +1,6 @@
 package edu.ucc.farmsim.ui.components;
 
+import edu.ucc.farmsim.ui.theme.Palette;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Font;
@@ -88,7 +89,7 @@ public final class ToastLayer extends JComponent {
                 g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, Math.max(0f, toast.opacity())));
                 g.setColor(background(toast.kind()));
                 g.fillRoundRect(x, y, width, height, ARC, ARC);
-                g.setColor(Color.WHITE);
+                g.setColor(Palette.TOAST_TEXT);
                 g.drawString(text, x + PAD, y + PAD + metrics.getAscent());
                 y -= height + GAP;
             }
@@ -99,10 +100,10 @@ public final class ToastLayer extends JComponent {
 
     private static Color background(ToastKind kind) {
         return switch (kind) {
-            case ERROR -> new Color(0xA33A32);
-            case SUCCESS -> new Color(0x2E7D4F);
-            case ACHIEVEMENT -> new Color(0x8A6A12);
-            case INFO -> new Color(0x2F4F6F);
+            case ERROR -> Palette.TOAST_ERROR;
+            case SUCCESS -> Palette.TOAST_SUCCESS;
+            case ACHIEVEMENT -> Palette.TOAST_ACHIEVEMENT;
+            case INFO -> Palette.TOAST_INFO;
         };
     }
 }

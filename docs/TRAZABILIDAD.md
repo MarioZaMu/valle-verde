@@ -66,7 +66,7 @@ RF-43, 48 | AnimalOfferView, BuyOfferView, GameCommands, GameController, GameDia
 | RF-39 | Should | HU-39 | Interfaz de usuario
 (Swing + FlatLaf)
 RF-33 a RF-41
-RF-43, 48 | GameScreen, GameScreenPresenter, OverlayPanel, ToastKind, ToastLayer, ToastPresenter, ToastQueue, ToastView | HU-39: 10 |
+RF-43, 48 | GameScreen, GameScreenPresenter, OverlayPanel, Palette, ToastKind, ToastLayer, ToastPresenter, ToastQueue, ToastView | HU-39: 10 |
 | RF-40 | Could | HU-40 | Interfaz de usuario
 (Swing + FlatLaf)
 RF-33 a RF-41
@@ -81,7 +81,7 @@ RF-42, 44 | AssetManager, MapRenderer | HU-42: 8 |
 | RF-43 | Should | HU-43 | Interfaz de usuario
 (Swing + FlatLaf)
 RF-33 a RF-41
-RF-43, 48 | pendiente | HU-43: 0 |
+RF-43, 48 | Contrast, Main, Palette, UiTheme | HU-43: 5 |
 | RF-44 | Should | HU-44 | Gestor de assets
 (AssetManager)
 RF-42, 44 | pendiente | HU-44: 0 |
@@ -141,15 +141,15 @@ RF-43, 48 | pendiente | HU-48: 0 |
 | HU-36 · Herramientas y clic sobre parcelas | 5.2 | Must | 5 | 20 | completa | GameScreen, GameScreenPresenter, Shortcut, Texts, Tool, ToolBar, ToolModel |
 | HU-37 · Inventario en grilla | 5.3 | Must | 4 | 9 | completa | GameCommands, GameController, GameDialogs, GameRestController, GameScreen, InventoryDialog, InventoryGrid, InventoryModel, InventoryView, MarketService, RemoteGameClient, SlotView |
 | HU-38 · Mercado modal | 5.3 | Must | 4 | 10 | completa | AnimalOfferView, BuyOfferView, GameCommands, GameController, GameDialogs, GameRestController, GameScreen, MarketDialog, MarketPresenter, MarketService, MarketView, RemoteGameClient, SellOfferView |
-| HU-39 · Notificaciones (toasts) | 5.6 | Should | 4 | 10 | completa | GameScreen, GameScreenPresenter, OverlayPanel, ToastKind, ToastLayer, ToastPresenter, ToastQueue, ToastView |
+| HU-39 · Notificaciones (toasts) | 5.6 | Should | 4 | 10 | completa | GameScreen, GameScreenPresenter, OverlayPanel, Palette, ToastKind, ToastLayer, ToastPresenter, ToastQueue, ToastView |
 | HU-40 · Efectos visuales de estación y clima | 5.6 | Could | 4 | 8 | completa | GameScreen, MapPanel, MapRenderer, Particle, SeasonPalette, VisualEffects |
 | HU-41 · Animaciones suaves | 5.6 | Could | 4 | 7 | completa | GameScreen, MapPanel, MapRenderer, VisualEffects |
 | HU-42 · Carga de sprites con respaldo vectorial | 5.6 | Should | 4 | 8 | completa | AssetManager, MapRenderer |
-| HU-43 · Tema visual profesional con FlatLaf | 5.7 | Should | 4 | 0 | sin pruebas | pendiente |
+| HU-43 · Tema visual profesional con FlatLaf | 5.7 | Should | 4 | 5 | completa | Contrast, Main, Palette, UiTheme |
 | HU-44 · Sprites pixel-art propios de 32 × 32 | 5.7 | Should | 5 | 0 | sin pruebas | pendiente |
 | HU-45 · Mover el avatar por la granja | 5.7 | Should | 5 | 0 | sin pruebas | pendiente |
 | HU-46 · Hablar con los NPC | 5.7 | Should | 5 | 0 | sin pruebas | pendiente |
 | HU-47 · Encargos de los NPC | 5.7 | Could | 4 | 0 | sin pruebas | pendiente |
 | HU-48 · Interfaz con aspecto de granja | 5.7 | Should | 5 | 0 | sin pruebas | pendiente |
 
-**Resumen:** 42 de 48 historias con todas sus pruebas; 371 pruebas `HUxx_` en total.
+**Resumen:** 43 de 48 historias con todas sus pruebas; 376 pruebas `HUxx_` en total.

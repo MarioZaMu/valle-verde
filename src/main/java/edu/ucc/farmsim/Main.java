@@ -5,6 +5,7 @@ import edu.ucc.farmsim.client.RemoteGameClient;
 import edu.ucc.farmsim.config.ServerApplication;
 import edu.ucc.farmsim.ui.screens.MainWindow;
 import edu.ucc.farmsim.ui.screens.ScreenRouter;
+import edu.ucc.farmsim.ui.theme.UiTheme;
 import java.awt.GraphicsEnvironment;
 import java.net.URI;
 import javax.swing.SwingUtilities;
@@ -17,7 +18,7 @@ import org.springframework.context.ConfigurableApplicationContext;
  * arguments it starts the Spring Boot server on this machine and a window that talks to it over HTTP;
  * {@code --server} starts only the server and {@code --client --url=...} only the window.
  *
- * <p>Stories: HU-33.
+ * <p>Stories: HU-33, HU-43.
  */
 public final class Main {
 
@@ -68,6 +69,7 @@ public final class Main {
         EventBus bus = new EventBus();
         RemoteGameClient client = new RemoteGameClient(server, bus);
         SwingUtilities.invokeLater(() -> {
+            UiTheme.install();
             MainWindow window = new MainWindow(GameInfo.NAME);
             window.setContentPane(new ScreenRouter(client, bus, System::currentTimeMillis));
             window.setVisible(true);

@@ -501,3 +501,5 @@ Ajustes surgidos al implementar: (1) `Main` se declara como capa «Composition»
 
 **Códigos de error nuevos (RN-35):** `MOVIMIENTO_BLOQUEADO`, `NPC_LEJOS`, `ENCARGO_INCOMPLETO` (los tres `409`).
 
+**Etapa 5.7b (hecha): tema FlatLaf (HU-43).** 491 pruebas en verde (2 omitidas); `UiTheme.install()` instala FlatLaf 3.6.1 con una sola tipografía de 14 pt y esquinas redondeadas, y si falla deja el aspecto por defecto con un aviso (`Main` lo llama antes de crear la ventana). `Contrast` calcula el contraste WCAG y una prueba exige ≥ 4,5 : 1 en los pares de texto y fondo de la `Palette` (avisos, HUD y diálogos). Los colores de los avisos pasaron de `ToastLayer` a `Palette`. Decisión **D-61:** FlatLaf reemplaza a la decisión D-60 (que lo descartaba) por pedido del estudiante.
+
