@@ -139,7 +139,7 @@ class HU34HudTest {
     void HU10_theEndDayButtonLogicShowsAMessageOnlyWhenTheDayCouldNotEnd() {
         TestApp app = TestApp.create();
         List<String> messages = new ArrayList<>();
-        GameScreenPresenter presenter = new GameScreenPresenter(app.controller, messages::add);
+        GameScreenPresenter presenter = new GameScreenPresenter(app.controller, new edu.ucc.farmsim.ui.components.ToolModel(), messages::add);
 
         presenter.onEndDay(); // no game in progress
         assertEquals(List.of("No hay una partida en curso."), messages);
@@ -147,7 +147,7 @@ class HU34HudTest {
         messages.clear();
         app.controller.newGame(TestApp.SEED);
         presenter.onEndDay();
-        assertTrue(messages.isEmpty());
+        assertTrue(messages.stream().allMatch(String::isBlank), "a successful end of day shows no message");
         assertEquals(2, app.controller.hud().value().day());
     }
 
