@@ -481,7 +481,7 @@ Ajustes surgidos al implementar: (1) `Main` se declara como capa «Composition»
 | Criterio | Qué falta | Cuándo |
 |---|---|---|
 | HU-29 · CA-2 | la prueba contra un MongoDB real que rechaza o no responde (la simulada sí está) | cuando haya MongoDB |
-| RNF-02 · RT-09 | medir el arranque del `.jar` (≤ 5 s) en una máquina limpia | cierre del proyecto |
+| RNF-02 · RT-09 | el arranque medido del `.jar` (servidor listo) fue de **4,96 s** en esta máquina, justo bajo el límite de 5 s; repetir en una máquina limpia | demostración final |
 
 **Diagramas:** `03_vista_logica` y `04_vista_desarrollo` incluyen `ToastPresenter`, `ToastQueue`, `ToastLayer`, `VisualEffects`, `Particle`, `SeasonPalette` y `AssetManager`; la secuencia anexa cambió `ToastLayer` por `ToastPresenter`. Las vistas se volvieron a renderizar.
 
