@@ -1,0 +1,101 @@
+@startdot
+/'
+  Vista 2 — Funcional (diagrama de componentes UML)
+  Cubre: RF-01..RF-42 agrupados por bloque funcional (ver docs/DIAGRAMAS.md §2); HU-10, HU-29, HU-30, HU-35, HU-42.
+  Notación de la guía: «component», interfaz provista (○ bolita unida al proveedor), interfaz requerida
+  (flecha con arco "(" hacia la bolita), puertos como cuadros pequeños en el borde del componente.
+  Capas: ui → application → domain; infrastructure → domain (el puerto ISaveRepository lo define el dominio).
+  Posiciones fijadas a mano (layout=neato) para evitar cruces; el marco de color indica la capa.
+'/
+digraph funcional {
+  graph [layout=neato, splines=line, pad=0.5, fontname="Arial", dpi=150, outputorder=nodesfirst, forcelabels=true,
+         label="Vista funcional — Valle Verde (diagrama de componentes)\n ", labelloc=t, fontsize=26];
+  node  [fontname="Arial", fontsize=13];
+  edge  [fontname="Arial", fontsize=12, penwidth=1.3, arrowsize=0.9];
+
+  /* ---------- marcos de capa ---------- */
+  fui  [shape=box, style="filled", fillcolor="#E3F2FD", color="#7F7F7F", fixedsize=true, width=4.0, height=5.8, pos="4,4.5!", label="Presentación (paquete ui)", labelloc=t, fontsize=15];
+  fapp [shape=box, style="filled", fillcolor="#E8F5E9", color="#7F7F7F", fixedsize=true, width=8.2, height=9.9, pos="10.55,4.45!", label="Aplicación (paquete application)", labelloc=t, fontsize=15];
+  fdom [shape=box, style="filled", fillcolor="#FFF3E0", color="#7F7F7F", fixedsize=true, width=3.6, height=2.0, pos="18.6,4.5!", label="Dominio (paquete domain)", labelloc=t, fontsize=15];
+  finf [shape=box, style="filled", fillcolor="#F3E5F5", color="#7F7F7F", fixedsize=true, width=3.6, height=2.0, pos="18.6,1.35!", label="Infraestructura                                  ", labelloc=b, fontsize=14];
+
+  /* ---------- componentes ---------- */
+  jugador [shape=box, style="rounded,filled", fillcolor=white, fixedsize=true, width=1.5, height=0.9, pos="-0.8,6.2!", label="«actor»\nJugador"];
+  ui  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.9, height=1.6, pos="4,6.2!", label="Interfaz de usuario\n(Swing + Java2D)\nRF-33 a RF-41"];
+  am  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.9, height=1.3, pos="4,2.8!", label="Gestor de assets\n(AssetManager)\nRF-42"];
+  pk  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.9, height=1.0, pos="4,0.0!", label="«externo»\nPaquete de assets\n(CC0 / CC-BY)"];
+
+  gc  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.6, height=1.4, pos="8.2,6.2!", label="Controlador del juego\n(GameController)"];
+  eb  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.4, height=1.1, pos="12.4,6.7!", label="Bus de eventos\n(EventBus)"];
+
+  sv  [shape=box, style="filled", fillcolor="#FFE9A8", color="#333333", fixedsize=true, width=7.2, height=3.8, pos="10.3,2.2!", label="«component»  Servicios de aplicación", labelloc=t, fontsize=14];
+  s1  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.0, height=0.95, pos="8.2,2.75!",  label="Cultivo\nRF-01 a RF-07"];
+  s2  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.0, height=0.95, pos="10.3,2.75!", label="Tiempo y clima\nRF-08 a RF-12, 17"];
+  s3  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.0, height=0.95, pos="12.4,2.75!", label="Economía\nRF-13 a RF-16"];
+  s4  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.0, height=0.95, pos="8.2,1.35!",  label="Construcción y\nanimales RF-18 a 25"];
+  s5  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.0, height=0.95, pos="10.3,1.35!", label="Progreso\nRF-26 a RF-28"];
+  s6  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.0, height=0.95, pos="12.4,1.35!", label="Guardado\nRF-29 a RF-32"];
+
+  dom [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.6, height=1.3, pos="18.6,4.4!", label="Dominio del juego\nreglas y estado\nRN-01 a RN-35"];
+  repo[shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.6, height=1.1, pos="18.6,1.3!", label="Repositorio de partidas\n(JsonSaveRepository)"];
+  fs  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.6, height=1.0, pos="18.6,-1.9!", label="«externo»\nSistema de archivos\nlocal"];
+
+  /* ---------- puertos (cuadros en el borde del componente) ---------- */
+  p_ui [shape=square, style=filled, fillcolor=white, fixedsize=true, width=0.2, pos="2.55,6.2!", label=""];
+  p_gc [shape=square, style=filled, fillcolor=white, fixedsize=true, width=0.2, pos="6.9,6.2!", label=""];
+
+  /* ---------- interfaces (bolitas) ---------- */
+  node [shape=circle, style=filled, fillcolor=white, fixedsize=true, width=0.3, label=""];
+  i_user [pos="1.1,6.2!",  xlabel="Ratón y teclado"];
+  i_as   [pos="4,4.55!",   xlabel="IAssetProvider"];
+  i_af   [pos="4,1.35!",   xlabel="IAssetFiles"];
+  i_gc   [pos="5.8,6.2!",  xlabel="IGameApi"];
+  i_es   [pos="10.3,8.4!", xlabel="IEventSubscription"];
+  i_sv   [pos="8.2,4.7!",  xlabel="IServicios"];
+  i_ep   [pos="12.4,4.75!",xlabel="IEventPublisher      "];
+  i_ru   [pos="15.7,4.4!", xlabel="IGameRules"];
+  i_sn   [pos="18.6,2.85!",xlabel="IGameSnapshot"];
+  i_re   [pos="15.7,1.3!", xlabel="ISaveRepository"];
+  i_fs   [pos="18.6,-0.5!",xlabel="IFileSystem"];
+
+  /* ---------- conexiones ---------- */
+  edge [color="#222222"];
+  /* proveedor: línea simple hasta la bolita; consumidor: flecha con arco hacia la bolita */
+  jugador -> i_user [style=dashed, arrowhead=vee, label="usa"];
+  i_user -> p_ui [dir=none];
+  ui -> p_ui [dir=none, style=invis];
+
+  ui -> i_gc [arrowhead=ocurve, arrowsize=1.6];
+  p_gc -> i_gc [dir=none];
+  gc -> p_gc [dir=none, style=invis];
+
+  ui -> i_as [arrowhead=ocurve, arrowsize=1.6];
+  am -> i_as [dir=none];
+  am -> i_af [arrowhead=ocurve, arrowsize=1.6];
+  pk -> i_af [dir=none];
+
+  ui -> i_es [arrowhead=ocurve, arrowsize=1.6];
+  eb -> i_es [dir=none];
+
+  gc -> i_sv [arrowhead=ocurve, arrowsize=1.6];
+  sv:n -> i_sv [dir=none];
+
+  sv:n -> i_ep [arrowhead=ocurve, arrowsize=1.6];
+  eb -> i_ep [dir=none];
+
+  sv:e -> i_ru [arrowhead=ocurve, arrowsize=1.6];
+  dom -> i_ru [dir=none];
+
+  repo -> i_sn [arrowhead=ocurve, arrowsize=1.6];
+  dom -> i_sn [dir=none];
+
+  s6 -> i_re [arrowhead=ocurve, arrowsize=1.6];
+  repo -> i_re [dir=none];
+
+  repo -> i_fs [arrowhead=ocurve, arrowsize=1.6];
+  fs -> i_fs [dir=none];
+
+  leyenda [shape=plaintext, fixedsize=false, width=0.1, height=0.1, margin=0.05, pos="10.5,-1.7!", fontsize=13,
+           label="○ interfaz provista (bolita)     ) interfaz requerida (arco)     ■ puerto     marco de color = capa de la arquitectura"];
+}
+@enddot
