@@ -15,9 +15,10 @@ Simulador de granja 2D **por turnos** (un turno = un día), hecho en Java con Sw
 | **5.2** | Cultivo: sembrar, regar, crecer, cosechar, marchitar y limpiar, con el mapa Java2D, herramientas y atajos (9 historias) | **hecha** |
 | **5.2b** | Migración a Spring Boot: servidor con API REST, cliente Swing por HTTP y partidas en MongoDB | **hecha** |
 | **5.3** | Clima y economía: efectos del clima, mercado con precios dinámicos, tendencia, inventario en grilla y mercado modal (6 historias) | **hecha** |
-| 5.4 a 5.6 | Construcción y animales, progresión y guardado, pulido visual | pendientes |
+| **5.4** | Construcción y animales: construir, comprar y alimentar animales, estados, producción, curación, resumen del día y Almacén (8 historias) | **hecha** |
+| 5.5 y 5.6 | Progresión y guardado, pulido visual | pendientes |
 
-Hoy el juego abre la **pantalla de inicio** (Nueva partida, Cargar, Salir) y una pantalla de juego con la barra superior (dinero, fecha, clima, pronóstico y energía) y el botón «Terminar día». Desde la fase 5.2 también tiene el **mapa de la granja**: eliges una herramienta (teclas `1` a `5` o la barra), eliges la semilla y haces clic en una parcela de tierra para sembrar, regar y cosechar; `Enter` termina el día. Desde la 5.3 el clima importa (la lluvia riega, la helada marchita), `I` abre el **inventario** en grilla (clic en una semilla para elegirla) y `M` el **mercado** con las pestañas Comprar y Vender, precios que cambian con la temporada y la saturación, y la tendencia ▲ ▼ ▬. Los animales y el guardado llegan en las fases siguientes.
+Hoy el juego abre la **pantalla de inicio** (Nueva partida, Cargar, Salir) y una pantalla de juego con la barra superior (dinero, fecha, clima, pronóstico y energía) y el botón «Terminar día». Desde la fase 5.2 también tiene el **mapa de la granja**: eliges una herramienta (teclas `1` a `5` o la barra), eliges la semilla y haces clic en una parcela de tierra para sembrar, regar y cosechar; `Enter` termina el día. Desde la 5.3 el clima importa (la lluvia riega, la helada marchita), `I` abre el **inventario** en grilla (clic en una semilla para elegirla) y `M` el **mercado** con las pestañas Comprar y Vender, precios que cambian con la temporada y la saturación, y la tendencia ▲ ▼ ▬. Desde la 5.4 puedes **construir** (herramienta `4`: clic en una parcela de hierba libre y eliges el edificio), comprar gallinas y vacas en el mercado, **alimentar** (herramienta `5` o el panel del edificio), **recolectar** (herramienta `3` sobre el edificio) y curar a los animales enfermos desde el panel que se abre al pulsar un edificio; al terminar el día aparece el **resumen del día**. El guardado y los logros llegan en las fases siguientes.
 
 ## Requisitos
 
@@ -76,7 +77,7 @@ edu.ucc.farmsim
 | Singleton | `GameClock` | HU-09 | hecho (5.1) |
 | State | `SeasonState` con `SpringState`, `SummerState`, `AutumnState`, `WinterState` | HU-09 | hecho (5.1) |
 | State | `CropState` con `SeedState`, `SproutState`, `GrowingState`, `MatureState`, `WitheredState` (contexto `Crop`) | HU-03, HU-05 | hecho (5.2) |
-| State | `AnimalState` y sus estados concretos | HU-21 | 5.4 |
+| State | `AnimalState` con `HealthyState`, `HungryState`, `SickState` (contexto `Animal`) | HU-21 | hecho (5.4) |
 | Strategy | `WeatherStrategy` con `SeasonalWeatherStrategy` y `FixedWeatherStrategy` | HU-11 | hecho (5.1) |
 | Strategy | `PricingStrategy` con `CropPricing` y `FlatPricing` | HU-15 | hecho (5.3) |
 | Observer | `EventBus`, `GameListener`, `HudModel`, `HudPanel` | HU-10, HU-34 | hecho (5.1) |
@@ -86,7 +87,7 @@ edu.ucc.farmsim
 | Observer | `InventoryModel` | HU-37 | hecho (5.3) |
 | Observer | `EventCollector` (el servidor guarda los eventos para la respuesta) | RNF-15 | hecho (5.2b) |
 | Factory Method | `CropFactory` con `CarrotFactory`, `PotatoFactory`, `TomatoFactory`, `CornFactory`, `PumpkinFactory` | HU-01 | hecho (5.2) |
-| Builder | `BuildingBuilder`, `BuildingDirector` | HU-18 | 5.4 |
+| Builder | `BuildingBuilder` con `CoopBuilder`, `BarnBuilder`, `WarehouseBuilder`, `GreenhouseBuilder` y `BuildingDirector` | HU-18 | hecho (5.4) |
 
 > Cada clase de patrón lleva el Javadoc `Pattern: <nombre> — Role: <rol>` y está registrada en `src/test/resources/patterns.txt` (una prueba lo verifica). La tabla se actualiza al cerrar cada fase.
 

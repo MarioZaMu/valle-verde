@@ -94,6 +94,10 @@ package "application" #F6FBF6 {
     +endDay(): Result
     +sell(item: String, qty: int): Result
     +build(type: String, col: int, row: int): Result
+    +buyAnimal(animal: String): Result
+    +feed(building: int): Result
+    +collect(building: int): Result
+    +cure(building: int, animal: int): Result
     +save(slot: int): Result
     +load(slot: int): Result
   }
@@ -126,6 +130,16 @@ package "application" #F6FBF6 {
   class MarketService {
     +sell(item: String, qty: int): Result
     +buy(item: String, qty: int): Result
+  }
+  class BuildingService {
+    +build(type: String, col: int, row: int): Result
+    +buildings(): Result
+  }
+  class AnimalService {
+    +buyAnimal(animal: String): Result
+    +feed(building: int): Result
+    +collect(building: int): Result
+    +cure(building: int, animal: int): Result
   }
   class SaveGameService <<Caretaker>> #F8BBD0 {
     +save(slot: int): Result
@@ -263,16 +277,26 @@ package "domain" #FFFCF5 {
       -width: int
       -height: int
       +addAnimal(a: Animal): boolean
-      +collectProducts(): int
+      +collectAll(): int
     }
-    interface BuildingBuilder <<Builder>> #B2DFDB {
-      +at(col: int, row: int): BuildingBuilder
-      +build(): Building
+    class BuildingType <<enumeration>> {
+      COOP
+      BARN
+      WAREHOUSE
+      GREENHOUSE
+    }
+    abstract class BuildingBuilder <<Builder>> #B2DFDB {
+      +placeAt(id: int, col: int, row: int): void
+      +defineHousing(): void
+      +defineEffects(): void
+      +result(): Building
     }
     class CoopBuilder <<ConcreteBuilder>> #B2DFDB
+    class BarnBuilder <<ConcreteBuilder>> #B2DFDB
+    class WarehouseBuilder <<ConcreteBuilder>> #B2DFDB
     class GreenhouseBuilder <<ConcreteBuilder>> #B2DFDB
     class BuildingDirector <<Director>> #B2DFDB {
-      +construct(type: String, col: int, row: int): Building
+      +{static} construct(type: BuildingType, id: int, col: int, row: int): Building
     }
   }
 
@@ -281,12 +305,17 @@ package "domain" #FFFCF5 {
       -daysWithoutFood: int
       -fedToday: boolean
       -pending: int
-      +feed(): void
-      +heal(): void
+      +feed(): boolean
+      +cure(): boolean
+      +endOfDay(): void
+    }
+    class AnimalType <<enumeration>> {
+      HEN
+      COW
     }
     interface AnimalState <<State>> #C8E6C9 {
       +onDayEnd(a: Animal): void
-      +canProduce(): boolean
+      +canEat(): boolean
     }
     class HealthyState <<ConcreteState>> #C8E6C9
     class HungryState <<ConcreteState>> #C8E6C9
@@ -318,6 +347,9 @@ package "domain" #FFFCF5 {
       -counters: Map<String, Integer>
       +evaluate(f: ProgressFacts): List<String>
     }
+    class Achievement <<enumeration>> {
+      LG-01..LG-09
+    }
     class ProgressFacts <<ValueObject>> {
       -money: int
       -harvests: int
@@ -347,6 +379,8 @@ GameController --> ProgressService
 GameController --> FarmService
 GameController --> DayService
 GameController --> MarketService
+GameController --> BuildingService
+GameController --> AnimalService
 GameController --> SaveGameService
 GameController ..> Result : devuelve
 DayService --> GameSession
@@ -358,6 +392,10 @@ ProgressService --> EventBus
 DayService --> EventBus
 MarketService --> GameSession
 MarketService --> EventBus
+BuildingService --> GameSession
+BuildingService --> EventBus
+AnimalService --> GameSession
+AnimalService --> EventBus
 
 ' ---------- Dominio: agregado ----------
 GameState *-- "1" FarmMap
@@ -407,10 +445,15 @@ AnimalState <|.. HungryState
 AnimalState <|.. SickState
 
 ' ---------- Builder ----------
-BuildingBuilder <|.. CoopBuilder
-BuildingBuilder <|.. GreenhouseBuilder
+BuildingBuilder <|-- CoopBuilder
+BuildingBuilder <|-- BarnBuilder
+BuildingBuilder <|-- WarehouseBuilder
+BuildingBuilder <|-- GreenhouseBuilder
 BuildingBuilder ..> Building : «create»
-BuildingDirector o-- "1" BuildingBuilder
+BuildingDirector ..> BuildingBuilder : elige y dirige
+Building ..> BuildingType
+BuildingType ..> AnimalType : aloja
+AchievementTracker o-- "0..*" Achievement
 
 ' ---------- Strategy (precios) ----------
 Market o-- "1" PricingStrategy

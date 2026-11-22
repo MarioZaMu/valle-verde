@@ -2,7 +2,7 @@
 
 > **Versión 0.2 · 2026-11-22 · Fase 5.2b (migración a Spring Boot)**
 > Formaliza el diseño propuesto en los diagramas ([`DIAGRAMAS.md`](DIAGRAMAS.md)): capas, árbol de paquetes, decisiones técnicas y plan de implementación por fases con sus historias ([`HISTORIAS_DE_USUARIO.md`](HISTORIAS_DE_USUARIO.md) §7). El plan de pruebas está en [`PLAN_DE_PRUEBAS.md`](PLAN_DE_PRUEBAS.md).
-> **Estado:** las Fases 5.0 (§10), 5.1 (§11), 5.2 (§12) y 5.2b (§13, migración a servidor Spring Boot con API REST, cliente Swing por HTTP y persistencia en MongoDB) y 5.3 (§14) están hechas. La Fase 5.4 empieza solo con tu visto bueno.
+> **Estado:** las Fases 5.0 (§10), 5.1 (§11), 5.2 (§12) y 5.2b (§13, migración a servidor Spring Boot con API REST, cliente Swing por HTTP y persistencia en MongoDB) 5.3 (§14) y 5.4 (§15) están hechas. La Fase 5.5 empieza solo con tu visto bueno.
 
 ## 1. Estilo arquitectónico
 
@@ -173,8 +173,8 @@ Como en la secuencia [A1](diagramas/A1_secuencia_vender_cosecha.png):
 | **5.2** Cultivo | HU-01 a 07, 35, 36 (**29**) | `FarmMap`, `Plot`, `Crop`, `CropState` ×5, `CropFactory` ×5, `FarmService`, pasos de crecimiento y marchitamiento, DTO de parcela, mapa Java2D en vectores, barra de herramientas, tooltips | mapa con parcelas, herramientas 1–5 y clic | State (cultivo), Factory Method | **1** (fuera de estación), **2** (inventario lleno) |
 | **5.2b** Migración a Spring Boot | — (sin historias nuevas: conserva las 163 pruebas) | `pom.xml` con Spring Boot 3.5.16; interfaz `GameCommands`; capa `api` (`GameRestController`, `ErrorStatusMapper`, `EventCollector`); `client` (`RemoteGameClient`); `config`; `MongoSaveRepository` en lugar de `JsonSaveRepository`; `Main` con modos; reglas AR-1 a AR-3 y AR-11; `docs/API.md` | la misma de la 5.2, ahora sobre HTTP | — (el Observer cruza la red en el sobre de respuesta) | todas las anteriores en verde; arranque ≤ 5 s (RNF-02) |
 | **5.3** Clima y economía | HU-12, 37, 14, 15, 16, 38 (**23**) | efectos del clima en el *pipeline*, `Market`, `PricingStrategy` ×2, `MarketService`, paso de mercado, `InventoryGrid`, `MarketDialog` | inventario en grilla y mercado modal | Strategy (precios) | **3** (helada), **4** (saturación) |
-| **5.4** Construcción y animales | HU-18 a 23, 17 (**21**) | `Building`, `BuildingBuilder` ×4, `BuildingDirector`, `Animal`, `AnimalState` ×3, `BuildingService`, `AnimalService`, paso de animales, `DaySummary` | diálogo de construcción y panel del edificio (alimentar, recolectar, curar) | Builder, State (animal) | **5** (animal enfermo no produce) |
-| **5.5** Progresión y persistencia | HU-26, 27, 24, 29, 30, 31, 32 (**24**) | `AchievementTracker`, `ProgressFacts`, desbloqueos, `GameMemento`, `GameStateValidator`, `SaveRepository`, `MongoSaveRepository`, `SaveCodec`, `Checksum`, `SaveGameService`; **pruebas de rendimiento a plena carga** (HU-10 · CA-3, HU-29 · CA-4, HU-30 · CA-4) | diálogos de ranuras, logros y atajos `F5`/`F9` | Memento (completo: documento en MongoDB) | **6** (guardar → cargar idéntico), **7** (partida dañada o inexistente) |
+| **5.4** Construcción y animales | HU-18 a 24, 17 (**23**) | `Building`, `BuildingBuilder` ×4, `BuildingDirector`, `Animal`, `AnimalState` ×3, `BuildingService`, `AnimalService`, paso de animales, `DaySummary` | diálogo de construcción y panel del edificio (alimentar, recolectar, curar) | Builder, State (animal) | **5** (animal enfermo no produce) |
+| **5.5** Progresión y persistencia | HU-26, 27, 29, 30, 31, 32 (**22**) | `AchievementTracker`, `ProgressFacts`, desbloqueos, `GameMemento`, `GameStateValidator`, `SaveRepository`, `MongoSaveRepository`, `SaveCodec`, `Checksum`, `SaveGameService`; **pruebas de rendimiento a plena carga** (HU-10 · CA-3, HU-29 · CA-4, HU-30 · CA-4) | diálogos de ranuras, logros y atajos `F5`/`F9` | Memento (completo: documento en MongoDB) | **6** (guardar → cargar idéntico), **7** (partida dañada o inexistente) |
 | **5.6** Interfaz visual y extras *(recortable)* | HU-39, 42, 25, 40, 41 (**19**) | `ToastLayer`, `AssetManager` y respaldo vectorial, invernadero, efectos (`ParticleSystem`, `DayNightTint`), animaciones con `Timer`; `docs/ASSETS.md`, README final y matriz de trazabilidad completa; decisión sobre FlatLaf | pulido visual | Observer (completado) | — |
 
 **Qué se actualiza al cerrar cada fase:** el diagrama de clases si aparecen clases nuevas con responsabilidad estructural, el de desarrollo si cambia un paquete o una dependencia (lo comprueba `tools/check_diagrams.py`) y la matriz de trazabilidad (RF → HU → diagrama → clases → pruebas).
@@ -279,7 +279,7 @@ Ajustes surgidos al implementar: (1) `Main` se declara como capa «Composition»
 | D-10 | La herramienta «Cosechar» cosecha, limpia o (en 5.4) recolecta según el contenido de la parcela | RN-34 |
 | D-11 | Código nuevo `CULTIVO_MARCHITO` en RN-35 | RN-07 manda rechazar el riego de un cultivo marchito y no había código para ello |
 | D-12 | Regar un cultivo maduro se permite (cuesta energía sin efecto) | RN-07 solo exige «vivo y sin regar hoy»; el rechazo necesitaría una regla nueva |
-| D-13 | Las herramientas «Construir» y «Alimentar» y los atajos `M`, `I`, `L`, `F5`, `F9` se pueden pulsar y responden «estará disponible en una fase posterior» | HU-36 · CA-1 y CA-5 piden que existan; sus pantallas llegan en 5.3, 5.4 y 5.5 |
+| D-13 | Las herramientas «Construir» y «Alimentar» y los atajos `M`, `I`, `L`, `F5`, `F9` se pueden pulsar; los que aún no tienen pantalla responden «estará disponible en una fase posterior» (en 5.3 y 5.4 ya funcionan `M`, `I`, «Construir» y «Alimentar»; quedan `L`, `F5` y `F9` para 5.5) | HU-36 · CA-1 y CA-5 piden que existan |
 | D-14 | `MapPanel` consulta el mapa solo al recibir un evento (`GameStarted`, `DayEnded`, `MapChanged`); no tiene `Timer` (lo verifica una prueba) | Regla de interfaz: actualizar por eventos, no por consulta en bucle |
 | D-15 | Geometría (`MapGeometry`) y dibujo (`MapRenderer`) son clases sin componente | Se prueban pintando sobre un `BufferedImage`, sin pantalla |
 
@@ -361,11 +361,50 @@ Ajustes surgidos al implementar: (1) `Main` se declara como capa «Composition»
 | Criterio | Qué falta | Fase |
 |---|---|---|
 | HU-28 · CA-1 | solo falta que los logros bloqueados empiecen con contadores en 0 (la demanda 100 ya se prueba) | 5.5 |
-| HU-37 · CA-2 | la grilla ya refleja la capacidad que informe el inventario; construir el Almacén (+12) llega con HU-20 | 5.4 |
-| HU-38 · CA-3 | el ejemplo de la Vaca (800 m): el catálogo de compra solo tiene semillas, heno y medicina; las compras de Gallina y Vaca llegan con los edificios. La prueba usa Medicina | 5.4 |
+| HU-37 · CA-2 | la grilla ya refleja la capacidad que informe el inventario; construir el Almacén (+12) | cerrado en 5.4 |
+| HU-38 · CA-3 | el ejemplo de la Vaca (800 m) | cerrado en 5.4 |
 | HU-10 · CA-3, HU-33 · CA-3 | rendimiento a plena carga y cargar una partida guardada | 5.5 |
-| HU-35 · CA-3, HU-36 · CA-4 | dibujar edificios y animales; recolectar sus productos con «Cosechar» | 5.4 |
+| HU-35 · CA-3, HU-36 · CA-4 | dibujar edificios y animales; recolectar sus productos con «Cosechar» | cerrados en 5.4 |
 | HU-36 · CA-5 | los atajos `L`, `F5` y `F9` aún responden que llegarán (`M` e `I` ya abren su función) | 5.5 |
 
 **Diagramas:** `04_vista_desarrollo` incluye las clases nuevas; el resto de vistas ya tenían el diseño de la economía (Strategy de precios, `MarketService`, `MarketDialog`). `check_diagrams.py` y `check_imports.py` terminan sin errores.
 
+---
+
+## 15. Estado de la Fase 5.4 (construcción y animales)
+
+**Historias cerradas (8 historias, 23 puntos):** HU-17, 18, 19, 20, 21, 22, 23 y 24. HU-24 (Almacén) se adelantó desde la 5.5 porque HU-37 · CA-2 pedía las 36 casillas. `python tools/traceability.py --upto 5.4` termina sin errores.
+
+| Resultado | Valor |
+|---|---|
+| Pruebas | 379 en verde y 2 omitidas con aviso (las de MongoDB real) |
+| Cobertura de líneas (JaCoCo) | **dominio 98,0 %**, **aplicación 97,8 %**, UI 91,8 %, API 95,7 %, cliente 90,0 % (barrera: 70 % en dominio y aplicación) |
+| Patrones aplicados | Builder: `BuildingBuilder` con `CoopBuilder`, `BarnBuilder`, `WarehouseBuilder`, `GreenhouseBuilder`, `BuildingDirector` y `Building` como producto; State: `AnimalState` con `HealthyState`, `HungryState`, `SickState` y `Animal` como contexto; todos registrados en `patterns.txt` |
+| Prueba crítica cerrada | **5** `HU22_ca2_aSickHenProducesNothing_criticalTest` (y la variante de la gallina hambrienta) |
+| API nueva | `GET|POST /api/buildings`, `POST /api/animals`, `POST /api/buildings/{id}/feeding`, `/collection` y `/animals/{n}/treatment`; el resumen del día viaja como evento `DaySummaryReady` (ver [`API.md`](API.md)) |
+| Verificadores | `check_hu.py`, `check_diagrams.py`, `check_imports.py` y `traceability.py` terminan sin errores |
+
+**Decisiones tomadas al implementar:**
+
+| # | Decisión | Motivo |
+|---|---|---|
+| D-33 | `Achievement` (los nueve logros de RN-28) y `AchievementTracker` ya existen con solo el conjunto de logros desbloqueados | RN-29 y HU-18 · CA-5 necesitan saber qué edificios están bloqueados; los contadores y la evaluación llegan en 5.5 (HU-26) |
+| D-34 | Construir comprueba en el orden de RN-21 (ubicación, desbloqueo, límite, saldo); comprar un animal comprueba primero el saldo y luego la plaza | HU-38 · CA-3 pide `SIN_FONDOS` aunque no haya Establo |
+| D-35 | Alimentar, recolectar y curar responden `BuildingActionView` (edificio, cantidad y un aviso opcional) | «No hay nada que alimentar», «animales enfermos omitidos» (HU-20 · CA-4) y «nada que recoger» son éxitos con aviso: RN-35 no tiene código para ellos |
+| D-36 | `GameState` lleva un `DayLedger` con ingresos y gastos del día (cada `earn` y `spend`), que entra en el memento; `DayPipeline` lo copia al `DayReport` y lo reinicia | HU-17 · CA-4: los acumulados parten en 0 cada día; el saldo anterior es `saldo nuevo − ingresos + gastos` |
+| D-37 | El resumen del día viaja como evento `DaySummaryReady` después de `DayEnded`; el diálogo no es modal | No cambia el cuerpo de `POST /api/game/days` y no bloquea el juego |
+| D-38 | Un edificio se identifica por su orden de construcción (no se demuelen) y las rutas son `/api/buildings/{id}/…`; un id o un animal inexistente responde `500 ERROR_INTERNO` | Como D-22 y D-32: la UI nunca los envía y RN-35 no tiene código para ello |
+| D-39 | Curar no es herramienta: se hace desde el panel del edificio. «Alimentar» y «Cosechar» actúan sobre el edificio bajo el clic, «Construir» abre el diálogo con la parcela pulsada como esquina y, sin herramienta, pulsar un edificio abre su panel | RN-27 y RN-34 |
+| D-40 | El catálogo de construcción incluye los cuatro edificios; el efecto del Invernadero (HU-25) llega en 5.6 | HU-18 lista el catálogo completo; construirlo ya funciona y cuesta lo que dice RN-20 |
+| D-41 | `MapView` lleva la lista de edificios (con sus animales) y `MarketView` la de animales en venta; los constructores anteriores se conservan | El mapa se dibuja de una sola consulta y la pestaña Comprar ofrece Gallina y Vaca |
+
+**Criterios cubiertos en parte (se completan donde nace lo que falta):**
+
+| Criterio | Qué falta | Fase |
+|---|---|---|
+| HU-17 · CA-2 | el resumen ya lista cultivos marchitos, animales enfermos y productos; falta la línea del logro desbloqueado | 5.5 |
+| HU-28 · CA-1 | solo falta que los logros bloqueados empiecen con contadores en 0 | 5.5 |
+| HU-10 · CA-3, HU-33 · CA-3 | rendimiento a plena carga y cargar una partida guardada | 5.5 |
+| HU-36 · CA-5 | los atajos `L`, `F5` y `F9` aún responden que llegarán | 5.5 |
+
+**Diagramas:** `03_vista_logica` y `04_vista_desarrollo` incluyen las clases y dependencias nuevas (`domain.game → animal/building`, `building → animal/economy/progress`, `animal → economy`); las seis vistas se volvieron a renderizar. `check_diagrams.py` y `check_imports.py` terminan sin errores.

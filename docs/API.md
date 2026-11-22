@@ -1,6 +1,6 @@
 # API REST — Valle Verde
 
-> **Versión 0.2 · 2026-11-22 · Fase 5.3**
+> **Versión 0.3 · 2026-11-22 · Fase 5.4**
 > Describe las rutas que el servidor Spring Boot ofrece al cliente Swing (RNF-15, AR-12). El servidor escucha solo en `127.0.0.1`; con `java -jar farmsim.jar` el puerto es libre y lo conoce el cliente, y con `--server --port 8080` es el indicado. Hay **una partida por servidor** y no hay sesión de usuario.
 
 ## 1. Convenciones
@@ -33,11 +33,19 @@ Las columnas de tipo usan los *records* de `application.dto` (`HudView`, `PlotVi
 | `POST /api/market/sales` | `sell(itemId, quantity)` | `{ "itemId": "CARROT", "quantity": 3 }` | total recibido (m) | `200` |
 | `GET /api/market/quotes?itemId=CARROT&quantity=3` | `quote(itemId, quantity)` | — | total previsto (m), sin vender | `200` |
 | `GET /api/inventory` | `inventory()` | — | `InventoryView` (capacidad y casillas ocupadas) | `200` |
+| `GET /api/buildings` | `buildings()` | — | `BuildingsView` (los edificios y el catálogo de construcción) | `200` |
+| `POST /api/buildings` | `build(buildingId, col, row)` | `{ "buildingId": "COOP", "col": 2, "row": 7 }` | `BuildingView` | `201` |
+| `POST /api/animals` | `buyAnimal(animalId)` | `{ "animalId": "HEN" }` | `BuildingView` donde vive el animal | `201` |
+| `POST /api/buildings/{id}/feeding` | `feed(id)` | — | `BuildingActionView` (cantidad alimentada y aviso opcional) | `200` |
+| `POST /api/buildings/{id}/collection` | `collect(id)` | — | `BuildingActionView` (unidades recogidas y aviso opcional) | `200` |
+| `POST /api/buildings/{id}/animals/{n}/treatment` | `cure(id, n)` | — | `BuildingActionView` | `200` |
 | `GET /api/saves/any` | `hasSavedGames()` | — | `true` / `false` | `200` |
 
 `hasGameInProgress()` no tiene ruta propia: el cliente lo deduce de `GET /api/game` (`404 SIN_PARTIDA` = no hay partida).
 
-**Rutas planificadas** (se agregan con su historia, siempre con endpoint y prueba, DoD 11): `/api/buildings` y `/api/animals` (Fase 5.4) y `/api/saves/{slot}` (HU-29 a HU-32, con `PUT` para guardar y `POST …/load` para cargar).
+El **resumen del día** no tiene ruta: `POST /api/game/days` añade a sus eventos `DaySummaryReady` con `DaySummaryView` (ingresos, gastos, saldo anterior y nuevo y los hechos del día). `GET /api/market` incluye ahora los animales en venta y `GET /api/farm/map` los edificios con sus animales. Un edificio o un animal que no existe responde `500 ERROR_INTERNO` (nunca lo envía la interfaz).
+
+**Rutas planificadas** (se agregan con su historia, siempre con endpoint y prueba, DoD 11): `/api/saves/{slot}` (HU-29 a HU-32, con `PUT` para guardar y `POST …/load` para cargar).
 
 ### Ejemplo
 

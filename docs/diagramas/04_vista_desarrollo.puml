@@ -101,6 +101,7 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
       class DayService
       class MarketService
       class BuildingService
+      class AnimalService
       class SaveGameService
       class ProgressService
       class ViewMapper
@@ -146,10 +147,21 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
     }
     package "building" as D_BLD #FFFFFF {
       class Building
+      class BuildingType
       class BuildingBuilder
+      class CoopBuilder
+      class BarnBuilder
+      class WarehouseBuilder
+      class GreenhouseBuilder
+      class BuildingDirector
     }
     package "animal" as D_ANI #FFFFFF {
       class Animal
+      class AnimalType
+      class AnimalState
+      class HealthyState
+      class HungryState
+      class SickState
     }
     package "economy" as D_ECO #FFFFFF {
       class Market
@@ -168,6 +180,7 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
     }
     package "progress" as D_PRO #FFFFFF {
       class AchievementTracker
+      class Achievement
       class ProgressFacts
     }
     package "config" as D_CFG #FFFFFF {
@@ -238,6 +251,11 @@ D_FARM .down.> D_CROP
 D_FARM .down.> D_BLD
 D_FARM .down.> D_TIM
 D_BLD .down.> D_ANI
+D_BLD .down.> D_ECO
+D_BLD .down.> D_PRO
+D_ANI .down.> D_ECO
+D_GAME .down.> D_ANI
+D_GAME .down.> D_BLD
 D_CROP .down.> D_TIM
 D_ECO .down.> D_CROP
 D_ECO .down.> D_TIM

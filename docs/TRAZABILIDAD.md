@@ -23,15 +23,15 @@
 | RF-14 | Must | HU-14 | Economía | BuyOfferView, GameCommands, GameController, GameEvent, GameRestController, GameState, Market, MarketDialog, MarketPresenter, MarketService, MarketView, RemoteGameClient | HU-14: 7 |
 | RF-15 | Must | HU-15 | Economía | CropPricing, FlatPricing, GameCommands, GameController, GameEvent, GameMemento, GameRestController, GameState, Market, MarketDialog, MarketPresenter, MarketService, MarketSnapshot, MarketStep, MarketView, PricingStrategy, RemoteGameClient, SellOfferView | HU-15: 12 |
 | RF-16 | Should | HU-16 | Economía | GameCommands, GameController, GameMemento, GameRestController, Market, MarketDialog, MarketPresenter, MarketService, MarketSnapshot, MarketStep, MarketView, RemoteGameClient, SellOfferView, Trend | HU-16: 6 |
-| RF-17 | Could | HU-17 | Tiempo y clima | pendiente | HU-17: 0 |
-| RF-18 | Must | HU-18 | Construcción y | pendiente | HU-18: 0 |
-| RF-19 | Must | HU-19 | Construcción y | pendiente | HU-19: 0 |
-| RF-20 | Must | HU-20 | Construcción y | pendiente | HU-20: 0 |
-| RF-21 | Must | HU-21 | Construcción y | pendiente | HU-21: 0 |
-| RF-22 | Must | HU-22 | Construcción y | pendiente | HU-22: 0 |
-| RF-23 | Should | HU-23 | Construcción y | pendiente | HU-23: 0 |
+| RF-17 | Could | HU-17 | Tiempo y clima | DayLedger, DayPipeline, DayReport, DayService, DaySummaryDialog, DaySummaryText, DaySummaryView, GameCommands, GameController, GameDialogs, GameEvent, GameMemento, GameRestController, GameScreen, GameScreenPresenter, GameState, LedgerSnapshot, RemoteGameClient, ViewMapper | HU-17: 9 |
+| RF-18 | Must | HU-18 | Construcción y | Achievement, AchievementTracker, BarnBuilder, Building, BuildingBuilder, BuildingDirector, BuildingOfferView, BuildingService, BuildingSnapshot, BuildingType, BuildingView, BuildingsView, ConstructionDialog, ConstructionPresenter, CoopBuilder, FarmMap, FarmMapSnapshot, GameCommands, GameController, GameDialogs, GameMemento, GameRestController, GameScreen, GameScreenPresenter, GameState, GreenhouseBuilder, MapRenderer, Names, RemoteGameClient, ViewMapper, WarehouseBuilder | HU-18: 17 |
+| RF-19 | Must | HU-19 | Construcción y | Animal, AnimalOfferView, AnimalService, AnimalSnapshot, AnimalType, AnimalView, Building, BuildingView, GameCommands, GameController, GameRestController, MapRenderer, MarketPresenter, MarketService, MarketView, RemoteGameClient | HU-19: 6 |
+| RF-20 | Must | HU-20 | Construcción y | Animal, AnimalService, Building, BuildingActionView, BuildingDialog, BuildingPresenter, GameCommands, GameController, GameRestController, GameScreen, GameScreenPresenter, RemoteGameClient | HU-20: 10 |
+| RF-21 | Must | HU-21 | Construcción y | Animal, AnimalCondition, AnimalSnapshot, AnimalState, AnimalView, AnimalsStep, DayReport, HealthyState, HungryState, SickState | HU-21: 5 |
+| RF-22 | Must | HU-22 | Construcción y | Animal, AnimalService, AnimalsStep, Building, BuildingActionView, BuildingDialog, BuildingPresenter, DayReport, GameCommands, GameController, GameRestController, GameScreen, GameScreenPresenter, HealthyState, HungryState, RemoteGameClient, SickState | HU-22: 10 |
+| RF-23 | Should | HU-23 | Construcción y | Animal, AnimalService, BuildingActionView, BuildingDialog, BuildingPresenter, GameCommands, GameController, GameRestController, GameScreen, RemoteGameClient, SickState | HU-23: 8 |
 | RF-24 | Could | HU-25 | Construcción y | pendiente | HU-25: 0 |
-| RF-25 | Should | HU-24 | Construcción y | pendiente | HU-24: 0 |
+| RF-25 | Should | HU-24 | Construcción y | Building, BuildingService | HU-24: 5 |
 | RF-26 | Must | HU-26 | Progreso | pendiente | HU-26: 0 |
 | RF-27 | Should | HU-27 | Progreso | pendiente | HU-27: 0 |
 | RF-28 | Must | HU-28 | Progreso | FarmMap, GameCommands, GameController, GameRestController, GameRules, GameSession, GameState, HudView, Plot, ProgressService, RemoteGameClient, Result, StartScreenPresenter, Terrain, ViewMapper | HU-28: 8 |
@@ -41,10 +41,10 @@
 | RF-32 | Should | HU-32 | Guardado | pendiente | HU-32: 0 |
 | RF-33 | Must | HU-33 | Interfaz de usuario | GameCommands, GameController, GameRestController, GameRules, GameScreen, Main, MongoSaveRepository, RemoteGameClient, SaveDocument, SaveGameService, SaveRepository, SaveStorageException, ScreenNavigator, ScreenRouter, StartScreen, StartScreenPresenter, Texts | HU-33: 11 |
 | RF-34 | Must | HU-34 | Interfaz de usuario | GameEvent, GameScreen, GameScreenPresenter, HudModel, HudPanel, HudView, Texts, ViewMapper | HU-34: 8 |
-| RF-35 | Must | HU-35 | Interfaz de usuario | CellPos, FarmService, GameCommands, GameController, GameRestController, GameScreen, MapGeometry, MapPanel, MapRenderer, MapView, Palette, PlotClickListener, RemoteGameClient, ViewMapper | HU-35: 10 |
-| RF-36 | Must | HU-36 | Interfaz de usuario | GameScreen, GameScreenPresenter, Shortcut, Texts, Tool, ToolBar, ToolModel | HU-36: 13 |
-| RF-37 | Must | HU-37 | Interfaz de usuario | GameCommands, GameController, GameDialogs, GameRestController, GameScreen, InventoryDialog, InventoryGrid, InventoryModel, InventoryView, MarketService, RemoteGameClient, SlotView | HU-37: 8 |
-| RF-38 | Must | HU-38 | Interfaz de usuario | BuyOfferView, GameCommands, GameController, GameDialogs, GameRestController, GameScreen, MarketDialog, MarketPresenter, MarketService, MarketView, RemoteGameClient, SellOfferView | HU-38: 8 |
+| RF-35 | Must | HU-35 | Interfaz de usuario | AnimalView, BuildingView, CellPos, FarmService, GameCommands, GameController, GameRestController, GameScreen, MapGeometry, MapPanel, MapRenderer, MapView, Palette, PlotClickListener, PlotText, RemoteGameClient, ViewMapper | HU-35: 14 |
+| RF-36 | Must | HU-36 | Interfaz de usuario | GameScreen, GameScreenPresenter, Shortcut, Texts, Tool, ToolBar, ToolModel | HU-36: 18 |
+| RF-37 | Must | HU-37 | Interfaz de usuario | GameCommands, GameController, GameDialogs, GameRestController, GameScreen, InventoryDialog, InventoryGrid, InventoryModel, InventoryView, MarketService, RemoteGameClient, SlotView | HU-37: 9 |
+| RF-38 | Must | HU-38 | Interfaz de usuario | AnimalOfferView, BuyOfferView, GameCommands, GameController, GameDialogs, GameRestController, GameScreen, MarketDialog, MarketPresenter, MarketService, MarketView, RemoteGameClient, SellOfferView | HU-38: 10 |
 | RF-39 | Should | HU-39 | Interfaz de usuario | pendiente | HU-39: 0 |
 | RF-40 | Could | HU-40 | Interfaz de usuario | pendiente | HU-40: 0 |
 | RF-41 | Could | HU-41 | Interfaz de usuario | pendiente | HU-41: 0 |
@@ -70,14 +70,14 @@
 | HU-14 · Comprar en el mercado | 5.3 | Must | 4 | 7 | completa | BuyOfferView, GameCommands, GameController, GameEvent, GameRestController, GameState, Market, MarketDialog, MarketPresenter, MarketService, MarketView, RemoteGameClient |
 | HU-15 · Vender con precio dinámico | 5.3 | Must | 6 | 12 | completa | CropPricing, FlatPricing, GameCommands, GameController, GameEvent, GameMemento, GameRestController, GameState, Market, MarketDialog, MarketPresenter, MarketService, MarketSnapshot, MarketStep, MarketView, PricingStrategy, RemoteGameClient, SellOfferView |
 | HU-16 · Tendencia de precio | 5.3 | Should | 4 | 6 | completa | GameCommands, GameController, GameMemento, GameRestController, Market, MarketDialog, MarketPresenter, MarketService, MarketSnapshot, MarketStep, MarketView, RemoteGameClient, SellOfferView, Trend |
-| HU-17 · Resumen del día | 5.4 | Could | 4 | 0 | sin pruebas | pendiente |
-| HU-18 · Construir edificios | 5.4 | Must | 6 | 0 | sin pruebas | pendiente |
-| HU-19 · Comprar animales | 5.4 | Must | 4 | 0 | sin pruebas | pendiente |
-| HU-20 · Alimentar animales | 5.4 | Must | 5 | 0 | sin pruebas | pendiente |
-| HU-21 · Estados del animal | 5.4 | Must | 4 | 0 | sin pruebas | pendiente |
-| HU-22 · Producción y recolección | 5.4 | Must | 4 | 0 | sin pruebas | pendiente |
-| HU-23 · Curar animales enfermos | 5.4 | Should | 4 | 0 | sin pruebas | pendiente |
-| HU-24 · Construir y usar el almacén | 5.5 | Should | 4 | 0 | sin pruebas | pendiente |
+| HU-17 · Resumen del día | 5.4 | Could | 4 | 9 | completa | DayLedger, DayPipeline, DayReport, DayService, DaySummaryDialog, DaySummaryText, DaySummaryView, GameCommands, GameController, GameDialogs, GameEvent, GameMemento, GameRestController, GameScreen, GameScreenPresenter, GameState, LedgerSnapshot, RemoteGameClient, ViewMapper |
+| HU-18 · Construir edificios | 5.4 | Must | 6 | 17 | completa | Achievement, AchievementTracker, BarnBuilder, Building, BuildingBuilder, BuildingDirector, BuildingOfferView, BuildingService, BuildingSnapshot, BuildingType, BuildingView, BuildingsView, ConstructionDialog, ConstructionPresenter, CoopBuilder, FarmMap, FarmMapSnapshot, GameCommands, GameController, GameDialogs, GameMemento, GameRestController, GameScreen, GameScreenPresenter, GameState, GreenhouseBuilder, MapRenderer, Names, RemoteGameClient, ViewMapper, WarehouseBuilder |
+| HU-19 · Comprar animales | 5.4 | Must | 4 | 6 | completa | Animal, AnimalOfferView, AnimalService, AnimalSnapshot, AnimalType, AnimalView, Building, BuildingView, GameCommands, GameController, GameRestController, MapRenderer, MarketPresenter, MarketService, MarketView, RemoteGameClient |
+| HU-20 · Alimentar animales | 5.4 | Must | 5 | 10 | completa | Animal, AnimalService, Building, BuildingActionView, BuildingDialog, BuildingPresenter, GameCommands, GameController, GameRestController, GameScreen, GameScreenPresenter, RemoteGameClient |
+| HU-21 · Estados del animal | 5.4 | Must | 4 | 5 | completa | Animal, AnimalCondition, AnimalSnapshot, AnimalState, AnimalView, AnimalsStep, DayReport, HealthyState, HungryState, SickState |
+| HU-22 · Producción y recolección | 5.4 | Must | 4 | 10 | completa | Animal, AnimalService, AnimalsStep, Building, BuildingActionView, BuildingDialog, BuildingPresenter, DayReport, GameCommands, GameController, GameRestController, GameScreen, GameScreenPresenter, HealthyState, HungryState, RemoteGameClient, SickState |
+| HU-23 · Curar animales enfermos | 5.4 | Should | 4 | 8 | completa | Animal, AnimalService, BuildingActionView, BuildingDialog, BuildingPresenter, GameCommands, GameController, GameRestController, GameScreen, RemoteGameClient, SickState |
+| HU-24 · Construir y usar el almacén | 5.5 | Should | 4 | 5 | completa | Building, BuildingService |
 | HU-25 · Construir y usar el invernadero | 5.6 | Could | 5 | 0 | sin pruebas | pendiente |
 | HU-26 · Registrar logros | 5.5 | Must | 5 | 0 | sin pruebas | pendiente |
 | HU-27 · Desbloquear edificios por logros | 5.5 | Should | 4 | 0 | sin pruebas | pendiente |
@@ -88,13 +88,13 @@
 | HU-32 · Listar ranuras de guardado | 5.5 | Should | 3 | 0 | sin pruebas | pendiente |
 | HU-33 · Pantalla de inicio | 5.1 | Must | 4 | 11 | completa | GameCommands, GameController, GameRestController, GameRules, GameScreen, Main, MongoSaveRepository, RemoteGameClient, SaveDocument, SaveGameService, SaveRepository, SaveStorageException, ScreenNavigator, ScreenRouter, StartScreen, StartScreenPresenter, Texts |
 | HU-34 · HUD superior | 5.1 | Must | 4 | 8 | completa | GameEvent, GameScreen, GameScreenPresenter, HudModel, HudPanel, HudView, Texts, ViewMapper |
-| HU-35 · Mapa de la granja | 5.2 | Must | 5 | 10 | completa | CellPos, FarmService, GameCommands, GameController, GameRestController, GameScreen, MapGeometry, MapPanel, MapRenderer, MapView, Palette, PlotClickListener, RemoteGameClient, ViewMapper |
-| HU-36 · Herramientas y clic sobre parcelas | 5.2 | Must | 5 | 13 | completa | GameScreen, GameScreenPresenter, Shortcut, Texts, Tool, ToolBar, ToolModel |
-| HU-37 · Inventario en grilla | 5.3 | Must | 4 | 8 | completa | GameCommands, GameController, GameDialogs, GameRestController, GameScreen, InventoryDialog, InventoryGrid, InventoryModel, InventoryView, MarketService, RemoteGameClient, SlotView |
-| HU-38 · Mercado modal | 5.3 | Must | 4 | 8 | completa | BuyOfferView, GameCommands, GameController, GameDialogs, GameRestController, GameScreen, MarketDialog, MarketPresenter, MarketService, MarketView, RemoteGameClient, SellOfferView |
+| HU-35 · Mapa de la granja | 5.2 | Must | 5 | 14 | completa | AnimalView, BuildingView, CellPos, FarmService, GameCommands, GameController, GameRestController, GameScreen, MapGeometry, MapPanel, MapRenderer, MapView, Palette, PlotClickListener, PlotText, RemoteGameClient, ViewMapper |
+| HU-36 · Herramientas y clic sobre parcelas | 5.2 | Must | 5 | 18 | completa | GameScreen, GameScreenPresenter, Shortcut, Texts, Tool, ToolBar, ToolModel |
+| HU-37 · Inventario en grilla | 5.3 | Must | 4 | 9 | completa | GameCommands, GameController, GameDialogs, GameRestController, GameScreen, InventoryDialog, InventoryGrid, InventoryModel, InventoryView, MarketService, RemoteGameClient, SlotView |
+| HU-38 · Mercado modal | 5.3 | Must | 4 | 10 | completa | AnimalOfferView, BuyOfferView, GameCommands, GameController, GameDialogs, GameRestController, GameScreen, MarketDialog, MarketPresenter, MarketService, MarketView, RemoteGameClient, SellOfferView |
 | HU-39 · Notificaciones (toasts) | 5.6 | Should | 4 | 0 | sin pruebas | pendiente |
 | HU-40 · Efectos visuales de estación y clima | 5.6 | Could | 4 | 0 | sin pruebas | pendiente |
 | HU-41 · Animaciones suaves | 5.6 | Could | 4 | 0 | sin pruebas | pendiente |
 | HU-42 · Carga de sprites con respaldo vectorial | 5.6 | Should | 4 | 0 | sin pruebas | pendiente |
 
-**Resumen:** 23 de 42 historias con todas sus pruebas; 194 pruebas `HUxx_` en total.
+**Resumen:** 31 de 42 historias con todas sus pruebas; 276 pruebas `HUxx_` en total.
