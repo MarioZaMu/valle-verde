@@ -240,49 +240,49 @@
 
 ## Trazabilidad RF → CU
 
-| RF | Requerimiento (resumen) | Prioridad | Casos de uso |
-|---|---|---|---|
-| RF-01 | El jugador podrá sembrar una semilla del inventario en una parcela de tierra libre, siempr… | Must | CU-02 |
-| RF-02 | El jugador podrá regar un cultivo vivo; el sistema marcará el cultivo como regado hoy y co… | Must | CU-03 |
-| RF-03 | El sistema hará crecer cada día a los cultivos regados y los hará avanzar por las etapas S… | Must | CU-06 |
-| RF-04 | El jugador podrá cosechar un cultivo maduro y recibir el producto en el inventario; si el … | Must | CU-04 |
-| RF-05 | El sistema marchitará los cultivos por falta de riego, por helada o por cambio a una estac… | Must | CU-06 |
-| RF-06 | El jugador podrá limpiar una parcela con cultivo marchito para volver a usarla | Should | CU-04 |
-| RF-07 | El jugador podrá consultar el estado de una parcela: cultivo, etapa, regado y días para ma… | Must | CU-05 |
-| RF-08 | El jugador podrá terminar el día; el sistema resolverá todos los efectos en el orden defin… | Must | CU-06 |
-| RF-09 | El sistema llevará el calendario: 4 estaciones, años y cambio de estación con sus consecue… | Must | CU-06 |
-| RF-10 | El sistema sorteará el clima de cada día según la estación y mostrará siempre el pronóstic… | Must | CU-06, CU-18 |
-| RF-11 | El sistema aplicará los efectos del clima a los cultivos: lluvia que riega, sequía que red… | Must | CU-06 |
-| RF-12 | El sistema administrará la energía diaria: descontará el costo de cada acción, rechazará l… | Must | CU-02, CU-06 |
-| RF-13 | El sistema administrará el inventario con casillas, pilas máximas y operaciones atómicas d… | Must | CU-17 |
-| RF-14 | El jugador podrá comprar semillas, heno, medicina y animales a precio fijo, con validación… | Must | CU-07, CU-10 |
-| RF-15 | El jugador podrá vender cosechas y productos animales a un precio dinámico que depende de … | Must | CU-08 |
-| RF-16 | El sistema mostrará la tendencia de cada precio (sube, baja o igual) | Should | CU-08 |
-| RF-17 | El sistema resumirá el día al terminarlo: ingresos, gastos y eventos relevantes | Could | CU-06 |
-| RF-18 | El jugador podrá construir edificios (Gallinero y Establo como mínimo) sobre hierba libre,… | Must | CU-09 |
-| RF-19 | El jugador podrá comprar animales que se alojarán en un edificio compatible con plaza libr… | Must | CU-10 |
-| RF-20 | El jugador podrá alimentar a los animales de un edificio consumiendo heno y energía | Must | CU-11 |
-| RF-21 | El sistema gestionará el estado de cada animal (Sano, Hambriento, Enfermo) según se lo ali… | Must | CU-06, CU-11 |
-| RF-22 | El sistema hará producir a los animales sanos y alimentados, y el jugador podrá recolectar… | Must | CU-06, CU-12 |
-| RF-23 | El jugador podrá curar a un animal enfermo con medicina | Should | CU-13 |
-| RF-24 | El jugador podrá construir un invernadero para cultivar en cualquier estación, protegido d… | Could | CU-09 |
-| RF-25 | El jugador podrá construir un almacén que amplíe la capacidad del inventario | Should | CU-09 |
-| RF-26 | El sistema registrará logros al cumplirse sus condiciones y abonará su recompensa una sola… | Must | CU-06, CU-16 |
-| RF-27 | El sistema desbloqueará edificios al conseguir los logros asociados | Should | CU-09, CU-16 |
-| RF-28 | El jugador podrá iniciar una nueva partida con el estado inicial definido | Must | CU-01 |
-| RF-29 | El jugador podrá guardar la partida en una de 3 ranuras de forma atómica | Must | CU-14 |
-| RF-30 | El jugador podrá cargar una partida guardada y recuperar un estado idéntico al guardado | Must | CU-15 |
-| RF-31 | El sistema rechazará archivos corruptos, de versión no soportada o inexistentes con un men… | Must | CU-15 |
-| RF-32 | El sistema listará las ranuras con sus metadatos (fecha del juego, dinero y fecha real de … | Should | CU-14, CU-15 |
-| RF-33 | El sistema ofrecerá una pantalla de inicio con *Nueva partida*, *Cargar* y *Salir* | Must | CU-01 |
-| RF-34 | La pantalla principal mostrará un HUD con dinero, día, estación, clima y barra de energía | Must | CU-18 |
-| RF-35 | El sistema dibujará el mapa de la granja con parcelas, cultivos por etapa, edificios y ani… | Must | CU-18 |
-| RF-36 | El jugador podrá elegir una herramienta (por barra o atajo) y actuar con clic sobre una pa… | Must | CU-18 |
-| RF-37 | El sistema mostrará el inventario como grilla de casillas con icono y cantidad | Must | CU-17 |
-| RF-38 | El sistema ofrecerá un mercado modal con pestañas Comprar y Vender, precio actual con tend… | Must | CU-07, CU-08 |
-| RF-39 | El sistema mostrará notificaciones (*toasts*) para logros, errores y eventos de estación | Should | CU-18 |
-| RF-40 | El sistema aplicará efectos visuales: tinte día/noche, paleta por estación, partículas de … | Could | CU-18 |
-| RF-41 | El sistema aplicará animaciones suaves (crecimiento, animales de 2 a 3 cuadros y transició… | Could | CU-18 |
-| RF-42 | El sistema cargará sprites mediante un `AssetManager` con caché y usará gráficos vectorial… | Should | CU-18 |
+| RF | Requerimiento (resumen) | Prioridad | Casos de uso | Historias de usuario |
+|---|---|---|---|---|
+| RF-01 | El jugador podrá sembrar una semilla del inventario en una parcela de tierra libre, siempr… | Must | CU-02 | HU-01 |
+| RF-02 | El jugador podrá regar un cultivo vivo; el sistema marcará el cultivo como regado hoy y co… | Must | CU-03 | HU-02 |
+| RF-03 | El sistema hará crecer cada día a los cultivos regados y los hará avanzar por las etapas S… | Must | CU-06 | HU-03 |
+| RF-04 | El jugador podrá cosechar un cultivo maduro y recibir el producto en el inventario; si el … | Must | CU-04 | HU-04 |
+| RF-05 | El sistema marchitará los cultivos por falta de riego, por helada o por cambio a una estac… | Must | CU-06 | HU-05, HU-12 |
+| RF-06 | El jugador podrá limpiar una parcela con cultivo marchito para volver a usarla | Should | CU-04 | HU-06 |
+| RF-07 | El jugador podrá consultar el estado de una parcela: cultivo, etapa, regado y días para ma… | Must | CU-05 | HU-07 |
+| RF-08 | El jugador podrá terminar el día; el sistema resolverá todos los efectos en el orden defin… | Must | CU-06 | HU-10 |
+| RF-09 | El sistema llevará el calendario: 4 estaciones, años y cambio de estación con sus consecue… | Must | CU-06 | HU-09 |
+| RF-10 | El sistema sorteará el clima de cada día según la estación y mostrará siempre el pronóstic… | Must | CU-06, CU-18 | HU-11 |
+| RF-11 | El sistema aplicará los efectos del clima a los cultivos: lluvia que riega, sequía que red… | Must | CU-06 | HU-12 |
+| RF-12 | El sistema administrará la energía diaria: descontará el costo de cada acción, rechazará l… | Must | CU-02, CU-06 | HU-08 |
+| RF-13 | El sistema administrará el inventario con casillas, pilas máximas y operaciones atómicas d… | Must | CU-17 | HU-13 |
+| RF-14 | El jugador podrá comprar semillas, heno, medicina y animales a precio fijo, con validación… | Must | CU-07, CU-10 | HU-14 |
+| RF-15 | El jugador podrá vender cosechas y productos animales a un precio dinámico que depende de … | Must | CU-08 | HU-15 |
+| RF-16 | El sistema mostrará la tendencia de cada precio (sube, baja o igual) | Should | CU-08 | HU-16 |
+| RF-17 | El sistema resumirá el día al terminarlo: ingresos, gastos y eventos relevantes | Could | CU-06 | HU-17 |
+| RF-18 | El jugador podrá construir edificios (Gallinero y Establo como mínimo) sobre hierba libre,… | Must | CU-09 | HU-18 |
+| RF-19 | El jugador podrá comprar animales que se alojarán en un edificio compatible con plaza libr… | Must | CU-10 | HU-19 |
+| RF-20 | El jugador podrá alimentar a los animales de un edificio consumiendo heno y energía | Must | CU-11 | HU-20 |
+| RF-21 | El sistema gestionará el estado de cada animal (Sano, Hambriento, Enfermo) según se lo ali… | Must | CU-06, CU-11 | HU-21 |
+| RF-22 | El sistema hará producir a los animales sanos y alimentados, y el jugador podrá recolectar… | Must | CU-06, CU-12 | HU-22 |
+| RF-23 | El jugador podrá curar a un animal enfermo con medicina | Should | CU-13 | HU-23 |
+| RF-24 | El jugador podrá construir un invernadero para cultivar en cualquier estación, protegido d… | Could | CU-09 | HU-25 |
+| RF-25 | El jugador podrá construir un almacén que amplíe la capacidad del inventario | Should | CU-09 | HU-24 |
+| RF-26 | El sistema registrará logros al cumplirse sus condiciones y abonará su recompensa una sola… | Must | CU-06, CU-16 | HU-26 |
+| RF-27 | El sistema desbloqueará edificios al conseguir los logros asociados | Should | CU-09, CU-16 | HU-27 |
+| RF-28 | El jugador podrá iniciar una nueva partida con el estado inicial definido | Must | CU-01 | HU-28 |
+| RF-29 | El jugador podrá guardar la partida en una de 3 ranuras de forma atómica | Must | CU-14 | HU-29 |
+| RF-30 | El jugador podrá cargar una partida guardada y recuperar un estado idéntico al guardado | Must | CU-15 | HU-30 |
+| RF-31 | El sistema rechazará archivos corruptos, de versión no soportada o inexistentes con un men… | Must | CU-15 | HU-31 |
+| RF-32 | El sistema listará las ranuras con sus metadatos (fecha del juego, dinero y fecha real de … | Should | CU-14, CU-15 | HU-32 |
+| RF-33 | El sistema ofrecerá una pantalla de inicio con *Nueva partida*, *Cargar* y *Salir* | Must | CU-01 | HU-33 |
+| RF-34 | La pantalla principal mostrará un HUD con dinero, día, estación, clima y barra de energía | Must | CU-18 | HU-34 |
+| RF-35 | El sistema dibujará el mapa de la granja con parcelas, cultivos por etapa, edificios y ani… | Must | CU-18 | HU-35 |
+| RF-36 | El jugador podrá elegir una herramienta (por barra o atajo) y actuar con clic sobre una pa… | Must | CU-18 | HU-36 |
+| RF-37 | El sistema mostrará el inventario como grilla de casillas con icono y cantidad | Must | CU-17 | HU-37 |
+| RF-38 | El sistema ofrecerá un mercado modal con pestañas Comprar y Vender, precio actual con tend… | Must | CU-07, CU-08 | HU-38 |
+| RF-39 | El sistema mostrará notificaciones (*toasts*) para logros, errores y eventos de estación | Should | CU-18 | HU-39 |
+| RF-40 | El sistema aplicará efectos visuales: tinte día/noche, paleta por estación, partículas de … | Could | CU-18 | HU-40 |
+| RF-41 | El sistema aplicará animaciones suaves (crecimiento, animales de 2 a 3 cuadros y transició… | Could | CU-18 | HU-41 |
+| RF-42 | El sistema cargará sprites mediante un `AssetManager` con caché y usará gráficos vectorial… | Should | CU-18 | HU-42 |
 
-> La columna de historias de usuario (`HU`) se añadirá en la **Fase 2**.
+> Las historias de usuario están en [`HISTORIAS_DE_USUARIO.md`](HISTORIAS_DE_USUARIO.md).
