@@ -84,7 +84,7 @@
 | HU-28 · Iniciar nueva partida | 5.1 | Must | 4 | 7 | completa | FarmMap, GameController, GameRules, GameSession, GameState, HudView, Plot, ProgressService, Result, StartScreenPresenter, Terrain, ViewMapper |
 | HU-29 · Guardar partida | 5.5 | Must | 4 | 0 | sin pruebas | pendiente |
 | HU-30 · Cargar partida | 5.5 | Must | 4 | 0 | sin pruebas | pendiente |
-| HU-31 · Rechazar archivos inválidos sin alterar la partida | 5.5 | Must | 5 | 0 | sin pruebas | pendiente |
+| HU-31 · Rechazar partidas inválidas sin alterar la partida | 5.5 | Must | 5 | 0 | sin pruebas | pendiente |
 | HU-32 · Listar ranuras de guardado | 5.5 | Should | 3 | 0 | sin pruebas | pendiente |
 | HU-33 · Pantalla de inicio | 5.1 | Must | 4 | 11 | completa | GameController, GameRules, GameScreen, JsonSaveRepository, Main, SaveGameService, SaveRepository, ScreenNavigator, ScreenRouter, StartScreen, StartScreenPresenter, Texts |
 | HU-34 · HUD superior | 5.1 | Must | 4 | 8 | completa | GameEvent, GameScreen, GameScreenPresenter, HudModel, HudPanel, HudView, Texts, ViewMapper |

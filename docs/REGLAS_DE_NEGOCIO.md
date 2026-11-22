@@ -343,26 +343,27 @@ Después se pone `alimentadoHoy = falso`.
 | Aleatoriedad | Semilla del generador (configurable; por defecto la hora actual) |
 
 ### RN-31 · Ranuras de guardado
-- Hay **3 ranuras** (`slot1`, `slot2`, `slot3`). Cada una es un archivo JSON en `<carpeta del usuario>/.farmsim/saves/`.
+- Hay **3 ranuras** (`slot1`, `slot2`, `slot3`). Cada una es un **documento** de la colección `partidas` de MongoDB, con `_id` igual al nombre de la ranura, en la base `valleverde` (la URI es configurable; por defecto `mongodb://localhost:27017`).
 - Guardar en una ranura ocupada la **sobrescribe** (la interfaz pide confirmación).
-- El guardado es **atómico**: se escribe un archivo temporal y luego se mueve sobre el original. Si falla, el archivo previo **queda intacto**.
+- El guardado es **atómico**: el documento completo se reemplaza en **una sola operación** (`replaceOne` con *upsert*). Si falla, el documento previo **queda intacto**.
+- **MongoDB no es necesario para jugar.** Si no responde en 2 s, guardar y cargar devuelven `ERROR_ES` y la partida en curso sigue sin cambios.
 - Metadatos visibles por ranura: Año, estación y día, dinero, fecha y hora real del guardado.
 
-### RN-32 · Formato e integridad del archivo
-- JSON UTF-8 con `schemaVersion` (= **1**), `savedAt`, `state` y `checksum` (**SHA-256** en hexadecimal del bloque `state`).
+### RN-32 · Formato e integridad del documento
+- Documento con los campos `_id`, `schemaVersion` (= **1**), `savedAt`, `state` (el estado como texto JSON UTF-8) y `checksum` (**SHA-256** en hexadecimal de `state`).
 - `state` incluye: calendario, energía, dinero, inventario, parcelas y cultivos, edificios y animales (con pendientes), mercado (demanda y precio anterior), clima y pronóstico, logros y contadores, y el **estado interno del generador aleatorio** (un entero de 64 bits que expone `StateRandom`), para continuar exactamente la misma secuencia al cargar.
-- Tamaño típico ≤ 200 KB.
+- Tamaño típico ≤ 200 KB (el límite de un documento de MongoDB es 16 MB).
 - **Guardar → cargar devuelve un estado idéntico** al original (igualdad estructural, incluida la secuencia futura de sorteos).
 
 ### RN-33 · Validación de carga
 La carga verifica **en este orden** y se detiene en el primer fallo:
-1. El archivo **existe** y es legible.
-2. El JSON está **bien formado**.
+1. El documento **existe** (y MongoDB responde).
+2. El JSON de `state` está **bien formado**.
 3. `schemaVersion` es **soportada**.
 4. El **checksum** coincide.
 5. **Invariantes:** dinero ≥ 0; energía 0–100; día 1–28; inventario dentro de su capacidad y pilas ≤ 99; cultivos solo en parcelas de TIERRA o de invernadero; edificios dentro del mapa y sin solapar; animales ≤ capacidad; logros coherentes con sus contadores.
 
-Si algo falla se informa en español la causa (archivo inexistente, corrupto, versión no soportada, datos inválidos) y la **partida actual no cambia en absoluto**: el nuevo estado se construye aparte y solo reemplaza al actual cuando **todas** las verificaciones pasan.
+Si algo falla se informa en español la causa (partida inexistente, dañada, versión no soportada, datos inválidos) y la **partida actual no cambia en absoluto**: el nuevo estado se construye aparte y solo reemplaza al actual cuando **todas** las verificaciones pasan.
 
 ---
 
@@ -407,7 +408,7 @@ El *tooltip* de una parcela aparece tras **300 ms** de reposo del cursor y muest
 | `ARCHIVO_INEXISTENTE` | «No existe una partida en la ranura {n}.» |
 | `ARCHIVO_CORRUPTO` | «La partida está dañada y no se puede cargar. Tu partida actual no cambió.» |
 | `VERSION_NO_SOPORTADA` | «La partida es de una versión no soportada.» |
-| `ERROR_ES` | «No se pudo leer o escribir el archivo: {detalle}.» |
+| `ERROR_ES` | «No se pudo acceder a las partidas guardadas: {detalle}.» |
 
 - **Toasts:** duración **3 s** (desvanecimiento de 0,4 s; los logros duran **5 s**), máximo **4 visibles** a la vez, tres tipos: éxito, información y error.
 - La interfaz **nunca** recibe excepciones: solo recibe un `Result` con código y mensaje.

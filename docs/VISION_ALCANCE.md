@@ -45,7 +45,8 @@
 | Tiempo y clima | Terminar el día, ciclo de 4 estaciones de 28 días, clima por estación con pronóstico, heladas, lluvia y sequía, energía diaria |
 | Economía | Inventario limitado, compra de insumos, venta con precio dinámico (temporada + saturación) |
 | Construcción y animales | Construir Gallinero y Establo, comprar animales, alimentarlos, recolectar huevos y leche, estados *hambriento* y *enfermo* |
-| Progresión y persistencia | Logros con recompensa, nueva partida, guardar y cargar en 3 ranuras, rechazo seguro de archivos corruptos o inexistentes |
+| Progresión y persistencia | Logros con recompensa, nueva partida, guardar y cargar en 3 ranuras, rechazo seguro de partidas dañadas o inexistentes |
+| Arquitectura | Servidor Spring Boot con API REST JSON y cliente Swing/Java2D que lo usa por HTTP, ambos en el mismo equipo; las partidas se guardan en MongoDB |
 | Interfaz | Pantalla de inicio, HUD, mapa Java2D con clic por herramienta, inventario en grilla, mercado modal |
 
 ### 4.2 Alcance incremental (prioridades *Should* y *Could*)
@@ -58,13 +59,13 @@ Limpiar parcelas marchitas, tendencia de precios, curar animales, Almacén, desb
 
 | Excluido | Motivo |
 |---|---|
-| Multijugador y red | Complejidad ajena al objetivo de diseño; el despliegue es un solo equipo local |
+| Multijugador y juego por Internet | Complejidad ajena al objetivo de diseño; servidor y cliente corren en un solo equipo (127.0.0.1) con un solo jugador |
 | Audio (música y efectos) | No aporta a la evaluación del diseño |
-| Base de datos y servicios externos | La persistencia es un archivo JSON local |
+| Servicios externos y nube | Solo MongoDB guarda partidas; no hay otros servicios, cuentas ni despliegue en la nube |
 | NPC y misiones de personajes | Solo si el alcance lo permite y el equipo lo pide explícitamente |
 | Personaje que camina por el mapa | La acción es *clic sobre la parcela con la herramienta elegida* |
 | Tiempo real | El juego avanza únicamente por turnos |
-| Modificaciones (*mods*), tienda en línea, cuentas de usuario | Sin red ni servicios |
+| Modificaciones (*mods*), tienda en línea, cuentas de usuario | Sin cuentas ni servicios externos |
 
 ## 5. Actores e interesados
 
@@ -73,7 +74,7 @@ Limpiar parcelas marchitas, tendencia de precios, curar animales, Almacén, desb
 | Actor | Tipo | Descripción | Interactúa con |
 |---|---|---|---|
 | **Jugador** | Primario (humano) | Único usuario. Administra la granja, la economía y el progreso | Todos los casos de uso |
-| **Sistema de archivos local** | Secundario (sistema) | Almacena y devuelve los archivos JSON de las partidas | CU-14 Guardar, CU-15 Cargar |
+| **MongoDB** | Secundario (sistema) | Almacena y devuelve las partidas (colección `partidas`) | CU-14 Guardar, CU-15 Cargar |
 | **Paquete de assets gráficos** | Secundario (recurso) | Imágenes CC0 / CC-BY que consume la interfaz; si falta, se dibuja con gráficos vectoriales | CU-18 Observar la granja |
 
 > El **reloj del juego** no es un actor externo: avanza solo cuando el Jugador termina el día.
@@ -90,16 +91,17 @@ Limpiar parcelas marchitas, tendencia de precios, curar animales, Almacén, desb
 
 | ID | Tipo | Descripción |
 |---|---|---|
-| R-01 | Tecnología | Java 17, Maven, Swing + Java2D, JUnit 5 y Gson; todo gratuito |
-| R-02 | Arquitectura | `ui → application → domain`; `infrastructure → domain`. El dominio no importa Swing, Gson ni E/S de archivos |
+| R-01 | Tecnología | Java 17, Maven, **Spring Boot 3.5** (API REST), **Spring Data MongoDB**, Swing + Java2D (cliente) y JUnit 5; todo gratuito. Spring Boot es obligatorio |
+| R-02 | Arquitectura | Servidor: `api → application → domain` e `infrastructure → domain`. Cliente: `ui → application` y `client → application`. El dominio no importa Swing, Spring, Jackson, MongoDB ni E/S |
 | R-03 | Arquitectura | `GameController` solo orquesta y devuelve un `Result`; nunca lanza excepciones hacia la UI |
 | R-04 | Arquitectura | La UI se actualiza por eventos (Observer); toda aleatoriedad recibe un `Random` inyectado |
 | R-05 | Licencias | Solo assets CC0 o CC-BY registrados en `docs/ASSETS.md`; respaldo vectorial dibujado por código |
 | R-06 | Convenciones | Código, comentarios, pruebas y commits en inglés; documentación y textos del jugador en español |
 | R-07 | Plataforma | Windows 10+ (equipo del desarrollador), JRE 17 o superior, resolución mínima 1024 × 768 |
 | R-08 | Proceso | Se avanza por fases y historias; una fase no empieza sin visto bueno del estudiante |
-| S-01 | Supuesto | El juego es de un solo jugador y un solo proceso (un hilo de lógica) |
-| S-02 | Supuesto | El profesor acepta una aplicación de escritorio, ya que el tema es libre; las capas se nombran como en el curso (*Controller → Service → Repository*, dominio aparte) |
+| R-09 | Arquitectura | El servidor escucha solo en 127.0.0.1; las respuestas de la API llevan los eventos que la interfaz necesita (Observer) |
+| S-01 | Supuesto | El juego es de un solo jugador y una sola partida por servidor; el servidor atiende las órdenes de una en una |
+| S-02 | Supuesto | El tema es libre; Spring Boot es obligatorio. Las capas se nombran como en el curso (*Controller → Service → Repository*, dominio aparte) y el controlador REST es distinto del controlador GRASP de la aplicación |
 
 ## 7. Glosario
 

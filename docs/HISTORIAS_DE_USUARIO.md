@@ -20,7 +20,7 @@
 Una historia está **terminada** solo si se cumple todo lo siguiente:
 
 1. Existe una prueba `HUxx_descripcion` por **cada criterio de aceptación**, escrita **antes** que el código, y todas pasan en verde con `mvn test`.
-2. El código respeta las capas: `ui → application → domain` e `infrastructure → domain`; el dominio no importa Swing, Gson ni E/S (verificado por la prueba de arquitectura, RNF-06).
+2. El código respeta las capas: servidor `api → application → domain` e `infrastructure → domain`, cliente `ui → application` y `client → application`; el dominio no importa Swing, Spring, Jackson, MongoDB ni E/S (verificado por la prueba de arquitectura, RNF-06).
 3. Todo rechazo devuelve un `Result` con **código y mensaje en español** (RN-35); ninguna excepción llega a la UI (RNF-07).
 4. No hay números mágicos: los valores de las RN están en constantes o en la clase de configuración (RNF-12). Toda aleatoriedad usa un `Random` inyectado (RNF-08).
 5. Cada clase que implemente un patrón lleva el Javadoc `Pattern: <nombre> — Role: <rol>` (RNF-13).
@@ -29,6 +29,7 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 8. Los diagramas y documentos afectados se actualizan **en el mismo commit** si el código cambia el diseño.
 9. Un commit en inglés `feat(area): description (HUxx)` por historia o fase, sin errores de compilación (`mvn clean package` en verde).
 10. Cada clase de producción creada o modificada declara en su Javadoc la línea `Stories: HU-xx, …` y `python tools/traceability.py` termina sin errores (así la matriz de trazabilidad se mantiene al día).
+11. Cada orden nueva que el cliente envía tiene su endpoint en la API ([`API.md`](API.md)) y una prueba de integración que verifica su código HTTP de éxito y el de cada rechazo (RNF-15).
 
 ## 3. Aplicación de INVEST
 
@@ -38,7 +39,7 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 | **N**egociable | Las historias dicen *qué* y no *cómo*; no fijan clases ni pantallas concretas. Las Could (efectos, animaciones, invernadero, resumen) son negociables o recortables |
 | **V**aliosa | Cada historia produce un cambio observable por el Jugador (ver, hacer o decidir algo nuevo) |
 | **E**stimable | Todas tienen valores numéricos y reglas cerradas en las RN |
-| **S**mall | Máximo 5 puntos. Divisiones realizadas: helada separada del marchitamiento por riego (HU-05 / HU-12); guardar, cargar y rechazar archivos inválidos como tres historias (HU-29 / HU-30 / HU-31); interfaz mínima separada de sprites, efectos y animaciones (HU-35 / HU-42 / HU-40 / HU-41); logros separados de su desbloqueo de edificios (HU-26 / HU-27) |
+| **S**mall | Máximo 5 puntos. Divisiones realizadas: helada separada del marchitamiento por riego (HU-05 / HU-12); guardar, cargar y rechazar partidas inválidas como tres historias (HU-29 / HU-30 / HU-31); interfaz mínima separada de sprites, efectos y animaciones (HU-35 / HU-42 / HU-40 / HU-41); logros separados de su desbloqueo de edificios (HU-26 / HU-27) |
 | **T**estable | Cada criterio usa valores concretos y se verifica con una prueba automática (o una comprobación visual definida para la UI) |
 
 ## 4. Brechas y supuestos detectados al redactar
@@ -394,10 +395,10 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 **Como** jugador **quiero** guardar mi partida en una de 3 ranuras **para** continuarla más tarde.
 
 **Criterios de aceptación**
-- **CA-1 · Guardado correcto.** **Dado** una partida en curso, **Cuando** guardo en la ranura 2, **Entonces** se crea `slot2` con `schemaVersion = 1`, `savedAt`, `state` y un `checksum` SHA-256 del `state`.
-- **CA-2 · Escritura atómica (negativo).** **Dado** un archivo previo en la ranura y una falla de escritura (disco lleno o sin permisos simulados), **Cuando** guardo, **Entonces** se informa `ERROR_ES`, el archivo previo **queda intacto** y la partida sigue en juego.
-- **CA-3 · Sobrescritura.** **Dado** una ranura ocupada, **Cuando** elijo guardar en ella, **Entonces** se pide confirmación y, al aceptar, el archivo se reemplaza.
-- **CA-4 · Tamaño y tiempo (borde).** **Dado** una granja a plena carga, **Cuando** guardo, **Entonces** el archivo pesa ≤ 200 KB y la operación toma ≤ 1 s.
+- **CA-1 · Guardado correcto.** **Dado** una partida en curso, **Cuando** guardo en la ranura 2, **Entonces** se crea o reemplaza el documento `slot2` de la colección `partidas` con `schemaVersion = 1`, `savedAt`, `state` y un `checksum` SHA-256 del `state`.
+- **CA-2 · Escritura atómica (negativo).** **Dado** un documento previo en la ranura y una falla de escritura (MongoDB rechaza la operación o no responde en 2 s), **Cuando** guardo, **Entonces** se informa `ERROR_ES`, el documento previo **queda intacto** y la partida sigue en juego.
+- **CA-3 · Sobrescritura.** **Dado** una ranura ocupada, **Cuando** elijo guardar en ella, **Entonces** se pide confirmación y, al aceptar, el documento se reemplaza.
+- **CA-4 · Tamaño y tiempo (borde).** **Dado** una granja a plena carga, **Cuando** guardo, **Entonces** el documento pesa ≤ 200 KB y la operación toma ≤ 1 s.
 
 ### HU-30 · Cargar partida
 **Épica:** Progresión y persistencia · **Prioridad:** Must · **Puntos:** 5 · **RF:** RF-30 · **RN:** RN-32, RN-33 · **Depende de:** HU-29
@@ -410,17 +411,17 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 - **CA-3 · Reemplazo del estado.** **Dado** una partida en curso distinta, **Cuando** cargo una ranura válida, **Entonces** el estado actual se reemplaza y el HUD refleja la partida cargada.
 - **CA-4 · Tiempo (borde).** **Dado** una partida a plena carga, **Cuando** cargo, **Entonces** la operación toma ≤ 1 s.
 
-### HU-31 · Rechazar archivos inválidos sin alterar la partida
+### HU-31 · Rechazar partidas inválidas sin alterar la partida
 **Épica:** Progresión y persistencia · **Prioridad:** Must · **Puntos:** 3 · **RF:** RF-31 · **RN:** RN-33, RN-35 · **Depende de:** HU-30
 
-**Como** jugador **quiero** que un archivo dañado o inexistente se rechace con un mensaje claro **para** no perder mi partida actual.
+**Como** jugador **quiero** que una partida dañada o inexistente se rechace con un mensaje claro **para** no perder mi partida actual.
 
 **Criterios de aceptación**
-- **CA-1 · Archivo inexistente (prueba crítica).** **Dado** una ranura 3 sin archivo, **Cuando** intento cargarla, **Entonces** se rechaza con `ARCHIVO_INEXISTENTE` («No existe una partida en la ranura 3.») y mi partida actual no cambia.
-- **CA-2 · Archivo corrupto (prueba crítica).** **Dado** un archivo con un carácter alterado o JSON truncado, **Cuando** intento cargarlo, **Entonces** se rechaza con `ARCHIVO_CORRUPTO` y mi partida actual tiene **0 diferencias** respecto a antes.
-- **CA-3 · Versión no soportada.** **Dado** un archivo con `schemaVersion = 99`, **Cuando** intento cargarlo, **Entonces** se rechaza con `VERSION_NO_SOPORTADA`.
-- **CA-4 · Invariante violada (borde).** **Dado** un archivo con dinero −5 y un checksum recalculado de forma válida, **Cuando** intento cargarlo, **Entonces** se rechaza con `ARCHIVO_CORRUPTO`; y la verificación se detiene en el primer fallo según el orden de RN-33 (un JSON mal formado se detecta antes que el checksum).
-- **CA-5 · Error de lectura (negativo).** **Dado** un fallo de E/S al leer, **Cuando** intento cargar, **Entonces** se informa `ERROR_ES` y mi partida no cambia.
+- **CA-1 · Partida inexistente (prueba crítica).** **Dado** una ranura 3 sin documento, **Cuando** intento cargarla, **Entonces** se rechaza con `ARCHIVO_INEXISTENTE` («No existe una partida en la ranura 3.») y mi partida actual no cambia.
+- **CA-2 · Partida dañada (prueba crítica).** **Dado** un documento con un carácter del `state` alterado o con JSON truncado, **Cuando** intento cargarlo, **Entonces** se rechaza con `ARCHIVO_CORRUPTO` y mi partida actual tiene **0 diferencias** respecto a antes.
+- **CA-3 · Versión no soportada.** **Dado** un documento con `schemaVersion = 99`, **Cuando** intento cargarlo, **Entonces** se rechaza con `VERSION_NO_SOPORTADA`.
+- **CA-4 · Invariante violada (borde).** **Dado** un documento con dinero −5 y un checksum recalculado de forma válida, **Cuando** intento cargarlo, **Entonces** se rechaza con `ARCHIVO_CORRUPTO`; y la verificación se detiene en el primer fallo según el orden de RN-33 (un JSON mal formado se detecta antes que el checksum).
+- **CA-5 · MongoDB no responde (negativo).** **Dado** que MongoDB no responde en 2 s, **Cuando** intento cargar, **Entonces** se informa `ERROR_ES` y mi partida no cambia.
 
 ### HU-32 · Listar ranuras de guardado
 **Épica:** Progresión y persistencia · **Prioridad:** Should · **Puntos:** 2 · **RF:** RF-32 · **RN:** RN-31 · **Depende de:** HU-29
@@ -429,7 +430,7 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 
 **Criterios de aceptación**
 - **CA-1 · Listado.** **Dado** las ranuras 1 y 3 ocupadas y la 2 vacía, **Cuando** abro el listado, **Entonces** veo «Ranura 1: Año 1 · Verano · día 5 · 1.250 m · 2026-11-22 10:30», «Ranura 2: Vacía» y la ranura 3 con sus datos.
-- **CA-2 · Archivo dañado (negativo).** **Dado** una ranura cuyo archivo está dañado, **Cuando** abro el listado, **Entonces** se muestra «Dañada» y el resto del listado sigue funcionando.
+- **CA-2 · Archivo dañado (negativo).** **Dado** una ranura cuyo documento está dañado, **Cuando** abro el listado, **Entonces** se muestra «Dañada» y el resto del listado sigue funcionando.
 - **CA-3 · Actualización (borde).** **Dado** una ranura vacía, **Cuando** guardo en ella, **Entonces** el listado muestra sus metadatos sin reiniciar la aplicación.
 
 ---
@@ -560,7 +561,7 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 | 4 | Saturación de precios al vender mucho | HU-15 · CA-2 y CA-3 |
 | 5 | Animal enfermo que no produce | HU-22 · CA-2 (y HU-21 · CA-3) |
 | 6 | Guardar → cargar devuelve estado idéntico | HU-30 · CA-1 |
-| 7 | Cargar archivo corrupto o inexistente sin alterar la partida | HU-31 · CA-1 y CA-2 |
+| 7 | Cargar una partida dañada o inexistente sin alterar la partida | HU-31 · CA-1 y CA-2 |
 
 ## 7. Backlog priorizado por fase de implementación
 
@@ -625,7 +626,7 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 | 3 | HU-24 · Construir y usar el almacén | Construcción y animales | Should | 2 | HU-18, HU-27 |
 | 4 | HU-29 · Guardar partida | Progresión y persistencia | Must | 5 | HU-28 |
 | 5 | HU-30 · Cargar partida | Progresión y persistencia | Must | 5 | HU-29 |
-| 6 | HU-31 · Rechazar archivos inválidos sin alterar la partida | Progresión y persistencia | Must | 3 | HU-30 |
+| 6 | HU-31 · Rechazar partidas inválidas sin alterar la partida | Progresión y persistencia | Must | 3 | HU-30 |
 | 7 | HU-32 · Listar ranuras de guardado | Progresión y persistencia | Should | 2 | HU-29 |
 
 ### Fase 5.6 · Interfaz visual y extras (recortable) — 19 puntos (5 historias)
@@ -660,7 +661,7 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 | Tiempo y clima | HU-08 Administrar la energía diaria, HU-09 Calendario y estaciones, HU-10 Terminar el día, HU-11 Sorteo de clima y pronóstico, HU-12 Efectos del clima en los cultivos | 18 |
 | Economía | HU-13 Administrar el inventario, HU-14 Comprar en el mercado, HU-15 Vender con precio dinámico, HU-16 Tendencia de precio, HU-17 Resumen del día | 15 |
 | Construcción y animales | HU-18 Construir edificios, HU-19 Comprar animales, HU-20 Alimentar animales, HU-21 Estados del animal, HU-22 Producción y recolección, HU-23 Curar animales enfermos, HU-24 Construir y usar el almacén, HU-25 Construir y usar el invernadero | 26 |
-| Progresión y persistencia | HU-26 Registrar logros, HU-27 Desbloquear edificios por logros, HU-28 Iniciar nueva partida, HU-29 Guardar partida, HU-30 Cargar partida, HU-31 Rechazar archivos inválidos sin alterar la partida, HU-32 Listar ranuras de guardado | 25 |
+| Progresión y persistencia | HU-26 Registrar logros, HU-27 Desbloquear edificios por logros, HU-28 Iniciar nueva partida, HU-29 Guardar partida, HU-30 Cargar partida, HU-31 Rechazar partidas inválidas sin alterar la partida, HU-32 Listar ranuras de guardado | 25 |
 | Interfaz | HU-33 Pantalla de inicio, HU-34 HUD superior, HU-35 Mapa de la granja, HU-36 Herramientas y clic sobre parcelas, HU-37 Inventario en grilla, HU-38 Mercado modal, HU-39 Notificaciones (toasts), HU-40 Efectos visuales de estación y clima, HU-41 Animaciones suaves, HU-42 Carga de sprites con respaldo vectorial | 38 |
 
 ## 9. Trazabilidad RF → HU → caso de uso

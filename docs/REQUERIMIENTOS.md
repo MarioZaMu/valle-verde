@@ -71,7 +71,7 @@ Los requerimientos se agrupan en las **6 épicas** que también organizarán las
 | RF-28 | El jugador podrá iniciar una **nueva partida** con el estado inicial definido | Must | RN-30 |
 | RF-29 | El jugador podrá **guardar** la partida en una de 3 ranuras de forma atómica | Must | RN-31, RN-32 |
 | RF-30 | El jugador podrá **cargar** una partida guardada y recuperar un estado idéntico al guardado | Must | RN-32, RN-33 |
-| RF-31 | El sistema **rechazará** archivos corruptos, de versión no soportada o inexistentes con un mensaje claro, **sin alterar la partida actual** | Must | RN-33 |
+| RF-31 | El sistema **rechazará** partidas dañadas, de versión no soportada o inexistentes con un mensaje claro, **sin alterar la partida actual** | Must | RN-33 |
 | RF-32 | El sistema **listará las ranuras** con sus metadatos (fecha del juego, dinero y fecha real de guardado) | Should | RN-31 |
 
 ### Épica F · Interfaz
@@ -98,19 +98,21 @@ Referencia de hardware: equipo de desarrollo con Windows 11, ≥ 8 GB de RAM y J
 | ID | Categoría | Requerimiento | Métrica / criterio de verificación |
 |---|---|---|---|
 | RNF-01 | Rendimiento | «Terminar día» es rápido incluso con la granja a plena carga (40 cultivos al aire libre, 9 en invernadero, 6 edificios y 16 animales) | ≤ 200 ms (percentil 95 sobre 100 ejecuciones, prueba automática) |
-| RNF-02 | Rendimiento | El juego arranca rápido | ≤ 5 s desde `java -jar` hasta la pantalla de inicio |
-| RNF-03 | Rendimiento | Guardar y cargar son rápidos y ligeros | ≤ 1 s por operación; archivo ≤ 200 KB |
+| RNF-02 | Rendimiento | El juego arranca rápido | ≤ 5 s desde `java -jar` (incluye el arranque del servidor Spring Boot) hasta la pantalla de inicio |
+| RNF-03 | Rendimiento | Guardar y cargar son rápidos y ligeros | ≤ 1 s por operación; documento ≤ 200 KB |
 | RNF-04 | Rendimiento | La interfaz es fluida | ≥ 30 FPS en el mapa con animaciones; la respuesta visible a un clic llega en ≤ 100 ms |
 | RNF-05 | Calidad | Pruebas suficientes y verdes | Cobertura de líneas ≥ 70 % (JaCoCo) en dominio y aplicación; las 7 pruebas críticas en verde con `mvn test` |
-| RNF-06 | Arquitectura | Dependencias en un solo sentido: `ui → application → domain` e `infrastructure → domain` | 0 violaciones en una prueba automática que revisa los `import`: el dominio no importa `javax.swing`, `com.google.gson` ni E/S de archivos; la UI no importa `domain` ni `infrastructure` |
+| RNF-06 | Arquitectura | Dependencias en un solo sentido: servidor `api → application → domain` e `infrastructure → domain`; cliente `ui → application` y `client → application` | 0 violaciones en una prueba automática que revisa los `import`: el dominio no importa Swing, AWT, Spring, Jackson, MongoDB ni E/S; la UI no importa `domain`, `infrastructure` ni `api`; los controladores REST no importan `domain` |
 | RNF-07 | Arquitectura | Ninguna excepción llega a la interfaz: `GameController` devuelve siempre un `Result` | 0 excepciones no controladas en las pruebas de aceptación; todo rechazo trae código y mensaje (RN-35) |
 | RNF-08 | Determinismo | Toda aleatoriedad usa un `Random` inyectado | Misma semilla + mismas acciones → mismo estado final tras simular 112 días (prueba automática) |
-| RNF-09 | Fiabilidad | La persistencia no pierde ni daña datos | Una carga fallida deja la partida actual con 0 diferencias; el guardado es atómico (el archivo previo sobrevive a un fallo) |
+| RNF-09 | Fiabilidad | La persistencia no pierde ni daña datos | Una carga fallida deja la partida actual con 0 diferencias; el guardado es atómico (el documento previo sobrevive a un fallo) |
 | RNF-10 | Usabilidad | Interfaz clara y en español | Toda acción de juego alcanzable en ≤ 2 clics o 1 atajo; 100 % de los textos visibles en español; todo error indica causa y qué hacer |
-| RNF-11 | Portabilidad | Se ejecuta en otros equipos | `mvn clean package` genera un `.jar` ejecutable con `java -jar` en Windows 10+ y JRE 17+; usable desde 1024 × 768 sin recortes |
+| RNF-11 | Portabilidad | Se ejecuta en otros equipos | `mvn clean package` genera un `.jar` ejecutable con `java -jar` en Windows 10+ y JRE 17+; usable desde 1024 × 768 sin recortes; **jugar no requiere MongoDB** (solo guardar y cargar: sin conexión responden `ERROR_ES` y la partida sigue) |
 | RNF-12 | Mantenibilidad | Sin números mágicos y nombre configurable | 0 valores de RN fuera de constantes o de la clase de configuración; el nombre visible del juego está en **una** constante |
 | RNF-13 | Mantenibilidad | Los patrones de diseño están documentados | 100 % de las clases que implementan un patrón llevan el Javadoc `Pattern: <nombre> — Role: <rol>`; 100 % de los commits de funcionalidad citan una `HUxx` |
 | RNF-14 | Legal y accesibilidad | Assets con licencia libre y lectura cómoda | 100 % de los assets CC0 o CC-BY, registrados en `docs/ASSETS.md` y en el README; el juego ejecuta **sin ningún archivo de imagen** (respaldo vectorial); contraste de texto ≥ 4,5 : 1 y ninguna información transmitida solo por color |
+| RNF-15 | Interoperabilidad | La lógica se expone como API REST JSON: recursos con sustantivos, verbos HTTP y códigos de estado coherentes (200, 201, 400, 404, 409, 422, 500, 503) | Cada orden del cliente corresponde a un endpoint documentado en `docs/API.md`; una prueba de integración por endpoint verifica el código de éxito y el de cada rechazo |
+| RNF-16 | Despliegue | Servidor y cliente corren en el mismo equipo y el servidor solo acepta conexiones locales | El servidor escucha en 127.0.0.1; un solo `java -jar` arranca ambos; admite también `--server` y `--client` por separado |
 
 ## 4. Trazabilidad RN → RF
 
@@ -149,7 +151,7 @@ Referencia de hardware: equipo de desarrollo con Windows 11, ≥ 8 GB de RAM y J
 | RN-29 | Desbloqueo de edificios | RF-18, RF-27 |
 | RN-30 | Partida nueva | RF-28, RF-33 |
 | RN-31 | Ranuras de guardado | RF-29, RF-32, RF-33 |
-| RN-32 | Formato e integridad del archivo | RF-29, RF-30 |
+| RN-32 | Formato e integridad del documento | RF-29, RF-30 |
 | RN-33 | Validación de carga | RF-30, RF-31 |
 | RN-34 | Herramientas y atajos | RF-36 |
 | RN-35 | Mensajes y notificaciones | RF-39 |
@@ -158,13 +160,13 @@ Referencia de hardware: equipo de desarrollo con Windows 11, ≥ 8 GB de RAM y J
 
 | ID | Elemento | Motivo |
 |---|---|---|
-| W-01 | Multijugador y juego en red | Fuera del alcance de diseño; despliegue en un solo equipo |
+| W-01 | Multijugador y juego por Internet | Fuera del alcance de diseño; servidor y cliente en un solo equipo |
 | W-02 | Audio (música y efectos de sonido) | No aporta a la evaluación del diseño |
-| W-03 | Base de datos o servicios externos | La persistencia es un archivo JSON local |
+| W-03 | Servicios externos y nube | Solo MongoDB guarda partidas; sin cuentas ni otros servicios |
 | W-04 | NPC, diálogos y misiones de personajes | Solo si el estudiante lo pide expresamente |
 | W-05 | Avatar que camina por el mapa | La acción es clic sobre la parcela con la herramienta |
 | W-06 | Tiempo real | El juego avanza únicamente por turnos |
-| W-07 | Cuentas de usuario, *mods*, tienda en línea | Sin red ni servicios |
+| W-07 | Cuentas de usuario, *mods*, tienda en línea | Sin cuentas ni servicios externos |
 
 ## 6. Siguiente paso
 

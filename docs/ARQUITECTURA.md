@@ -1,41 +1,49 @@
 # Arquitectura y plan técnico — Valle Verde
 
-> **Versión 0.1 · 2026-11-22 · Fase 4**
+> **Versión 0.2 · 2026-11-22 · Fase 5.2b (migración a Spring Boot)**
 > Formaliza el diseño propuesto en los diagramas ([`DIAGRAMAS.md`](DIAGRAMAS.md)): capas, árbol de paquetes, decisiones técnicas y plan de implementación por fases con sus historias ([`HISTORIAS_DE_USUARIO.md`](HISTORIAS_DE_USUARIO.md) §7). El plan de pruebas está en [`PLAN_DE_PRUEBAS.md`](PLAN_DE_PRUEBAS.md).
-> **Estado:** las Fases 5.0 (§10), 5.1 (§11) y 5.2 (§12) están hechas. La Fase 5.3 empieza solo con tu visto bueno.
+> **Estado:** las Fases 5.0 (§10), 5.1 (§11) y 5.2 (§12) están hechas. La **Fase 5.2b** (§13) migra el diseño a un servidor Spring Boot con API REST, un cliente Swing por HTTP y persistencia en MongoDB. La Fase 5.3 empieza solo con tu visto bueno.
 
 ## 1. Estilo arquitectónico
 
-**Arquitectura por capas con inversión de dependencias en la persistencia**, en una sola aplicación de escritorio (un proceso, un hilo de lógica). Las capas tienen los nombres del curso (*Controller → Service → Repository*) y el modelo de dominio va aparte, como «no es una cuarta capa» (PDF Spring p. 21).
+**Cliente-servidor por capas, con inversión de dependencias en la persistencia**, desplegado en un solo equipo: un **servidor Spring Boot** (API REST JSON en 127.0.0.1, lógica del juego y acceso a MongoDB) y un **cliente Swing/Java2D** que lo usa por HTTP. Un solo `java -jar` arranca ambos. La lógica corre en un solo hilo del servidor (una partida por servidor, S-01).
+
+Las capas del servidor tienen los nombres del curso (*Controller → Service → Repository*) y el modelo de dominio va aparte, como «no es una cuarta capa» (PDF Spring p. 21). Hay **dos controladores con papeles distintos**, como separa el taller del bloque 7: el `GameRestController` (`@RestController`, capa `api`) solo traduce HTTP, y `GameController` (patrón GRASP *Controller*, capa `application`) orquesta los casos de uso.
 
 ```
-   ui  ───────►  application  ───────►  domain  ◄───────  infrastructure
- (Swing/Java2D)  (Controller,           (reglas,           (JSON, archivos)
-                  Services,              estado,
-                  DTO, EventBus)         patrones)
+ CLIENTE (Swing)                         SERVIDOR (Spring Boot, 127.0.0.1)
+ ui ──► GameCommands ◄── client ═HTTP/JSON═► api ──► application ──► domain ◄── infrastructure ──► MongoDB
+ (Swing/Java2D)   (RemoteGameClient)  (@RestController)  (Controller,     (reglas,   (MongoSaveRepository)
+                                                          Services,       estado,
+                                                          DTO, EventBus)  patrones)
 ```
 
 | Regla | Descripción | Cómo se verifica |
 |---|---|---|
-| **AR-1** | `ui → application → domain` e `infrastructure → domain`; ninguna otra dirección. `Main` es la única clase que puede ver todas las capas (raíz de composición) | prueba ArchUnit de capas |
-| **AR-2** | El dominio no importa `javax.swing`, `java.awt`, `com.google.gson` ni E/S de archivos (`java.io`, `java.nio.file`) | prueba ArchUnit |
-| **AR-3** | La UI no importa `domain` ni `infrastructure`: dibuja con DTO inmutables de `application` | prueba ArchUnit |
-| **AR-4** | `GameController` solo orquesta y devuelve un `Result`; nunca lanza excepciones hacia la UI y nunca llama a un repositorio | prueba ArchUnit + prueba de inyección de fallas |
+| **AR-1** | Servidor: `api → application → domain` e `infrastructure → domain`. Cliente: `ui → application` y `client → application`. Ninguna otra dirección. `Main` y `config` son la raíz de composición y los únicos que pueden ver todas las capas | prueba ArchUnit de capas |
+| **AR-2** | El dominio no importa Swing, AWT, `org.springframework`, `com.fasterxml.jackson`, `com.mongodb` ni E/S (`java.io`, `java.nio.file`, `java.net`) | prueba ArchUnit |
+| **AR-3** | La UI no importa `domain`, `infrastructure`, `api` ni `client`: da órdenes por la interfaz `GameCommands` y dibuja con DTO inmutables de `application` | prueba ArchUnit |
+| **AR-4** | `GameController` solo orquesta y devuelve un `Result`; nunca lanza excepciones hacia la UI ni hacia la API y nunca llama a un repositorio | prueba ArchUnit + prueba de inyección de fallas |
 | **AR-5** | Sin ciclos entre paquetes de `domain` | prueba ArchUnit (`slices`) y `tools/check_diagrams.py` |
 | **AR-6** | La UI se actualiza por eventos (Observer), no consultando en bucle | revisión y prueba de `HudPanel` con eventos simulados |
-| **AR-7** | Toda aleatoriedad recibe un `Random` inyectado | prueba: ningún `new Random()` ni `Math.random()` fuera de `Main` |
+| **AR-7** | Toda aleatoriedad recibe un `Random` inyectado | prueba: ningún `new Random()` ni `Math.random()` fuera de `Main` y `config` |
 | **AR-8** | Sin números mágicos: las RN viven en `GameRules` y en las tablas de catálogo | revisión en cada historia (DoD 4) |
 | **AR-9** | Cada clase de patrón lleva el Javadoc `Pattern: <nombre> — Role: <rol>` | `PatternJavadocTest` con un registro (`src/test/resources/patterns.txt`) que cada fase completa |
 | **AR-10** | Toda clase de producción declara en su Javadoc la línea `Stories: HU-xx, …` (o `Stories: none`) | `tools/traceability.py` (alimenta la matriz de trazabilidad) |
+| **AR-11** | Los controladores REST (`api`) no importan `domain` ni `infrastructure`: solo traducen HTTP ↔ `GameController`. El cliente (`client`) no importa `api` | prueba ArchUnit |
+| **AR-12** | Cada orden del cliente tiene su endpoint documentado en [`API.md`](API.md) y una prueba de integración con el código HTTP de éxito y el de cada rechazo | DoD 11 y pruebas de `api` y `client` |
 
 ## 2. Responsabilidades por capa
 
 | Capa | Paquete | Responsabilidad | Contiene | No debe |
 |---|---|---|---|---|
-| Presentación | `ui` | Dibujar y capturar entrada del jugador | pantallas, paneles, `MapPanel` (Java2D), `AssetManager`, tema | contener reglas de negocio, importar `domain` |
-| Aplicación | `application` | Casos de uso: coordinar, validar entradas y traducir | `GameController`, servicios, `GameSession`, `EventBus`, DTO, `Result` | dibujar, tocar archivos |
-| Dominio | `domain` | Reglas y estado del juego (RN-01 a RN-35) | agregado `GameState`, cultivos, animales, edificios, mercado, tiempo, logros, patrones | depender de otra capa o de bibliotecas de UI, JSON y E/S |
-| Infraestructura | `infrastructure` | Detalles técnicos | `JsonSaveRepository`, `SaveFileCodec`, `Checksum` | contener reglas de negocio |
+| Presentación (cliente) | `ui` | Dibujar y capturar entrada del jugador | pantallas, paneles, `MapPanel` (Java2D), `AssetManager`, tema | contener reglas de negocio, importar `domain` ni saber si hay HTTP |
+| Cliente HTTP | `client` | Implementar `GameCommands` enviando cada orden a la API y republicar los eventos recibidos | `RemoteGameClient`, `EventDecoder` | contener reglas de negocio, importar `domain` o `api` |
+| API REST | `api` | Traducir HTTP ↔ `GameController`: rutas, JSON, códigos de estado, eventos de la respuesta | `GameRestController`, `ApiResponse`, `ErrorStatusMapper`, `EventCollector`, manejo global de errores | contener reglas de negocio, importar `domain` o `infrastructure` |
+| Aplicación | `application` | Casos de uso: coordinar, validar entradas y traducir | `GameCommands`, `GameController`, servicios, `GameSession`, `EventBus`, DTO, `Result` | dibujar, hablar HTTP, tocar MongoDB |
+| Dominio | `domain` | Reglas y estado del juego (RN-01 a RN-35) | agregado `GameState`, cultivos, animales, edificios, mercado, tiempo, logros, patrones | depender de otra capa o de bibliotecas de UI, Spring, JSON, MongoDB y E/S |
+| Infraestructura | `infrastructure` | Detalles técnicos: guardar y leer partidas en MongoDB | `MongoSaveRepository`, `SaveDocument`, `SaveCodec`, `Checksum` | contener reglas de negocio |
+| Configuración | `config` | Declarar los beans de Spring que no son componentes (`StateRandom`, `EventBus`, `GameSession`, pasos del día) y los tiempos de espera de MongoDB | `ServerConfig`, `MongoConfig` | contener reglas de negocio |
 
 ## 3. Árbol de paquetes
 
@@ -43,7 +51,7 @@ Paquete raíz `edu.ucc.farmsim`. Las clases entre paréntesis se muestran en los
 
 ```
 edu.ucc.farmsim
-├─ Main                                 raíz de composición: crea Random, repositorio, servicios, EventBus y ventana
+├─ Main                                 raíz de composición: arranca el servidor Spring Boot y/o la ventana del cliente (`--server`, `--client`)
 ├─ GameInfo                             nombre visible y versión del juego (única constante, RNF-12)
 ├─ ui
 │  ├─ screens      MainWindow, StartScreen, GameScreen, ScreenRouter
@@ -51,8 +59,13 @@ edu.ucc.farmsim
 │  ├─ render       MapPanel, MapRenderer, ParticleSystem, DayNightTint
 │  ├─ assets       AssetManager, VectorFallback
 │  └─ theme        Palette, Texts (cadenas de interfaz en español)
+├─ client                               (cliente HTTP)
+│     RemoteGameClient (implementa GameCommands), EventDecoder
+├─ api                                  (servidor: capa REST)
+│     GameRestController, ApiResponse, EventDto, ErrorStatusMapper, EventCollector, ApiExceptionHandler
+├─ config                               ServerConfig, MongoConfig (beans de Spring)
 ├─ application
-│  ├─ controller   GameController
+│  ├─ controller   GameCommands (puerto), GameController
 │  ├─ service      GameSession, FarmService, DayService, MarketService, BuildingService,
 │  │               AnimalService, ProgressService, SaveGameService
 │  ├─ event        EventBus, GameListener, GameEvent (interfaz sellada + records)
@@ -72,7 +85,7 @@ edu.ucc.farmsim
 │  ├─ progress     AchievementTracker, Achievement, ProgressFacts
 │  └─ config       GameRules (constantes de las RN)
 └─ infrastructure
-   └─ persistence  JsonSaveRepository, SaveFileCodec, Checksum
+   └─ persistence  MongoSaveRepository, SaveDocument, SaveCodec, Checksum
 ```
 
 Estructura Maven del repositorio:
@@ -81,6 +94,7 @@ Estructura Maven del repositorio:
 ProyectoFinal/
 ├─ pom.xml
 ├─ src/main/java/edu/ucc/farmsim/...        código (en inglés)
+├─ src/main/resources/application.properties   configuración de Spring (puerto, URI de MongoDB)
 ├─ src/main/resources/assets/               sprites CC0 / CC-BY (opcionales)
 ├─ src/test/java/edu/ucc/farmsim/...        espejo de los paquetes + acceptance/ + architecture/
 ├─ docs/                                    documentación y diagramas (en español)
@@ -92,21 +106,28 @@ ProyectoFinal/
 
 | ID | Decisión | Justificación |
 |---|---|---|
-| **DT-01** | **Frontera UI ↔ aplicación con DTO.** `GameController` recibe y devuelve tipos simples (`int`, `String` con ids como `"CARROT"`) y `record` inmutables (`GameView`, `PlotView`, …). Los ids de catálogo y los textos para mostrar salen de `application` | La UI no importa `domain` (AR-3); el dominio puede cambiar sin tocar la UI |
+| **DT-01** | **Frontera UI ↔ aplicación con DTO y el puerto `GameCommands`.** La UI da órdenes por la interfaz `GameCommands`, que recibe y devuelve tipos simples (`int`, `String` con ids como `"CARROT"`) y `record` inmutables (`GameView`, `PlotView`, …). Los ids de catálogo y los textos para mostrar salen de `application` | La UI no importa `domain` (AR-3); el dominio puede cambiar sin tocar la UI |
 | **DT-02** | **`Result<T>` + `ErrorCode`.** Cada operación del controlador devuelve `Result.ok(valor)` o `Result.fail(código, mensaje)` con los textos de RN-35. El controlador envuelve cada llamada en `try/catch` y convierte cualquier excepción inesperada en `ERROR_INTERNO` | Cumple R-03 y RNF-07; ninguna excepción llega a la UI |
 | **DT-03** | **Dominio mutable, con transacciones por memento.** `GameState` es un agregado mutable; antes de operaciones compuestas (terminar día, cargar) el servicio toma una instantánea (`createMemento()`) y, si algo falla, la restaura | Reutiliza el patrón Memento para cumplir HU-10 · CA-4 («falla interna: el estado queda idéntico») sin lógica de reversión aparte |
 | **DT-04** | **Fin de día como *pipeline* de pasos.** `DayPipeline` ejecuta una lista **ordenada** de `DayStep` (clima, crecimiento, animales, mercado, calendario, pronóstico, energía, logros) y produce un `DayReport`; cada historia agrega su propio paso | Materializa RN-03 y el principio de independencia de las historias (HU-10 define el *pipeline*; las demás se registran). El paso de calendario y los pasos de granja operan por métodos de agregado (`FarmMap.advanceDay`, `Market.recoverDemand`), sin que `game` importe `crop`, `animal` ni `building` directamente |
-| **DT-05** | **Eventos síncronos en el hilo de Swing (EDT).** `EventBus` notifica a los observadores en el mismo hilo; los eventos se publican **después** de que la operación tuvo éxito. Un observador que falla no impide notificar a los demás | Un solo hilo de lógica (S-01): sin concurrencia, sin bloqueos y con pruebas deterministas |
-| **DT-06** | **Un solo hilo.** Lógica, guardado y carga corren en el EDT (≤ 1 s, RNF-03). Las animaciones usan un `javax.swing.Timer` de la vista y no modifican el estado | Simplicidad; la animación nunca decide el estado (reglas de interfaz) |
+| **DT-05** | **Eventos síncronos.** `EventBus` notifica a los observadores en el mismo hilo; los eventos se publican **después** de que la operación tuvo éxito. Un observador que falla no impide notificar a los demás. En el servidor los recoge un `EventCollector` (DT-19); en el cliente notifican a la UI en el EDT | Un solo hilo de lógica (S-01): sin concurrencia, sin bloqueos y con pruebas deterministas |
+| **DT-06** | **Un solo hilo de lógica.** En el servidor cada orden se ejecuta bajo un candado (DT-20), incluidos guardar y cargar (≤ 1 s, RNF-03). Las animaciones del cliente usan un `javax.swing.Timer` de la vista y no modifican el estado | Simplicidad; la animación nunca decide el estado (reglas de interfaz) |
 | **DT-07** | **Aleatoriedad reproducible: `StateRandom extends java.util.Random`.** Su estado completo es un `long` (algoritmo SplitMix64 que sobrescribe `next(bits)`), con `state()` y `restore(long)`. Se inyecta desde `Main`; las pruebas usan semillas fijas | `java.util.Random` no permite leer su estado interno. Con `StateRandom`, guardar y cargar continúa **exactamente** la misma secuencia (RN-32, HU-30 · CA-2), sin recontar sorteos |
 | **DT-08** | **Configuración sin números mágicos.** Todos los valores de RN-01 a RN-35 están en `GameRules` (constantes agrupadas); las tablas de catálogo (RN-05, RN-16, RN-20, RN-23, RN-28) viven en los enumerados `CropType`, `ItemType`, `BuildingType`, `AnimalType` y `Achievement`, que se consideran *tablas de configuración*. El nombre visible del juego está en **una** constante (RNF-12) | Una sola fuente de verdad, igual que en las reglas de negocio |
 | **DT-09** | **Singleton `GameClock` con aislamiento para pruebas.** `getInstance()`, `restore(GameDate)` y `resetForTests()`. El `GameMemento` guarda la fecha y `GameState.restore` la restablece | El patrón se pidió explícitamente. El riesgo (estado global) se contiene con el método de reinicio y con una regla de pruebas: toda prueba que use el reloj lo reinicia en `@BeforeEach` |
 | **DT-10** | **`GameSession` como contenedor del estado actual.** Los servicios obtienen el `GameState` de `GameSession`; cargar construye un estado **aparte** y lo asigna con `replace` solo si todo es válido | Garantiza HU-31 («la partida actual no cambia»): el estado vigente no se toca hasta que el nuevo está completo y validado |
-| **DT-11** | **Formato de guardado.** Envoltura JSON `{schemaVersion, savedAt, state, checksum}`. El `GameMemento` contiene instantáneas inmutables (`record` sin dependencias de Gson); `SaveFileCodec` las serializa con Gson. El `checksum` es SHA-256 del texto canónico del bloque `state` | El dominio no conoce Gson (AR-2); el versionado permite rechazar archivos de otra versión |
-| **DT-12** | **Guardado atómico.** Escribir en un archivo temporal del mismo directorio y mover con `Files.move(..., ATOMIC_MOVE, REPLACE_EXISTING)` | Si falla, el archivo previo queda intacto (RN-31, HU-29 · CA-2) |
-| **DT-13** | **Validación de carga en el dominio.** `GameStateValidator` aplica las invariantes de RN-33 sin E/S; la secuencia de 5 verificaciones se reparte entre infraestructura (existencia, JSON, versión, checksum) y dominio (invariantes) | La regla de negocio vive en el dominio; la infraestructura solo lee bytes |
+| **DT-11** | **Formato de guardado.** Documento `{_id, schemaVersion, savedAt, state, checksum}` (RN-32). El `GameMemento` contiene instantáneas inmutables (`record` sin dependencias de bibliotecas); `SaveCodec` (infraestructura) las serializa a JSON con Jackson y `SaveDocument` es el `@Document` de Spring Data MongoDB. El `checksum` es SHA-256 del texto de `state` | El dominio no conoce Jackson ni MongoDB (AR-2); el versionado permite rechazar partidas de otra versión |
+| **DT-12** | **Guardado atómico.** Reemplazar el documento de la ranura en una sola operación (`replaceOne` con *upsert*); MongoDB garantiza la atomicidad por documento | Si falla, el documento previo queda intacto (RN-31, HU-29 · CA-2) |
+| **DT-13** | **Validación de carga en el dominio.** `GameStateValidator` aplica las invariantes de RN-33 sin E/S; la secuencia de 5 verificaciones se reparte entre infraestructura (existencia, JSON, versión, checksum) y dominio (invariantes) | La regla de negocio vive en el dominio; la infraestructura solo lee el documento |
 | **DT-14** | **Interfaz.** `ScreenRouter` con `CardLayout` (inicio / juego); `MapPanel` extiende `JPanel` y dibuja con Java2D en `paintComponent`; atajos con `InputMap/ActionMap`; textos en `Texts` (español). FlatLaf (Apache 2.0) es **opcional** y se decide en la Fase 5.6 | La UI funcional mínima se entrega desde la 5.1; lo visual es lo último y recortable |
-| **DT-15** | **Registro de eventos técnicos** con `java.util.logging` (sin bibliotecas adicionales). Los mensajes al jugador siempre salen de `Messages` | Cero dependencias nuevas |
+| **DT-15** | **Registro de eventos técnicos** con `java.util.logging` en el cliente y el registro de Spring Boot (SLF4J) en el servidor. Los mensajes al jugador siempre salen de `Messages` | Cero dependencias nuevas: ya vienen con Spring Boot |
+| **DT-16** | **Spring Boot como servidor.** `Main` arranca un `SpringApplication` con Tomcat embebido en `127.0.0.1` y un puerto libre (RNF-16). `@RestController` en `api`, `@Service` en los servicios de `application` y `@Repository` en `MongoSaveRepository`; los beans que no son componentes se declaran en `config`. El dominio no lleva anotaciones de Spring | Spring Boot es obligatorio (R-01); el dominio sigue puro y se prueba sin Spring |
+| **DT-17** | **Dos controladores, un puerto.** `GameRestController` (HTTP) delega en `GameController` (GRASP). `GameController` y `RemoteGameClient` implementan la interfaz `GameCommands`; la UI depende solo de ella | Las 146 pruebas de aceptación siguen usando el controlador en proceso, sin servidor; la UI no sabe si hay red (AR-3) |
+| **DT-18** | **API REST.** Un recurso por sustantivo y verbos HTTP; JSON; sin sesión de usuario (una partida por servidor). `ErrorStatusMapper` traduce cada `ErrorCode` a un código HTTP (200/201 éxito; 400 entrada inválida; 404 no existe; 409 regla de negocio; 422 partida dañada; 500 y 503 fallas). El cuerpo de error es `{code, message}` con los textos de RN-35. Detalle en [`API.md`](API.md) | Cumple RNF-15; el cliente reconstruye el mismo `Result` que devuelve el controlador |
+| **DT-19** | **Eventos en el sobre de la respuesta.** `EventCollector` (un `GameListener` del servidor) acumula los eventos que provoca cada orden y `GameRestController` los devuelve como `events` junto a `data`. `RemoteGameClient` reconstruye el `Result`, y después republica los eventos, en el mismo orden, en su `EventBus` local | El Observer cruza la red sin WebSockets ni sondeo (AR-6, R-09): un solo viaje por orden |
+| **DT-20** | **Concurrencia.** Una partida por servidor (S-01): `GameRestController` ejecuta cada orden bajo un mismo candado. El cliente envía las órdenes desde el EDT, de forma síncrona (localhost, tiempo de espera de 5 s) | Sin carreras con un solo jugador y sin `SwingWorker`; el riesgo está en RT-08 |
+| **DT-21** | **Persistencia en MongoDB.** El puerto `SaveRepository` sigue en el dominio; el adaptador `MongoSaveRepository` usa Spring Data MongoDB sobre la colección `partidas` (RN-31, RN-32). La URI se configura con `valleverde.mongo.uri` (por defecto `mongodb://localhost:27017/valleverde`) con tiempos de espera de 2 s. Cualquier error de MongoDB se convierte en una excepción sin marcar del dominio que `SaveGameService` traduce a `ERROR_ES` | Jugar no requiere MongoDB (RNF-11); la infraestructura sigue siendo reemplazable (inversión de dependencias) |
+| **DT-22** | **Lanzador.** `Main` sin argumentos arranca el servidor y el cliente en el mismo proceso (el cliente usa `RemoteGameClient` contra el puerto elegido). `--server [--port n]` arranca solo el servidor y `--client --url …` solo la ventana. Spring se inicia con `headless(false)` para poder abrir Swing | RNF-16; permite demostrar la separación y depurar cada lado |
 
 ## 5. Pila tecnológica y construcción
 
@@ -116,15 +137,16 @@ ProyectoFinal/
 | Construcción | Apache Maven | 3.9.16 (portable en `tools/`) |
 | Pruebas | JUnit Jupiter (JUnit 5) | 5.14.4 |
 | Arquitectura | ArchUnit (`archunit-junit5`), solo en pruebas | 1.5.1 |
-| JSON | Gson | 2.15.0 |
+| Servidor | Spring Boot (`spring-boot-starter-parent`) con los starters `web` (Tomcat embebido y Jackson), `data-mongodb`, `validation` y `test`; el BOM fija las versiones de Spring, Jackson y el *driver* de MongoDB | 3.5.16 (requiere Java 17) |
+| Base de datos | MongoDB (servidor local gratuito) | el que tenga instalado el equipo |
 | Cobertura | JaCoCo (`jacoco-maven-plugin`) | 0.8.16 |
-| Plugins Maven | compiler 3.16.0 · surefire 3.6.1 · shade 3.6.2 (jar ejecutable único) | — |
+| Plugins Maven | compiler 3.16.0 · surefire 3.6.1 · `spring-boot-maven-plugin` 3.5.16 (jar ejecutable único; reemplaza a *shade*) | — |
 | Aspecto (opcional) | FlatLaf | 3.8 |
 
 > JUnit ya publica la serie 6, pero se mantiene **JUnit 5** como pide el stack. Todo es gratuito (Apache 2.0, EPL 2.0 o similar).
 
 Decisiones del `pom.xml` (se crea en la Fase 5.0):
-- `maven.compiler.release=17`; `finalName=farmsim`; `Main-Class: edu.ucc.farmsim.Main`; el *shade* produce un único `farmsim.jar` con Gson y los assets.
+- `maven.compiler.release=17`; `finalName=farmsim`; el `spring-boot-maven-plugin` (`repackage`) produce un único `farmsim.jar` con Spring, Jackson, el *driver* de MongoDB y los assets; la clase de arranque es `edu.ucc.farmsim.Main`.
 - JaCoCo: informe en `target/site/jacoco` y regla `check` con **dos reglas separadas** (paquetes `domain` y `application`, cobertura de líneas ≥ 70 %, RNF-05).
 - Surefire ejecuta las pruebas rápidas por defecto; las de rendimiento llevan `@Tag("perf")` y corren con `-Pperf` (y en el cierre de la Fase 5.5).
 - Comando de verificación de cada fase: `mvn clean verify` (compila, prueba, mide cobertura y empaqueta).
@@ -134,11 +156,11 @@ Decisiones del `pom.xml` (se crea en la Fase 5.0):
 
 Como en la secuencia [A1](diagramas/A1_secuencia_vender_cosecha.png):
 
-1. La UI captura el clic o el botón y llama a `GameController.sell("CARROT", 3)` (tipos simples).
-2. El controlador delega en `MarketService`, que obtiene el estado de `GameSession`, valida (`Inventory.count`), llama al dominio (`Market.sellUnit`, `Inventory.remove`, `GameState.earn`) y evalúa logros con `ProgressFacts`.
-3. El servicio publica el evento (`EventBus.publish`) y devuelve `Result.ok(79)`.
-4. `HudPanel` y `ToastLayer` reciben el evento y se actualizan; `MarketDialog` muestra el resultado.
-5. Ante un rechazo el flujo termina con `Result.fail(código, mensaje)` y **sin cambios de estado ni eventos**.
+1. La UI captura el clic o el botón y llama a `GameCommands.sell("CARROT", 3)` (tipos simples). La implementación del cliente, `RemoteGameClient`, envía `POST /api/market/sales` con `{itemId, quantity}`.
+2. `GameRestController` toma el candado y llama a `GameController.sell`, que delega en `MarketService`: este obtiene el estado de `GameSession`, valida (`Inventory.count`), llama al dominio (`Market.sellUnit`, `Inventory.remove`, `GameState.earn`) y evalúa logros con `ProgressFacts`.
+3. El servicio publica el evento (`EventBus.publish`) y devuelve `Result.ok(79)`; el `EventCollector` lo guarda y el controlador REST responde `200` con `{data: 79, events: [...]}`.
+4. `RemoteGameClient` reconstruye `Result.ok(79)` y republica los eventos en el `EventBus` local; `HudPanel` y `ToastLayer` se actualizan y `MarketDialog` muestra el resultado.
+5. Ante un rechazo, el servicio devuelve `Result.fail(código, mensaje)`, la API responde con el código HTTP del error (p. ej. `409`) y el cuerpo `{code, message}`, y el cliente reconstruye el mismo `Result.fail`: **sin cambios de estado ni eventos**.
 
 ## 7. Plan de implementación por fases
 
@@ -149,9 +171,10 @@ Como en la secuencia [A1](diagramas/A1_secuencia_vender_cosecha.png):
 | **5.0** Preparación técnica | — | `pom.xml`, esqueleto de paquetes, `Main` (ventana vacía), pruebas de arquitectura (AR-1 a AR-5), JaCoCo, `mvnw`, README inicial | ventana vacía | — | arquitectura |
 | **5.1** Núcleo del turno | HU-13, 09, 08, 11, 28, 10, 33, 34 (**25**) | `GameRules`, `Inventory`, calendario (`GameClock`, `SeasonState`), `StateRandom`, clima (`WeatherStrategy`), `GameState`, `DayPipeline` con pasos de calendario, pronóstico y energía, `GameSession`, `DayService`, `Result/Messages`, `EventBus` | pantalla de inicio, HUD con etiquetas y botón «Terminar día» | Singleton, State (estación), Strategy (clima), Observer, Memento (versión mínima en memoria, para HU-10 · CA-4) | determinismo de 112 días |
 | **5.2** Cultivo | HU-01 a 07, 35, 36 (**29**) | `FarmMap`, `Plot`, `Crop`, `CropState` ×5, `CropFactory` ×5, `FarmService`, pasos de crecimiento y marchitamiento, DTO de parcela, mapa Java2D en vectores, barra de herramientas, tooltips | mapa con parcelas, herramientas 1–5 y clic | State (cultivo), Factory Method | **1** (fuera de estación), **2** (inventario lleno) |
+| **5.2b** Migración a Spring Boot | — (sin historias nuevas: conserva las 163 pruebas) | `pom.xml` con Spring Boot 3.5.16; interfaz `GameCommands`; capa `api` (`GameRestController`, `ErrorStatusMapper`, `EventCollector`); `client` (`RemoteGameClient`); `config`; `MongoSaveRepository` en lugar de `JsonSaveRepository`; `Main` con modos; reglas AR-1 a AR-3 y AR-11; `docs/API.md` | la misma de la 5.2, ahora sobre HTTP | — (el Observer cruza la red en el sobre de respuesta) | todas las anteriores en verde; arranque ≤ 5 s (RNF-02) |
 | **5.3** Clima y economía | HU-12, 37, 14, 15, 16, 38 (**23**) | efectos del clima en el *pipeline*, `Market`, `PricingStrategy` ×2, `MarketService`, paso de mercado, `InventoryGrid`, `MarketDialog` | inventario en grilla y mercado modal | Strategy (precios) | **3** (helada), **4** (saturación) |
 | **5.4** Construcción y animales | HU-18 a 23, 17 (**21**) | `Building`, `BuildingBuilder` ×4, `BuildingDirector`, `Animal`, `AnimalState` ×3, `BuildingService`, `AnimalService`, paso de animales, `DaySummary` | diálogo de construcción y panel del edificio (alimentar, recolectar, curar) | Builder, State (animal) | **5** (animal enfermo no produce) |
-| **5.5** Progresión y persistencia | HU-26, 27, 24, 29, 30, 31, 32 (**24**) | `AchievementTracker`, `ProgressFacts`, desbloqueos, `GameMemento`, `GameStateValidator`, `SaveRepository`, `JsonSaveRepository`, `SaveFileCodec`, `Checksum`, `SaveGameService`; **pruebas de rendimiento a plena carga** (HU-10 · CA-3, HU-29 · CA-4, HU-30 · CA-4) | diálogos de ranuras, logros y atajos `F5`/`F9` | Memento (completo: archivo) | **6** (guardar → cargar idéntico), **7** (archivo corrupto o inexistente) |
+| **5.5** Progresión y persistencia | HU-26, 27, 24, 29, 30, 31, 32 (**24**) | `AchievementTracker`, `ProgressFacts`, desbloqueos, `GameMemento`, `GameStateValidator`, `SaveRepository`, `MongoSaveRepository`, `SaveCodec`, `Checksum`, `SaveGameService`; **pruebas de rendimiento a plena carga** (HU-10 · CA-3, HU-29 · CA-4, HU-30 · CA-4) | diálogos de ranuras, logros y atajos `F5`/`F9` | Memento (completo: documento en MongoDB) | **6** (guardar → cargar idéntico), **7** (partida dañada o inexistente) |
 | **5.6** Interfaz visual y extras *(recortable)* | HU-39, 42, 25, 40, 41 (**19**) | `ToastLayer`, `AssetManager` y respaldo vectorial, invernadero, efectos (`ParticleSystem`, `DayNightTint`), animaciones con `Timer`; `docs/ASSETS.md`, README final y matriz de trazabilidad completa; decisión sobre FlatLaf | pulido visual | Observer (completado) | — |
 
 **Qué se actualiza al cerrar cada fase:** el diagrama de clases si aparecen clases nuevas con responsabilidad estructural, el de desarrollo si cambia un paquete o una dependencia (lo comprueba `tools/check_diagrams.py`) y la matriz de trazabilidad (RF → HU → diagrama → clases → pruebas).
@@ -164,11 +187,15 @@ Como en la secuencia [A1](diagramas/A1_secuencia_vender_cosecha.png):
 |---|---|---|---|---|
 | RT-01 | El `pipeline` del fin de día se vuelve un cuello de botella o se rompe al agregar pasos | Media | Alto | Pasos pequeños e independientes con prueba de orden (HU-10 · CA-1); `DayReport` único; transacción por memento (DT-03) |
 | RT-02 | El estado global del Singleton contamina pruebas | Media | Medio | `resetForTests()` y regla de `@BeforeEach` (DT-09) |
-| RT-03 | Cambios al esquema de guardado rompen archivos viejos | Baja | Medio | `schemaVersion` y rechazo con `VERSION_NO_SOPORTADA`; pruebas con archivos de ejemplo versionados |
+| RT-03 | Cambios al esquema de guardado rompen partidas viejas | Baja | Medio | `schemaVersion` y rechazo con `VERSION_NO_SOPORTADA`; pruebas con documentos de ejemplo versionados |
 | RT-04 | La UI Swing no se puede probar sin pantalla | Media | Bajo | Lógica de presentación en clases sin Swing (presentadores y DTO); pruebas de componentes solo si `!GraphicsEnvironment.isHeadless()` |
 | RT-05 | El JDK 25 del equipo produce bytecode incompatible con JRE 17 | Baja | Alto | `--release 17` y una comprobación en 5.0 (`javap` del `.class` generado) |
 | RT-06 | Mapas, sprites y efectos consumen el tiempo | Alta | Alto | Orden de fases con la 5.6 recortable; vectoriales desde el inicio |
 | RT-07 | Sobreingeniería por tantos patrones | Media | Medio | Cada patrón está justificado por escrito ([`DIAGRAMAS.md`](DIAGRAMAS.md) §3.1); no se agregan más |
+| RT-08 | El cliente bloquea el EDT al esperar la respuesta HTTP | Baja | Medio | Servidor local (milisegundos), tiempo de espera de 5 s y mensaje `ERROR_INTERNO` si vence; si en la práctica se nota, las órdenes pasan a un `SwingWorker` sin tocar el servidor |
+| RT-09 | El arranque de Spring Boot supera los 5 s de RNF-02 | Media | Medio | Medir en la Fase 5.2b; inicialización perezosa de beans y `spring.main.banner-mode=off`; la ventana puede abrirse mientras el servidor termina de arrancar |
+| RT-10 | MongoDB no está disponible al guardar o cargar | Media | Medio | Jugar no lo requiere (RNF-11); tiempo de espera de 2 s y `ERROR_ES` con la partida intacta (HU-29 · CA-2, HU-31 · CA-5) |
+| RT-11 | Las pruebas de MongoDB dependen del equipo donde corren | Media | Bajo | Solo `MongoSaveRepository` las necesita; el resto usa `FakeSaveRepository`; se omiten con un aviso si no hay MongoDB |
 
 ## 9. Cambios derivados de esta fase (ya aplicados)
 

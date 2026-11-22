@@ -44,7 +44,9 @@ Las pruebas se escriben **antes** que el código, historia por historia (DoD 1).
 |---|---|---|---|---|
 | **Unitarias de dominio** | Reglas de cultivos, animales, mercado, tiempo (RN-01 a RN-35) con `StateRandom` de semilla fija | `src/test/.../domain/**` | JUnit 5 | milisegundos |
 | **Aceptación** (aplicación) | Cada criterio de cada historia, **a través de `GameController`** con un repositorio en memoria | `src/test/.../acceptance/**` | JUnit 5 | milisegundos |
-| **Infraestructura** | `JsonSaveRepository`, checksum, escritura atómica, archivos corruptos (con directorios temporales) | `src/test/.../infrastructure/**` | JUnit 5 + `@TempDir` | decenas de ms |
+| **API REST** | Cada endpoint: código HTTP de éxito y de cada rechazo, cuerpo JSON y eventos de la respuesta | `src/test/.../api/**` | Spring Boot Test + MockMvc | decenas de ms |
+| **Cliente HTTP** | `RemoteGameClient` contra el servidor real en un puerto libre: mismos resultados que el controlador en proceso | `src/test/.../client/**` | Spring Boot Test (`RANDOM_PORT`) | cientos de ms |
+| **Infraestructura** | `MongoSaveRepository`: reemplazo atómico, documentos dañados, MongoDB que no responde | `src/test/.../infrastructure/**` | JUnit 5 + MongoDB de pruebas | decenas de ms |
 | **Arquitectura** | Capas, ciclos, imports prohibidos, Javadoc de patrones (AR-1 a AR-9) | `src/test/.../architecture/**` | ArchUnit | ~1 s |
 | **Rendimiento** | Fin de día, guardado y carga a plena carga (RNF-01, RNF-03) | `src/test/.../perf/**` con `@Tag("perf")` | JUnit 5 | segundos |
 | **Interfaz** | Presentadores y componentes sin pantalla; el resto con lista de comprobación visual | `src/test/.../ui/**` | JUnit 5 (omitidas si `GraphicsEnvironment.isHeadless()`) | decenas de ms |
@@ -68,7 +70,7 @@ Las pruebas se escriben **antes** que el código, historia por historia (DoD 1).
 - **Datos de prueba** (clase `GameFixtures`): partida nueva con semilla fija; constructores de estado (`aGame().inSeason(SPRING).withMoney(500)…`); `fullLoadGame()` (40 cultivos al aire libre, 9 en invernadero, 6 edificios y 16 animales, para RNF-01).
 - **Aleatoriedad:** nunca `new Random()` en pruebas; siempre `StateRandom` con semilla fija o `FixedWeatherStrategy` para controlar el clima del día.
 - **Reloj:** toda prueba que lo use llama a `GameClock.resetForTests()` en `@BeforeEach` (DT-09).
-- **Repositorios:** `InMemorySaveRepository` (en pruebas) para aceptación; `@TempDir` para infraestructura.
+- **Repositorios:** `FakeSaveRepository` en memoria para aceptación, API y cliente; MongoDB real solo en las pruebas de `MongoSaveRepository` (se omiten con un aviso si no hay un MongoDB al que conectarse).
 - **Fallas inyectadas:** servicios y repositorios de prueba que lanzan excepciones para verificar que el controlador devuelve `ERROR_INTERNO` y que el estado no cambia (RNF-07, HU-10 · CA-4).
 - **Trazabilidad:** cada clase de producción lleva `Stories: HU-xx` en su Javadoc y cada método de prueba el prefijo `HUxx_`; `python tools/traceability.py` (con `--upto 5.x` al cerrar una fase) comprueba que cada historia tenga clases y al menos tantas pruebas como criterios.
 - **Mensajes:** las pruebas comparan el **código** de error y, en pocas pruebas dedicadas, el texto en español de RN-35.
@@ -95,14 +97,14 @@ Total: **{tot} criterios** → **{tot_a}** de dominio/aplicación y **{tot_ui}**
 | 4 | Saturación de precios al vender mucho | HU-15 · CA-2 y CA-3 | `HU15_ca2_priceDropsAfterManySales`, `HU15_ca3_demandNeverFallsBelowFloor` | 5.3 |
 | 5 | Animal enfermo que no produce | HU-22 · CA-2 (y HU-21 · CA-3) | `HU22_ca2_sickAnimalDoesNotProduce` | 5.4 |
 | 6 | Guardar → cargar devuelve estado idéntico | HU-30 · CA-1 | `HU30_ca1_loadedStateEqualsSavedState` | 5.5 |
-| 7 | Cargar archivo corrupto o inexistente sin alterar la partida | HU-31 · CA-1 y CA-2 | `HU31_ca1_missingFileLeavesGameUntouched`, `HU31_ca2_corruptFileLeavesGameUntouched` | 5.5 |
+| 7 | Cargar una partida dañada o inexistente sin alterar la partida | HU-31 · CA-1 y CA-2 | `HU31_ca1_missingSaveLeavesGameUntouched`, `HU31_ca2_corruptSaveLeavesGameUntouched` | 5.5 |
 
 ## 6. Pruebas de arquitectura y de calidad transversal
 
 | ID | Prueba | Verifica |
 |---|---|---|
 | AR-1 | `layersAreRespected` | `ui → application → domain`; `infrastructure → domain` |
-| AR-2 | `domainHasNoFrameworkOrIoImports` | el dominio no importa Swing, AWT, Gson, `java.io` ni `java.nio.file` |
+| AR-2 | `domainHasNoFrameworkOrIoImports` | el dominio no importa Swing, AWT, Spring, Jackson, MongoDB, `java.io` ni `java.nio.file` |
 | AR-3 | `uiDoesNotImportDomainOrInfrastructure` | la UI solo conoce `application` |
 | AR-4 | `controllerNeverTouchesRepositories` y `controllerNeverThrows` | el controlador no usa repositorios y siempre devuelve `Result` (inyección de fallas) |
 | AR-5 | `domainPackagesHaveNoCycles` | sin ciclos entre subpaquetes de `domain` |
@@ -119,7 +121,7 @@ Total: **{tot} criterios** → **{tot_a}** de dominio/aplicación y **{tot_ui}**
 |---|---|---|
 | RNF-01 (fin de día ≤ 200 ms p95) | prueba `perf` con `fullLoadGame()`: 20 ejecuciones de calentamiento y 100 medidas | 5.5 |
 | RNF-02 (arranque ≤ 5 s) | medición manual con cronómetro sobre `java -jar farmsim.jar` y registro en el README | 5.1 y 5.6 |
-| RNF-03 (guardar/cargar ≤ 1 s, ≤ 200 KB) | prueba `perf` + comprobación del tamaño del archivo | 5.5 |
+| RNF-03 (guardar/cargar ≤ 1 s, ≤ 200 KB) | prueba `perf` + comprobación del tamaño del documento | 5.5 |
 | RNF-04 (≥ 30 FPS, clic ≤ 100 ms) | contador de cuadros de `MapPanel` en modo de depuración; comprobación manual | 5.6 |
 | RNF-05 (cobertura ≥ 70 %) | `jacoco:check` en `mvn verify`: **dominio** y **aplicación** por separado | cada fase |
 | RNF-06 y RNF-07 | pruebas AR-1 a AR-5 y `controllerNeverThrows` | cada fase |

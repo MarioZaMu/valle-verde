@@ -50,7 +50,7 @@ java -jar target\farmsim.jar
 
 ## Arquitectura
 
-Capas con dependencias en un solo sentido: `ui → application → domain` e `infrastructure → domain`. El dominio no conoce Swing, Gson ni archivos; la UI dibuja con DTO inmutables y se actualiza por eventos (Observer); el controlador siempre devuelve un `Result` y nunca lanza excepciones hacia la UI. Detalle en [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md).
+Servidor Spring Boot (API REST) y cliente Swing por HTTP en el mismo equipo, con partidas en MongoDB (migración en curso, Fase 5.2b). Capas con dependencias en un solo sentido: servidor `api → application → domain` e `infrastructure → domain`, cliente `ui → application` y `client → application`. El dominio no conoce Swing, Spring, Jackson, MongoDB ni E/S; la UI dibuja con DTO inmutables y se actualiza por eventos (Observer); el controlador siempre devuelve un `Result` y nunca lanza excepciones hacia la UI. Detalle en [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md).
 
 ```
 edu.ucc.farmsim
@@ -85,7 +85,7 @@ edu.ucc.farmsim
 | Documento | Contenido |
 |---|---|
 | [`docs/VISION_ALCANCE.md`](docs/VISION_ALCANCE.md) | visión, alcance, actores y riesgos |
-| [`docs/REQUERIMIENTOS.md`](docs/REQUERIMIENTOS.md) | 42 requerimientos funcionales (MoSCoW) y 14 no funcionales |
+| [`docs/REQUERIMIENTOS.md`](docs/REQUERIMIENTOS.md) | 42 requerimientos funcionales (MoSCoW) y 16 no funcionales |
 | [`docs/REGLAS_DE_NEGOCIO.md`](docs/REGLAS_DE_NEGOCIO.md) | reglas con valores numéricos (RN-01 a RN-35) |
 | [`docs/CASOS_DE_USO.md`](docs/CASOS_DE_USO.md) | 18 casos de uso en texto |
 | [`docs/HISTORIAS_DE_USUARIO.md`](docs/HISTORIAS_DE_USUARIO.md) | 42 historias con criterios Dado/Cuando/Entonces y backlog por fases |

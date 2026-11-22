@@ -2,7 +2,7 @@
 
 > **Versión 0.1 · 2026-11-22 · Fase 1 (Análisis)**
 > Descripción textual (sin diagrama de casos de uso, que no se entrega). Cada caso cita los `RF` que cubre y las `RN` que aplica.
-> **Actor primario:** el **Jugador**. **Actor secundario:** el **Sistema de archivos local** (CU-14 y CU-15) y el **Paquete de assets** (CU-18).
+> **Actor primario:** el **Jugador**. **Actor secundario:** **MongoDB** (CU-14 y CU-15) y el **Paquete de assets** (CU-18).
 > Convención de los flujos alternos: `A#` = alternativa en el paso indicado; todo rechazo devuelve un código y un mensaje en español (RN-35) y **no modifica el estado**.
 
 ## Índice
@@ -185,26 +185,26 @@
 - **Postcondición:** el animal está sano; si se lo alimenta, producirá al terminar el día.
 
 ## CU-14 · Guardar partida
-- **Actor:** Jugador; secundario: Sistema de archivos · **RF:** RF-29, RF-32 · **RN:** RN-31, RN-32
+- **Actor:** Jugador; secundario: MongoDB · **RF:** RF-29, RF-32 · **RN:** RN-31, RN-32
 - **Precondición:** hay una partida en curso.
 - **Flujo principal:**
   1. El Jugador abre *Guardar* y la interfaz lista las 3 ranuras con sus metadatos.
   2. El Jugador elige una ranura (con confirmación si está ocupada).
-  3. El sistema crea una instantánea del estado, calcula el checksum y escribe un archivo temporal.
-  4. El sistema mueve el archivo temporal sobre el definitivo y confirma con un *toast*.
-- **Alternativas:** **A3.** Error de escritura (disco lleno, sin permisos) → `ERROR_ES`; el archivo previo **queda intacto** y la partida sigue en juego.
+  3. El sistema crea una instantánea del estado, calcula el checksum y arma el documento de la ranura.
+  4. El sistema reemplaza el documento en MongoDB en una sola operación y confirma con un *toast*.
+- **Alternativas:** **A3.** MongoDB no responde o rechaza la escritura → `ERROR_ES`; el documento previo **queda intacto** y la partida sigue en juego.
 - **Postcondición:** la ranura contiene la partida actual.
 
 ## CU-15 · Cargar partida
-- **Actor:** Jugador; secundario: Sistema de archivos · **RF:** RF-30, RF-31, RF-32 · **RN:** RN-32, RN-33
+- **Actor:** Jugador; secundario: MongoDB · **RF:** RF-30, RF-31, RF-32 · **RN:** RN-32, RN-33
 - **Precondición:** la pantalla de inicio o el juego en curso.
 - **Flujo principal:**
   1. El Jugador abre *Cargar* y ve las 3 ranuras con metadatos.
   2. El Jugador elige una ranura ocupada.
-  3. El sistema lee el archivo y valida, en orden: existencia, JSON, versión, checksum e invariantes (RN-33).
+  3. El sistema lee el documento y valida, en orden: existencia, JSON, versión, checksum e invariantes (RN-33).
   4. El sistema construye el nuevo estado aparte y, solo si todo es válido, **reemplaza** el estado actual.
   5. El sistema muestra la partida cargada.
-- **Alternativas:** **A3a.** La ranura está vacía o el archivo falta → `ARCHIVO_INEXISTENTE`. **A3b.** JSON mal formado o checksum distinto → `ARCHIVO_CORRUPTO`. **A3c.** Versión desconocida → `VERSION_NO_SOPORTADA`. **A3d.** Invariante violada → `ARCHIVO_CORRUPTO`. En todos los casos la **partida actual no cambia**.
+- **Alternativas:** **A3a.** La ranura está vacía o el documento falta → `ARCHIVO_INEXISTENTE`. **A3b.** JSON mal formado o checksum distinto → `ARCHIVO_CORRUPTO`. **A3e.** MongoDB no responde → `ERROR_ES`. **A3c.** Versión desconocida → `VERSION_NO_SOPORTADA`. **A3d.** Invariante violada → `ARCHIVO_CORRUPTO`. En todos los casos la **partida actual no cambia**.
 - **Postcondición:** el estado en memoria equivale al guardado, o bien sigue idéntico al anterior si hubo error.
 
 ## CU-16 · Consultar logros

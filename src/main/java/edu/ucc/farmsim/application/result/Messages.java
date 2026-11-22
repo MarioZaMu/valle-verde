@@ -41,7 +41,7 @@ public final class Messages {
         TEMPLATES.put(ErrorCode.ARCHIVO_CORRUPTO,
                 "La partida está dañada y no se puede cargar. Tu partida actual no cambió.");
         TEMPLATES.put(ErrorCode.VERSION_NO_SOPORTADA, "La partida es de una versión no soportada.");
-        TEMPLATES.put(ErrorCode.ERROR_ES, "No se pudo leer o escribir el archivo: %s.");
+        TEMPLATES.put(ErrorCode.ERROR_ES, "No se pudo acceder a las partidas guardadas: %s.");
         TEMPLATES.put(ErrorCode.ERROR_INTERNO, "Ocurrió un error inesperado. Tu partida no cambió.");
     }
 
