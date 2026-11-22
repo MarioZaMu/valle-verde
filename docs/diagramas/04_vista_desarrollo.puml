@@ -46,12 +46,17 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
     package "components" as UI_CMP #FFFFFF {
       class HudPanel
       class HudModel
+      class ToolModel
+      class ToolBar
+      class PlotText
       class InventoryGrid
       class MarketDialog
       class ToastLayer
     }
     package "render" as UI_REN #FFFFFF {
       class MapPanel
+      class MapRenderer
+      class MapGeometry
       class ParticleSystem
     }
     package "assets" as UI_AST #FFFFFF {
@@ -84,6 +89,7 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
     }
     package "dto" as APP_DTO #FFFFFF {
       class HudView
+      class MapView
       class GameView
       class PlotView
     }
@@ -91,6 +97,7 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
       class Result
       class ErrorCode
       class Messages
+      class Names
     }
   }
 
@@ -110,6 +117,7 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
     }
     package "crop" as D_CROP #FFFFFF {
       class Crop
+      class CropType
       class CropFactory
     }
     package "building" as D_BLD #FFFFFF {

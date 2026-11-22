@@ -116,6 +116,7 @@ Tomados de la revisión de la guía de estudio y del PDF de despliegue:
 | Cada **mensaje** de la secuencia es una operación de la clase receptora (o de la interfaz que implementa) | 10 mensajes verificados |
 | Los **42 RF** aparecen en la vista funcional exactamente una vez | 42 / 42 |
 | Los `RF-xx` y `HU-xx` citados en los encabezados de los `.puml` existen en la documentación | 0 referencias rotas |
+| Las dependencias reales entre paquetes del dominio (según los `import` del código) están dibujadas en la vista de desarrollo (`tools/check_imports.py`, desde la fase 5.2) | 0 dependencias faltantes |
 
 La prueba se validó también en negativo: al renombrar una operación de la secuencia y mover una clase de paquete, el verificador reportó ambos errores.
 

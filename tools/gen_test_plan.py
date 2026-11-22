@@ -57,7 +57,7 @@ Las pruebas se escriben **antes** que el código, historia por historia (DoD 1).
 | Solo pruebas de una historia | `mvn test -Dtest='HU01*'` |
 | Incluir pruebas de rendimiento | `mvn verify -Pperf` |
 | Informe de cobertura | `target/site/jacoco/index.html` |
-| Comprobar diagramas, historias y trazabilidad | `python tools/check_diagrams.py` · `python tools/check_hu.py` · `python tools/traceability.py [--upto 5.x]` |
+| Comprobar diagramas, historias, código y trazabilidad | `python tools/check_diagrams.py` · `python tools/check_hu.py` · `python tools/check_imports.py` · `python tools/traceability.py [--upto 5.x]` |
 
 > En este equipo Maven no está en el PATH: se usa `tools/apache-maven-3.9.16/bin/mvn` (o el `mvnw` que se generará en la Fase 5.0).
 

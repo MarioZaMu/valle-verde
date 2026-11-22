@@ -37,6 +37,10 @@ package "ui  (presentación)" #F5FAFF {
     +onSellClicked(item: String, qty: int): void
   }
   class ToastLayer <<ConcreteObserver>> #BBDEFB
+  class ToolModel {
+    +current(): Tool
+    +selectedSeed(): String
+  }
   class HudModel <<ConcreteObserver>> #BBDEFB {
     +energyText(): String
     +energyFraction(): double
@@ -52,6 +56,8 @@ package "application" #F6FBF6 {
     +plant(col: int, row: int, crop: String): Result
     +water(col: int, row: int): Result
     +harvest(col: int, row: int): Result
+    +inspect(col: int, row: int): Result
+    +map(): Result
     +endDay(): Result
     +sell(item: String, qty: int): Result
     +build(type: String, col: int, row: int): Result
@@ -71,6 +77,12 @@ package "application" #F6FBF6 {
     -state: GameState
     +current(): GameState
     +replace(s: GameState): void
+  }
+  class FarmService {
+    +plant(col: int, row: int, seed: String): Result
+    +water(col: int, row: int): Result
+    +harvest(col: int, row: int): Result
+    +inspect(col: int, row: int): Result
   }
   class ProgressService {
     +newGame(seed: long): Result
@@ -177,7 +189,8 @@ package "domain" #FFFCF5 {
       -cols: int
       -rows: int
       +plotAt(col: int, row: int): Plot
-      +advanceDay(w: Weather, s: SeasonState): void
+      +growCrops(w: Weather): int
+      +witherOutOfSeason(s: Season): int
     }
     class Plot {
       -terrain: Terrain
@@ -190,11 +203,12 @@ package "domain" #FFFCF5 {
       -daysGrown: int
       -daysWithoutWater: int
       -watered: boolean
-      +water(): void
-      +endOfDay(w: Weather, s: SeasonState): void
+      +water(): boolean
+      +endOfDay(dryDays: int): void
+      +witherIfOutOfSeason(s: Season): boolean
     }
     interface CropState <<State>> #C8E6C9 {
-      +onDayEnd(c: Crop): void
+      +onDayEnd(c: Crop, dryDays: int): void
       +canHarvest(): boolean
     }
     class SeedState <<ConcreteState>> #C8E6C9
@@ -296,6 +310,7 @@ MarketDialog ..> GameController : usa
 
 ' ---------- Aplicación ----------
 GameController --> ProgressService
+GameController --> FarmService
 GameController --> DayService
 GameController --> MarketService
 GameController --> SaveGameService
@@ -303,6 +318,8 @@ GameController ..> Result : devuelve
 DayService --> GameSession
 DayService --> DayPipeline
 ProgressService --> GameSession
+FarmService --> GameSession
+FarmService --> EventBus
 ProgressService --> EventBus
 DayService --> EventBus
 MarketService --> GameSession

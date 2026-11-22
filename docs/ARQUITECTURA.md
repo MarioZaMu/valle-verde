@@ -2,7 +2,7 @@
 
 > **Versión 0.1 · 2026-11-22 · Fase 4**
 > Formaliza el diseño propuesto en los diagramas ([`DIAGRAMAS.md`](DIAGRAMAS.md)): capas, árbol de paquetes, decisiones técnicas y plan de implementación por fases con sus historias ([`HISTORIAS_DE_USUARIO.md`](HISTORIAS_DE_USUARIO.md) §7). El plan de pruebas está en [`PLAN_DE_PRUEBAS.md`](PLAN_DE_PRUEBAS.md).
-> **Estado:** las Fases 5.0 (§10) y 5.1 (§11) están hechas. La Fase 5.2 empieza solo con tu visto bueno.
+> **Estado:** las Fases 5.0 (§10), 5.1 (§11) y 5.2 (§12) están hechas. La Fase 5.3 empieza solo con tu visto bueno.
 
 ## 1. Estilo arquitectónico
 
@@ -229,4 +229,47 @@ Ajustes surgidos al implementar: (1) `Main` se declara como capa «Composition»
 | HU-33 · CA-3 | cargar cuando sí hay una partida guardada | 5.5 (HU-30) |
 
 **Diagramas:** el diagrama lógico y el de desarrollo incluyen ahora las clases reales de la fase. Además de `tools/check_diagrams.py`, se comprobó una vez contra los `import` reales del dominio: no falta ninguna dependencia en el dibujo (las flechas dibujadas que aún no existen en el código corresponden a fases siguientes).
+
+## 12. Estado de la Fase 5.2 (cultivo)
+
+**Historias cerradas (9 historias, 29 puntos):** HU-01, 02, 03, 04, 05, 06, 07, 35 y 36. `python tools/traceability.py --upto 5.2` termina sin errores.
+
+| Resultado | Valor |
+|---|---|
+| Pruebas | 163 en verde (146 con prefijo `HUxx_`) y 1 deshabilitada con motivo (HU-10 · CA-3, fase 5.5) |
+| Cobertura de líneas (JaCoCo) | **dominio 97,8 %**, **aplicación 95,5 %**, UI 90,6 %, infraestructura 100 % (barrera: 70 % en dominio y aplicación) |
+| Patrones aplicados | State (`CropState` con `SeedState`, `SproutState`, `GrowingState`, `MatureState`, `WitheredState`; contexto `Crop`), Factory Method (`CropFactory` con 5 creadores), Observer (`MapPanel`); todos registrados en `patterns.txt` |
+| Pruebas críticas cerradas | **1** `HU01_ca2_sowingOutOfSeasonIsRejectedAndNothingChanges` y **2** `HU04_ca2_harvestingWithAFullInventoryIsRejectedAndTheCropStaysMature` |
+| Integración Swing real | herramienta «1 Sembrar» → clic en el mapa → HUD 98/100 → `Enter` termina el día |
+
+**Decisiones tomadas al implementar:**
+
+| # | Decisión | Motivo |
+|---|---|---|
+| D-07 | `CropType` no conoce `ItemType`: es `ItemType` quien enlaza cada semilla y cada cosecha con su cultivo | Evita un ciclo `crop ↔ economy`: el diagrama de desarrollo ya dibujaba `economy → crop` |
+| D-08 | `GrowingPhaseState` agrupa lo común de Semilla, Brote y Crecimiento (necesitan agua, no se cosechan) | Una sola implementación de la regla de crecimiento y de marchitamiento por sequedad |
+| D-09 | El marchitamiento por cambio de estación vive en `CalendarStep` (paso 5 de RN-03) y el de sequedad en `GrowthStep` (paso 2) | Es exactamente el orden de RN-03; el crecimiento del último día ocurre antes del cambio de estación |
+| D-10 | La herramienta «Cosechar» cosecha, limpia o (en 5.4) recolecta según el contenido de la parcela | RN-34 |
+| D-11 | Código nuevo `CULTIVO_MARCHITO` en RN-35 | RN-07 manda rechazar el riego de un cultivo marchito y no había código para ello |
+| D-12 | Regar un cultivo maduro se permite (cuesta energía sin efecto) | RN-07 solo exige «vivo y sin regar hoy»; el rechazo necesitaría una regla nueva |
+| D-13 | Las herramientas «Construir» y «Alimentar» y los atajos `M`, `I`, `L`, `F5`, `F9` se pueden pulsar y responden «estará disponible en una fase posterior» | HU-36 · CA-1 y CA-5 piden que existan; sus pantallas llegan en 5.3, 5.4 y 5.5 |
+| D-14 | `MapPanel` consulta el mapa solo al recibir un evento (`GameStarted`, `DayEnded`, `MapChanged`); no tiene `Timer` (lo verifica una prueba) | Regla de interfaz: actualizar por eventos, no por consulta en bucle |
+| D-15 | Geometría (`MapGeometry`) y dibujo (`MapRenderer`) son clases sin componente | Se prueban pintando sobre un `BufferedImage`, sin pantalla |
+
+**Correcciones a documentos aprobados:** (1) las coordenadas de ejemplo de HU-01 (parcela `(2,3)`) y de HU-18 (esquina `(4,6)`) no coincidían con el mapa de RN-04 y se cambiaron por `(5,3)` y `(2,7)`; (2) `CULTIVO_MARCHITO` se agregó a RN-35; (3) los diagramas lógico y de desarrollo incluyen las clases de la fase (`FarmMap.growCrops`, `Crop.endOfDay`, `CropState.onDayEnd`, `FarmService`).
+
+**Criterios de la 5.1 que se cerraron en esta fase:** HU-10 · CA-2 (se limpia la marca de riego), HU-08 · CA-2 (`SIN_ENERGIA` al sembrar) y HU-34 · CA-2 (el evento `EnergyChanged` lo publica una acción real).
+
+**Criterios cubiertos en parte (se completan donde nace lo que falta):**
+
+| Criterio | Qué falta | Fase |
+|---|---|---|
+| HU-28 · CA-1 | demanda 100 de todos los productos y logros bloqueados | 5.3 y 5.5 |
+| HU-10 · CA-3 | rendimiento a plena carga (prueba `@Disabled`) | 5.5 |
+| HU-33 · CA-3 | cargar cuando sí hay una partida guardada | 5.5 |
+| HU-35 · CA-3 | dibujar edificios y animales | 5.4 |
+| HU-36 · CA-4 | recolectar los productos de un edificio con «Cosechar» | 5.4 |
+| HU-36 · CA-5 | `M`, `I`, `L`, `F5` y `F9` abren su función (hoy solo responden que llegará) | 5.3 y 5.5 |
+
+**Diagramas:** además de `tools/check_diagrams.py`, la nueva herramienta `tools/check_imports.py` compara los `import` reales entre paquetes del dominio con las flechas del diagrama de desarrollo: no falta ninguna.
 
