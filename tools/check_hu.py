@@ -1,4 +1,5 @@
-import re, sys
+import os, re, sys
+os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','docs'))
 sys.stdout.reconfigure(encoding='utf-8')
 P='HISTORIAS_DE_USUARIO.md'
 hu=open(P,encoding='utf-8').read()
