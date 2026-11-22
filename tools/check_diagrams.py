@@ -86,6 +86,102 @@ for n in range(1,43):
     if cov.get(n,0)!=1: errs.append(f'vista funcional: RF-{n:02d} cubierto {cov.get(n,0)} veces (debe ser 1)')
 print(f'RF cubiertos en vista funcional: {sum(1 for n in range(1,43) if cov.get(n)==1)}/42')
 
+
+# --- development view: no cycles and layer rules (arrows A ..> B between package aliases) ---
+edges=re.findall(r'^(\w+) \.(?:down|up)?\.?> (\w+)',desarrollo,re.M)
+edges+=re.findall(r'^(\w+) \.\.> (\w+)',desarrollo,re.M)
+graph={}
+for a,b in set(edges): graph.setdefault(a,set()).add(b)
+def find_cycle():
+    state={}
+    def dfs(n,path):
+        state[n]=1
+        for m in graph.get(n,()):
+            if state.get(m)==1: return path+[n,m]
+            if state.get(m) is None:
+                r=dfs(m,path+[n])
+                if r: return r
+        state[n]=2
+    for n in list(graph):
+        if state.get(n) is None:
+            r=dfs(n,[])
+            if r: return r
+cy=find_cycle()
+if cy: errs.append('vista de desarrollo: ciclo de dependencias '+' -> '.join(cy))
+layer=lambda n: {'UI':'ui','APP':'application','DOM':'domain','D':'domain','INF':'infrastructure','ROOT':'root'}.get(n.split('_')[0],'x')
+allowed={'ui':{'ui','application'},'application':{'application','domain'},'domain':{'domain'},'infrastructure':{'infrastructure','domain'},'root':{'ui','application','domain','infrastructure'}}
+for a,b in set(edges):
+    la,lb=layer(a),layer(b)
+    if a=='Main': la='root'
+    if la in allowed and lb not in allowed[la]: errs.append(f'vista de desarrollo: dependencia prohibida {a} ({la}) -> {b} ({lb})')
+    if a.startswith('D_') and not b.startswith('D_') : errs.append(f'dominio depende de otra capa: {a} -> {b}')
+print(f'dependencias de paquetes analizadas: {len(set(edges))} · ciclos: {"sí" if cy else "no"}')
+
+
+# --- package dependencies derived from the CLASS diagram: must be acyclic and drawn in the development view ---
+alias_path={}; stack=[]
+for line in desarrollo.splitlines():
+    s=line.strip()
+    m=re.match(r'package "([^"]+)"\s+as\s+(\w+).*\{$',s)
+    if m: stack.append(m.group(1)); alias_path[m.group(2)]='.'.join(stack[1:]); continue
+    if s=='}' and stack: stack.pop()
+dev_edges={(alias_path[a],alias_path[b]) for a,b in set(edges) if a in alias_path and b in alias_path}
+names=set(classes)
+cdeps=set()
+# (a) types used in member signatures
+for line in logica.splitlines():
+    pass
+cur=None; depth=[]
+for line in logica.splitlines():
+    s=line.strip()
+    if re.match(r'package ".*\{$',s): depth.append('p'); continue
+    m=re.match(r'(?:abstract\s+)?(?:class|interface)\s+(\w+)',s)
+    if m:
+        cur=m.group(1)
+        if s.endswith('{'): depth.append('c')
+        continue
+    if s=='}':
+        if depth and depth.pop()=='c': cur=None
+        continue
+    if cur and re.match(r'[+\-]',s):
+        for tok in set(re.findall(r'\b[A-Z]\w+\b',s)):
+            if tok in names and tok!=cur: cdeps.add((cur,tok))
+# (b) relationship lines
+for a,arrow,b in re.findall(r'^(\w+)\s+(?:"[^"]*"\s+)?([<>|.\-*o]{2,6})\s+(?:"[^"]*"\s+)?(\w+)',logica,re.M):
+    if a not in names or b not in names: continue
+    if arrow.startswith('<|') or arrow.startswith('<.'): cdeps.add((b,a))      # B hereda/realiza A -> B depende de A
+    else: cdeps.add((a,b))
+def pkg(c):
+    p=classes[c]
+    return p if p.split('.')[0] in ('domain',) else p.split('.')[0]
+pedges={(pkg(a),pkg(b)) for a,b in cdeps if pkg(a)!=pkg(b)}
+g2={}
+for a,b in pedges:
+    if b!='domain.config': g2.setdefault(a,set()).add(b)
+def cyc2():
+    st={}
+    def d(n,path):
+        st[n]=1
+        for m in g2.get(n,()):
+            if st.get(m)==1: return path+[n,m]
+            if st.get(m) is None:
+                r=d(m,path+[n])
+                if r: return r
+        st[n]=2
+    for n in list(g2):
+        if st.get(n) is None:
+            r=d(n,[])
+            if r: return r
+c2=cyc2()
+if c2: errs.append('vista lógica: ciclo de dependencias entre paquetes '+' -> '.join(c2))
+for a,b in sorted(pedges):
+    if a.startswith('domain.') and b.startswith('domain.') and b!='domain.config' and (a,b) not in dev_edges:
+        errs.append(f'la vista lógica implica {a} -> {b} pero la vista de desarrollo no lo dibuja')
+    la,lb=a.split('.')[0],b.split('.')[0]
+    if la!=lb and (la,lb) not in {('ui','application'),('application','domain'),('infrastructure','domain')}:
+        errs.append(f'dependencia entre capas prohibida en la vista lógica: {a} -> {b}')
+print(f'dependencias entre paquetes derivadas de las clases: {len(pedges)} · ciclos: {"sí" if c2 else "no"}')
+
 # --- IDs cited in the .puml headers exist in docs ---
 req=open('docs/REQUERIMIENTOS.md',encoding='utf-8').read(); hu=open('docs/HISTORIAS_DE_USUARIO.md',encoding='utf-8').read()
 import glob
