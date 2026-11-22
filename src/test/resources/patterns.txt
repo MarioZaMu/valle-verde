@@ -16,3 +16,5 @@ edu.ucc.farmsim.domain.game.GameState | Memento | Originator (creates and restor
 edu.ucc.farmsim.domain.game.GameMemento | Memento | Memento (immutable snapshot of the game state)
 edu.ucc.farmsim.application.event.EventBus | Observer | Subject (publishes events to its listeners)
 edu.ucc.farmsim.application.event.GameListener | Observer | Observer interface (anything that wants to hear about game events)
+edu.ucc.farmsim.ui.components.HudModel | Observer | ConcreteObserver (keeps the top-bar data up to date from game events)
+edu.ucc.farmsim.ui.components.HudPanel | Observer | ConcreteObserver (the Swing top bar, repainted when an event arrives)

@@ -43,10 +43,11 @@ public final class Main {
             System.exit(EXIT_NO_DISPLAY);
             return;
         }
-        GameController controller = buildController(new EventBus());
+        EventBus bus = new EventBus();
+        GameController controller = buildController(bus);
         SwingUtilities.invokeLater(() -> {
             MainWindow window = new MainWindow(GameInfo.NAME);
-            window.setContentPane(new ScreenRouter(controller, System::currentTimeMillis));
+            window.setContentPane(new ScreenRouter(controller, bus, System::currentTimeMillis));
             window.setVisible(true);
         });
     }

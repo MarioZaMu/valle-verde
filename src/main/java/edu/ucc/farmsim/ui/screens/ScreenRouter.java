@@ -2,6 +2,7 @@ package edu.ucc.farmsim.ui.screens;
 
 import edu.ucc.farmsim.GameInfo;
 import edu.ucc.farmsim.application.controller.GameController;
+import edu.ucc.farmsim.application.event.EventBus;
 import java.awt.CardLayout;
 import java.awt.Window;
 import java.util.function.LongSupplier;
@@ -27,12 +28,13 @@ public final class ScreenRouter extends JPanel implements ScreenNavigator {
      * Builds the router with its screens, showing the start screen first.
      *
      * @param controller entry point to the game
+     * @param bus        where game events are published
      * @param seeds      supplies the seed of each new game
      */
-    public ScreenRouter(GameController controller, LongSupplier seeds) {
+    public ScreenRouter(GameController controller, EventBus bus, LongSupplier seeds) {
         setLayout(cards);
         add(new StartScreen(new StartScreenPresenter(controller, this, seeds)), START);
-        add(new GameScreen(this), GAME);
+        add(new GameScreen(controller, bus, this), GAME);
         showStart();
     }
 

@@ -1,15 +1,20 @@
 package edu.ucc.farmsim.ui.screens;
 
+import edu.ucc.farmsim.application.controller.GameController;
+import edu.ucc.farmsim.application.event.EventBus;
+import edu.ucc.farmsim.ui.components.HudPanel;
 import edu.ucc.farmsim.ui.theme.Texts;
 import java.awt.BorderLayout;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 /**
- * The main game screen. In this phase it only has the way back to the start screen; the top bar, the farm
- * map and the tools are added by the following stories.
+ * The main game screen: the top bar (HUD), a placeholder where the farm map will be drawn, and the buttons
+ * "End day" and "Menu". The map and the tools are added by the following stories.
  *
- * <p>Stories: HU-33.
+ * <p>Stories: HU-33, HU-34.
  */
 public final class GameScreen extends JPanel {
 
@@ -18,13 +23,23 @@ public final class GameScreen extends JPanel {
     /**
      * Builds the screen.
      *
-     * @param navigator switches screens
+     * @param controller entry point to the game
+     * @param bus        where game events are published (the top bar listens to it)
+     * @param navigator  switches screens and shows messages
      */
-    public GameScreen(ScreenNavigator navigator) {
+    public GameScreen(GameController controller, EventBus bus, ScreenNavigator navigator) {
         super(new BorderLayout());
+        GameScreenPresenter presenter = new GameScreenPresenter(controller, navigator::showMessage);
+
+        add(new HudPanel(bus), BorderLayout.NORTH);
+        add(new JLabel(Texts.MAP_PLACEHOLDER, SwingConstants.CENTER), BorderLayout.CENTER);
+
         JPanel bottom = new JPanel();
+        JButton endDay = new JButton(Texts.END_DAY);
+        endDay.addActionListener(event -> presenter.onEndDay());
         JButton menu = new JButton(Texts.MENU);
         menu.addActionListener(event -> navigator.showStart());
+        bottom.add(endDay);
         bottom.add(menu);
         add(bottom, BorderLayout.SOUTH);
     }
