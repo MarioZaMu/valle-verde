@@ -6,7 +6,7 @@ package edu.ucc.farmsim.domain.config;
  * <p>The values mirror docs/REGLAS_DE_NEGOCIO.md; if a rule changes there, it changes here only.
  * This class depends on nothing (it holds primitives), so every domain package may use it.
  *
- * <p>Stories: HU-08, HU-09, HU-11, HU-13, HU-28, HU-33.
+ * <p>Stories: HU-01, HU-08, HU-09, HU-11, HU-13, HU-28, HU-33.
  */
 public final class GameRules {
 
@@ -126,6 +126,11 @@ public final class GameRules {
 
     /** Number of save slots. */
     public static final int SAVE_SLOTS = 3;
+
+    // ---- RN-06: sowing ----
+
+    /** Seeds consumed by one sowing. */
+    public static final int SEEDS_PER_SOWING = 1;
 
     // ---- RN-15: inventory ----
 

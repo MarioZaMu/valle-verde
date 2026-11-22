@@ -4,11 +4,13 @@ import edu.ucc.farmsim.application.controller.GameController;
 import edu.ucc.farmsim.application.event.EventBus;
 import edu.ucc.farmsim.application.event.GameEvent;
 import edu.ucc.farmsim.application.service.DayService;
+import edu.ucc.farmsim.application.service.FarmService;
 import edu.ucc.farmsim.application.service.GameSession;
 import edu.ucc.farmsim.application.service.ProgressService;
 import edu.ucc.farmsim.application.service.SaveGameService;
 import edu.ucc.farmsim.application.service.ViewMapper;
 import edu.ucc.farmsim.domain.game.DayPipeline;
+import edu.ucc.farmsim.domain.game.GameState;
 import edu.ucc.farmsim.domain.save.SaveRepository;
 import edu.ucc.farmsim.domain.time.GameClock;
 import java.util.ArrayList;
@@ -31,6 +33,19 @@ public final class TestApp {
         this.bus = bus;
         this.controller = controller;
         bus.subscribe(events::add);
+    }
+
+    /** Creates the graph and starts a new game (Year 1, Spring, day 1, 500 m, 10 carrot and 5 potato seeds). */
+    public static TestApp startedGame() {
+        TestApp app = create();
+        app.controller.newGame(SEED);
+        app.events.clear();
+        return app;
+    }
+
+    /** The game in progress. */
+    public GameState state() {
+        return session.current();
     }
 
     /** Creates the graph with the standard end-of-day pipeline. */
@@ -58,6 +73,7 @@ public final class TestApp {
         ProgressService progress = new ProgressService(session, mapper, bus);
         DayService day = new DayService(session, pipeline, mapper, bus);
         SaveGameService saves = new SaveGameService(repository);
-        return new TestApp(session, bus, new GameController(session, mapper, progress, day, saves));
+        FarmService farm = new FarmService(session, mapper, bus);
+        return new TestApp(session, bus, new GameController(session, mapper, progress, day, saves, farm));
     }
 }

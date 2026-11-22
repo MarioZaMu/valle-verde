@@ -1,7 +1,7 @@
 package edu.ucc.farmsim.ui.theme;
 
+import edu.ucc.farmsim.application.result.Names;
 import java.util.Locale;
-import java.util.Map;
 
 /**
  * Every text the player reads on screen, in Spanish. Keeping them here means the screens contain no
@@ -43,11 +43,6 @@ public final class Texts {
     public static final String NO_VALUE = "—";
 
     private static final Locale SPANISH = Locale.forLanguageTag("es");
-    private static final Map<String, String> SEASONS = Map.of(
-            "SPRING", "Primavera", "SUMMER", "Verano", "AUTUMN", "Otoño", "WINTER", "Invierno");
-    private static final Map<String, String> WEATHERS = Map.of(
-            "SUNNY", "Soleado", "CLOUDY", "Nublado", "RAINY", "Lluvioso",
-            "DROUGHT", "Sequía", "FROST", "Helada", "SNOWY", "Nevado");
 
     private Texts() {
         // constants holder
@@ -55,12 +50,12 @@ public final class Texts {
 
     /** Spanish name of a season id (for example {@code SPRING}); unknown ids are returned unchanged. */
     public static String season(String id) {
-        return SEASONS.getOrDefault(id, id);
+        return Names.season(id);
     }
 
     /** Spanish name of a weather id (for example {@code RAINY}); unknown ids are returned unchanged. */
     public static String weather(String id) {
-        return WEATHERS.getOrDefault(id, id);
+        return Names.weather(id);
     }
 
     /** Money with thousands separator and the coin symbol, for example {@code 1.250 m}. */

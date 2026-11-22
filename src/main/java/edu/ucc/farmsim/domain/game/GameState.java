@@ -17,7 +17,7 @@ import edu.ucc.farmsim.domain.time.WeatherCycle;
  * {@link #createMemento()} and {@link #restore(GameMemento)} undo a failed end of the day (HU-10) and
  * will back saving and loading (HU-29, HU-30).
  *
- * <p>Stories: HU-10, HU-28.
+ * <p>Stories: HU-01, HU-10, HU-28.
  */
 public final class GameState {
 
@@ -88,7 +88,7 @@ public final class GameState {
     /** Takes an immutable snapshot of everything that changes during play. */
     public GameMemento createMemento() {
         return new GameMemento(date(), money, energy.current(), inventory.snapshot(),
-                weather.today(), weather.forecast(), random.state());
+                farm.snapshot(), weather.today(), weather.forecast(), random.state());
     }
 
     /** Puts the state back exactly as it was when the snapshot was taken. */
@@ -97,6 +97,7 @@ public final class GameState {
         this.money = memento.money();
         energy.set(memento.energy());
         inventory.restoreFrom(memento.inventory());
+        farm.restoreFrom(memento.farm());
         weather.restore(memento.today(), memento.forecast());
         random.restore(memento.randomState());
     }

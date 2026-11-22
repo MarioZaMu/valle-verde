@@ -3,6 +3,7 @@ package edu.ucc.farmsim;
 import edu.ucc.farmsim.application.controller.GameController;
 import edu.ucc.farmsim.application.event.EventBus;
 import edu.ucc.farmsim.application.service.DayService;
+import edu.ucc.farmsim.application.service.FarmService;
 import edu.ucc.farmsim.application.service.GameSession;
 import edu.ucc.farmsim.application.service.ProgressService;
 import edu.ucc.farmsim.application.service.SaveGameService;
@@ -60,6 +61,7 @@ public final class Main {
         return new GameController(session, mapper,
                 new ProgressService(session, mapper, bus),
                 new DayService(session, DayPipeline.standard(), mapper, bus),
-                new SaveGameService(repository));
+                new SaveGameService(repository),
+                new FarmService(session, mapper, bus));
     }
 }

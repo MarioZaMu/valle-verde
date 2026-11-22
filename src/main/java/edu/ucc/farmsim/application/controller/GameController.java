@@ -1,9 +1,11 @@
 package edu.ucc.farmsim.application.controller;
 
 import edu.ucc.farmsim.application.dto.HudView;
+import edu.ucc.farmsim.application.dto.PlotView;
 import edu.ucc.farmsim.application.result.ErrorCode;
 import edu.ucc.farmsim.application.result.Result;
 import edu.ucc.farmsim.application.service.DayService;
+import edu.ucc.farmsim.application.service.FarmService;
 import edu.ucc.farmsim.application.service.GameSession;
 import edu.ucc.farmsim.application.service.ProgressService;
 import edu.ucc.farmsim.application.service.SaveGameService;
@@ -19,7 +21,7 @@ import java.util.logging.Logger;
  * No exception ever reaches the UI: anything unexpected becomes {@code ERROR_INTERNO} (R-03, RNF-07), and
  * it never touches repositories (AR-4).
  *
- * <p>Stories: HU-10, HU-28, HU-33.
+ * <p>Stories: HU-01, HU-10, HU-28, HU-33.
  */
 public final class GameController {
 
@@ -30,6 +32,7 @@ public final class GameController {
     private final ProgressService progress;
     private final DayService day;
     private final SaveGameService saves;
+    private final FarmService farm;
 
     /**
      * Creates the controller.
@@ -39,14 +42,16 @@ public final class GameController {
      * @param progress starts games
      * @param day      ends days
      * @param saves    knows about the save slots
+     * @param farm     crop use cases
      */
     public GameController(GameSession session, ViewMapper mapper, ProgressService progress, DayService day,
-                          SaveGameService saves) {
+                          SaveGameService saves, FarmService farm) {
         this.session = session;
         this.mapper = mapper;
         this.progress = progress;
         this.day = day;
         this.saves = saves;
+        this.farm = farm;
     }
 
     /** True if a game is in progress (the UI asks for confirmation before discarding it). */
@@ -71,6 +76,17 @@ public final class GameController {
     /** Ends the day: effects are resolved in the order of RN-03 and the new top bar is returned. */
     public Result<HudView> endDay() {
         return guard(day::endDay);
+    }
+
+    /**
+     * Sows a seed from the inventory in a plot (RN-06).
+     *
+     * @param col    column of the plot
+     * @param row    row of the plot
+     * @param seedId item id of the seed, for example {@code CARROT_SEED}
+     */
+    public Result<PlotView> plant(int col, int row, String seedId) {
+        return guard(() -> farm.plant(col, row, seedId));
     }
 
     /** True if at least one of the save slots holds a game. */

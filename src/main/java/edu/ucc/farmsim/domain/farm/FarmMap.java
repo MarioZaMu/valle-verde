@@ -1,12 +1,17 @@
 package edu.ucc.farmsim.domain.farm;
 
 import edu.ucc.farmsim.domain.config.GameRules;
+import edu.ucc.farmsim.domain.crop.Crop;
+import edu.ucc.farmsim.domain.crop.CropSnapshot;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * The farm grid: {@link GameRules#MAP_COLS} x {@link GameRules#MAP_ROWS} plots with coordinates
  * {@code (column, row)}, where {@code (0, 0)} is the top-left corner (RN-04).
  *
- * <p>Stories: HU-28.
+ * <p>Stories: HU-01, HU-28.
  */
 public final class FarmMap {
 
@@ -85,4 +90,27 @@ public final class FarmMap {
         }
         return total;
     }
+
+    /** Copy of the crops of every plot in row-major order ({@code null} where there is none), for the memento. */
+    public FarmMapSnapshot snapshot() {
+        List<CropSnapshot> crops = new ArrayList<>();
+        for (Plot[] line : plots) {
+            for (Plot plot : line) {
+                crops.add(plot.crop() == null ? null : plot.crop().snapshot());
+            }
+        }
+        return new FarmMapSnapshot(Collections.unmodifiableList(crops));
+    }
+
+    /** Puts every plot's crop back as it was when the snapshot was taken. */
+    public void restoreFrom(FarmMapSnapshot snapshot) {
+        int index = 0;
+        for (Plot[] line : plots) {
+            for (Plot plot : line) {
+                CropSnapshot saved = snapshot.crops().get(index++);
+                plot.restoreCrop(saved == null ? null : Crop.fromSnapshot(saved));
+            }
+        }
+    }
 }
+

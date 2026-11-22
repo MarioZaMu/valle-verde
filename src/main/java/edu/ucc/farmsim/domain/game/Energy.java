@@ -8,7 +8,7 @@ import edu.ucc.farmsim.domain.config.GameRules;
  * <p>Actions pay their cost with {@link #trySpend(int)}; a rejected payment changes nothing.
  * The end of the day calls {@link #restore()}: leftover energy never accumulates.
  *
- * <p>Stories: HU-08.
+ * <p>Stories: HU-01, HU-08.
  */
 public final class Energy {
 
@@ -41,6 +41,11 @@ public final class Energy {
     /** Maximum energy. */
     public int max() {
         return GameRules.MAX_ENERGY;
+    }
+
+    /** True if an action costing this much can be paid now (nothing is spent). */
+    public boolean canSpend(int cost) {
+        return cost >= 0 && cost <= current;
     }
 
     /**
