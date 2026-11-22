@@ -18,6 +18,7 @@
 | Progresión | RN-28 a RN-29 |
 | Partida y persistencia | RN-30 a RN-33 |
 | Interfaz | RN-34 a RN-35 |
+| Avatar y personajes | RN-36 a RN-38 |
 
 ---
 
@@ -418,3 +419,40 @@ El *tooltip* de una parcela aparece tras **300 ms** de reposo del cursor y muest
 ## 11. Trazabilidad hacia atrás (RN → RF)
 
 Cada RN se usa por al menos un requerimiento funcional; la tabla completa RF ↔ RN está en [`REQUERIMIENTOS.md`](REQUERIMIENTOS.md) §4.
+
+---
+
+## 10. Avatar y personajes (Fase 5.7)
+
+### RN-36 · Avatar y movimiento
+- El avatar ocupa **una parcela** del mapa y **mira** en una de cuatro direcciones (norte, sur, este u oeste). Empieza en una parcela de hierba libre fijada en la configuración, mirando al sur.
+- Dar **un paso** (flechas o `W` `A` `S` `D`) lo mueve a la parcela vecina en esa dirección. Moverse **no cuesta energía y no avanza el día**.
+- El paso se **rechaza** (`MOVIMIENTO_BLOQUEADO`, «No puedes pasar por ahí.») si el destino está fuera del mapa, es agua u obstáculo, está cubierto por un edificio o lo ocupa un NPC. Aun así, el avatar **cambia su mirada** hacia esa dirección.
+- La **parcela frente al avatar** es la vecina en la dirección que mira. La tecla `Espacio` aplica la herramienta elegida a esa parcela con las mismas reglas de siempre (RN-06 a RN-10, RN-24, RN-26); el **clic** sobre una parcela sigue aplicándola a la parcela clicada, sin exigir cercanía.
+- Posición y mirada forman parte de la partida guardada (RN-32). Un documento de versión 1 (sin avatar) se acepta y deja al avatar en su posición inicial (RN-33).
+
+### RN-37 · Personajes (NPC) y diálogos
+- Hay **cuatro NPC** fijos, cada uno en una parcela de hierba de la configuración; **no se mueven** y **bloquean el paso** (RN-36).
+
+| NPC | Rol | De qué habla |
+|---|---|---|
+| Marta | Vendedora del mercado | qué productos suben o bajan de precio |
+| Don Tomás | Granjero veterano | qué conviene sembrar en la estación actual |
+| Dra. Lucía | Veterinaria | si hay animales enfermos o sin comer |
+| Inés | Vecina | el pronóstico de mañana |
+
+- Se puede **hablar** con un NPC solo si el avatar está en una de sus **cuatro parcelas vecinas**; si no, se rechaza (`NPC_LEJOS`, «Acércate a {nombre} para hablar.»). Hablar no cuesta energía ni avanza el día.
+- El diálogo es un texto **en español** que depende solo del estado del juego (estación, clima, mercado, animales, encargo): el mismo estado produce siempre el mismo texto (sin azar).
+
+### RN-38 · Encargos de los NPC
+- Cada NPC ofrece **un encargo** de un solo uso: entregarle una cantidad de un artículo a cambio de una recompensa.
+
+| NPC | Entrega | Recompensa |
+|---|---|---|
+| Marta | 5 Zanahorias | 60 m |
+| Don Tomás | 3 Papas | 50 m |
+| Dra. Lucía | 2 Heno | 30 m |
+| Inés | 4 Huevos | 80 m |
+
+- Al hablar con el NPC se puede **entregar** el encargo: si el inventario tiene la cantidad, se retira y se paga la recompensa (ingreso del día, RN-14); si no, se rechaza (`ENCARGO_INCOMPLETO`, «Te faltan {n} {artículo} para el encargo.») sin cambiar nada.
+- Un encargo cumplido **no se repite**; su estado se guarda en la partida (RN-32).

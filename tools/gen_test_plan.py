@@ -9,16 +9,16 @@ for b in re.split(r'^### (?=HU-\d\d ·)',hu,flags=re.M)[1:]:
     meta=re.search(r'\*\*Prioridad:\*\* (\w+) · \*\*Puntos:\*\* (\d+) · \*\*RF:\*\* (.*?) · \*\*RN:',b)
     S[i]=dict(title=m.group(2).strip(),pri=meta.group(1),rf=re.findall(r'RF-\d\d',meta.group(3)),n=len(re.findall(r'^- \*\*CA-\d+',b,re.M)))
 PH=[('5.1',[13,9,8,11,28,10,33,34]),('5.2',[1,2,3,4,5,6,7,35,36]),('5.3',[12,37,14,15,16,38]),
-    ('5.4',[18,19,20,21,22,23,17]),('5.5',[26,27,24,29,30,31,32]),('5.6',[39,42,25,40,41])]
+    ('5.4',[18,19,20,21,22,23,17]),('5.5',[26,27,24,29,30,31,32]),('5.6',[39,42,25,40,41]),('5.7',[43,44,48,45,46,47])]
 phase={f'HU-{h:02d}':p for p,l in PH for h in l}
 CLS={1:'SowCrop',2:'WaterCrop',3:'CropGrowth',4:'HarvestCrop',5:'CropWithering',6:'ClearWitheredPlot',7:'PlotInspection',8:'EnergyManagement',
  9:'CalendarAndSeasons',10:'EndDay',11:'WeatherAndForecast',12:'WeatherEffectsOnCrops',13:'InventoryManagement',14:'BuyFromMarket',
  15:'SellWithDynamicPrice',16:'PriceTrend',17:'DaySummary',18:'BuildBuildings',19:'BuyAnimals',20:'FeedAnimals',21:'AnimalStates',
  22:'ProductionAndCollection',23:'CureAnimals',24:'StorageBuilding',25:'Greenhouse',26:'Achievements',27:'BuildingUnlocks',28:'NewGame',
  29:'SaveGame',30:'LoadGame',31:'RejectInvalidSaves',32:'ListSaveSlots',33:'StartScreen',34:'HudPanel',35:'FarmMapView',36:'ToolsAndClicks',
- 37:'InventoryGridView',38:'MarketDialog',39:'Toasts',40:'VisualEffects',41:'Animations',42:'AssetManager'}
-assert len(CLS)==42 and len(S)==42
-UI=set(range(33,43))
+ 37:'InventoryGridView',38:'MarketDialog',39:'Toasts',40:'VisualEffects',41:'Animations',42:'AssetManager',43:'FlatLafTheme',44:'PixelSprites',45:'AvatarMovement',46:'NpcDialogue',47:'NpcErrands',48:'FarmStyleInterface'}
+assert len(CLS)==48 and len(S)==48
+UI=set(range(33,44))|{44,48}
 rows=''; tot=0; tot_a=0; tot_ui=0
 for i in sorted(S):
     n=int(i[3:]); k='UI + visual' if n in UI else 'Aceptación'

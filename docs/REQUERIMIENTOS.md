@@ -88,8 +88,14 @@ Los requerimientos se agrupan en las **6 épicas** que también organizarán las
 | RF-40 | El sistema aplicará **efectos visuales**: tinte día/noche, paleta por estación, partículas de lluvia y nieve, indicadores de sequía y helada | Could | RN-01, RN-11, RN-12 |
 | RF-41 | El sistema aplicará **animaciones** suaves (crecimiento, animales de 2 a 3 cuadros y transición de día) sin que el estado del juego dependa de ellas | Could | RN-08, RN-25 |
 | RF-42 | El sistema cargará **sprites** mediante un `AssetManager` con caché y usará **gráficos vectoriales de respaldo** si faltan | Should | RN-08, RN-25 |
+| RF-43 | La interfaz usará el tema visual **FlatLaf** con una tipografía única y, si el tema no se puede instalar, el aspecto por defecto de Swing | Should | RN-34 |
+| RF-44 | El sistema incluirá **sprites pixel-art propios de 32 × 32 px** (terrenos, cultivos por etapa, animales, edificios, ítems, avatar y NPC) y los ampliará por factor entero sin desenfocarlos | Should | RN-08, RN-25 |
+| RF-45 | El jugador podrá mover un **avatar** con el teclado por el mapa, con colisiones, y usar la herramienta elegida sobre la parcela que tiene enfrente | Should | RN-36 |
+| RF-46 | El jugador podrá **hablar con los NPC** que estén junto a su avatar y leer diálogos en español que dependen del estado del juego | Should | RN-37 |
+| RF-47 | Los NPC ofrecerán **encargos** de un solo uso que el jugador cumple entregando artículos a cambio de una recompensa en m | Could | RN-38 |
+| RF-48 | La interfaz tendrá aspecto de granja: barra de herramientas con iconos, HUD con iconos e inventario con los sprites de los ítems | Should | RN-34 |
 
-**Totales:** 42 RF → 30 *Must* · 8 *Should* · 4 *Could*.
+**Totales:** 48 RF → 30 *Must* · 13 *Should* · 5 *Could* (los RF-43 a RF-48 se agregaron en la Fase 5.7 por pedido expreso del estudiante).
 
 ## 3. Requerimientos no funcionales (medibles)
 
@@ -127,7 +133,7 @@ Referencia de hardware: equipo de desarrollo con Windows 11, ≥ 8 GB de RAM y J
 | RN-05 | Catálogo de cultivos | RF-01, RF-07 |
 | RN-06 | Siembra | RF-01 |
 | RN-07 | Riego | RF-02, RF-03, RF-11 |
-| RN-08 | Crecimiento y etapas | RF-03, RF-07, RF-35, RF-41, RF-42 |
+| RN-08 | Crecimiento y etapas | RF-03, RF-07, RF-35, RF-41, RF-42, RF-44 |
 | RN-09 | Marchitamiento | RF-05, RF-07, RF-09, RF-11 |
 | RN-10 | Cosecha y limpieza | RF-04, RF-06 |
 | RN-11 | Clima por estación | RF-10, RF-34, RF-40 |
@@ -144,7 +150,7 @@ Referencia de hardware: equipo de desarrollo con Windows 11, ≥ 8 GB de RAM y J
 | RN-22 | Invernadero | RF-24 |
 | RN-23 | Catálogo de animales | RF-19 |
 | RN-24 | Alimentación | RF-20 |
-| RN-25 | Estados del animal | RF-21, RF-41, RF-42 |
+| RN-25 | Estados del animal | RF-21, RF-41, RF-42, RF-44 |
 | RN-26 | Producción y recolección | RF-22 |
 | RN-27 | Curación | RF-23 |
 | RN-28 | Logros | RF-26 |
@@ -153,8 +159,11 @@ Referencia de hardware: equipo de desarrollo con Windows 11, ≥ 8 GB de RAM y J
 | RN-31 | Ranuras de guardado | RF-29, RF-32, RF-33 |
 | RN-32 | Formato e integridad del documento | RF-29, RF-30 |
 | RN-33 | Validación de carga | RF-30, RF-31 |
-| RN-34 | Herramientas y atajos | RF-36 |
+| RN-34 | Herramientas y atajos | RF-36, RF-43, RF-48 |
 | RN-35 | Mensajes y notificaciones | RF-39 |
+| RN-36 | Avatar y movimiento | RF-45 |
+| RN-37 | Personajes (NPC) y diálogos | RF-46 |
+| RN-38 | Encargos de los NPC | RF-47 |
 
 ## 5. Fuera de alcance (*Won't*)
 
@@ -163,8 +172,8 @@ Referencia de hardware: equipo de desarrollo con Windows 11, ≥ 8 GB de RAM y J
 | W-01 | Multijugador y juego por Internet | Fuera del alcance de diseño; servidor y cliente en un solo equipo |
 | W-02 | Audio (música y efectos de sonido) | No aporta a la evaluación del diseño |
 | W-03 | Servicios externos y nube | Solo MongoDB guarda partidas; sin cuentas ni otros servicios |
-| W-04 | NPC, diálogos y misiones de personajes | Solo si el estudiante lo pide expresamente |
-| W-05 | Avatar que camina por el mapa | La acción es clic sobre la parcela con la herramienta |
+| ~~W-04~~ | ~~NPC, diálogos y misiones de personajes~~ | **Incluido desde la Fase 5.7** por pedido expreso del estudiante (RF-46, RF-47) |
+| ~~W-05~~ | ~~Avatar que camina por el mapa~~ | **Incluido desde la Fase 5.7** por pedido expreso del estudiante (RF-45); el clic sobre la parcela sigue funcionando |
 | W-06 | Tiempo real | El juego avanza únicamente por turnos |
 | W-07 | Cuentas de usuario, *mods*, tienda en línea | Sin cuentas ni servicios externos |
 

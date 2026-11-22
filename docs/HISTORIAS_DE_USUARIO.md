@@ -7,7 +7,7 @@
 
 | Elemento | Convención |
 |---|---|
-| ID | `HU-01` … `HU-42`. El orden numérico sigue las épicas; el **orden de implementación** está en §6 |
+| ID | `HU-01` … `HU-48`. El orden numérico sigue las épicas; el **orden de implementación** está en §6 |
 | Prioridad | MoSCoW heredada de los RF: **Must** (MVP), **Should**, **Could** |
 | Puntos | Fibonacci (1, 2, 3, 5). **Ninguna historia supera 5**: si una pasaba de 5, se dividió |
 | Rol | Todas las historias son del único actor humano, el **Jugador** |
@@ -549,6 +549,80 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 - **CA-3 · Sin imágenes (borde).** **Dado** una instalación sin ninguna imagen, **Entonces** el juego ejecuta y se juega completo con gráficos vectoriales.
 - **CA-4 · Licencias.** **Entonces** el 100 % de los paquetes de imágenes aparece en `docs/ASSETS.md` con su fuente y licencia (CC0 o CC-BY).
 
+### HU-43 · Tema visual profesional con FlatLaf
+**Épica:** Interfaz · **Prioridad:** Should · **Puntos:** 3 · **RF:** RF-43 · **RN:** RN-34 · **Depende de:** HU-33, HU-34
+
+**Como** jugador **quiero** una interfaz con un tema moderno y coherente **para** que el juego se vea profesional.
+
+**Criterios de aceptación**
+- **CA-1 · Tema aplicado.** **Dado** que arranca el juego, **Cuando** se muestra la ventana, **Entonces** el aspecto activo es FlatLaf y todos los textos usan una sola familia tipográfica de al menos 14 px.
+- **CA-2 · Respaldo (negativo).** **Dado** que el tema no se puede instalar, **Cuando** arranca el juego, **Entonces** se usa el aspecto por defecto de Swing, se registra un aviso y no se lanza ninguna excepción.
+- **CA-3 · Sin pantalla (borde).** **Dado** un entorno sin pantalla (pruebas automáticas), **Cuando** se instala el tema, **Entonces** no falla.
+- **CA-4 · Contraste.** **Dado** los pares de colores de texto y fondo de la paleta, **Entonces** el contraste de cada par es de al menos 4,5 : 1 (RNF-14).
+
+### HU-44 · Sprites pixel-art propios de 32 × 32
+**Épica:** Interfaz · **Prioridad:** Should · **Puntos:** 5 · **RF:** RF-44 · **RN:** RN-08, RN-25 · **Depende de:** HU-42, HU-43
+
+**Como** jugador **quiero** ver sprites pixel-art de estilo granja **para** que el juego tenga aspecto de videojuego.
+
+**Criterios de aceptación**
+- **CA-1 · Tamaño.** **Dado** el paquete de sprites, **Entonces** cada imagen mide exactamente 32 × 32 px (las hojas de cuadros, un múltiplo de 32 en cada lado).
+- **CA-2 · Cobertura.** **Dado** el paquete completo, **Entonces** existen sprites de los 4 terrenos, de los 5 cultivos en sus 5 etapas, de la gallina y la vaca en 3 cuadros, de los 4 edificios, de los ítems del inventario, del avatar y de los 4 NPC, y el mapa los usa en lugar de los gráficos vectoriales.
+- **CA-3 · Nitidez (borde).** **Dado** una ventana de cualquier tamaño, **Entonces** el mapa se amplía por un factor entero con interpolación de vecino más cercano (sin bordes borrosos); si el área es menor que 512 × 320 px se admite una escala menor.
+- **CA-4 · Sprite faltante (negativo).** **Dado** un archivo ausente, **Cuando** se dibuja el elemento, **Entonces** se usa el gráfico vectorial de respaldo de HU-42.
+- **CA-5 · Licencia.** **Dado** el repositorio, **Entonces** todo sprite es obra propia reproducible con `tools/gen_sprites.py`, ninguno procede de otro juego y cada carpeta consta en `docs/ASSETS.md`.
+
+### HU-48 · Interfaz con aspecto de granja
+**Épica:** Interfaz · **Prioridad:** Should · **Puntos:** 3 · **RF:** RF-48 · **RN:** RN-34 · **Depende de:** HU-36, HU-43, HU-44
+
+**Como** jugador **quiero** iconos en la barra, el HUD y el inventario **para** reconocer todo de un vistazo.
+
+**Criterios de aceptación**
+- **CA-1 · Barra de herramientas.** **Dado** la pantalla de juego, **Entonces** cada herramienta muestra un icono de 32 × 32 px, su nombre y su tecla.
+- **CA-2 · HUD.** **Dado** la pantalla de juego, **Entonces** el HUD muestra con icono la estación y el clima, el dinero y una barra de energía, y ninguna información depende solo del color.
+- **CA-3 · Inventario.** **Dado** el inventario abierto, **Entonces** cada casilla ocupada muestra el icono del ítem y su cantidad.
+- **CA-4 · Sin texto cortado (borde).** **Dado** una ventana de 1024 × 768, **Entonces** ningún texto de la pantalla de juego ni de los diálogos aparece cortado.
+- **CA-5 · Sin iconos (negativo).** **Dado** que faltan los sprites, **Entonces** los botones y casillas se muestran solo con texto.
+
+---
+
+### Épica G · Mundo y personajes
+
+### HU-45 · Mover el avatar por la granja
+**Épica:** Mundo y personajes · **Prioridad:** Should · **Puntos:** 5 · **RF:** RF-45 · **RN:** RN-36 · **Depende de:** HU-30, HU-35, HU-36, HU-44
+
+**Como** jugador **quiero** caminar por la granja con mi personaje **para** sentirme dentro del valle.
+
+**Criterios de aceptación**
+- **CA-1 · Paso.** **Dado** un avatar con la parcela del este libre, **Cuando** pulso la flecha derecha, **Entonces** avanza una parcela, mira al este y ni la energía ni el día cambian.
+- **CA-2 · Bloqueo (negativo).** **Dado** que el destino es agua, obstáculo, edificio, NPC o el borde del mapa, **Cuando** intento pasar, **Entonces** se rechaza con `MOVIMIENTO_BLOQUEADO`, el avatar no se mueve pero cambia su mirada hacia allí.
+- **CA-3 · Herramienta al frente.** **Dado** la herramienta Regar y un cultivo frente al avatar, **Cuando** pulso `Espacio`, **Entonces** se riega ese cultivo con las reglas de siempre; y el clic sobre otra parcela la riega sin exigir cercanía.
+- **CA-4 · Persistencia (borde).** **Dado** un avatar en una posición distinta de la inicial, **Cuando** guardo y cargo, **Entonces** posición y mirada son idénticas; y un documento de versión 1 sin avatar se carga con el avatar en su posición inicial.
+- **CA-5 · Animación.** **Dado** que el avatar camina, **Entonces** se muestra una animación de 3 cuadros y uno solo en reposo, movida por el temporizador de la vista sin afectar el estado.
+
+### HU-46 · Hablar con los NPC
+**Épica:** Mundo y personajes · **Prioridad:** Should · **Puntos:** 5 · **RF:** RF-46 · **RN:** RN-37 · **Depende de:** HU-44, HU-45
+
+**Como** jugador **quiero** conversar con los habitantes del valle **para** recibir consejos útiles.
+
+**Criterios de aceptación**
+- **CA-1 · Diálogo.** **Dado** un avatar junto a Marta, **Cuando** pulso `E` o hago clic en ella, **Entonces** se abre un cuadro con su nombre y un texto en español sobre los precios.
+- **CA-2 · Lejos (negativo).** **Dado** un avatar que no está en una parcela vecina del NPC, **Cuando** intento hablarle, **Entonces** se rechaza con `NPC_LEJOS` y el mensaje con su nombre.
+- **CA-3 · Determinismo (borde).** **Dado** el mismo estado de juego, **Entonces** el diálogo es siempre el mismo texto, y cambia cuando cambian la estación, el clima, los animales enfermos o los precios que menciona.
+- **CA-4 · Bloqueo.** **Dado** un NPC en su parcela, **Entonces** el avatar no puede atravesarla.
+- **CA-5 · Sin costo.** **Cuando** hablo con un NPC, **Entonces** no gasto energía ni avanza el día.
+
+### HU-47 · Encargos de los NPC
+**Épica:** Mundo y personajes · **Prioridad:** Could · **Puntos:** 3 · **RF:** RF-47 · **RN:** RN-38 · **Depende de:** HU-26, HU-46
+
+**Como** jugador **quiero** cumplir encargos de los NPC **para** ganar un dinero extra y sentir que el valle tiene vida.
+
+**Criterios de aceptación**
+- **CA-1 · Entrega.** **Dado** 5 Zanahorias en el inventario y el encargo de Marta, **Cuando** se lo entrego, **Entonces** se retiran las 5, recibo 60 m y el encargo queda cumplido.
+- **CA-2 · Incompleto (negativo).** **Dado** solo 3 Zanahorias, **Cuando** intento entregar, **Entonces** se rechaza con `ENCARGO_INCOMPLETO` («Te faltan 2 Zanahorias para el encargo.») y nada cambia.
+- **CA-3 · Una sola vez (borde).** **Dado** un encargo cumplido, **Cuando** vuelvo a hablar con el NPC, **Entonces** me lo agradece y no paga de nuevo; y el estado se conserva al guardar y cargar.
+- **CA-4 · Resumen del día.** **Dado** un encargo cumplido hoy, **Entonces** su recompensa aparece como ingreso en el resumen del día.
+
 ---
 
 ## 6. Pruebas críticas obligatorias → historias
@@ -639,6 +713,17 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 | 4 | HU-40 · Efectos visuales de estación y clima | Interfaz | Could | 5 | HU-11, HU-35 |
 | 5 | HU-41 · Animaciones suaves | Interfaz | Could | 3 | HU-35, HU-42 |
 
+### Fase 5.7 · Interfaz profesional, avatar y NPC (pedido del estudiante) — 24 puntos (6 historias)
+
+| Orden | Historia | Épica | Prioridad | Puntos | Depende de |
+|---|---|---|---|---|---|
+| 1 | HU-43 · Tema visual profesional con FlatLaf | Interfaz | Should | 3 | HU-33, HU-34 |
+| 2 | HU-44 · Sprites pixel-art propios de 32 × 32 | Interfaz | Should | 5 | HU-42, HU-43 |
+| 3 | HU-48 · Interfaz con aspecto de granja | Interfaz | Should | 3 | HU-36, HU-43, HU-44 |
+| 4 | HU-45 · Mover el avatar por la granja | Mundo y personajes | Should | 5 | HU-30, HU-35, HU-36, HU-44 |
+| 5 | HU-46 · Hablar con los NPC | Mundo y personajes | Should | 5 | HU-44, HU-45 |
+| 6 | HU-47 · Encargos de los NPC | Mundo y personajes | Could | 3 | HU-26, HU-46 |
+
 ### Resumen de puntos
 
 | Fase | Puntos | Acumulado | Must | Should | Could |
@@ -649,9 +734,10 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 | 5.4 · Construcción y animales | 21 | 98 | 17 | 2 | 2 |
 | 5.5 · Progresión y persistencia | 24 | 122 | 18 | 6 | 0 |
 | 5.6 · Interfaz visual y extras (recortable) | 19 | 141 | 0 | 6 | 13 |
-| **Total** | **141** | **141** | **109** | **17** | **15** |
+| 5.7 · Interfaz profesional, avatar y NPC | 24 | 165 | 0 | 21 | 3 |
+| **Total** | **165** | **165** | **109** | **38** | **18** |
 
-> **MVP (todas las *Must*): 109 puntos** en 30 historias. Lo *Should* y *Could* (32 puntos) se puede recortar sin afectar el diseño base.
+> **MVP (todas las *Must*): 109 puntos** en 30 historias. Lo *Should* y *Could* (56 puntos) se puede recortar sin afectar el diseño base.
 
 ## 8. Mapa de historias (épica → historias)
 
@@ -662,7 +748,8 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 | Economía | HU-13 Administrar el inventario, HU-14 Comprar en el mercado, HU-15 Vender con precio dinámico, HU-16 Tendencia de precio, HU-17 Resumen del día | 15 |
 | Construcción y animales | HU-18 Construir edificios, HU-19 Comprar animales, HU-20 Alimentar animales, HU-21 Estados del animal, HU-22 Producción y recolección, HU-23 Curar animales enfermos, HU-24 Construir y usar el almacén, HU-25 Construir y usar el invernadero | 26 |
 | Progresión y persistencia | HU-26 Registrar logros, HU-27 Desbloquear edificios por logros, HU-28 Iniciar nueva partida, HU-29 Guardar partida, HU-30 Cargar partida, HU-31 Rechazar partidas inválidas sin alterar la partida, HU-32 Listar ranuras de guardado | 25 |
-| Interfaz | HU-33 Pantalla de inicio, HU-34 HUD superior, HU-35 Mapa de la granja, HU-36 Herramientas y clic sobre parcelas, HU-37 Inventario en grilla, HU-38 Mercado modal, HU-39 Notificaciones (toasts), HU-40 Efectos visuales de estación y clima, HU-41 Animaciones suaves, HU-42 Carga de sprites con respaldo vectorial | 38 |
+| Interfaz | HU-33 Pantalla de inicio, HU-34 HUD superior, HU-35 Mapa de la granja, HU-36 Herramientas y clic sobre parcelas, HU-37 Inventario en grilla, HU-38 Mercado modal, HU-39 Notificaciones (toasts), HU-40 Efectos visuales de estación y clima, HU-41 Animaciones suaves, HU-42 Carga de sprites con respaldo vectorial, HU-43 Tema visual profesional con FlatLaf, HU-44 Sprites pixel-art propios de 32 × 32, HU-48 Interfaz con aspecto de granja | 49 |
+| Mundo y personajes | HU-45 Mover el avatar por la granja, HU-46 Hablar con los NPC, HU-47 Encargos de los NPC | 13 |
 
 ## 9. Trazabilidad RF → HU → caso de uso
 
@@ -710,3 +797,9 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 | RF-40 | Could | HU-40 | CU-18 |
 | RF-41 | Could | HU-41 | CU-18 |
 | RF-42 | Should | HU-42 | CU-18 |
+| RF-43 | Should | HU-43 | CU-18 |
+| RF-44 | Should | HU-44 | CU-18 |
+| RF-45 | Should | HU-45 | CU-19 |
+| RF-46 | Should | HU-46 | CU-20 |
+| RF-47 | Could | HU-47 | CU-20 |
+| RF-48 | Should | HU-48 | CU-18 |

@@ -485,3 +485,19 @@ Ajustes surgidos al implementar: (1) `Main` se declara como capa «Composition»
 
 **Diagramas:** `03_vista_logica` y `04_vista_desarrollo` incluyen `ToastPresenter`, `ToastQueue`, `ToastLayer`, `VisualEffects`, `Particle`, `SeasonPalette` y `AssetManager`; la secuencia anexa cambió `ToastLayer` por `ToastPresenter`. Las vistas se volvieron a renderizar.
 
+## 18. Fase 5.7 (en curso): interfaz profesional, avatar y NPC
+
+**Origen:** el estudiante pidió, tras cerrar la 5.6, FlatLaf, sprites en estilo granja, NPC y un avatar que camina. Esto **revierte** las decisiones de Fase 0 «sin NPC» (W-04) y «sin avatar» (W-05). Los sprites de Stardew Valley son de ConcernedApe y tienen copyright: no se usan; se dibujan sprites **propios** de 32 × 32 px.
+
+**Etapa 5.7a (hecha, solo documentación):** RF-43 a RF-48, RN-36 a RN-38, CU-19 y CU-20, HU-43 a HU-48 (24 puntos), vista funcional con 48 RF y verificadores actualizados (`check_hu.py`, `check_diagrams.py`, `gen_test_plan.py`).
+
+| Etapa | Historias | Contenido |
+|---|---|---|
+| 5.7b | HU-43 | `pom.xml` con FlatLaf (descarga de Maven Central), `UiTheme`, tipografía, contraste |
+| 5.7c | HU-44, HU-48 | `tools/gen_sprites.py`, sprites de 32 × 32, escala entera nítida, iconos en barra, HUD e inventario |
+| 5.7d | HU-45 | `Avatar` en `GameState` y en el memento (esquema 2, el 1 se sigue aceptando), `GameCommands.move`, `POST /api/avatar/moves`, teclas, animación |
+| 5.7e | HU-46, HU-47 | `Npc`, `DialogueService`, `GET /api/npcs`, `POST /api/npcs/{id}/talk`, encargos, cuadro de diálogo |
+| 5.7f | — | cierre: arranque ≤ 5 s, cobertura, diagramas, README |
+
+**Códigos de error nuevos (RN-35):** `MOVIMIENTO_BLOQUEADO`, `NPC_LEJOS`, `ENCARGO_INCOMPLETO` (los tres `409`).
+

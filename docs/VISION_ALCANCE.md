@@ -62,8 +62,8 @@ Limpiar parcelas marchitas, tendencia de precios, curar animales, Almacén, desb
 | Multijugador y juego por Internet | Complejidad ajena al objetivo de diseño; servidor y cliente corren en un solo equipo (127.0.0.1) con un solo jugador |
 | Audio (música y efectos) | No aporta a la evaluación del diseño |
 | Servicios externos y nube | Solo MongoDB guarda partidas; no hay otros servicios, cuentas ni despliegue en la nube |
-| NPC y misiones de personajes | Solo si el alcance lo permite y el equipo lo pide explícitamente |
-| Personaje que camina por el mapa | La acción es *clic sobre la parcela con la herramienta elegida* |
+| ~~NPC y misiones de personajes~~ | **Incluidos desde la Fase 5.7** por pedido expreso del estudiante (RF-46, RF-47) |
+| ~~Personaje que camina por el mapa~~ | **Incluido desde la Fase 5.7** por pedido expreso del estudiante (RF-45); el clic sobre la parcela se conserva |
 | Tiempo real | El juego avanza únicamente por turnos |
 | Modificaciones (*mods*), tienda en línea, cuentas de usuario | Sin cuentas ni servicios externos |
 
@@ -125,4 +125,4 @@ Limpiar parcelas marchitas, tendencia de precios, curar animales, Almacén, desb
 | Assets con licencia incompatible | Media | Medio | Solo CC0 / CC-BY, registro en `ASSETS.md`, respaldo vectorial |
 | Reglas de negocio incoherentes entre documentos | Media | Alto | Valores únicos en `REGLAS_DE_NEGOCIO.md`; constantes en una sola clase de configuración |
 | Aleatoriedad que vuelve las pruebas frágiles | Media | Medio | `Random` inyectado con semilla fija en todas las pruebas |
-| Alcance excesivo (42 RF) | Media | Medio | MoSCoW: 30 *Must* forman el MVP; el resto se recorta sin afectar el diseño |
+| Alcance excesivo (48 RF) | Media | Medio | MoSCoW: 30 *Must* forman el MVP; el resto se recorta sin afectar el diseño |

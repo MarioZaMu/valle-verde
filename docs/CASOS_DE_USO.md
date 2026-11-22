@@ -26,7 +26,9 @@
 | CU-15 | Cargar partida | Persistencia | RF-30, RF-31, RF-32 |
 | CU-16 | Consultar logros | Progresión | RF-26, RF-27 |
 | CU-17 | Consultar inventario | Economía | RF-13, RF-37 |
-| CU-18 | Observar la granja | Interfaz | RF-10, RF-34, RF-35, RF-36, RF-39, RF-40, RF-41, RF-42 |
+| CU-18 | Observar la granja | Interfaz | RF-10, RF-34, RF-35, RF-36, RF-39, RF-40, RF-41, RF-42, RF-43, RF-44, RF-48 |
+| CU-19 | Caminar por la granja | Mundo | RF-45 |
+| CU-20 | Hablar con un NPC | Mundo | RF-46, RF-47 |
 
 ---
 
@@ -226,7 +228,7 @@
 - **Postcondición:** consulta; la única modificación posible es la semilla seleccionada.
 
 ## CU-18 · Observar la granja
-- **Actor:** Jugador; secundario: Paquete de assets · **RF:** RF-10, RF-34, RF-35, RF-36, RF-39, RF-40, RF-41, RF-42 · **RN:** RN-01, RN-02, RN-04, RN-08, RN-11, RN-12, RN-25, RN-34, RN-35
+- **Actor:** Jugador; secundario: Paquete de assets · **RF:** RF-10, RF-34, RF-35, RF-36, RF-39, RF-40, RF-41, RF-42, RF-43, RF-44, RF-48 · **RN:** RN-01, RN-02, RN-04, RN-08, RN-11, RN-12, RN-25, RN-34, RN-35
 - **Flujo principal:**
   1. El sistema muestra el HUD (dinero, día, estación, clima, pronóstico y energía) y dibuja el mapa con las parcelas, los cultivos según su etapa, los edificios y los animales.
   2. El Jugador mueve el cursor: se resalta la parcela y se muestra el *tooltip* (CU-05).
@@ -235,6 +237,26 @@
   5. El sistema anuncia los eventos con *toasts*.
 - **Alternativas:** **A1.** Si no hay sprites disponibles, el sistema dibuja gráficos vectoriales de respaldo. **A4.** Los efectos (tinte, partículas) cambian con la estación y el clima, sin alterar el estado del juego.
 - **Postcondición:** la pantalla refleja siempre el estado actual del juego.
+
+## CU-19 · Caminar por la granja
+- **Actor:** Jugador · **RF:** RF-45 · **RN:** RN-36
+- **Precondición:** hay una partida en curso.
+- **Flujo principal:**
+  1. El Jugador pulsa una flecha o `W` `A` `S` `D`.
+  2. El sistema mueve al avatar una parcela en esa dirección, actualiza su mirada y lo anima.
+  3. El Jugador elige una herramienta y pulsa `Espacio`: el sistema la aplica a la parcela que tiene enfrente (CU-02, CU-03, CU-04, CU-11).
+- **Alternativas:** **A2.** El destino es agua, obstáculo, edificio, NPC o el borde: se rechaza con `MOVIMIENTO_BLOQUEADO` y el avatar solo cambia su mirada. **A3.** El Jugador hace clic sobre una parcela: la herramienta actúa sobre ella como siempre.
+- **Postcondición:** la posición y la mirada quedan en el estado y se guardan con la partida.
+
+## CU-20 · Hablar con un NPC
+- **Actor:** Jugador · **RF:** RF-46, RF-47 · **RN:** RN-37, RN-38, RN-14
+- **Precondición:** el avatar está en una parcela vecina del NPC.
+- **Flujo principal:**
+  1. El Jugador pulsa `E` (o hace clic sobre el NPC).
+  2. El sistema abre el cuadro de diálogo con el nombre del NPC y un texto que depende del estado del juego.
+  3. Si el Jugador tiene el encargo completo, elige «Entregar»: el sistema retira los artículos, paga la recompensa y marca el encargo como cumplido.
+- **Alternativas:** **A1.** El avatar no está junto al NPC: `NPC_LEJOS`. **A3.** Faltan artículos: `ENCARGO_INCOMPLETO` y no cambia nada. **A3b.** El encargo ya fue cumplido: el NPC lo agradece y no paga de nuevo.
+- **Postcondición:** el encargo cumplido y el dinero quedan guardados con la partida.
 
 ---
 
@@ -284,5 +306,11 @@
 | RF-40 | El sistema aplicará efectos visuales: tinte día/noche, paleta por estación, partículas de … | Could | CU-18 | HU-40 |
 | RF-41 | El sistema aplicará animaciones suaves (crecimiento, animales de 2 a 3 cuadros y transició… | Could | CU-18 | HU-41 |
 | RF-42 | El sistema cargará sprites mediante un `AssetManager` con caché y usará gráficos vectorial… | Should | CU-18 | HU-42 |
+| RF-43 | La interfaz usará el tema visual FlatLaf con una tipografía única y, si el tema no se puede instalar, … | Should | CU-18 | HU-43 |
+| RF-44 | El sistema incluirá sprites pixel-art propios de 32 × 32 px y los ampliará por factor entero … | Should | CU-18 | HU-44 |
+| RF-45 | El jugador podrá mover un avatar con el teclado por el mapa, con colisiones, y usar la herramienta … | Should | CU-19 | HU-45 |
+| RF-46 | El jugador podrá hablar con los NPC que estén junto a su avatar y leer diálogos en español … | Should | CU-20 | HU-46 |
+| RF-47 | Los NPC ofrecerán encargos de un solo uso con recompensa en m | Could | CU-20 | HU-47 |
+| RF-48 | La interfaz tendrá aspecto de granja: barra de herramientas con iconos, HUD con iconos e inventario … | Should | CU-18 | HU-48 |
 
 > Las historias de usuario están en [`HISTORIAS_DE_USUARIO.md`](HISTORIAS_DE_USUARIO.md).

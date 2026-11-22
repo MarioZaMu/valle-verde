@@ -30,7 +30,7 @@
 ![Vista funcional](diagramas/02_vista_funcional.png)
 
 - **Cubre:** los **42 RF** agrupados por componente (el verificador confirma que cada RF aparece **exactamente una vez**), HU-10, HU-29, HU-30, HU-35, HU-42 y las RN-01 a RN-35 (en el dominio).
-- **Componentes:** Interfaz de usuario (RF-33 a RF-41), Gestor de assets (RF-42), Cliente HTTP (`RemoteGameClient`) con el bus de eventos del cliente, Controlador REST (`GameRestController` y `EventCollector`), Controlador del juego, Servicios de aplicación (6 bloques: cultivo RF-01–07, tiempo y clima RF-08–12 y RF-17, economía RF-13–16, construcción y animales RF-18–25, progreso RF-26–28, guardado RF-29–32), Bus de eventos, Dominio del juego, Repositorio de partidas y dos externos (MongoDB y paquete de assets).
+- **Componentes:** Interfaz de usuario (RF-33 a RF-41, RF-43 y RF-48), Gestor de assets (RF-42 y RF-44), Cliente HTTP (`RemoteGameClient`) con el bus de eventos del cliente, Controlador REST (`GameRestController` y `EventCollector`), Controlador del juego, Servicios de aplicación (6 bloques: cultivo RF-01–07, tiempo y clima RF-08–12 y RF-17, economía RF-13–16, construcción y animales RF-18–25, progreso RF-26–28, guardado RF-29–32, avatar y personajes RF-45–47), Bus de eventos, Dominio del juego, Repositorio de partidas y dos externos (MongoDB y paquete de assets).
 - **Interfaces:** `IGameCommands` (la provee el cliente a la UI y el controlador del juego a la API), `IApiRest` (HTTP/JSON), `IServicios`, `IGameRules`, `IEventPublisher`, `IEventSubscription`, `IAssetProvider`, `ISaveRepository`, `IGameSnapshot`, `IMongoDB` e `IAssetFiles`; más 2 puertos en los componentes de entrada.
 - **Decisiones:**
   - La interfaz `ISaveRepository` la define el **dominio** y la implementa la infraestructura (inversión de dependencias); el repositorio requiere `IGameSnapshot` del dominio.
@@ -115,7 +115,7 @@ Tomados de la revisión de la guía de estudio y del PDF de despliegue:
 |---|---|
 | Las clases comunes a la vista lógica y a la de desarrollo están en el **mismo paquete** | 28 clases comunes, 0 discrepancias |
 | Cada **mensaje** de la secuencia es una operación de la clase receptora (o de la interfaz que implementa) | 10 mensajes verificados |
-| Los **42 RF** aparecen en la vista funcional exactamente una vez | 42 / 42 |
+| Los **48 RF** aparecen en la vista funcional exactamente una vez | 48 / 48 |
 | Los `RF-xx` y `HU-xx` citados en los encabezados de los `.puml` existen en la documentación | 0 referencias rotas |
 | Las dependencias reales entre paquetes del dominio (según los `import` del código) están dibujadas en la vista de desarrollo (`tools/check_imports.py`, desde la fase 5.2) | 0 dependencias faltantes |
 
@@ -128,7 +128,7 @@ Para volver a generar los PNG: `tools/render_diagrams.sh` (requiere Java, `tools
 | Vista | RF | HU | CU | RN principales |
 |---|---|---|---|---|
 | 1 · Contexto | alcance completo | — | CU-14, CU-15, CU-18 | RN-31, RN-32 |
-| 2 · Funcional | RF-01 a RF-42 | HU-10, HU-29, HU-30, HU-35, HU-42 | todos | RN-01 a RN-35 |
+| 2 · Funcional | RF-01 a RF-48 | HU-10, HU-29, HU-30, HU-35, HU-42 | todos | RN-01 a RN-38 |
 | 3 · Lógica | RF-01 a RF-32 | HU-01 a HU-32 | CU-01 a CU-17 | RN-05 a RN-29 |
 | 4 · Desarrollo | transversal | HU-01 a HU-42 | — | R-02, RNF-06, RNF-12 |
 | 5 · Despliegue | RNF-02, RNF-03, RNF-11 | HU-29, HU-30, HU-33 | CU-14, CU-15 | RN-31, RN-32 |

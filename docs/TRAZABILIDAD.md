@@ -39,16 +39,65 @@
 | RF-30 | Must | HU-30 | Guardado | GameCommands, GameController, GameDialogs, GameRestController, GameScreen, GameScreenPresenter, MongoSaveRepository, ProgressSnapshot, RemoteGameClient, SaveCodec, SaveGameService, SaveLoadException, SaveRepository, SlotsDialog, SlotsPresenter, StartScreenPresenter | HU-30: 7 |
 | RF-31 | Must | HU-31 | Guardado | Checksum, GameCommands, GameController, GameRestController, GameStateValidator, MongoSaveRepository, RemoteGameClient, SaveCodec, SaveGameService, SaveLoadException, SaveRepository | HU-31: 11 |
 | RF-32 | Should | HU-32 | Guardado | GameCommands, GameController, GameRestController, MongoSaveRepository, RemoteGameClient, SaveGameService, SaveRepository, SaveSlotView, SlotInfo, SlotsDialog, SlotsPresenter | HU-32: 5 |
-| RF-33 | Must | HU-33 | Interfaz de usuario | GameCommands, GameController, GameRestController, GameRules, GameScreen, Main, MongoSaveRepository, RemoteGameClient, SaveDocument, SaveGameService, SaveRepository, SaveStorageException, ScreenNavigator, ScreenRouter, StartScreen, StartScreenPresenter, Texts | HU-33: 11 |
-| RF-34 | Must | HU-34 | Interfaz de usuario | GameEvent, GameScreen, GameScreenPresenter, HudModel, HudPanel, HudView, Texts, ViewMapper | HU-34: 8 |
-| RF-35 | Must | HU-35 | Interfaz de usuario | AnimalView, BuildingView, CellPos, FarmService, GameCommands, GameController, GameRestController, GameScreen, MapGeometry, MapPanel, MapRenderer, MapView, Palette, PlotClickListener, PlotText, RemoteGameClient, ViewMapper | HU-35: 14 |
-| RF-36 | Must | HU-36 | Interfaz de usuario | GameScreen, GameScreenPresenter, Shortcut, Texts, Tool, ToolBar, ToolModel | HU-36: 20 |
-| RF-37 | Must | HU-37 | Interfaz de usuario | GameCommands, GameController, GameDialogs, GameRestController, GameScreen, InventoryDialog, InventoryGrid, InventoryModel, InventoryView, MarketService, RemoteGameClient, SlotView | HU-37: 9 |
-| RF-38 | Must | HU-38 | Interfaz de usuario | AnimalOfferView, BuyOfferView, GameCommands, GameController, GameDialogs, GameRestController, GameScreen, MarketDialog, MarketPresenter, MarketService, MarketView, RemoteGameClient, SellOfferView | HU-38: 10 |
-| RF-39 | Should | HU-39 | Interfaz de usuario | GameScreen, GameScreenPresenter, OverlayPanel, ToastKind, ToastLayer, ToastPresenter, ToastQueue, ToastView | HU-39: 10 |
-| RF-40 | Could | HU-40 | Interfaz de usuario | GameScreen, MapPanel, MapRenderer, Particle, SeasonPalette, VisualEffects | HU-40: 8 |
-| RF-41 | Could | HU-41 | Interfaz de usuario | GameScreen, MapPanel, MapRenderer, VisualEffects | HU-41: 7 |
-| RF-42 | Should | HU-42 | Gestor de assets | AssetManager, MapRenderer | HU-42: 8 |
+| RF-33 | Must | HU-33 | Interfaz de usuario
+(Swing + FlatLaf)
+RF-33 a RF-41
+RF-43, 48 | GameCommands, GameController, GameRestController, GameRules, GameScreen, Main, MongoSaveRepository, RemoteGameClient, SaveDocument, SaveGameService, SaveRepository, SaveStorageException, ScreenNavigator, ScreenRouter, StartScreen, StartScreenPresenter, Texts | HU-33: 11 |
+| RF-34 | Must | HU-34 | Interfaz de usuario
+(Swing + FlatLaf)
+RF-33 a RF-41
+RF-43, 48 | GameEvent, GameScreen, GameScreenPresenter, HudModel, HudPanel, HudView, Texts, ViewMapper | HU-34: 8 |
+| RF-35 | Must | HU-35 | Interfaz de usuario
+(Swing + FlatLaf)
+RF-33 a RF-41
+RF-43, 48 | AnimalView, BuildingView, CellPos, FarmService, GameCommands, GameController, GameRestController, GameScreen, MapGeometry, MapPanel, MapRenderer, MapView, Palette, PlotClickListener, PlotText, RemoteGameClient, ViewMapper | HU-35: 14 |
+| RF-36 | Must | HU-36 | Interfaz de usuario
+(Swing + FlatLaf)
+RF-33 a RF-41
+RF-43, 48 | GameScreen, GameScreenPresenter, Shortcut, Texts, Tool, ToolBar, ToolModel | HU-36: 20 |
+| RF-37 | Must | HU-37 | Interfaz de usuario
+(Swing + FlatLaf)
+RF-33 a RF-41
+RF-43, 48 | GameCommands, GameController, GameDialogs, GameRestController, GameScreen, InventoryDialog, InventoryGrid, InventoryModel, InventoryView, MarketService, RemoteGameClient, SlotView | HU-37: 9 |
+| RF-38 | Must | HU-38 | Interfaz de usuario
+(Swing + FlatLaf)
+RF-33 a RF-41
+RF-43, 48 | AnimalOfferView, BuyOfferView, GameCommands, GameController, GameDialogs, GameRestController, GameScreen, MarketDialog, MarketPresenter, MarketService, MarketView, RemoteGameClient, SellOfferView | HU-38: 10 |
+| RF-39 | Should | HU-39 | Interfaz de usuario
+(Swing + FlatLaf)
+RF-33 a RF-41
+RF-43, 48 | GameScreen, GameScreenPresenter, OverlayPanel, ToastKind, ToastLayer, ToastPresenter, ToastQueue, ToastView | HU-39: 10 |
+| RF-40 | Could | HU-40 | Interfaz de usuario
+(Swing + FlatLaf)
+RF-33 a RF-41
+RF-43, 48 | GameScreen, MapPanel, MapRenderer, Particle, SeasonPalette, VisualEffects | HU-40: 8 |
+| RF-41 | Could | HU-41 | Interfaz de usuario
+(Swing + FlatLaf)
+RF-33 a RF-41
+RF-43, 48 | GameScreen, MapPanel, MapRenderer, VisualEffects | HU-41: 7 |
+| RF-42 | Should | HU-42 | Gestor de assets
+(AssetManager)
+RF-42, 44 | AssetManager, MapRenderer | HU-42: 8 |
+| RF-43 | Should | HU-43 | Interfaz de usuario
+(Swing + FlatLaf)
+RF-33 a RF-41
+RF-43, 48 | pendiente | HU-43: 0 |
+| RF-44 | Should | HU-44 | Gestor de assets
+(AssetManager)
+RF-42, 44 | pendiente | HU-44: 0 |
+| RF-45 | Should | HU-45 | Avatar y personajes
+(NPC y encargos)
+RF-45 a RF-47 | pendiente | HU-45: 0 |
+| RF-46 | Should | HU-46 | Avatar y personajes
+(NPC y encargos)
+RF-45 a RF-47 | pendiente | HU-46: 0 |
+| RF-47 | Could | HU-47 | Avatar y personajes
+(NPC y encargos)
+RF-45 a RF-47 | pendiente | HU-47: 0 |
+| RF-48 | Should | HU-48 | Interfaz de usuario
+(Swing + FlatLaf)
+RF-33 a RF-41
+RF-43, 48 | pendiente | HU-48: 0 |
 
 ## 2. Por historia de usuario
 
@@ -96,5 +145,11 @@
 | HU-40 · Efectos visuales de estación y clima | 5.6 | Could | 4 | 8 | completa | GameScreen, MapPanel, MapRenderer, Particle, SeasonPalette, VisualEffects |
 | HU-41 · Animaciones suaves | 5.6 | Could | 4 | 7 | completa | GameScreen, MapPanel, MapRenderer, VisualEffects |
 | HU-42 · Carga de sprites con respaldo vectorial | 5.6 | Should | 4 | 8 | completa | AssetManager, MapRenderer |
+| HU-43 · Tema visual profesional con FlatLaf | 5.7 | Should | 4 | 0 | sin pruebas | pendiente |
+| HU-44 · Sprites pixel-art propios de 32 × 32 | 5.7 | Should | 5 | 0 | sin pruebas | pendiente |
+| HU-45 · Mover el avatar por la granja | 5.7 | Should | 5 | 0 | sin pruebas | pendiente |
+| HU-46 · Hablar con los NPC | 5.7 | Should | 5 | 0 | sin pruebas | pendiente |
+| HU-47 · Encargos de los NPC | 5.7 | Could | 4 | 0 | sin pruebas | pendiente |
+| HU-48 · Interfaz con aspecto de granja | 5.7 | Should | 5 | 0 | sin pruebas | pendiente |
 
-**Resumen:** 42 de 42 historias con todas sus pruebas; 371 pruebas `HUxx_` en total.
+**Resumen:** 42 de 48 historias con todas sus pruebas; 371 pruebas `HUxx_` en total.
