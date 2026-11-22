@@ -56,12 +56,19 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
       class MarketPresenter
       class MarketDialog
       class ToastLayer
+      class ToastQueue
+      class ToastPresenter
+      class ToastKind
+      class ToastView
+      class OverlayPanel
     }
     package "render" as UI_REN #FFFFFF {
       class MapPanel
       class MapRenderer
       class MapGeometry
-      class ParticleSystem
+      class VisualEffects
+      class Particle
+      class SeasonPalette
     }
     package "assets" as UI_AST #FFFFFF {
       class AssetManager

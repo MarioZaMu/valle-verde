@@ -60,7 +60,7 @@
 | **Factory Method** | Creador `CropFactory` → `CarrotFactory`, `PumpkinFactory` (y 3 más) | HU-01 | Cada cultivo se crea con sus propios valores (RN-05); sembrar solo conoce `CropFactory`, así que un cultivo nuevo no obliga a tocar `FarmService` |
 | **Builder** | `BuildingBuilder` (`CoopBuilder`, `GreenhouseBuilder`…) + `BuildingDirector` | HU-18 | Un edificio tiene muchos parámetros (tipo, posición, tamaño, capacidad, costo) y validaciones de colocación (RN-20, RN-21); se construye paso a paso y se valida al final |
 | **Memento** | Originador `GameState`; recuerdo `GameMemento`; cuidador `SaveGameService` | HU-29, HU-30, HU-31 | Guardar y cargar requieren una instantánea inmutable que no exponga el estado interno; así «cargar un archivo inválido sin alterar la partida» es natural (se construye aparte y solo reemplaza al actual si todo es válido, RN-33) |
-| **Observer** | Sujeto `EventBus`; observador `GameListener`; concretos `HudPanel`, `MapPanel`, `ToastLayer` | HU-34, HU-35, HU-39 | La UI debe actualizarse por eventos y no consultando en bucle (R-04); el bus desacopla `application` de `ui` |
+| **Observer** | Sujeto `EventBus`; observador `GameListener`; concretos `HudPanel`, `MapPanel`, `ToastPresenter` | HU-34, HU-35, HU-39 | La UI debe actualizarse por eventos y no consultando en bucle (R-04); el bus desacopla `application` de `ui` |
 
 Cada clase que implemente un patrón llevará el Javadoc `Pattern: <nombre> — Role: <rol>` (RNF-13).
 
@@ -88,7 +88,7 @@ Cada clase que implemente un patrón llevará el Javadoc `Pattern: <nombre> — 
 ![Secuencia Vender cosecha](diagramas/A1_secuencia_vender_cosecha.png)
 
 - **Cubre:** HU-15 (CA-1 y CA-6), HU-26 (LG-04), HU-34, HU-38 y HU-39; RF-15, RF-26, RF-34, RF-38 y RF-39; RN-14, RN-15, RN-17, RN-18 y RN-28.
-- **Camino exitoso:** 3 Zanahorias en Primavera con demanda 100 → `sell` viaja por HTTP (`POST /api/market/sales`) → `sellUnit` ×3 (27 + 26 + 26) → `remove` → `earn(79)` → `evaluate` → `publish(SaleCompleted)` → el servidor devuelve `200 {data: 79, events}` → el cliente republica el evento → `onEvent` en `HudPanel` y `ToastLayer` → `Result.ok(79)`.
+- **Camino exitoso:** 3 Zanahorias en Primavera con demanda 100 → `sell` viaja por HTTP (`POST /api/market/sales`) → `sellUnit` ×3 (27 + 26 + 26) → `remove` → `earn(79)` → `evaluate` → `publish(SaleCompleted)` → el servidor devuelve `200 {data: 79, events}` → el cliente republica el evento → `onEvent` en `HudPanel` y, si la venta desbloquea un logro, en `ToastPresenter` → `Result.ok(79)`.
 - **Camino de error:** cantidad fuera de rango → `Result.fail(CANTIDAD_INVALIDA)` → respuesta HTTP de error y el mismo `Result` en el cliente, sin modificar inventario, saldo ni demanda.
 - **Regla del taller:** cada mensaje sólido corresponde a una operación del diagrama de clases (verificado por script).
 - **Demuestra la regla de capas:** `MarketDialog` → `RemoteGameClient` → HTTP → `GameRestController` → `GameController` → `MarketService` → dominio; el controlador nunca llama a un repositorio y la UI recibe solo un `Result` (nunca una excepción).

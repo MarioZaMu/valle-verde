@@ -55,9 +55,9 @@ edu.ucc.farmsim
 ├─ GameInfo                             nombre visible y versión del juego (única constante, RNF-12)
 ├─ ui
 │  ├─ screens      MainWindow, StartScreen, GameScreen, ScreenRouter
-│  ├─ components   HudPanel, ToolBar, InventoryGrid, MarketDialog, SlotDialog, AchievementsDialog, ToastLayer
-│  ├─ render       MapPanel, MapRenderer, ParticleSystem, DayNightTint
-│  ├─ assets       AssetManager, VectorFallback
+│  ├─ components   HudPanel, ToolBar, InventoryGrid, MarketDialog, SlotsDialog, AchievementsDialog, ToastPresenter, ToastQueue, ToastLayer
+│  ├─ render       MapPanel, MapRenderer, VisualEffects, Particle, SeasonPalette
+│  ├─ assets       AssetManager (el respaldo vectorial vive en `MapRenderer`)
 │  └─ theme        Palette, Texts (cadenas de interfaz en español)
 ├─ client                               (cliente HTTP)
 │     RemoteGameClient (implementa GameCommands), EventDecoder
@@ -175,7 +175,7 @@ Como en la secuencia [A1](diagramas/A1_secuencia_vender_cosecha.png):
 | **5.3** Clima y economía | HU-12, 37, 14, 15, 16, 38 (**23**) | efectos del clima en el *pipeline*, `Market`, `PricingStrategy` ×2, `MarketService`, paso de mercado, `InventoryGrid`, `MarketDialog` | inventario en grilla y mercado modal | Strategy (precios) | **3** (helada), **4** (saturación) |
 | **5.4** Construcción y animales | HU-18 a 24, 17 (**23**) | `Building`, `BuildingBuilder` ×4, `BuildingDirector`, `Animal`, `AnimalState` ×3, `BuildingService`, `AnimalService`, paso de animales, `DaySummary` | diálogo de construcción y panel del edificio (alimentar, recolectar, curar) | Builder, State (animal) | **5** (animal enfermo no produce) |
 | **5.5** Progresión y persistencia | HU-26, 27, 29, 30, 31, 32 (**22**) | `AchievementTracker`, `ProgressFacts`, desbloqueos, `GameMemento`, `GameStateValidator`, `SaveRepository`, `MongoSaveRepository`, `SaveCodec`, `Checksum`, `SaveGameService`; **pruebas de rendimiento a plena carga** (HU-10 · CA-3, HU-29 · CA-4, HU-30 · CA-4) | diálogos de ranuras, logros y atajos `F5`/`F9` | Memento (completo: documento en MongoDB) | **6** (guardar → cargar idéntico), **7** (partida dañada o inexistente) |
-| **5.6** Interfaz visual y extras *(recortable)* | HU-39, 42, 25, 40, 41 (**19**) | `ToastLayer`, `AssetManager` y respaldo vectorial, invernadero, efectos (`ParticleSystem`, `DayNightTint`), animaciones con `Timer`; `docs/ASSETS.md`, README final y matriz de trazabilidad completa; decisión sobre FlatLaf | pulido visual | Observer (completado) | — |
+| **5.6** Interfaz visual y extras *(recortable)* | HU-39, 42, 25, 40, 41 (**19**) | `ToastQueue`, `ToastPresenter`, `ToastLayer`, `AssetManager` y respaldo vectorial, invernadero, efectos (`VisualEffects`, `Particle`, `SeasonPalette`), animaciones con `Timer`; `docs/ASSETS.md`, README final y matriz de trazabilidad completa; decisión sobre FlatLaf | pulido visual | Observer (completado) | — **(hecha)** |
 
 **Qué se actualiza al cerrar cada fase:** el diagrama de clases si aparecen clases nuevas con responsabilidad estructural, el de desarrollo si cambia un paquete o una dependencia (lo comprueba `tools/check_diagrams.py`) y la matriz de trazabilidad (RF → HU → diagrama → clases → pruebas).
 
@@ -448,3 +448,40 @@ Ajustes surgidos al implementar: (1) `Main` se declara como capa «Composition»
 | HU-29 · CA-2 | la prueba contra un MongoDB real que rechaza o no responde (la simulada sí está) | cuando haya MongoDB |
 
 **Diagramas:** `03_vista_logica` y `04_vista_desarrollo` incluyen `AchievementService`, `GameStateValidator`, `SaveCodec`, `Checksum`, `SlotInfo` y sus dependencias (`domain.game → crop`, `domain.save → time`); las seis vistas se volvieron a renderizar. `check_diagrams.py` y `check_imports.py` terminan sin errores.
+
+## 17. Estado de la Fase 5.6 (interfaz visual y extras)
+
+**Historias cerradas (5 historias, 19 puntos):** HU-25, 39, 40, 41 y 42, más los criterios que esperaban al invernadero (HU-10 · CA-3, HU-29 · CA-4 y HU-30 · CA-4 con los 9 cultivos protegidos). `python tools/traceability.py --upto 5.6` termina sin errores. Con esta fase **las 42 historias están implementadas**.
+
+| Resultado | Valor |
+|---|---|
+| Pruebas | 486 en verde y 2 omitidas con aviso (las de MongoDB real) |
+| Cobertura de líneas (JaCoCo) | **dominio 97,3 %**, **aplicación 98,4 %**, infraestructura 96,1 %, UI 91,5 %, API 96,6 %, cliente 94,0 % (barrera: 70 % en dominio y aplicación) |
+| Patrones aplicados | Observer completado: `ToastPresenter` (`ConcreteObserver`, registrado en `patterns.txt`) |
+| Rendimiento | un cuadro con partículas activas tarda menos de 33 ms (≥ 30 FPS, `HU40_ca4`); la plena carga ahora incluye los 9 cultivos del invernadero |
+| API | `PlotView` añade `sheltered` (ver [`API.md`](API.md) v0.5); no hay rutas nuevas |
+| Verificadores | `check_hu.py`, `check_diagrams.py`, `check_imports.py` y `traceability.py` terminan sin errores |
+
+**Decisiones tomadas al implementar:**
+
+| # | Decisión | Motivo |
+|---|---|---|
+| D-52 | Una parcela «protegida» se deduce del edificio que la cubre (`Plot.isSheltered()`); no se guarda nada nuevo en el memento y el validador acepta cultivos sobre parcelas de un invernadero | RN-22 y RN-32: el estado ya contiene el edificio |
+| D-53 | Dentro del invernadero la tolerancia sin riego es siempre 3 días y regar cuesta 1 de energía aunque el clima sea Sequía; la lluvia no riega, la helada y el cambio de estación no marchitan | RN-22 · «inmunes a Helada y Sequía» y HU-25 · CA-3 y CA-4 |
+| D-54 | Los avisos son un Observer: `ToastPresenter` escucha el bus (logros y cambio de estación) y recibe de `GameScreenPresenter` los rechazos y avisos propios; `ToastQueue` (sin Swing, con reloj inyectado) guarda 4 visibles y el resto en cola; `ToastLayer` solo dibuja y no captura el ratón. La barra de estado se mantiene | HU-39; la barra sigue siendo el rastro del último mensaje |
+| D-55 | Un aviso dura 3 s (5 s el de logro) a opacidad completa y luego se desvanece 0,4 s; el tiempo cuenta desde que se hace visible, no desde que se publicó | HU-39 · CA-1 y CA-3 |
+| D-56 | `VisualEffects` (paleta de estación, lluvia, nieve, tinte de noche, cuadros de animales, crecimiento de cultivos) es un modelo sin Swing que solo recibe lo que la vista ya sabe y **nunca llama al juego**; `MapPanel` lo mueve con un `javax.swing.Timer` que solo corre mientras algo se mueve | HU-40 · CA-3 y HU-41 · CA-3 y CA-4 |
+| D-57 | La prueba `HU35_ca5` («no usa un *timer* para sondear») pasó a comprobar lo que de verdad importa: el panel nunca pide el mapa por su cuenta y su temporizador está detenido si nada se mueve | El temporizador de HU-41 es de dibujo, no de sondeo |
+| D-58 | `AssetManager` lee `crops/<CULTIVO>_<ETAPA>.png` y `animals/<ANIMAL>_<CUADRO>.png` de `assets/`, guarda cada archivo una vez y, si falta, `MapRenderer` dibuja el vector. **No se incluye ningún sprite**; el primer faltante se registra como aviso y los demás en nivel FINE | HU-42; evita 30 avisos por cuadro en una instalación sin imágenes |
+| D-59 | La casilla «Efectos» apaga a la vez los efectos y las animaciones; con ella apagada el mapa se dibuja con su aspecto base | HU-40 · CA-4 |
+| D-60 | **FlatLaf no se adopta:** el aspecto por defecto de Swing con el mapa vectorial basta, y evita una dependencia más que verificar | Alcance y RNF-02 (arranque) |
+
+**Criterios cubiertos en parte:**
+
+| Criterio | Qué falta | Cuándo |
+|---|---|---|
+| HU-29 · CA-2 | la prueba contra un MongoDB real que rechaza o no responde (la simulada sí está) | cuando haya MongoDB |
+| RNF-02 · RT-09 | medir el arranque del `.jar` (≤ 5 s) en una máquina limpia | cierre del proyecto |
+
+**Diagramas:** `03_vista_logica` y `04_vista_desarrollo` incluyen `ToastPresenter`, `ToastQueue`, `ToastLayer`, `VisualEffects`, `Particle`, `SeasonPalette` y `AssetManager`; la secuencia anexa cambió `ToastLayer` por `ToastPresenter`. Las vistas se volvieron a renderizar.
+

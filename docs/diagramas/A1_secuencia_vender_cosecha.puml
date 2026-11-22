@@ -26,7 +26,7 @@ actor Jugador
 box "ui" #E3F2FD
   participant MarketDialog
   participant HudPanel
-  participant ToastLayer
+  participant ToastPresenter
 end box
 box "client" #E0F7FA
   participant RemoteGameClient
@@ -106,8 +106,8 @@ else cantidad válida (camino exitoso)
     EventBus -> HudPanel : onEvent(SaleCompleted)
     note right of HudPanel : actualiza el dinero (HU-34)
   else
-    EventBus -> ToastLayer : onEvent(SaleCompleted)
-    note right of ToastLayer : «Vendiste 3 Zanahorias por 79 m» (HU-39)
+    EventBus -> ToastPresenter : onEvent(AchievementUnlocked)
+    note right of ToastPresenter : solo si la venta desbloquea un logro: aviso de 5 s (HU-39)
   end
   deactivate EventBus
   RemoteGameClient --> MarketDialog : Result (ok, 79 m)

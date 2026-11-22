@@ -36,7 +36,22 @@ package "ui  (presentación)" #F5FAFF {
   class MarketDialog {
     +onSellClicked(item: String, qty: int): void
   }
-  class ToastLayer <<ConcreteObserver>> #BBDEFB
+  class ToastPresenter <<ConcreteObserver>> #BBDEFB
+  class ToastQueue {
+    +post(kind: ToastKind, text: String): void
+    +visible(): List<ToastView>
+  }
+  class ToastLayer
+  class VisualEffects {
+    +onWorld(season: String, weather: String): void
+    +onMap(map: MapView): void
+    +animalFrame(index: int): int
+    +cropScale(col: int, row: int): float
+  }
+  class MapRenderer
+  class AssetManager {
+    +sprite(name: String): Optional<BufferedImage>
+  }
   class ToolModel {
     +current(): Tool
     +selectedSeed(): String
@@ -394,7 +409,13 @@ EventBus ..> GameEvent : publica
 HudPanel ..|> GameListener
 HudModel ..|> GameListener
 MapPanel ..|> GameListener
-ToastLayer ..|> GameListener
+ToastPresenter ..|> GameListener
+ToastPresenter --> ToastQueue
+ToastLayer --> ToastQueue : dibuja
+MapPanel --> VisualEffects
+MapPanel --> MapRenderer
+MapRenderer --> AssetManager : sprites o vectores
+MapRenderer ..> VisualEffects : lee
 MapPanel ..> GameCommands : usa
 MarketDialog ..> GameCommands : usa
 

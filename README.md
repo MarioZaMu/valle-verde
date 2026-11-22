@@ -17,9 +17,9 @@ Simulador de granja 2D **por turnos** (un turno = un día), hecho en Java con Sw
 | **5.3** | Clima y economía: efectos del clima, mercado con precios dinámicos, tendencia, inventario en grilla y mercado modal (6 historias) | **hecha** |
 | **5.4** | Construcción y animales: construir, comprar y alimentar animales, estados, producción, curación, resumen del día y Almacén (8 historias) | **hecha** |
 | **5.5** | Progresión y persistencia: logros con recompensa, edificios desbloqueados, guardar, cargar y listar ranuras en MongoDB, rechazo de partidas dañadas y pruebas de rendimiento (6 historias) | **hecha** |
-| 5.6 | Pulido visual, notificaciones, invernadero y extras | pendiente |
+| **5.6** | Avisos (*toasts*), invernadero, efectos de estación y clima, animaciones y carga de sprites con respaldo vectorial (5 historias) | **hecha** |
 
-Hoy el juego abre la **pantalla de inicio** (Nueva partida, Cargar, Salir) y una pantalla de juego con la barra superior (dinero, fecha, clima, pronóstico y energía) y el botón «Terminar día». Desde la fase 5.2 también tiene el **mapa de la granja**: eliges una herramienta (teclas `1` a `5` o la barra), eliges la semilla y haces clic en una parcela de tierra para sembrar, regar y cosechar; `Enter` termina el día. Desde la 5.3 el clima importa (la lluvia riega, la helada marchita), `I` abre el **inventario** en grilla (clic en una semilla para elegirla) y `M` el **mercado** con las pestañas Comprar y Vender, precios que cambian con la temporada y la saturación, y la tendencia ▲ ▼ ▬. Desde la 5.4 puedes **construir** (herramienta `4`: clic en una parcela de hierba libre y eliges el edificio), comprar gallinas y vacas en el mercado, **alimentar** (herramienta `5` o el panel del edificio), **recolectar** (herramienta `3` sobre el edificio) y curar a los animales enfermos desde el panel que se abre al pulsar un edificio; al terminar el día aparece el **resumen del día**. Desde la 5.5 `L` abre los **logros** (con su recompensa y tu avance), `F5` guarda y `F9` carga en la última ranura usada (si no hay ninguna se abre el diálogo de **ranuras**), y «Cargar» en la pantalla de inicio te deja elegir entre tres ranuras. Las partidas se guardan en MongoDB (`valleverde.mongo.uri`); si no responde, el juego sigue y avisa.
+Hoy el juego abre la **pantalla de inicio** (Nueva partida, Cargar, Salir) y una pantalla de juego con la barra superior (dinero, fecha, clima, pronóstico y energía) y el botón «Terminar día». Desde la fase 5.2 también tiene el **mapa de la granja**: eliges una herramienta (teclas `1` a `5` o la barra), eliges la semilla y haces clic en una parcela de tierra para sembrar, regar y cosechar; `Enter` termina el día. Desde la 5.3 el clima importa (la lluvia riega, la helada marchita), `I` abre el **inventario** en grilla (clic en una semilla para elegirla) y `M` el **mercado** con las pestañas Comprar y Vender, precios que cambian con la temporada y la saturación, y la tendencia ▲ ▼ ▬. Desde la 5.4 puedes **construir** (herramienta `4`: clic en una parcela de hierba libre y eliges el edificio), comprar gallinas y vacas en el mercado, **alimentar** (herramienta `5` o el panel del edificio), **recolectar** (herramienta `3` sobre el edificio) y curar a los animales enfermos desde el panel que se abre al pulsar un edificio; al terminar el día aparece el **resumen del día**. Desde la 5.5 `L` abre los **logros** (con su recompensa y tu avance), `F5` guarda y `F9` carga en la última ranura usada (si no hay ninguna se abre el diálogo de **ranuras**), y «Cargar» en la pantalla de inicio te deja elegir entre tres ranuras. Desde la 5.6 aparecen **avisos** que se desvanecen (logros, errores y cambio de estación), el **invernadero** permite sembrar en cualquier estación y protege de la helada y la sequía (la lluvia no lo riega), el mapa cambia de color con la estación, muestra lluvia, nieve, sol de sequía y copo de helada, oscurece al terminar el día y mueve a los animales y a los cultivos que crecen; la casilla «Efectos» apaga todo eso sin afectar al juego. Las partidas se guardan en MongoDB (`valleverde.mongo.uri`); si no responde, el juego sigue y avisa.
 
 ## Requisitos
 
@@ -83,7 +83,7 @@ edu.ucc.farmsim
 | Strategy | `PricingStrategy` con `CropPricing` y `FlatPricing` | HU-15 | hecho (5.3) |
 | Observer | `EventBus`, `GameListener`, `HudModel`, `HudPanel` | HU-10, HU-34 | hecho (5.1) |
 | Observer | `MapPanel` | HU-35 | hecho (5.2) |
-| Observer | `ToastLayer` | HU-39 | 5.6 |
+| Observer | `ToastPresenter` (y `ToastQueue`/`ToastLayer` que dibujan lo que recibe) | HU-39 | hecho (5.6) |
 | Memento | `GameState` (originador), `GameMemento`, `SaveGameService` (*caretaker*) | HU-10, HU-29, HU-30 | hecho (5.5): guardado en MongoDB |
 | Observer | `InventoryModel` | HU-37 | hecho (5.3) |
 | Observer | `EventCollector` (el servidor guarda los eventos para la respuesta) | RNF-15 | hecho (5.2b) |
@@ -103,13 +103,14 @@ edu.ucc.farmsim
 | [`docs/HISTORIAS_DE_USUARIO.md`](docs/HISTORIAS_DE_USUARIO.md) | 42 historias con criterios Dado/Cuando/Entonces y backlog por fases |
 | [`docs/DIAGRAMAS.md`](docs/DIAGRAMAS.md) | las 5 vistas del PPTX del curso y una secuencia anexa |
 | [`docs/API.md`](docs/API.md) | rutas REST, cuerpos, eventos y código HTTP de cada rechazo |
+| [`docs/ASSETS.md`](docs/ASSETS.md) | recursos gráficos, nombres de sprites y licencias (hoy: ninguno, todo es vectorial) |
 | [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md) | capas, paquetes, decisiones técnicas y plan por fases |
 | [`docs/PLAN_DE_PRUEBAS.md`](docs/PLAN_DE_PRUEBAS.md) | estrategia de pruebas y criterios de salida |
 | [`docs/TRAZABILIDAD.md`](docs/TRAZABILIDAD.md) | RF → HU → componente → clases → pruebas (generado) |
 
 ## Assets gráficos
 
-Todavía no hay imágenes: el juego se dibujará con gráficos vectoriales y, cuando se agreguen sprites, serán únicamente de licencia **CC0 o CC-BY** y se registrarán en `docs/ASSETS.md` y en esta sección (Fase 5.6). No se usan sprites ni nombres de juegos comerciales.
+No hay imágenes: el juego se dibuja con gráficos vectoriales y, si se agregan sprites (el `AssetManager` los usa y, si falta alguno, dibuja el vector), serán únicamente de licencia **CC0 o CC-BY** y se registrarán en [`docs/ASSETS.md`](docs/ASSETS.md). No se usan sprites ni nombres de juegos comerciales.
 
 ## Convenciones
 
