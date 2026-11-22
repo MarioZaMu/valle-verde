@@ -6,7 +6,7 @@ package edu.ucc.farmsim.domain.config;
  * <p>The values mirror docs/REGLAS_DE_NEGOCIO.md; if a rule changes there, it changes here only.
  * This class depends on nothing (it holds primitives), so every domain package may use it.
  *
- * <p>Stories: HU-08, HU-09, HU-13.
+ * <p>Stories: HU-08, HU-09, HU-11, HU-13.
  */
 public final class GameRules {
 
@@ -20,6 +20,30 @@ public final class GameRules {
 
     /** Day of the season in which a new game starts. */
     public static final int START_DAY = 1;
+
+    // ---- RN-11: weather probabilities (percent, in the order of the Weather enum) ----
+    // Order: SUNNY, CLOUDY, RAINY, DROUGHT, FROST, SNOWY. Each table adds up to 100.
+
+    /** Spring weather table. */
+    public static final int[] WEATHER_WEIGHTS_SPRING = {55, 15, 30, 0, 0, 0};
+
+    /** Summer weather table. */
+    public static final int[] WEATHER_WEIGHTS_SUMMER = {60, 10, 15, 15, 0, 0};
+
+    /** Autumn weather table for days 1 to 21. */
+    public static final int[] WEATHER_WEIGHTS_AUTUMN_EARLY = {50, 20, 30, 0, 0, 0};
+
+    /** Autumn weather table for days 22 to 28 (frost becomes possible). */
+    public static final int[] WEATHER_WEIGHTS_AUTUMN_LATE = {35, 15, 25, 0, 25, 0};
+
+    /** Winter weather table. */
+    public static final int[] WEATHER_WEIGHTS_WINTER = {25, 20, 0, 0, 15, 40};
+
+    /** First day of Autumn on which frost is possible. */
+    public static final int AUTUMN_FROST_FROM_DAY = 22;
+
+    /** Total of every weather table: the roll is made between 0 and this value. */
+    public static final int WEATHER_TABLE_TOTAL = 100;
 
     // ---- RN-02: daily energy ----
 
