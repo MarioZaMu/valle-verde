@@ -10,10 +10,14 @@ import edu.ucc.farmsim.domain.time.StateRandom;
 import edu.ucc.farmsim.domain.time.WeatherCycle;
 
 /**
- * The state of one game: money, energy, inventory, farm map, weather and the random generator, plus the
- * shared calendar ({@link GameClock}). It is the aggregate root that every operation works on.
+ * Pattern: Memento — Role: Originator (creates and restores snapshots of itself).
  *
- * <p>Stories: HU-28.
+ * <p>The state of one game: money, energy, inventory, farm map, weather and the random generator, plus the
+ * shared calendar ({@link GameClock}). It is the aggregate root that every operation works on.
+ * {@link #createMemento()} and {@link #restore(GameMemento)} undo a failed end of the day (HU-10) and
+ * will back saving and loading (HU-29, HU-30).
+ *
+ * <p>Stories: HU-10, HU-28.
  */
 public final class GameState {
 
@@ -79,6 +83,22 @@ public final class GameState {
     /** The random generator of this game. */
     public StateRandom random() {
         return random;
+    }
+
+    /** Takes an immutable snapshot of everything that changes during play. */
+    public GameMemento createMemento() {
+        return new GameMemento(date(), money, energy.current(), inventory.snapshot(),
+                weather.today(), weather.forecast(), random.state());
+    }
+
+    /** Puts the state back exactly as it was when the snapshot was taken. */
+    public void restore(GameMemento memento) {
+        GameClock.getInstance().restore(memento.date());
+        this.money = memento.money();
+        energy.set(memento.energy());
+        inventory.restoreFrom(memento.inventory());
+        weather.restore(memento.today(), memento.forecast());
+        random.restore(memento.randomState());
     }
 
     /** Current calendar date. */

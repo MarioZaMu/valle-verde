@@ -3,9 +3,10 @@ package edu.ucc.farmsim.application.controller;
 import edu.ucc.farmsim.application.dto.HudView;
 import edu.ucc.farmsim.application.result.ErrorCode;
 import edu.ucc.farmsim.application.result.Result;
+import edu.ucc.farmsim.application.service.DayService;
 import edu.ucc.farmsim.application.service.GameSession;
+import edu.ucc.farmsim.application.service.ProgressService;
 import edu.ucc.farmsim.application.service.ViewMapper;
-import edu.ucc.farmsim.domain.game.GameState;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,7 +18,7 @@ import java.util.logging.Logger;
  * No exception ever reaches the UI: anything unexpected becomes {@code ERROR_INTERNO} (R-03, RNF-07), and
  * it never touches repositories (AR-4).
  *
- * <p>Stories: HU-28.
+ * <p>Stories: HU-10, HU-28.
  */
 public final class GameController {
 
@@ -25,16 +26,22 @@ public final class GameController {
 
     private final GameSession session;
     private final ViewMapper mapper;
+    private final ProgressService progress;
+    private final DayService day;
 
     /**
      * Creates the controller.
      *
-     * @param session the game in progress
-     * @param mapper  builds the views the UI draws
+     * @param session  the game in progress
+     * @param mapper   builds the views the UI draws
+     * @param progress starts games
+     * @param day      ends days
      */
-    public GameController(GameSession session, ViewMapper mapper) {
+    public GameController(GameSession session, ViewMapper mapper, ProgressService progress, DayService day) {
         this.session = session;
         this.mapper = mapper;
+        this.progress = progress;
+        this.day = day;
     }
 
     /** True if a game is in progress (the UI asks for confirmation before discarding it). */
@@ -53,11 +60,12 @@ public final class GameController {
      * @param seed seed of the random generator
      */
     public Result<HudView> newGame(long seed) {
-        return guard(() -> {
-            GameState state = GameState.newGame(seed);
-            session.replace(state);
-            return Result.ok(mapper.hud(state));
-        });
+        return guard(() -> progress.newGame(seed));
+    }
+
+    /** Ends the day: effects are resolved in the order of RN-03 and the new top bar is returned. */
+    public Result<HudView> endDay() {
+        return guard(day::endDay);
     }
 
     /** The top bar of the game in progress. */

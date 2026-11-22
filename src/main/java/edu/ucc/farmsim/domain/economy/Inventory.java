@@ -13,15 +13,15 @@ import java.util.List;
  * a normal rejection with {@code false}; the application layer turns it into the {@code INVENTARIO_LLENO}
  * error. A non-positive amount is a programming error and raises {@link IllegalArgumentException}.
  *
- * <p>Stories: HU-13.
+ * <p>Stories: HU-10, HU-13.
  */
 public final class Inventory {
 
     /** One occupied slot. */
     public record ItemStack(ItemType type, int amount) { }
 
-    private final ItemType[] types;
-    private final int[] amounts;
+    private ItemType[] types;
+    private int[] amounts;
 
     /**
      * Creates an empty inventory.
@@ -130,6 +130,26 @@ public final class Inventory {
             }
         }
         return true;
+    }
+
+    /** An immutable copy of every slot, empty ones included, for the memento. */
+    public InventorySnapshot snapshot() {
+        List<ItemStack> slots = new ArrayList<>();
+        for (int i = 0; i < types.length; i++) {
+            slots.add(new ItemStack(types[i], amounts[i]));
+        }
+        return new InventorySnapshot(types.length, List.copyOf(slots));
+    }
+
+    /** Replaces the whole content (and the number of slots) with a snapshot taken earlier. */
+    public void restoreFrom(InventorySnapshot snapshot) {
+        this.types = new ItemType[snapshot.capacity()];
+        this.amounts = new int[snapshot.capacity()];
+        for (int i = 0; i < snapshot.slots().size(); i++) {
+            ItemStack slot = snapshot.slots().get(i);
+            types[i] = slot.amount() > 0 ? slot.type() : null;
+            amounts[i] = slot.amount();
+        }
     }
 
     private int roomFor(ItemType type) {
