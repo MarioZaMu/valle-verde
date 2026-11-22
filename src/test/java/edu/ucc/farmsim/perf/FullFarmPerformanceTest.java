@@ -26,8 +26,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
- * Performance at full load (RNF-01, RNF-03): a farm with 40 crops in the open, six buildings and 16 animals.
- * The nine greenhouse crops of the story arrive with HU-25 (phase 5.6); the greenhouse itself is built.
+ * Performance at full load (RNF-01, RNF-03): a farm with 40 crops in the open, 9 in the greenhouse, six
+ * buildings and 16 animals.
  */
 class FullFarmPerformanceTest {
 
@@ -53,6 +53,11 @@ class FullFarmPerformanceTest {
         animalHomes.add(GameFixtures.build(state, BuildingType.BARN, 11, 7));
         GameFixtures.build(state, BuildingType.WAREHOUSE, 2, 5);
         GameFixtures.build(state, BuildingType.GREENHOUSE, 12, 2);
+        for (int col = 12; col < 15; col++) {
+            for (int row = 2; row < 5; row++) {
+                GameFixtures.plant(state, col, row, CropType.PUMPKIN, 3, 1, true, false);
+            }
+        }
         state.inventory().addSlots(12);
         for (Building home : animalHomes) {
             for (int i = 0; i < GameRules.ANIMALS_PER_BUILDING; i++) {

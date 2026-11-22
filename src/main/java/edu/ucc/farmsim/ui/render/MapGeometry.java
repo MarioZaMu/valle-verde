@@ -24,6 +24,11 @@ public record MapGeometry(int cols, int rows, int cellSize, int originX, int ori
         return new MapGeometry(cols, rows, size, originX, originY);
     }
 
+    /** Pixel rectangle of the whole map. */
+    public Rectangle area() {
+        return new Rectangle(originX, originY, cols * cellSize, rows * cellSize);
+    }
+
     /** Pixel rectangle of a plot. */
     public Rectangle cellBounds(int col, int row) {
         return new Rectangle(originX + col * cellSize, originY + row * cellSize, cellSize, cellSize);

@@ -9,7 +9,6 @@ import edu.ucc.farmsim.domain.economy.Inventory;
 import edu.ucc.farmsim.domain.economy.Market;
 import edu.ucc.farmsim.domain.economy.ItemType;
 import edu.ucc.farmsim.domain.farm.FarmMap;
-import edu.ucc.farmsim.domain.farm.Terrain;
 import edu.ucc.farmsim.domain.progress.Achievement;
 import edu.ucc.farmsim.domain.progress.ProgressFacts;
 import edu.ucc.farmsim.domain.progress.ProgressSnapshot;
@@ -114,6 +113,11 @@ public final class GameStateValidator {
 
     private static void checkCrops(GameMemento memento, List<String> found) {
         FarmMap initial = FarmMap.initial();
+        for (BuildingSnapshot building : memento.farm().buildings()) {
+            if (initial.canPlace(building.type(), building.col(), building.row())) {
+                initial.place(building.type(), building.col(), building.row());
+            }
+        }
         List<CropSnapshot> crops = memento.farm().crops();
         if (crops.size() != initial.cols() * initial.rows()) {
             found.add("the map has " + crops.size() + " plots");
@@ -124,9 +128,8 @@ public final class GameStateValidator {
             if (crop == null) {
                 continue;
             }
-            Terrain terrain = initial.plotAt(i % initial.cols(), i / initial.cols()).terrain();
-            if (terrain != Terrain.SOIL) {
-                found.add("a crop on a plot that is not soil: " + i);
+            if (!initial.plotAt(i % initial.cols(), i / initial.cols()).canBeSown()) {
+                found.add("a crop on a plot that is neither soil nor a greenhouse plot: " + i);
             }
             if (crop.type() == null || crop.daysGrown() < 0 || crop.daysWithoutWater() < 0) {
                 found.add("invalid crop at plot " + i);

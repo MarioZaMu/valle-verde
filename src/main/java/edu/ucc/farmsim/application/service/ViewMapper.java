@@ -44,10 +44,10 @@ public final class ViewMapper {
         Plot plot = state.farm().plotAt(col, row);
         Crop crop = plot.crop();
         if (crop == null) {
-            return new PlotView(col, row, plot.terrain().name(), null, null, false, 0);
+            return new PlotView(col, row, plot.terrain().name(), null, null, false, 0, plot.isSheltered());
         }
         return new PlotView(col, row, plot.terrain().name(), crop.type().name(), crop.stage().name(),
-                crop.isWatered(), crop.daysLeft());
+                crop.isWatered(), crop.daysLeft(), plot.isSheltered());
     }
 
     /** The whole farm map, plot by plot in row-major order. */

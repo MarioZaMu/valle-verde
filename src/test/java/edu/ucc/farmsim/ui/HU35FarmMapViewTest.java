@@ -171,10 +171,21 @@ class HU35FarmMapViewTest {
     }
 
     @Test
-    void HU35_ca5_thePanelRedrawsWhenAMapEventArrivesAndNeverUsesATimerToPoll() throws Exception {
-        // Given a panel showing the map of a new game
+    void HU35_ca5_thePanelRedrawsWhenAMapEventArrivesAndNeverPollsTheGame() throws Exception {
+        // Given a panel showing the map of a new game, over a controller that counts the map requests
         TestApp app = TestApp.startedGame();
-        MapPanel panel = new MapPanel(app.controller, app.bus, (col, row) -> { });
+        int[] mapRequests = {0};
+        edu.ucc.farmsim.application.controller.GameCommands counting =
+                (edu.ucc.farmsim.application.controller.GameCommands) java.lang.reflect.Proxy.newProxyInstance(
+                        getClass().getClassLoader(),
+                        new Class<?>[] {edu.ucc.farmsim.application.controller.GameCommands.class},
+                        (proxy, method, args) -> {
+                            if (method.getName().equals("map")) {
+                                mapRequests[0]++;
+                            }
+                            return method.invoke(app.controller, args);
+                        });
+        MapPanel panel = new MapPanel(counting, app.bus, (col, row) -> { });
         SwingUtilities.invokeAndWait(() -> { });
         assertNull(panel.currentView().plotAt(5, 3).crop());
 
@@ -182,11 +193,13 @@ class HU35FarmMapViewTest {
         app.controller.plant(5, 3, "CARROT_SEED");
         SwingUtilities.invokeAndWait(() -> { });
 
-        // Then the panel already holds the new view, without any polling
+        // Then the panel already holds the new view, and with nothing moving it has no timer running
         assertNotNull(panel.currentView().plotAt(5, 3).crop());
-        for (Field field : MapPanel.class.getDeclaredFields()) {
-            assertNotEquals(javax.swing.Timer.class, field.getType(), "the map must be redrawn by events, not by a timer");
-        }
+        assertFalse(panel.isAnimating());
+        int requests = mapRequests[0];
+        Thread.sleep(150);
+        SwingUtilities.invokeAndWait(() -> { });
+        assertEquals(requests, mapRequests[0], "the panel never asks the game for the map on its own");
     }
 
     @Test

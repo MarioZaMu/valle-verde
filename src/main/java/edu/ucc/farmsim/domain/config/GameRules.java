@@ -181,6 +181,9 @@ public final class GameRules {
     /** Same, when the weather of the day that ends is Drought. */
     public static final int DRY_DAYS_TO_WITHER_IN_DROUGHT = 2;
 
+    /** Same inside a greenhouse, whatever the weather: it shields its crops from drought (RN-22). */
+    public static final int DRY_DAYS_TO_WITHER_IN_GREENHOUSE = 3;
+
     // ---- RN-15: inventory ----
 
     /** Base number of inventory slots. */

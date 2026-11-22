@@ -14,7 +14,6 @@ import edu.ucc.farmsim.domain.crop.CropType;
 import edu.ucc.farmsim.domain.economy.ItemType;
 import edu.ucc.farmsim.domain.farm.FarmMap;
 import edu.ucc.farmsim.domain.farm.Plot;
-import edu.ucc.farmsim.domain.farm.Terrain;
 import edu.ucc.farmsim.domain.game.Energy;
 import edu.ucc.farmsim.domain.game.GameState;
 import edu.ucc.farmsim.domain.time.Season;
@@ -26,7 +25,7 @@ import org.springframework.stereotype.Service;
  * The crop use cases: sow, water, harvest and clear (RN-06 to RN-10). Each operation checks every rule
  * first and only then changes the game, so a rejection never leaves anything half done.
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-26, HU-35.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-25, HU-26, HU-35.
  */
 @Service
 public final class FarmService {
@@ -66,7 +65,7 @@ public final class FarmService {
         }
         GameState state = session.current();
         FarmMap farm = state.farm();
-        if (!farm.contains(col, row) || farm.plotAt(col, row).terrain() != Terrain.SOIL) {
+        if (!farm.contains(col, row) || !farm.plotAt(col, row).canBeSown()) {
             return Result.failWith(ErrorCode.PARCELA_NO_CULTIVABLE);
         }
         Plot plot = farm.plotAt(col, row);
@@ -79,7 +78,7 @@ public final class FarmService {
         }
         CropType type = seed.cropType();
         Season season = state.date().season();
-        if (!type.validSeasons().contains(season)) {
+        if (!plot.isSheltered() && !type.validSeasons().contains(season)) {
             String valid = type.validSeasons().stream().map(s -> Names.season(s.name()))
                     .collect(Collectors.joining(SEASON_SEPARATOR));
             return Result.failWith(ErrorCode.FUERA_DE_ESTACION,
@@ -121,7 +120,8 @@ public final class FarmService {
         if (crop.isWatered()) {
             return Result.failWith(ErrorCode.YA_REGADO);
         }
-        int cost = state.weather().today() == Weather.DROUGHT
+        boolean dry = state.weather().today() == Weather.DROUGHT && !state.farm().plotAt(col, row).isSheltered();
+        int cost = dry
                 ? GameRules.ENERGY_COST_WATER_IN_DROUGHT
                 : GameRules.ENERGY_COST_WATER;
         Energy energy = state.energy();

@@ -200,6 +200,15 @@ public final class Texts {
         return "¡Logro desbloqueado: " + name + "! +" + money(reward);
     }
 
+    /** Label of the check box that switches the visual effects and animations on and off. */
+    public static final String EFFECTS = "Efectos";
+
+    /** Notice shown when a new season begins, for example {@code Comienza el Verano.} (HU-39 · CA-4). */
+    public static String seasonStarted(String seasonId) {
+        String article = "SPRING".equals(seasonId) ? "la" : "el";
+        return "Comienza " + article + " " + Names.season(seasonId) + ".";
+    }
+
     /** Size of a building, for example {@code 2 × 2}. */
     public static String size(int width, int height) {
         return width + " × " + height;

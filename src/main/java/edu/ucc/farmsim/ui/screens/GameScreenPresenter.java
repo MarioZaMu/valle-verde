@@ -10,6 +10,8 @@ import edu.ucc.farmsim.application.dto.PlotView;
 import edu.ucc.farmsim.application.dto.SaveSlotView;
 import edu.ucc.farmsim.application.result.Result;
 import edu.ucc.farmsim.ui.components.Shortcut;
+import edu.ucc.farmsim.ui.components.ToastPresenter;
+import edu.ucc.farmsim.ui.components.ToastQueue;
 import edu.ucc.farmsim.ui.components.Tool;
 import edu.ucc.farmsim.ui.components.ToolModel;
 import edu.ucc.farmsim.ui.theme.Texts;
@@ -19,7 +21,7 @@ import java.util.function.Consumer;
  * Logic of the game screen, with no Swing: what happens when the player clicks a plot, presses a button or
  * uses a shortcut. Messages go to a sink (the status bar in production); an empty string clears the bar.
  *
- * <p>Stories: HU-10, HU-17, HU-18, HU-20, HU-22, HU-26, HU-29, HU-30, HU-34, HU-36.
+ * <p>Stories: HU-10, HU-17, HU-18, HU-20, HU-22, HU-26, HU-29, HU-30, HU-34, HU-36, HU-39.
  */
 public final class GameScreenPresenter {
 
@@ -29,6 +31,7 @@ public final class GameScreenPresenter {
     private final ToolModel tools;
     private final Consumer<String> messages;
     private final GameDialogs dialogs;
+    private final ToastPresenter toasts;
     private int lastSlot;
 
     /**
@@ -37,19 +40,45 @@ public final class GameScreenPresenter {
      * @param controller entry point to the game
      * @param tools      the selected tool and seed
      * @param messages   where messages for the player are sent
+     * @param dialogs    opens the dialogs
+     * @param toasts     where errors and notices are shown as toasts (HU-39)
      */
     public GameScreenPresenter(GameCommands controller, ToolModel tools, Consumer<String> messages,
-                               GameDialogs dialogs) {
+                               GameDialogs dialogs, ToastPresenter toasts) {
         this.controller = controller;
         this.tools = tools;
         this.messages = messages;
         this.dialogs = dialogs;
+        this.toasts = toasts;
+    }
+
+    /**
+     * Creates the presenter without notices: only the message sink hears about the result of an order.
+     *
+     * @param controller entry point to the game
+     * @param tools      the selected tool and seed
+     * @param messages   where messages for the player are sent
+     * @param dialogs    opens the dialogs
+     */
+    public GameScreenPresenter(GameCommands controller, ToolModel tools, Consumer<String> messages,
+                               GameDialogs dialogs) {
+        this(controller, tools, messages, dialogs, new ToastPresenter(new ToastQueue(() -> 0L)));
+    }
+
+    /** Sends a message to the status bar; a rejection also becomes an error notice (HU-39 · CA-2). */
+    private void show(boolean ok, String onSuccess, String onFailure) {
+        messages.accept(ok ? onSuccess : onFailure);
+        if (!ok) {
+            toasts.error(onFailure);
+        } else if (!onSuccess.isEmpty()) {
+            toasts.info(onSuccess);
+        }
     }
 
     /** "End day": the top bar updates through the events; a message appears only if the day could not end. */
     public void onEndDay() {
         Result<HudView> result = controller.endDay();
-        messages.accept(result.isOk() ? CLEAR : result.message());
+        show(result.isOk(), CLEAR, result.message());
     }
 
     /**
@@ -71,10 +100,13 @@ public final class GameScreenPresenter {
             return;
         }
         if (tool == Tool.SOW && tools.selectedSeed() == null) {
-            messages.accept(Texts.NO_SEED_SELECTED);
+            show(false, CLEAR, Texts.NO_SEED_SELECTED);
             return;
         }
         BuildingView building = tool == Tool.FEED || tool == Tool.HARVEST ? buildingAt(col, row) : null;
+        if (tool == Tool.HARVEST && building != null && building.capacity() == 0) {
+            building = null;
+        }
         if (tool == Tool.FEED) {
             onFeed(building);
         } else if (tool == Tool.HARVEST && building != null) {
@@ -85,7 +117,7 @@ public final class GameScreenPresenter {
                 case WATER -> controller.water(col, row);
                 default -> controller.harvest(col, row);
             };
-            messages.accept(result.isOk() ? CLEAR : result.message());
+            show(result.isOk(), CLEAR, result.message());
         }
     }
 
@@ -96,7 +128,7 @@ public final class GameScreenPresenter {
 
     private void onFeed(BuildingView building) {
         if (building == null) {
-            messages.accept(Texts.NO_BUILDING_HERE);
+            show(false, CLEAR, Texts.NO_BUILDING_HERE);
         } else {
             report(controller.feed(building.id()));
         }
@@ -108,10 +140,13 @@ public final class GameScreenPresenter {
 
     private void report(Result<BuildingActionView> result) {
         if (!result.isOk()) {
-            messages.accept(result.message());
+            show(false, CLEAR, result.message());
         } else {
             String notice = result.value().notice();
             messages.accept(notice == null ? CLEAR : notice);
+            if (notice != null) {
+                toasts.info(notice);
+            }
         }
     }
 
@@ -152,7 +187,7 @@ public final class GameScreenPresenter {
             return;
         }
         Result<SaveSlotView> result = controller.save(lastSlot);
-        messages.accept(result.isOk() ? Texts.SAVED_IN_SLOT + lastSlot + "." : result.message());
+        show(result.isOk(), Texts.SAVED_IN_SLOT + lastSlot + ".", result.message());
     }
 
     private void quickLoad() {
@@ -161,6 +196,6 @@ public final class GameScreenPresenter {
             return;
         }
         Result<HudView> result = controller.load(lastSlot);
-        messages.accept(result.isOk() ? Texts.LOADED_FROM_SLOT + lastSlot + "." : result.message());
+        show(result.isOk(), Texts.LOADED_FROM_SLOT + lastSlot + ".", result.message());
     }
 }

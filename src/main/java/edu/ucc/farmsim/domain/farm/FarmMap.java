@@ -17,7 +17,7 @@ import java.util.List;
  * The farm grid: {@link GameRules#MAP_COLS} x {@link GameRules#MAP_ROWS} plots with coordinates
  * {@code (column, row)}, where {@code (0, 0)} is the top-left corner (RN-04).
  *
- * <p>Stories: HU-01, HU-03, HU-05, HU-18, HU-28.
+ * <p>Stories: HU-01, HU-03, HU-05, HU-12, HU-18, HU-25, HU-28.
  */
 public final class FarmMap {
 
@@ -158,7 +158,7 @@ public final class FarmMap {
      * @return number of crops that withered now
      */
     public int growCrops(Weather todayWeather) {
-        int dryDaysToWither = todayWeather == Weather.DROUGHT
+        int openTolerance = todayWeather == Weather.DROUGHT
                 ? GameRules.DRY_DAYS_TO_WITHER_IN_DROUGHT
                 : GameRules.DRY_DAYS_TO_WITHER;
         int withered = 0;
@@ -167,7 +167,7 @@ public final class FarmMap {
                 Crop crop = plot.crop();
                 if (crop != null) {
                     boolean wasAlive = crop.isAlive();
-                    crop.endOfDay(dryDaysToWither);
+                    crop.endOfDay(plot.isSheltered() ? GameRules.DRY_DAYS_TO_WITHER_IN_GREENHOUSE : openTolerance);
                     if (wasAlive && !crop.isAlive()) {
                         withered++;
                     }
@@ -178,13 +178,13 @@ public final class FarmMap {
     }
 
     /**
-     * Rain waters every living crop in the open (step 1 of RN-03). There is no greenhouse yet, so every crop is
-     * in the open.
+     * Rain waters every living crop in the open (step 1 of RN-03); the ones inside a greenhouse get no rain
+     * (RN-22).
      */
     public void rainOnCrops() {
         for (Plot[] line : plots) {
             for (Plot plot : line) {
-                if (plot.crop() != null) {
+                if (plot.crop() != null && !plot.isSheltered()) {
                     plot.crop().water();
                 }
             }
@@ -200,7 +200,7 @@ public final class FarmMap {
         int withered = 0;
         for (Plot[] line : plots) {
             for (Plot plot : line) {
-                if (plot.crop() != null && plot.crop().witherByFrost()) {
+                if (plot.crop() != null && !plot.isSheltered() && plot.crop().witherByFrost()) {
                     withered++;
                 }
             }
@@ -217,7 +217,7 @@ public final class FarmMap {
         int withered = 0;
         for (Plot[] line : plots) {
             for (Plot plot : line) {
-                if (plot.crop() != null && plot.crop().witherIfOutOfSeason(season)) {
+                if (plot.crop() != null && !plot.isSheltered() && plot.crop().witherIfOutOfSeason(season)) {
                     withered++;
                 }
             }

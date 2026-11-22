@@ -4,18 +4,25 @@ import edu.ucc.farmsim.application.dto.AnimalView;
 import edu.ucc.farmsim.application.dto.BuildingView;
 import edu.ucc.farmsim.application.dto.MapView;
 import edu.ucc.farmsim.application.dto.PlotView;
+import edu.ucc.farmsim.ui.assets.AssetManager;
 import edu.ucc.farmsim.ui.theme.Palette;
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.util.Optional;
 
 /**
- * Draws the farm map with Java2D, using only vector shapes (no image files needed). Each terrain and each
- * crop stage has its own look; it works on any {@link Graphics2D}, including one of an image, so it is tested
- * without a display.
+ * Draws the farm map with Java2D. Each terrain and each crop stage has its own look, drawn with vector shapes;
+ * if a sprite exists in the {@link AssetManager} it is used instead, and when it does not the vector graphic
+ * is the fallback, so the game needs no image at all (HU-42). With a {@link VisualEffects} it also paints the
+ * palette of the season, the weather, the night tint and the animations (HU-40, HU-41). It works on any
+ * {@link Graphics2D}, including one of an image, so it is tested without a display.
  *
- * <p>Stories: HU-18, HU-19, HU-35.
+ * <p>Stories: HU-18, HU-19, HU-25, HU-35, HU-40, HU-41, HU-42.
  */
 public final class MapRenderer {
 
@@ -24,9 +31,30 @@ public final class MapRenderer {
     private static final float LEAF_H = 0.12f;
     private static final float FRUIT = 0.16f;
     private static final int HOVER_WIDTH = 3;
+    private static final int NIGHT_MAX_ALPHA = 150;
+    private static final Color NIGHT = new Color(10, 20, 60);
+    private static final Color SUN = new Color(0xFFC21A);
+    private static final Color SNOWFLAKE = new Color(0xFFFFFF);
+    private static final Color RAIN = new Color(0xBFD9FF);
+
+    private final AssetManager assets;
+
+    /** Creates a renderer that looks for sprites in the {@code assets} folder of the class path. */
+    public MapRenderer() {
+        this(AssetManager.fromClasspath());
+    }
 
     /**
-     * Paints the whole map into the given area.
+     * Creates a renderer.
+     *
+     * @param assets where the sprites come from
+     */
+    public MapRenderer(AssetManager assets) {
+        this.assets = assets;
+    }
+
+    /**
+     * Paints the whole map into the given area, without effects.
      *
      * @param g      where to paint
      * @param map    the map to draw
@@ -35,21 +63,45 @@ public final class MapRenderer {
      * @param hover  plot under the cursor, or {@code null}
      */
     public void render(Graphics2D g, MapView map, int width, int height, CellPos hover) {
+        render(g, map, width, height, hover, null);
+    }
+
+    /**
+     * Paints the whole map into the given area.
+     *
+     * @param g       where to paint
+     * @param map     the map to draw
+     * @param width   width of the area
+     * @param height  height of the area
+     * @param hover   plot under the cursor, or {@code null}
+     * @param effects the season, weather and animations to show, or {@code null} for the plain look
+     */
+    public void render(Graphics2D g, MapView map, int width, int height, CellPos hover, VisualEffects effects) {
+        VisualEffects fx = effects != null && effects.isEnabled() ? effects : null;
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setColor(Palette.BACKGROUND);
         g.fillRect(0, 0, width, height);
         MapGeometry geometry = MapGeometry.fit(map.cols(), map.rows(), width, height);
+        Color grass = fx == null ? Palette.GRASS : SeasonPalette.grass(fx.season());
         for (PlotView plot : map.plots()) {
             Rectangle cell = geometry.cellBounds(plot.col(), plot.row());
-            drawTerrain(g, plot, cell);
-            if (plot.crop() != null) {
-                drawCrop(g, plot, cell);
+            drawTerrain(g, plot, cell, grass);
+            if (plot.crop() != null && !plot.sheltered()) {
+                drawCrop(g, plot, cell, fx);
             }
             g.setColor(Palette.GRID);
             g.drawRect(cell.x, cell.y, cell.width - 1, cell.height - 1);
         }
         for (BuildingView building : map.buildings()) {
-            drawBuilding(g, building, geometry);
+            drawBuilding(g, building, geometry, fx);
+        }
+        for (PlotView plot : map.plots()) {
+            if (plot.crop() != null && plot.sheltered()) {
+                drawCrop(g, plot, geometry.cellBounds(plot.col(), plot.row()), fx);
+            }
+        }
+        if (fx != null) {
+            drawAmbience(g, fx, geometry.area(), width, height);
         }
         if (hover != null) {
             Rectangle cell = geometry.cellBounds(hover.col(), hover.row());
@@ -60,7 +112,56 @@ public final class MapRenderer {
         }
     }
 
-    private void drawBuilding(Graphics2D g, BuildingView building, MapGeometry geometry) {
+    private void drawAmbience(Graphics2D g, VisualEffects fx, Rectangle area, int width, int height) {
+        Color tint = SeasonPalette.tint(fx.weather());
+        if (tint != null) {
+            g.setColor(tint);
+            g.fillRect(area.x, area.y, area.width, area.height);
+        }
+        for (Particle particle : fx.particles()) {
+            int x = area.x + (int) Math.round(particle.x() * area.width);
+            int y = area.y + (int) Math.round(particle.y() * area.height);
+            if (particle.kind() == Particle.Kind.RAIN) {
+                g.setColor(RAIN);
+                g.drawLine(x, y, x - 3, y + 10);
+            } else {
+                g.setColor(SNOWFLAKE);
+                g.fillOval(x - 2, y - 2, 5, 5);
+            }
+        }
+        drawIndicator(g, fx.weather(), area);
+        float night = fx.nightAlpha();
+        if (night > 0f) {
+            g.setColor(new Color(NIGHT.getRed(), NIGHT.getGreen(), NIGHT.getBlue(), Math.round(night * NIGHT_MAX_ALPHA)));
+            g.fillRect(0, 0, width, height);
+        }
+    }
+
+    private void drawIndicator(Graphics2D g, String weather, Rectangle area) {
+        int r = Math.max(8, area.height / 36);
+        int cx = area.x + area.width - 2 * r;
+        int cy = area.y + 2 * r;
+        g.setStroke(new BasicStroke(Math.max(2f, r / 4f)));
+        if ("DROUGHT".equals(weather)) {
+            g.setColor(SUN);
+            g.fillOval(cx - r, cy - r, 2 * r, 2 * r);
+            for (int i = 0; i < 8; i++) {
+                double angle = Math.PI * i / 4;
+                g.drawLine(cx + (int) Math.round(Math.cos(angle) * r * 1.3), cy + (int) Math.round(Math.sin(angle) * r * 1.3),
+                        cx + (int) Math.round(Math.cos(angle) * r * 1.9), cy + (int) Math.round(Math.sin(angle) * r * 1.9));
+            }
+        } else if ("FROST".equals(weather)) {
+            g.setColor(SNOWFLAKE);
+            for (int i = 0; i < 3; i++) {
+                double angle = Math.PI * i / 3;
+                g.drawLine(cx - (int) Math.round(Math.cos(angle) * r * 1.6), cy - (int) Math.round(Math.sin(angle) * r * 1.6),
+                        cx + (int) Math.round(Math.cos(angle) * r * 1.6), cy + (int) Math.round(Math.sin(angle) * r * 1.6));
+            }
+        }
+        g.setStroke(new BasicStroke(1f));
+    }
+
+    private void drawBuilding(Graphics2D g, BuildingView building, MapGeometry geometry, VisualEffects fx) {
         Rectangle first = geometry.cellBounds(building.col(), building.row());
         Rectangle last = geometry.cellBounds(building.col() + building.width() - 1, building.row() + building.height() - 1);
         Rectangle area = first.union(last);
@@ -74,6 +175,10 @@ public final class MapRenderer {
                 int x = body.x + body.width * i / building.width();
                 g.drawLine(x, body.y, x, body.y + body.height);
             }
+            for (int i = 1; i < building.height(); i++) {
+                int y = body.y + body.height * i / building.height();
+                g.drawLine(body.x, y, body.x + body.width, y);
+            }
         } else {
             g.setColor(wallColor(building.type()));
             g.fillRect(body.x, body.y, body.width, body.height);
@@ -84,7 +189,7 @@ public final class MapRenderer {
         }
         g.setColor(Palette.BUILDING_OUTLINE);
         g.drawRect(body.x, body.y, body.width, body.height);
-        drawAnimals(g, building, body);
+        drawAnimals(g, building, body, fx);
         if (building.pendingProducts() > 0) {
             int r = Math.max(4, area.width / 12);
             g.setColor(Palette.PENDING);
@@ -94,7 +199,7 @@ public final class MapRenderer {
         }
     }
 
-    private static java.awt.Color wallColor(String type) {
+    private static Color wallColor(String type) {
         return switch (type) {
             case "BARN" -> Palette.BARN_WALL;
             case "WAREHOUSE" -> Palette.WAREHOUSE_WALL;
@@ -102,12 +207,18 @@ public final class MapRenderer {
         };
     }
 
-    private void drawAnimals(Graphics2D g, BuildingView building, Rectangle body) {
+    private void drawAnimals(Graphics2D g, BuildingView building, Rectangle body, VisualEffects fx) {
         int slots = Math.max(1, building.capacity());
         int d = Math.max(4, body.width / (slots + 1));
         for (AnimalView animal : building.animals()) {
+            int frame = fx == null ? 0 : fx.animalFrame(animal.index());
             int x = body.x + body.width * (2 * animal.index() + 1) / (2 * slots) - d / 2;
-            int y = body.y + body.height * 2 / 3 - d / 2;
+            int y = body.y + body.height * 2 / 3 - d / 2 - bob(frame, d);
+            Optional<BufferedImage> sprite = assets.sprite("animals/" + animal.type() + "_" + frame + ".png");
+            if (sprite.isPresent()) {
+                g.drawImage(sprite.get(), x, y, d, d, null);
+                continue;
+            }
             g.setColor(switch (animal.condition()) {
                 case "SICK" -> Palette.ANIMAL_SICK;
                 case "HUNGRY" -> Palette.ANIMAL_HUNGRY;
@@ -125,7 +236,16 @@ public final class MapRenderer {
         }
     }
 
-    private void drawTerrain(Graphics2D g, PlotView plot, Rectangle c) {
+    /** How many pixels the animal rises on each frame of its little hop: down, up, halfway. */
+    private static int bob(int frame, int d) {
+        return switch (frame) {
+            case 1 -> Math.max(1, d / 6);
+            case 2 -> Math.max(1, d / 12);
+            default -> 0;
+        };
+    }
+
+    private void drawTerrain(Graphics2D g, PlotView plot, Rectangle c, Color grass) {
         switch (plot.terrain()) {
             case "SOIL" -> {
                 g.setColor(plot.watered() ? Palette.SOIL_WATERED : Palette.SOIL);
@@ -153,13 +273,32 @@ public final class MapRenderer {
                 g.fillOval(c.x + c.width / 5, c.y + c.height / 8, c.width * 3 / 5, c.height * 3 / 5);
             }
             default -> {
-                g.setColor(Palette.GRASS);
+                g.setColor(grass);
                 g.fillRect(c.x, c.y, c.width, c.height);
             }
         }
     }
 
-    private void drawCrop(Graphics2D g, PlotView plot, Rectangle c) {
+    private void drawCrop(Graphics2D g, PlotView plot, Rectangle c, VisualEffects fx) {
+        float scale = fx == null ? 1f : fx.cropScale(plot.col(), plot.row());
+        AffineTransform saved = g.getTransform();
+        if (scale < 1f) {
+            double cx = c.x + c.width / 2.0;
+            double cy = c.y + c.height / 2.0;
+            g.translate(cx, cy);
+            g.scale(scale, scale);
+            g.translate(-cx, -cy);
+        }
+        Optional<BufferedImage> sprite = assets.sprite("crops/" + plot.crop() + "_" + plot.stage() + ".png");
+        if (sprite.isPresent()) {
+            g.drawImage(sprite.get(), c.x, c.y, c.width, c.height, null);
+        } else {
+            drawCropVector(g, plot, c);
+        }
+        g.setTransform(saved);
+    }
+
+    private void drawCropVector(Graphics2D g, PlotView plot, Rectangle c) {
         int s = c.width;
         int cx = c.x + s / 2;
         int cy = c.y + s / 2;

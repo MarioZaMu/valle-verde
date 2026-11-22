@@ -1,13 +1,14 @@
 package edu.ucc.farmsim.domain.farm;
 
 import edu.ucc.farmsim.domain.building.Building;
+import edu.ucc.farmsim.domain.building.BuildingType;
 import edu.ucc.farmsim.domain.crop.Crop;
 
 /**
  * One square of the farm map: its terrain, the crop growing in it (on soil) or the building that covers it
  * (on grass).
  *
- * <p>Stories: HU-01, HU-28.
+ * <p>Stories: HU-01, HU-25, HU-28.
  */
 public final class Plot {
 
@@ -45,13 +46,23 @@ public final class Plot {
      * @throws IllegalStateException if the plot is not soil or already has a crop
      */
     public void plant(Crop newCrop) {
-        if (terrain != Terrain.SOIL) {
-            throw new IllegalStateException("Only soil can be sown: " + terrain);
+        if (!canBeSown()) {
+            throw new IllegalStateException("Only soil or a greenhouse plot can be sown: " + terrain);
         }
         if (crop != null) {
             throw new IllegalStateException("The plot already has a crop");
         }
         this.crop = newCrop;
+    }
+
+    /** True if a greenhouse covers the plot: its crop is a protected crop (RN-22). */
+    public boolean isSheltered() {
+        return building != null && building.type() == BuildingType.GREENHOUSE;
+    }
+
+    /** True if a crop can be sown here: soil, or a plot of a greenhouse (RN-06, RN-22). */
+    public boolean canBeSown() {
+        return terrain == Terrain.SOIL || isSheltered();
     }
 
     /** Removes the crop (harvest or clearing). */

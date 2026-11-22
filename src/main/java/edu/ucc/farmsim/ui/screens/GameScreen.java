@@ -16,9 +16,13 @@ import edu.ucc.farmsim.ui.components.InventoryDialog;
 import edu.ucc.farmsim.ui.components.InventoryModel;
 import edu.ucc.farmsim.ui.components.MarketDialog;
 import edu.ucc.farmsim.ui.components.MarketPresenter;
+import edu.ucc.farmsim.ui.components.OverlayPanel;
 import edu.ucc.farmsim.ui.components.Shortcut;
 import edu.ucc.farmsim.ui.components.SlotsDialog;
 import edu.ucc.farmsim.ui.components.SlotsPresenter;
+import edu.ucc.farmsim.ui.components.ToastLayer;
+import edu.ucc.farmsim.ui.components.ToastPresenter;
+import edu.ucc.farmsim.ui.components.ToastQueue;
 import edu.ucc.farmsim.ui.components.Tool;
 import edu.ucc.farmsim.ui.components.ToolBar;
 import edu.ucc.farmsim.ui.components.ToolModel;
@@ -29,6 +33,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -42,7 +47,7 @@ import javax.swing.SwingUtilities;
  * buttons "End day" and "Menu". Keys 1 to 5 pick a tool, Escape deselects it, and the shortcuts of RN-34 work
  * anywhere on the screen.
  *
- * <p>Stories: HU-17, HU-18, HU-20, HU-22, HU-23, HU-26, HU-29, HU-30, HU-33, HU-34, HU-35, HU-36, HU-37, HU-38.
+ * <p>Stories: HU-17, HU-18, HU-20, HU-22, HU-23, HU-26, HU-29, HU-30, HU-33, HU-34, HU-35, HU-36, HU-37, HU-38, HU-39, HU-40, HU-41.
  */
 public final class GameScreen extends JPanel {
 
@@ -106,7 +111,10 @@ public final class GameScreen extends JPanel {
                 new DaySummaryDialog(SwingUtilities.getWindowAncestor(GameScreen.this), summary).setVisible(true);
             }
         };
-        GameScreenPresenter presenter = new GameScreenPresenter(controller, tools, status::setText, dialogs);
+        ToastQueue toastQueue = new ToastQueue(System::currentTimeMillis);
+        ToastPresenter toasts = new ToastPresenter(toastQueue);
+        bus.subscribe(toasts);
+        GameScreenPresenter presenter = new GameScreenPresenter(controller, tools, status::setText, dialogs, toasts);
         presenterRef[0] = presenter;
         bus.subscribe(event -> {
             if (event instanceof GameEvent.DaySummaryReady ready) {
@@ -117,7 +125,10 @@ public final class GameScreen extends JPanel {
         });
 
         add(new HudPanel(bus), BorderLayout.NORTH);
-        add(new MapPanel(controller, bus, presenter::onPlotClicked), BorderLayout.CENTER);
+        MapPanel map = new MapPanel(controller, bus, presenter::onPlotClicked);
+        OverlayPanel stage = new OverlayPanel(map);
+        stage.addOnTop(new ToastLayer(toastQueue));
+        add(stage, BorderLayout.CENTER);
 
         JPanel bottom = new JPanel();
         bottom.setLayout(new BoxLayout(bottom, BoxLayout.Y_AXIS));
@@ -128,8 +139,12 @@ public final class GameScreen extends JPanel {
         endDay.addActionListener(event -> presenter.onEndDay());
         JButton menu = new JButton(Texts.MENU);
         menu.addActionListener(event -> navigator.showStart());
+        JCheckBox effects = new JCheckBox(Texts.EFFECTS, true);
+        effects.setFocusable(false);
+        effects.addActionListener(event -> map.setEffectsEnabled(effects.isSelected()));
         buttons.add(endDay);
         buttons.add(menu);
+        buttons.add(effects);
         bottom.add(buttons);
         add(bottom, BorderLayout.SOUTH);
 
