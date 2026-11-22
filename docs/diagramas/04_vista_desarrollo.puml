@@ -102,6 +102,7 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
       class MarketService
       class BuildingService
       class AnimalService
+      class AchievementService
       class SaveGameService
       class ProgressService
       class ViewMapper
@@ -132,9 +133,12 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
       class GameMemento
       class Energy
       class DayPipeline
+      class GameStateValidator
     }
     package "save" as D_SAVE #FFFFFF {
       class SaveRepository
+      class SlotInfo
+      class SaveLoadException
     }
     package "farm" as D_FARM #FFFFFF {
       class FarmMap
@@ -192,6 +196,8 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
     package "persistence" as INF_PER #FFFFFF {
       class MongoSaveRepository
       class SaveDocument
+      class SaveCodec
+      class Checksum
     }
   }
 }
@@ -255,6 +261,8 @@ D_BLD .down.> D_ECO
 D_BLD .down.> D_PRO
 D_ANI .down.> D_ECO
 D_GAME .down.> D_ANI
+D_GAME .down.> D_CROP
+D_SAVE .down.> D_TIM
 D_GAME .down.> D_BLD
 D_CROP .down.> D_TIM
 D_ECO .down.> D_CROP

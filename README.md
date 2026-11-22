@@ -16,9 +16,10 @@ Simulador de granja 2D **por turnos** (un turno = un día), hecho en Java con Sw
 | **5.2b** | Migración a Spring Boot: servidor con API REST, cliente Swing por HTTP y partidas en MongoDB | **hecha** |
 | **5.3** | Clima y economía: efectos del clima, mercado con precios dinámicos, tendencia, inventario en grilla y mercado modal (6 historias) | **hecha** |
 | **5.4** | Construcción y animales: construir, comprar y alimentar animales, estados, producción, curación, resumen del día y Almacén (8 historias) | **hecha** |
-| 5.5 y 5.6 | Progresión y guardado, pulido visual | pendientes |
+| **5.5** | Progresión y persistencia: logros con recompensa, edificios desbloqueados, guardar, cargar y listar ranuras en MongoDB, rechazo de partidas dañadas y pruebas de rendimiento (6 historias) | **hecha** |
+| 5.6 | Pulido visual, notificaciones, invernadero y extras | pendiente |
 
-Hoy el juego abre la **pantalla de inicio** (Nueva partida, Cargar, Salir) y una pantalla de juego con la barra superior (dinero, fecha, clima, pronóstico y energía) y el botón «Terminar día». Desde la fase 5.2 también tiene el **mapa de la granja**: eliges una herramienta (teclas `1` a `5` o la barra), eliges la semilla y haces clic en una parcela de tierra para sembrar, regar y cosechar; `Enter` termina el día. Desde la 5.3 el clima importa (la lluvia riega, la helada marchita), `I` abre el **inventario** en grilla (clic en una semilla para elegirla) y `M` el **mercado** con las pestañas Comprar y Vender, precios que cambian con la temporada y la saturación, y la tendencia ▲ ▼ ▬. Desde la 5.4 puedes **construir** (herramienta `4`: clic en una parcela de hierba libre y eliges el edificio), comprar gallinas y vacas en el mercado, **alimentar** (herramienta `5` o el panel del edificio), **recolectar** (herramienta `3` sobre el edificio) y curar a los animales enfermos desde el panel que se abre al pulsar un edificio; al terminar el día aparece el **resumen del día**. El guardado y los logros llegan en las fases siguientes.
+Hoy el juego abre la **pantalla de inicio** (Nueva partida, Cargar, Salir) y una pantalla de juego con la barra superior (dinero, fecha, clima, pronóstico y energía) y el botón «Terminar día». Desde la fase 5.2 también tiene el **mapa de la granja**: eliges una herramienta (teclas `1` a `5` o la barra), eliges la semilla y haces clic en una parcela de tierra para sembrar, regar y cosechar; `Enter` termina el día. Desde la 5.3 el clima importa (la lluvia riega, la helada marchita), `I` abre el **inventario** en grilla (clic en una semilla para elegirla) y `M` el **mercado** con las pestañas Comprar y Vender, precios que cambian con la temporada y la saturación, y la tendencia ▲ ▼ ▬. Desde la 5.4 puedes **construir** (herramienta `4`: clic en una parcela de hierba libre y eliges el edificio), comprar gallinas y vacas en el mercado, **alimentar** (herramienta `5` o el panel del edificio), **recolectar** (herramienta `3` sobre el edificio) y curar a los animales enfermos desde el panel que se abre al pulsar un edificio; al terminar el día aparece el **resumen del día**. Desde la 5.5 `L` abre los **logros** (con su recompensa y tu avance), `F5` guarda y `F9` carga en la última ranura usada (si no hay ninguna se abre el diálogo de **ranuras**), y «Cargar» en la pantalla de inicio te deja elegir entre tres ranuras. Las partidas se guardan en MongoDB (`valleverde.mongo.uri`); si no responde, el juego sigue y avisa.
 
 ## Requisitos
 
@@ -83,7 +84,7 @@ edu.ucc.farmsim
 | Observer | `EventBus`, `GameListener`, `HudModel`, `HudPanel` | HU-10, HU-34 | hecho (5.1) |
 | Observer | `MapPanel` | HU-35 | hecho (5.2) |
 | Observer | `ToastLayer` | HU-39 | 5.6 |
-| Memento | `GameState` (originador), `GameMemento` | HU-10 | en memoria (5.1); guardado en MongoDB en 5.5 |
+| Memento | `GameState` (originador), `GameMemento`, `SaveGameService` (*caretaker*) | HU-10, HU-29, HU-30 | hecho (5.5): guardado en MongoDB |
 | Observer | `InventoryModel` | HU-37 | hecho (5.3) |
 | Observer | `EventCollector` (el servidor guarda los eventos para la respuesta) | RNF-15 | hecho (5.2b) |
 | Factory Method | `CropFactory` con `CarrotFactory`, `PotatoFactory`, `TomatoFactory`, `CornFactory`, `PumpkinFactory` | HU-01 | hecho (5.2) |

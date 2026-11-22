@@ -1,6 +1,6 @@
 # API REST — Valle Verde
 
-> **Versión 0.3 · 2026-11-22 · Fase 5.4**
+> **Versión 0.4 · 2026-11-22 · Fase 5.5**
 > Describe las rutas que el servidor Spring Boot ofrece al cliente Swing (RNF-15, AR-12). El servidor escucha solo en `127.0.0.1`; con `java -jar farmsim.jar` el puerto es libre y lo conoce el cliente, y con `--server --port 8080` es el indicado. Hay **una partida por servidor** y no hay sesión de usuario.
 
 ## 1. Convenciones
@@ -39,13 +39,19 @@ Las columnas de tipo usan los *records* de `application.dto` (`HudView`, `PlotVi
 | `POST /api/buildings/{id}/feeding` | `feed(id)` | — | `BuildingActionView` (cantidad alimentada y aviso opcional) | `200` |
 | `POST /api/buildings/{id}/collection` | `collect(id)` | — | `BuildingActionView` (unidades recogidas y aviso opcional) | `200` |
 | `POST /api/buildings/{id}/animals/{n}/treatment` | `cure(id, n)` | — | `BuildingActionView` | `200` |
+| `GET /api/achievements` | `achievements()` | — | lista de `AchievementView` (nombre, condición, recompensa, progreso) | `200` |
 | `GET /api/saves/any` | `hasSavedGames()` | — | `true` / `false` | `200` |
+| `GET /api/saves` | `saveSlots()` | — | las 3 ranuras (`SaveSlotView`: `EMPTY`, `OK` o `DAMAGED`; una dañada no impide listar las demás) | `200` |
+| `PUT /api/saves/{slot}` | `save(slot)` | — | la ranura como queda (`SaveSlotView`) | `200` |
+| `POST /api/saves/{slot}/load` | `load(slot)` | — | `HudView` de la partida cargada; evento `GameStarted` | `200` |
 
 `hasGameInProgress()` no tiene ruta propia: el cliente lo deduce de `GET /api/game` (`404 SIN_PARTIDA` = no hay partida).
 
 El **resumen del día** no tiene ruta: `POST /api/game/days` añade a sus eventos `DaySummaryReady` con `DaySummaryView` (ingresos, gastos, saldo anterior y nuevo y los hechos del día). `GET /api/market` incluye ahora los animales en venta y `GET /api/farm/map` los edificios con sus animales. Un edificio o un animal que no existe responde `500 ERROR_INTERNO` (nunca lo envía la interfaz).
 
-**Rutas planificadas** (se agregan con su historia, siempre con endpoint y prueba, DoD 11): `/api/saves/{slot}` (HU-29 a HU-32, con `PUT` para guardar y `POST …/load` para cargar).
+Cargar una ranura rechazada **no cambia la partida en curso** (RN-33): `404 ARCHIVO_INEXISTENTE` si no hay documento, `422 ARCHIVO_CORRUPTO` si el texto, la suma de control o los datos no son válidos, `422 VERSION_NO_SOPORTADA` y `503 ERROR_ES` si MongoDB no responde en 2 s. Una ranura fuera de 1 a 3 responde `500 ERROR_INTERNO` (la interfaz nunca la envía). Los logros desbloqueados viajan como evento `AchievementUnlocked` en la respuesta de la orden que los causó.
+
+**Rutas planificadas:** ninguna por ahora; cada historia nueva agrega su ruta y su prueba (DoD 11).
 
 ### Ejemplo
 

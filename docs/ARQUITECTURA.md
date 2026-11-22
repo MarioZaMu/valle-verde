@@ -2,7 +2,7 @@
 
 > **Versión 0.2 · 2026-11-22 · Fase 5.2b (migración a Spring Boot)**
 > Formaliza el diseño propuesto en los diagramas ([`DIAGRAMAS.md`](DIAGRAMAS.md)): capas, árbol de paquetes, decisiones técnicas y plan de implementación por fases con sus historias ([`HISTORIAS_DE_USUARIO.md`](HISTORIAS_DE_USUARIO.md) §7). El plan de pruebas está en [`PLAN_DE_PRUEBAS.md`](PLAN_DE_PRUEBAS.md).
-> **Estado:** las Fases 5.0 (§10), 5.1 (§11), 5.2 (§12) y 5.2b (§13, migración a servidor Spring Boot con API REST, cliente Swing por HTTP y persistencia en MongoDB) 5.3 (§14) y 5.4 (§15) están hechas. La Fase 5.5 empieza solo con tu visto bueno.
+> **Estado:** las Fases 5.0 (§10), 5.1 (§11), 5.2 (§12) y 5.2b (§13, migración a servidor Spring Boot con API REST, cliente Swing por HTTP y persistencia en MongoDB) 5.3 (§14), 5.4 (§15) y 5.5 (§16) están hechas. La Fase 5.6 empieza solo con tu visto bueno.
 
 ## 1. Estilo arquitectónico
 
@@ -408,3 +408,43 @@ Ajustes surgidos al implementar: (1) `Main` se declara como capa «Composition»
 | HU-36 · CA-5 | los atajos `L`, `F5` y `F9` aún responden que llegarán | 5.5 |
 
 **Diagramas:** `03_vista_logica` y `04_vista_desarrollo` incluyen las clases y dependencias nuevas (`domain.game → animal/building`, `building → animal/economy/progress`, `animal → economy`); las seis vistas se volvieron a renderizar. `check_diagrams.py` y `check_imports.py` terminan sin errores.
+
+---
+
+## 16. Estado de la Fase 5.5 (progresión y persistencia)
+
+**Historias cerradas (6 historias, 22 puntos):** HU-26, 27, 29, 30, 31 y 32, más los criterios que esperaban a los logros y al guardado (HU-17 · CA-2, HU-28 · CA-1, HU-10 · CA-3, HU-33 · CA-3, HU-36 · CA-5). `python tools/traceability.py --upto 5.5` termina sin errores.
+
+| Resultado | Valor |
+|---|---|
+| Pruebas | 442 en verde y 2 omitidas con aviso (las de MongoDB real) |
+| Cobertura de líneas (JaCoCo) | **dominio 97,2 %**, **aplicación 97,6 %**, infraestructura 94,2 %, UI 91,1 %, API 95,9 %, cliente 90,8 % (barrera: 70 % en dominio y aplicación) |
+| Patrones aplicados | Memento completo: `GameMemento` con todas las partes (logros y contadores incluidos) y `SaveGameService` como *caretaker*; registrado en `patterns.txt` |
+| Pruebas críticas cerradas | **6** `HU30_ca1_theLoadedStateIsStructurallyIdenticalToTheSavedOne_criticalTest` y **7** `HU31_ca1_…Inexistent…`, `HU31_ca2_…Corrupt…` (carácter cambiado y JSON truncado) |
+| Rendimiento a plena carga | `FullFarmPerformanceTest`: terminar el día 100 veces (p95 ≤ 200 ms), guardar y cargar (≤ 1 s, documento ≤ 200 KB) |
+| API nueva | `GET /api/achievements`, `GET /api/saves`, `PUT /api/saves/{slot}`, `POST /api/saves/{slot}/load` (ver [`API.md`](API.md)) |
+| Verificadores | `check_hu.py`, `check_diagrams.py`, `check_imports.py` y `traceability.py` terminan sin errores |
+
+**Decisiones tomadas al implementar:**
+
+| # | Decisión | Motivo |
+|---|---|---|
+| D-42 | `SaveRepository` guarda y lee `GameMemento` (no texto): `SaveCodec` y `Checksum` viven en la infraestructura y `GameStateValidator` en el dominio; el servicio de guardado decide el código de error | DT-11 y DT-13: el dominio no conoce Jackson ni MongoDB y las invariantes de RN-33 son regla de negocio |
+| D-43 | El orden de RN-33 se cumple así: existencia, JSON bien formado, versión, suma de control y datos (en `SaveCodec`) e invariantes (en el dominio). Un JSON mal formado gana a una versión o suma erróneas | HU-31 · CA-4 |
+| D-44 | Cargar construye el estado aparte (`GameState.fromMemento`) después de validar y solo entonces reemplaza al de `GameSession`; si algo inesperado falla se restaura el anterior | RN-33: la partida actual no cambia en absoluto |
+| D-45 | Los logros se evalúan en `AchievementService` tras cada acción exitosa (cosechar, vender, construir, comprar animal, curar) y en el paso 8 del día (`AchievementsStep`); una recompensa que cumple otra condición encadena la siguiente | RN-28: «después de cada acción exitosa y en el paso 8» |
+| D-46 | Construir el primer edificio paga LG-06 (100 m): el saldo tras construir un Gallinero es 200 m, no 100 m | HU-26 · CA-5 manda sobre la cifra de HU-18 · CA-1; las pruebas de HU-18 comprueban los 400 m cobrados y la recompensa |
+| D-47 | Los contadores (cosechas, ventas, edificios, curaciones) forman parte del memento y de la validación («logros coherentes con sus contadores») | RN-32 y RN-33 |
+| D-48 | `F5` y `F9` guardan y cargan en la última ranura usada; si no hay ninguna abren el diálogo de ranuras. Sobrescribir una ranura ocupada pide confirmación en el diálogo (no en `F5`, que repite la ranura elegida) | HU-36 · CA-5 y HU-29 · CA-3 |
+| D-49 | «Cargar» en la pantalla de inicio ofrece las tres ranuras en una lista; una ranura dañada o vacía se rechaza con el mensaje de RN-35 sin salir del inicio | HU-31 |
+| D-50 | La prueba de plena carga usa 40 cultivos al aire libre, 6 edificios (el Invernadero incluido) y 16 animales; los 9 cultivos del invernadero llegan con HU-25 (5.6) | El efecto del Invernadero aún no existe |
+| D-51 | Las pruebas de guardado usan el `MongoSaveRepository` real sobre un `MongoTemplate` en memoria (`InMemoryMongo`); la prueba con MongoDB de verdad sigue omitida si no hay uno | No hay MongoDB en esta máquina (RT-11) |
+
+**Criterios cubiertos en parte (se completan donde nace lo que falta):**
+
+| Criterio | Qué falta | Fase |
+|---|---|---|
+| HU-10 · CA-3, HU-29 · CA-4, HU-30 · CA-4 | los 9 cultivos del invernadero de la «plena carga» | 5.6 (HU-25) |
+| HU-29 · CA-2 | la prueba contra un MongoDB real que rechaza o no responde (la simulada sí está) | cuando haya MongoDB |
+
+**Diagramas:** `03_vista_logica` y `04_vista_desarrollo` incluyen `AchievementService`, `GameStateValidator`, `SaveCodec`, `Checksum`, `SlotInfo` y sus dependencias (`domain.game → crop`, `domain.save → time`); las seis vistas se volvieron a renderizar. `check_diagrams.py` y `check_imports.py` terminan sin errores.

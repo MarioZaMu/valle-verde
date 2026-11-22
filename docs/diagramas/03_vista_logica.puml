@@ -144,6 +144,11 @@ package "application" #F6FBF6 {
   class SaveGameService <<Caretaker>> #F8BBD0 {
     +save(slot: int): Result
     +load(slot: int): Result
+    +slots(): Result
+  }
+  class AchievementService {
+    +check(s: GameState): void
+    +achievements(): Result
   }
   class EventBus <<Subject>> #BBDEFB {
     -listeners: List<GameListener>
@@ -185,6 +190,9 @@ package "domain" #FFFCF5 {
       +add(step: DayStep): DayPipeline
       +run(s: GameState): DayReport
     }
+    class GameStateValidator {
+      +{static} violations(m: GameMemento): List<String>
+    }
     class GameMemento <<Memento>> #F8BBD0 {
       -snapshot: Object
     }
@@ -192,8 +200,16 @@ package "domain" #FFFCF5 {
 
   package "save" #FFFFFF {
     interface SaveRepository <<Port>> {
-      +save(slot: int, m: GameMemento): void
+      +save(slot: int, m: GameMemento, at: Instant): void
       +load(slot: int): GameMemento
+      +slots(): List<SlotInfo>
+    }
+    class SlotInfo <<ValueObject>> {
+      -status: Status
+      -money: int
+    }
+    class SaveLoadException {
+      -reason: Reason
     }
   }
 
@@ -344,8 +360,9 @@ package "domain" #FFFCF5 {
 
   package "progress" #FFFFFF {
     class AchievementTracker {
-      -counters: Map<String, Integer>
-      +evaluate(f: ProgressFacts): List<String>
+      -harvests: int
+      -unitsSold: int
+      +evaluate(f: ProgressFacts): List<Achievement>
     }
     class Achievement <<enumeration>> {
       LG-01..LG-09
@@ -362,6 +379,13 @@ package "domain" #FFFCF5 {
 package "infrastructure" #FBF5FC {
   class MongoSaveRepository
   class SaveDocument
+  class SaveCodec {
+    +encode(slot: int, m: GameMemento, at: Instant): SaveDocument
+    +decode(d: SaveDocument): GameMemento
+  }
+  class Checksum {
+    +{static} of(text: String): String
+  }
 }
 
 ' ---------- Observer ----------
@@ -392,6 +416,13 @@ ProgressService --> EventBus
 DayService --> EventBus
 MarketService --> GameSession
 MarketService --> EventBus
+MarketService --> AchievementService
+FarmService --> AchievementService
+BuildingService --> AchievementService
+AnimalService --> AchievementService
+DayService --> AchievementService
+AchievementService --> GameSession
+AchievementService --> EventBus
 BuildingService --> GameSession
 BuildingService --> EventBus
 AnimalService --> GameSession
@@ -467,6 +498,12 @@ SaveGameService ..> GameMemento : conserva
 SaveGameService --> SaveRepository
 MongoSaveRepository ..|> SaveRepository
 MongoSaveRepository ..> SaveDocument : lee y escribe
+MongoSaveRepository --> SaveCodec
+SaveCodec ..> Checksum : calcula
+SaveGameService ..> GameStateValidator : valida
+SaveRepository ..> SlotInfo : lista
+SaveRepository ..> SaveLoadException : lanza
+GameController --> AchievementService
 
 ' ---------- Cliente y servidor (RNF-15) ----------
 GameController ..|> GameCommands
