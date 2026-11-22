@@ -392,6 +392,7 @@ El *tooltip* de una parcela aparece tras **300 ms** de reposo del cursor y muest
 | `SIN_SEMILLAS` | «No tienes semillas de {cultivo}.» |
 | `CANTIDAD_INVALIDA` | «La cantidad debe estar entre 1 y {máx}.» (compra: máx 99; venta: máx = existencia) |
 | `ERROR_INTERNO` | «Ocurrió un error inesperado. Tu partida no cambió.» |
+| `SIN_PARTIDA` | «No hay una partida en curso.» |
 | `PARCELA_NO_CULTIVABLE` / `PARCELA_OCUPADA` | «Esta parcela no es de tierra de cultivo.» / «La parcela ya está ocupada.» |
 | `YA_REGADO` | «El cultivo ya está regado hoy.» |
 | `NO_MADURO` | «El cultivo aún no está maduro: faltan {n} días.» |
