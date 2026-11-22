@@ -33,6 +33,7 @@ title Vista de desarrollo — Valle Verde (paquetes edu.ucc.farmsim y dependenci
 package "edu.ucc.farmsim" as ROOT #FFFFFF {
 
   class Main <<composición>>
+  class LaunchOptions
   class GameInfo
 
   package "ui" as UI #E3F2FD {
@@ -68,8 +69,28 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
     }
   }
 
+  package "client" as CLI #E0F7FA {
+    class RemoteGameClient
+    class EventDecoder
+  }
+
+  package "api" as API #E0F2F1 {
+    class GameRestController
+    class ApiResponse
+    class EventDto
+    class ErrorStatusMapper
+    class EventCollector
+    class ApiExceptionHandler
+  }
+
+  package "config" as CFG #FFFDE7 {
+    class ServerApplication
+    class ServerConfig
+  }
+
   package "application" as APP #E8F5E9 {
     package "controller" as APP_CTL #FFFFFF {
+      class GameCommands
       class GameController
     }
     package "service" as APP_SRV #FFFFFF {
@@ -149,8 +170,8 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
 
   package "infrastructure" as INF #F3E5F5 {
     package "persistence" as INF_PER #FFFFFF {
-      class JsonSaveRepository
-      class SaveFileCodec
+      class MongoSaveRepository
+      class SaveDocument
     }
   }
 }
@@ -163,19 +184,25 @@ Palette -[hidden]down-> GameController
 Result -[hidden]down-> GameRules
 GameEvent -[hidden]down-> SaveRepository
 ErrorCode -[hidden]down-> SaveRepository
-Animal -[hidden]down-> JsonSaveRepository
-GameClock -[hidden]down-> JsonSaveRepository
-WeatherCycle -[hidden]down-> JsonSaveRepository
-ItemType -[hidden]down-> JsonSaveRepository
+Animal -[hidden]down-> MongoSaveRepository
+GameClock -[hidden]down-> MongoSaveRepository
+WeatherCycle -[hidden]down-> MongoSaveRepository
+ItemType -[hidden]down-> MongoSaveRepository
 
 ' ---------- Raíz de composición ----------
 Main .down.> UI
+Main ..> CLI
+Main ..> CFG
 Main ..> APP
 Main ..> DOM
 Main ..> INF
 
 ' ---------- Capas ----------
 UI .down.> APP
+CLI .down.> APP
+API .down.> APP
+CFG .down.> APP
+CFG .down.> DOM
 APP .down.> DOM
 INF .up.> DOM
 
@@ -218,7 +245,7 @@ note right of D_CFG
 end note
 
 note bottom of INF
-  JsonSaveRepository implementa
+  MongoSaveRepository implementa
   domain.save.SaveRepository
   (inversión de dependencias).
 end note
@@ -227,7 +254,7 @@ legend right
   <b>Lectura</b>
   A ..> B  significa «A importa clases de B».
   <b>Prohibido</b> (lo verifica la prueba de arquitectura):
-  ui → domain · ui → infrastructure · domain → cualquier otra capa
+  ui → domain · ui → infrastructure · ui → api · client → api · api → domain · domain → cualquier otra capa
   application → infrastructure · controller → repository · ciclos
 endlegend
 @enduml

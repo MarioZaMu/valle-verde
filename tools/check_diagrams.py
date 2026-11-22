@@ -108,8 +108,8 @@ def find_cycle():
             if r: return r
 cy=find_cycle()
 if cy: errs.append('vista de desarrollo: ciclo de dependencias '+' -> '.join(cy))
-layer=lambda n: {'UI':'ui','APP':'application','DOM':'domain','D':'domain','INF':'infrastructure','ROOT':'root'}.get(n.split('_')[0],'x')
-allowed={'ui':{'ui','application'},'application':{'application','domain'},'domain':{'domain'},'infrastructure':{'infrastructure','domain'},'root':{'ui','application','domain','infrastructure'}}
+layer=lambda n: {'UI':'ui','APP':'application','DOM':'domain','D':'domain','INF':'infrastructure','ROOT':'root','CLI':'client','API':'api','CFG':'root'}.get(n.split('_')[0],'x')
+allowed={'ui':{'ui','application'},'client':{'client','application'},'api':{'api','application'},'application':{'application','domain'},'domain':{'domain'},'infrastructure':{'infrastructure','domain'},'root':{'ui','client','api','application','domain','infrastructure','root'}}
 for a,b in set(edges):
     la,lb=layer(a),layer(b)
     if a=='Main': la='root'
@@ -178,7 +178,7 @@ for a,b in sorted(pedges):
     if a.startswith('domain.') and b.startswith('domain.') and b!='domain.config' and (a,b) not in dev_edges:
         errs.append(f'la vista lógica implica {a} -> {b} pero la vista de desarrollo no lo dibuja')
     la,lb=a.split('.')[0],b.split('.')[0]
-    if la!=lb and (la,lb) not in {('ui','application'),('application','domain'),('infrastructure','domain')}:
+    if la!=lb and (la,lb) not in {('ui','application'),('client','application'),('api','application'),('application','domain'),('infrastructure','domain')}:
         errs.append(f'dependencia entre capas prohibida en la vista lógica: {a} -> {b}')
 print(f'dependencias entre paquetes derivadas de las clases: {len(pedges)} · ciclos: {"sí" if c2 else "no"}')
 

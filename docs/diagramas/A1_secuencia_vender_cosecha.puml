@@ -2,6 +2,7 @@
 /'
   Anexo A1 — Diagrama de secuencia «Vender cosecha»  ·  Cubre: HU-15 (CA-1, CA-6), HU-26 (LG-04), HU-38, HU-34, HU-39;
   RF-15, RF-26, RF-34, RF-38, RF-39; RN-14, RN-15, RN-17, RN-18, RN-28, RN-35.
+  Con cliente y servidor: la orden cruza HTTP (los mensajes HTTP se rotulan con el verbo y la ruta, ver docs/API.md).
   Taller bloque 7: cada mensaje corresponde a una operación del diagrama de clases (03_vista_logica) y el flujo incluye
   el camino exitoso y el camino de error. Ejemplo numérico: 3 Zanahorias en Primavera con demanda 100 → 27 + 26 + 26 = 79 m.
 '/
@@ -27,6 +28,13 @@ box "ui" #E3F2FD
   participant HudPanel
   participant ToastLayer
 end box
+box "client" #E0F7FA
+  participant RemoteGameClient
+end box
+box "api (servidor)" #E0F2F1
+  participant GameRestController
+  participant EventCollector
+end box
 box "application" #E8F5E9
   participant GameController
   participant MarketService
@@ -41,7 +49,11 @@ end box
 
 Jugador -> MarketDialog : elige Zanahoria, cantidad 3\ny pulsa «Vender»
 activate MarketDialog
-MarketDialog -> GameController : sell("CARROT", 3)
+MarketDialog -> RemoteGameClient : sell("CARROT", 3)
+activate RemoteGameClient
+RemoteGameClient -> GameRestController : POST /api/market/sales {itemId, quantity}
+activate GameRestController
+GameRestController -> GameController : sell("CARROT", 3)
 activate GameController
 GameController -> MarketService : sell("CARROT", 3)
 activate MarketService
@@ -56,7 +68,9 @@ alt cantidad fuera de rango (cantidad < 1 o mayor que la existencia)
     HU-15 · CA-6: no cambian inventario,
     saldo ni demanda.
   end note
-  GameController --> MarketDialog : Result (error)
+  GameController --> GameRestController : Result (error)
+  GameRestController --> RemoteGameClient : 409 {code: CANTIDAD_INVALIDA, message}
+  RemoteGameClient --> MarketDialog : Result (error)
   MarketDialog --> Jugador : muestra «La cantidad debe estar\nentre 1 y 3.»
 else cantidad válida (camino exitoso)
   loop 3 veces, una por unidad (la demanda baja 2 puntos cada vez)
@@ -76,6 +90,18 @@ else cantidad válida (camino exitoso)
   deactivate AchievementTracker
   MarketService -> EventBus : publish(SaleCompleted)
   activate EventBus
+  EventBus -> EventCollector : onEvent(SaleCompleted)
+  note right of EventCollector : el servidor no tiene pantalla: guarda\nel evento para la respuesta (DT-19)
+  deactivate EventBus
+  MarketService --> GameController : Result.ok(79)
+  deactivate MarketService
+  GameController --> GameRestController : Result (ok, 79 m)
+  deactivate GameController
+  GameRestController --> RemoteGameClient : 200 {data: 79, events: [SaleCompleted]}
+  deactivate GameRestController
+  RemoteGameClient -> EventBus : publish(SaleCompleted)
+  note right of EventBus : el cliente republica los eventos en su\npropio bus, después de rehacer el Result
+  activate EventBus
   par notificación a los observadores
     EventBus -> HudPanel : onEvent(SaleCompleted)
     note right of HudPanel : actualiza el dinero (HU-34)
@@ -84,10 +110,8 @@ else cantidad válida (camino exitoso)
     note right of ToastLayer : «Vendiste 3 Zanahorias por 79 m» (HU-39)
   end
   deactivate EventBus
-  MarketService --> GameController : Result.ok(79)
-  deactivate MarketService
-  GameController --> MarketDialog : Result (ok, 79 m)
-  deactivate GameController
+  RemoteGameClient --> MarketDialog : Result (ok, 79 m)
+  deactivate RemoteGameClient
   MarketDialog --> Jugador : muestra el total vendido
 end
 deactivate MarketDialog

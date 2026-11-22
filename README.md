@@ -13,12 +13,14 @@ Simulador de granja 2D **por turnos** (un turno = un día), hecho en Java con Sw
 | **5.0** | Preparación técnica: `pom.xml`, esqueleto de paquetes, pruebas de arquitectura, cobertura | **hecha** |
 | **5.1** | Núcleo del turno: inventario, calendario, energía, clima, nueva partida, terminar día, pantalla de inicio y HUD (8 historias) | **hecha** |
 | **5.2** | Cultivo: sembrar, regar, crecer, cosechar, marchitar y limpiar, con el mapa Java2D, herramientas y atajos (9 historias) | **hecha** |
+| **5.2b** | Migración a Spring Boot: servidor con API REST, cliente Swing por HTTP y partidas en MongoDB | **hecha** |
 | 5.3 a 5.6 | Economía, animales y edificios, guardado y pulido visual | pendientes |
 
 Hoy el juego abre la **pantalla de inicio** (Nueva partida, Cargar, Salir) y una pantalla de juego con la barra superior (dinero, fecha, clima, pronóstico y energía) y el botón «Terminar día». Desde la fase 5.2 también tiene el **mapa de la granja**: eliges una herramienta (teclas `1` a `5` o la barra), eliges la semilla y haces clic en una parcela de tierra para sembrar, regar y cosechar; `Enter` termina el día. El mercado, los animales y el guardado llegan en las fases siguientes.
 
 ## Requisitos
 
+- **MongoDB** (opcional): solo guarda y carga partidas. Sin él, el juego funciona y guardar/cargar responden «No se pudo acceder a las partidas guardadas». Por defecto se busca en `localhost:27017`; otra dirección se indica con la variable de entorno `VALLEVERDE_MONGO_URI`.
 - **JDK 17 o superior** (el proyecto compila con `--release 17`; se probó con JDK 25).
 - Una pantalla (el juego es gráfico). Sin pantalla termina con un mensaje.
 - No hace falta instalar Maven: el repositorio incluye el *Maven Wrapper*.
@@ -37,6 +39,8 @@ Compila, ejecuta las pruebas, mide la cobertura (JaCoCo exige ≥ 70 % en domini
 java -jar target\farmsim.jar
 ```
 
+Con un solo comando arranca el **servidor** (Spring Boot, solo en 127.0.0.1, puerto libre) y la **ventana** que lo usa por HTTP. También se pueden separar: `--server --port 8080` (solo servidor; la API está en [`docs/API.md`](docs/API.md)) y `--client --url=http://127.0.0.1:8080` (solo ventana).
+
 | Objetivo | Comando |
 |---|---|
 | Solo las pruebas de una historia | `.\mvnw.cmd test "-Dtest=HU01*"` |
@@ -50,12 +54,15 @@ java -jar target\farmsim.jar
 
 ## Arquitectura
 
-Servidor Spring Boot (API REST) y cliente Swing por HTTP en el mismo equipo, con partidas en MongoDB (migración en curso, Fase 5.2b). Capas con dependencias en un solo sentido: servidor `api → application → domain` e `infrastructure → domain`, cliente `ui → application` y `client → application`. El dominio no conoce Swing, Spring, Jackson, MongoDB ni E/S; la UI dibuja con DTO inmutables y se actualiza por eventos (Observer); el controlador siempre devuelve un `Result` y nunca lanza excepciones hacia la UI. Detalle en [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md).
+Servidor Spring Boot (API REST) y cliente Swing por HTTP en el mismo equipo, con partidas en MongoDB. Capas con dependencias en un solo sentido: servidor `api → application → domain` e `infrastructure → domain`, cliente `ui → application` y `client → application`. El dominio no conoce Swing, Spring, Jackson, MongoDB ni E/S; la UI dibuja con DTO inmutables y se actualiza por eventos (Observer); el controlador siempre devuelve un `Result` y nunca lanza excepciones hacia la UI. Detalle en [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md).
 
 ```
 edu.ucc.farmsim
-├─ Main, GameInfo                 raíz de composición y datos del juego
-├─ ui            screens · components · render · assets · theme
+├─ Main, LaunchOptions, GameInfo  raíz de composición y datos del juego
+├─ ui            screens · components · render · assets · theme   (cliente)
+├─ client        RemoteGameClient, EventDecoder                   (cliente HTTP)
+├─ api           GameRestController, ApiResponse, EventCollector… (servidor REST)
+├─ config        ServerApplication, ServerConfig                  (Spring)
 ├─ application   controller · service · event · dto · result
 ├─ domain        game · save · farm · crop · building · animal · economy · time · progress · config
 └─ infrastructure persistence
@@ -74,7 +81,8 @@ edu.ucc.farmsim
 | Observer | `EventBus`, `GameListener`, `HudModel`, `HudPanel` | HU-10, HU-34 | hecho (5.1) |
 | Observer | `MapPanel` | HU-35 | hecho (5.2) |
 | Observer | `ToastLayer` | HU-39 | 5.6 |
-| Memento | `GameState` (originador), `GameMemento` | HU-10 | en memoria (5.1); guardado en archivo en 5.5 |
+| Memento | `GameState` (originador), `GameMemento` | HU-10 | en memoria (5.1); guardado en MongoDB en 5.5 |
+| Observer | `EventCollector` (el servidor guarda los eventos para la respuesta) | RNF-15 | hecho (5.2b) |
 | Factory Method | `CropFactory` con `CarrotFactory`, `PotatoFactory`, `TomatoFactory`, `CornFactory`, `PumpkinFactory` | HU-01 | hecho (5.2) |
 | Builder | `BuildingBuilder`, `BuildingDirector` | HU-18 | 5.4 |
 
@@ -90,6 +98,7 @@ edu.ucc.farmsim
 | [`docs/CASOS_DE_USO.md`](docs/CASOS_DE_USO.md) | 18 casos de uso en texto |
 | [`docs/HISTORIAS_DE_USUARIO.md`](docs/HISTORIAS_DE_USUARIO.md) | 42 historias con criterios Dado/Cuando/Entonces y backlog por fases |
 | [`docs/DIAGRAMAS.md`](docs/DIAGRAMAS.md) | las 5 vistas del PPTX del curso y una secuencia anexa |
+| [`docs/API.md`](docs/API.md) | rutas REST, cuerpos, eventos y código HTTP de cada rechazo |
 | [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md) | capas, paquetes, decisiones técnicas y plan por fases |
 | [`docs/PLAN_DE_PRUEBAS.md`](docs/PLAN_DE_PRUEBAS.md) | estrategia de pruebas y criterios de salida |
 | [`docs/TRAZABILIDAD.md`](docs/TRAZABILIDAD.md) | RF → HU → componente → clases → pruebas (generado) |

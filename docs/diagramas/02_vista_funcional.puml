@@ -1,10 +1,11 @@
 @startdot
 /'
   Vista 2 — Funcional (diagrama de componentes UML)
-  Cubre: RF-01..RF-42 agrupados por bloque funcional (ver docs/DIAGRAMAS.md §2); HU-10, HU-29, HU-30, HU-35, HU-42.
+  Cubre: RF-01..RF-42 agrupados por bloque funcional (ver docs/DIAGRAMAS.md §2); HU-10, HU-29, HU-30, HU-35, HU-42; RNF-15.
   Notación de la guía: «component», interfaz provista (○ bolita unida al proveedor), interfaz requerida
   (flecha con arco "(" hacia la bolita), puertos como cuadros pequeños en el borde del componente.
-  Capas: ui → application → domain; infrastructure → domain (el puerto ISaveRepository lo define el dominio).
+  Cliente (ui, client) y servidor (api → application → domain; infrastructure → domain) se hablan por HTTP/JSON
+  (el puerto ISaveRepository lo define el dominio y lo implementa el repositorio de MongoDB).
   Posiciones fijadas a mano (layout=neato) para evitar cruces; el marco de color indica la capa.
 '/
 digraph funcional {
@@ -15,9 +16,12 @@ digraph funcional {
 
   /* ---------- marcos de capa ---------- */
   fui  [shape=box, style="filled", fillcolor="#E3F2FD", color="#7F7F7F", fixedsize=true, width=4.0, height=5.8, pos="4,4.5!", label="Presentación (paquete ui)", labelloc=t, fontsize=15];
-  fapp [shape=box, style="filled", fillcolor="#E8F5E9", color="#7F7F7F", fixedsize=true, width=8.2, height=9.9, pos="10.55,4.45!", label="Aplicación (paquete application)", labelloc=t, fontsize=15];
-  fdom [shape=box, style="filled", fillcolor="#FFF3E0", color="#7F7F7F", fixedsize=true, width=3.6, height=2.0, pos="18.6,4.5!", label="Dominio (paquete domain)", labelloc=t, fontsize=15];
-  finf [shape=box, style="filled", fillcolor="#F3E5F5", color="#7F7F7F", fixedsize=true, width=3.6, height=2.0, pos="18.6,1.35!", label="Infraestructura                                  ", labelloc=b, fontsize=14];
+  fapp [shape=box, style="filled", fillcolor="#E8F5E9", color="#7F7F7F", fixedsize=true, width=8.2, height=9.9, pos="19.55,4.45!", label="Aplicación (paquete application)", labelloc=t, fontsize=15];
+  fdom [shape=box, style="filled", fillcolor="#FFF3E0", color="#7F7F7F", fixedsize=true, width=3.6, height=2.0, pos="27.6,4.5!", label="Dominio (paquete domain)", labelloc=t, fontsize=15];
+  finf [shape=box, style="filled", fillcolor="#F3E5F5", color="#7F7F7F", fixedsize=true, width=3.6, height=2.0, pos="27.6,1.35!", label="Infraestructura                                  ", labelloc=b, fontsize=14];
+
+  fcl  [shape=box, style="filled", fillcolor="#E0F7FA", color="#7F7F7F", fixedsize=true, width=2.9, height=4.6, pos="8.6,5.2!", label="Cliente HTTP (paquete client)", labelloc=t, fontsize=14];
+  fapi [shape=box, style="filled", fillcolor="#E0F2F1", color="#7F7F7F", fixedsize=true, width=2.9, height=4.6, pos="12.9,5.2!", label="API REST (paquete api)", labelloc=t, fontsize=14];
 
   /* ---------- componentes ---------- */
   jugador [shape=box, style="rounded,filled", fillcolor=white, fixedsize=true, width=1.5, height=0.9, pos="-0.8,6.2!", label="«actor»\nJugador"];
@@ -25,38 +29,47 @@ digraph funcional {
   am  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.9, height=1.3, pos="4,2.8!", label="Gestor de assets\n(AssetManager)\nRF-42"];
   pk  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.9, height=1.0, pos="4,0.0!", label="«externo»\nPaquete de assets\n(CC0 / CC-BY)"];
 
-  gc  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.6, height=1.4, pos="8.2,6.2!", label="Controlador del juego\n(GameController)"];
-  eb  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.4, height=1.1, pos="12.4,6.7!", label="Bus de eventos\n(EventBus)"];
+  cl  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.5, height=1.3, pos="8.6,6.2!", label="Cliente del juego\n(RemoteGameClient)"];
+  ebc [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.5, height=1.1, pos="8.6,3.9!", label="Bus de eventos\ndel cliente\n(EventBus)"];
+  api [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.5, height=1.5, pos="12.9,6.2!", label="Controlador REST\n(GameRestController\n+ EventCollector)\nRNF-15"];
 
-  sv  [shape=box, style="filled", fillcolor="#FFE9A8", color="#333333", fixedsize=true, width=7.2, height=3.8, pos="10.3,2.2!", label="«component»  Servicios de aplicación", labelloc=t, fontsize=14];
-  s1  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.0, height=0.95, pos="8.2,2.75!",  label="Cultivo\nRF-01 a RF-07"];
-  s2  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.0, height=0.95, pos="10.3,2.75!", label="Tiempo y clima\nRF-08 a RF-12, 17"];
-  s3  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.0, height=0.95, pos="12.4,2.75!", label="Economía\nRF-13 a RF-16"];
-  s4  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.0, height=0.95, pos="8.2,1.35!",  label="Construcción y\nanimales RF-18 a 25"];
-  s5  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.0, height=0.95, pos="10.3,1.35!", label="Progreso\nRF-26 a RF-28"];
-  s6  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.0, height=0.95, pos="12.4,1.35!", label="Guardado\nRF-29 a RF-32"];
+  gc  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.6, height=1.4, pos="17.2,6.2!", label="Controlador del juego\n(GameController)"];
+  eb  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.4, height=1.1, pos="21.4,6.7!", label="Bus de eventos\ndel servidor\n(EventBus)"];
 
-  dom [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.6, height=1.3, pos="18.6,4.4!", label="Dominio del juego\nreglas y estado\nRN-01 a RN-35"];
-  repo[shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.6, height=1.1, pos="18.6,1.3!", label="Repositorio de partidas\n(JsonSaveRepository)"];
-  fs  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.6, height=1.0, pos="18.6,-1.9!", label="«externo»\nSistema de archivos\nlocal"];
+  sv  [shape=box, style="filled", fillcolor="#FFE9A8", color="#333333", fixedsize=true, width=7.2, height=3.8, pos="19.3,2.2!", label="«component»  Servicios de aplicación", labelloc=t, fontsize=14];
+  s1  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.0, height=0.95, pos="17.2,2.75!",  label="Cultivo\nRF-01 a RF-07"];
+  s2  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.0, height=0.95, pos="19.3,2.75!", label="Tiempo y clima\nRF-08 a RF-12, 17"];
+  s3  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.0, height=0.95, pos="21.4,2.75!", label="Economía\nRF-13 a RF-16"];
+  s4  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.0, height=0.95, pos="17.2,1.35!",  label="Construcción y\nanimales RF-18 a 25"];
+  s5  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.0, height=0.95, pos="19.3,1.35!", label="Progreso\nRF-26 a RF-28"];
+  s6  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.0, height=0.95, pos="21.4,1.35!", label="Guardado\nRF-29 a RF-32"];
+
+  dom [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.6, height=1.3, pos="27.6,4.4!", label="Dominio del juego\nreglas y estado\nRN-01 a RN-35"];
+  repo[shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.6, height=1.1, pos="27.6,1.3!", label="Repositorio de partidas\n(MongoSaveRepository)"];
+  fs  [shape=component, style=filled, fillcolor="#FFF2CC", fixedsize=true, width=2.6, height=1.0, pos="27.6,-1.9!", label="«externo»\nMongoDB\n(colección partidas)"];
 
   /* ---------- puertos (cuadros en el borde del componente) ---------- */
   p_ui [shape=square, style=filled, fillcolor=white, fixedsize=true, width=0.2, pos="2.55,6.2!", label=""];
-  p_gc [shape=square, style=filled, fillcolor=white, fixedsize=true, width=0.2, pos="6.9,6.2!", label=""];
+  p_cl [shape=square, style=filled, fillcolor=white, fixedsize=true, width=0.2, pos="7.35,6.2!", label=""];
+  p_gc [shape=square, style=filled, fillcolor=white, fixedsize=true, width=0.2, pos="15.9,6.2!", label=""];
 
   /* ---------- interfaces (bolitas) ---------- */
   node [shape=circle, style=filled, fillcolor=white, fixedsize=true, width=0.3, label=""];
   i_user [pos="1.1,6.2!",  xlabel="Ratón y teclado"];
   i_as   [pos="4,4.55!",   xlabel="IAssetProvider"];
   i_af   [pos="4,1.35!",   xlabel="IAssetFiles"];
-  i_gc   [pos="5.8,6.2!",  xlabel="IGameApi"];
-  i_es   [pos="10.3,8.4!", xlabel="IEventSubscription"];
-  i_sv   [pos="8.2,4.7!",  xlabel="IServicios"];
-  i_ep   [pos="12.4,4.75!",xlabel="IEventPublisher      "];
-  i_ru   [pos="15.7,4.4!", xlabel="IGameRules"];
-  i_sn   [pos="18.6,2.85!",xlabel="IGameSnapshot"];
-  i_re   [pos="15.7,1.3!", xlabel="ISaveRepository"];
-  i_fs   [pos="18.6,-0.5!",xlabel="IFileSystem"];
+  i_gc1  [pos="6.3,6.2!",  xlabel="IGameCommands"];
+  i_http [pos="10.75,6.2!",xlabel="IApiRest (HTTP / JSON)"];
+  i_gc2  [pos="14.95,6.2!",xlabel="IGameCommands"];
+  i_es1  [pos="6.3,3.9!",  xlabel="IEventSubscription"];
+  i_epc  [pos="8.6,5.05!", xlabel="IEventPublisher"];
+  i_es   [pos="19.3,8.4!", xlabel="IEventSubscription"];
+  i_sv   [pos="17.2,4.7!",  xlabel="IServicios"];
+  i_ep   [pos="21.4,4.75!",xlabel="IEventPublisher      "];
+  i_ru   [pos="24.7,4.4!", xlabel="IGameRules"];
+  i_sn   [pos="27.6,2.85!",xlabel="IGameSnapshot"];
+  i_re   [pos="24.7,1.3!", xlabel="ISaveRepository"];
+  i_fs   [pos="27.6,-0.5!",xlabel="IMongoDB (protocolo MongoDB)"];
 
   /* ---------- conexiones ---------- */
   edge [color="#222222"];
@@ -65,8 +78,15 @@ digraph funcional {
   i_user -> p_ui [dir=none];
   ui -> p_ui [dir=none, style=invis];
 
-  ui -> i_gc [arrowhead=ocurve, arrowsize=1.6];
-  p_gc -> i_gc [dir=none];
+  ui -> i_gc1 [arrowhead=ocurve, arrowsize=1.6];
+  p_cl -> i_gc1 [dir=none];
+  cl -> p_cl [dir=none, style=invis];
+
+  cl -> i_http [arrowhead=ocurve, arrowsize=1.6];
+  api -> i_http [dir=none];
+
+  api -> i_gc2 [arrowhead=ocurve, arrowsize=1.6];
+  p_gc -> i_gc2 [dir=none];
   gc -> p_gc [dir=none, style=invis];
 
   ui -> i_as [arrowhead=ocurve, arrowsize=1.6];
@@ -74,7 +94,12 @@ digraph funcional {
   am -> i_af [arrowhead=ocurve, arrowsize=1.6];
   pk -> i_af [dir=none];
 
-  ui -> i_es [arrowhead=ocurve, arrowsize=1.6];
+  ui -> i_es1 [arrowhead=ocurve, arrowsize=1.6];
+  ebc -> i_es1 [dir=none];
+  cl -> i_epc [arrowhead=ocurve, arrowsize=1.6];
+  ebc -> i_epc [dir=none];
+
+  api -> i_es [arrowhead=ocurve, arrowsize=1.6];
   eb -> i_es [dir=none];
 
   gc -> i_sv [arrowhead=ocurve, arrowsize=1.6];
@@ -95,7 +120,7 @@ digraph funcional {
   repo -> i_fs [arrowhead=ocurve, arrowsize=1.6];
   fs -> i_fs [dir=none];
 
-  leyenda [shape=plaintext, fixedsize=false, width=0.1, height=0.1, margin=0.05, pos="10.5,-1.7!", fontsize=13,
-           label="○ interfaz provista (bolita)     ) interfaz requerida (arco)     ■ puerto     marco de color = capa de la arquitectura"];
+  leyenda [shape=plaintext, fixedsize=false, width=0.1, height=0.1, margin=0.05, pos="14.5,-1.7!", fontsize=13,
+           label="○ interfaz provista (bolita)     ) interfaz requerida (arco)     ■ puerto     marco de color = capa de la arquitectura\lCliente y servidor tienen cada uno su bus de eventos: el servidor devuelve los eventos en la respuesta HTTP y el cliente los republica.\l"];
 }
 @enddot

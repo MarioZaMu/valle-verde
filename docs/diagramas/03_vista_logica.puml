@@ -47,7 +47,40 @@ package "ui  (presentación)" #F5FAFF {
   }
 }
 
+package "client  (cliente HTTP)" #F2FCFD {
+  class RemoteGameClient {
+    +newGame(seed: long): Result
+    +hud(): Result
+    +plant(col: int, row: int, crop: String): Result
+  }
+  class EventDecoder
+}
+
+package "api  (servidor REST)" #F2FBFA {
+  class GameRestController {
+    +newGame(seed: long): ResponseEntity
+    +hud(): ResponseEntity
+    +plant(col: int, row: int, crop: String): ResponseEntity
+  }
+  class ApiResponse
+  class EventDto
+  class ErrorStatusMapper
+  class EventCollector <<ConcreteObserver>> #BBDEFB
+}
+
 package "application" #F6FBF6 {
+  interface GameCommands {
+    +sell(item: String, qty: int): Result
+    +newGame(seed: long): Result
+    +hasGameInProgress(): boolean
+    +hud(): Result
+    +hasSavedGames(): Result
+    +plant(col: int, row: int, crop: String): Result
+    +water(col: int, row: int): Result
+    +harvest(col: int, row: int): Result
+    +inspect(col: int, row: int): Result
+    +map(): Result
+  }
   class GameController <<Controller>> {
     +newGame(seed: long): Result
     +hasGameInProgress(): boolean
@@ -295,7 +328,8 @@ package "domain" #FFFCF5 {
 }
 
 package "infrastructure" #FBF5FC {
-  class JsonSaveRepository
+  class MongoSaveRepository
+  class SaveDocument
 }
 
 ' ---------- Observer ----------
@@ -305,8 +339,8 @@ HudPanel ..|> GameListener
 HudModel ..|> GameListener
 MapPanel ..|> GameListener
 ToastLayer ..|> GameListener
-MapPanel ..> GameController : usa
-MarketDialog ..> GameController : usa
+MapPanel ..> GameCommands : usa
+MarketDialog ..> GameCommands : usa
 
 ' ---------- Aplicación ----------
 GameController --> ProgressService
@@ -388,7 +422,20 @@ GameState ..> GameMemento : «create»
 SaveGameService --> GameSession
 SaveGameService ..> GameMemento : conserva
 SaveGameService --> SaveRepository
-JsonSaveRepository ..|> SaveRepository
+MongoSaveRepository ..|> SaveRepository
+MongoSaveRepository ..> SaveDocument : lee y escribe
+
+' ---------- Cliente y servidor (RNF-15) ----------
+GameController ..|> GameCommands
+RemoteGameClient ..|> GameCommands
+RemoteGameClient ..> EventDecoder
+RemoteGameClient ..> EventBus : republica eventos
+GameRestController --> GameCommands
+GameRestController --> EventCollector
+GameRestController ..> ApiResponse : responde
+GameRestController ..> ErrorStatusMapper
+ApiResponse o-- "0..*" EventDto
+EventCollector ..|> GameListener
 SaveRepository ..> GameMemento
 
 legend right

@@ -1,40 +1,47 @@
 @startdot
 /'
   Vista 5 — Despliegue (diagrama de despliegue UML)
-  Cubre: RNF-02, RNF-03, RNF-11, R-07, W-01..W-03 (sin red ni base de datos); HU-29, HU-30, HU-33; RN-31, RN-32.
+  Cubre: RNF-02, RNF-03, RNF-11, RNF-15, RNF-16, R-07, R-09, W-01..W-03; HU-29, HU-30, HU-33; RN-31, RN-32.
   Notación de la guía (Diagramas-de-despliegue-UML.pdf p.5): nodo «device» = hardware (cubo); «executionEnvironment» =
-  plataforma donde corre el software (cubo anidado: JVM y sistema de archivos); «artifact» = unidad desplegable o archivo.
+  plataforma donde corre el software (cubo anidado: JVM con servidor y cliente, y MongoDB); «artifact» = unidad desplegable.
   Reglas (p.14 y p.17): no dibujar capas lógicas como servidores, no confundir clase con artefacto,
   toda ruta de comunicación lleva protocolo, no agregar infraestructura que el escenario no tiene.
-  Escenario: aplicación de escritorio de un solo equipo, sin red. Posiciones fijas (layout=neato).
+  Escenario: un solo equipo; un proceso Java con el servidor Spring Boot y el cliente Swing, y MongoDB local.
+  Posiciones fijas (layout=neato).
 '/
 digraph despliegue {
   graph [layout=neato, splines=line, pad=0.5, fontname="Arial", dpi=150, outputorder=nodesfirst,
-         label="Vista de despliegue — Valle Verde (escenario: un solo equipo, sin red)\n ", labelloc=t, fontsize=24];
+         label="Vista de despliegue — Valle Verde (escenario: un solo equipo, servidor y cliente locales)\n ", labelloc=t, fontsize=24];
   node  [fontname="Arial", fontsize=14];
   edge  [fontname="Arial", fontsize=13, penwidth=1.6];
 
-  pc  [shape=box3d, style=filled, fillcolor=white, fixedsize=true, width=12.8, height=6.2, pos="6.25,3.0!",
+  pc  [shape=box3d, style=filled, fillcolor=white, fixedsize=true, width=15.2, height=6.6, pos="7.35,3.1!",
        labelloc=t, fontsize=16,
        label="«device»\nEquipo del jugador\nWindows 10 o superior · pantalla ≥ 1024 × 768"];
 
-  jvm [shape=box3d, style=filled, fillcolor=white, fixedsize=true, width=4.0, height=3.5, pos="2.4,2.55!",
+  jvm [shape=box3d, style=filled, fillcolor=white, fixedsize=true, width=8.4, height=4.6, pos="4.2,2.95!",
        labelloc=t, fontsize=15,
-       label="«executionEnvironment»\nJVM\n(JRE 17 o superior)"];
-  jar [shape=note, style=filled, fillcolor="#FFF8E1", fixedsize=true, width=2.4, height=0.95, pos="2.4,1.4!",
+       label="«executionEnvironment»\nJVM (JRE 17 o superior)"];
+  cli [shape=box3d, style=filled, fillcolor=white, fixedsize=true, width=3.0, height=2.1, pos="2.0,3.0!",
+       labelloc=t, fontsize=14,
+       label="«executionEnvironment»\nCliente\n(Swing + Java2D)"];
+  srv [shape=box3d, style=filled, fillcolor=white, fixedsize=true, width=3.2, height=2.1, pos="6.5,3.0!",
+       labelloc=t, fontsize=14,
+       label="«executionEnvironment»\nServidor\n(Spring Boot · Tomcat embebido)\n127.0.0.1 · puerto libre"];
+  jar [shape=note, style=filled, fillcolor="#FFF8E1", fixedsize=true, width=2.6, height=0.8, pos="4.2,1.35!",
        label="«artifact»\nfarmsim.jar"];
 
-  fs  [shape=box3d, style=filled, fillcolor=white, fixedsize=true, width=5.2, height=3.5, pos="9.7,2.55!",
+  mdb [shape=box3d, style=filled, fillcolor=white, fixedsize=true, width=4.4, height=4.6, pos="12.4,2.95!",
        labelloc=t, fontsize=15,
-       label="«executionEnvironment»\nSistema de archivos local\n<carpeta del usuario>/.farmsim/saves/"];
-  s1  [shape=note, style=filled, fillcolor="#FFF8E1", fixedsize=true, width=1.35, height=0.95, pos="8.0,1.4!",  label="«artifact»\nslot1.json"];
-  s2  [shape=note, style=filled, fillcolor="#FFF8E1", fixedsize=true, width=1.35, height=0.95, pos="9.7,1.4!",  label="«artifact»\nslot2.json"];
-  s3  [shape=note, style=filled, fillcolor="#FFF8E1", fixedsize=true, width=1.35, height=0.95, pos="11.4,1.4!", label="«artifact»\nslot3.json"];
+       label="«executionEnvironment»\nMongoDB\n(servidor local · puerto 27017)"];
+  col [shape=note, style=filled, fillcolor="#FFF8E1", fixedsize=true, width=2.9, height=1.2, pos="12.4,2.2!",
+       label="«artifact»\ncolección partidas\n(documentos slot1, slot2, slot3)"];
 
-  /* ruta de comunicación entre nodos (con protocolo) */
-  jvm -> fs [dir=none, xlabel="E/S de archivos locales\n(java.nio.file)   ", penwidth=2.2];
+  /* rutas de comunicación (con protocolo) */
+  cli -> srv [dir=none, xlabel="HTTP / JSON\n(127.0.0.1)   ", penwidth=2.2];
+  srv -> mdb [dir=none, xlabel="protocolo MongoDB\n(TCP · localhost:27017)   ", penwidth=2.2];
 
-  leyenda [shape=box, style=filled, fillcolor="#FFFFF0", color="#999999", fixedsize=false, margin="0.25,0.15", fontsize=13, pos="6.25,-1.9!",
-           label="farmsim.jar: se genera con «mvn clean package» y se ejecuta con «java -jar farmsim.jar».\lContiene las clases de las 4 capas, Gson y los assets gráficos (CC0 / CC-BY, opcionales).\lslotN.json: schemaVersion, savedAt, state y checksum SHA-256 (RN-31, RN-32); pesa ≤ 200 KB.\lSin red: no hay servidor, HTTP/HTTPS ni base de datos (fuera de alcance W-01 a W-03).\lui, application, domain e infrastructure son capas lógicas dentro del mismo proceso, no nodos.\l"];
+  leyenda [shape=box, style=filled, fillcolor="#FFFFF0", color="#999999", fixedsize=false, margin="0.25,0.15", fontsize=13, pos="7.35,-1.9!",
+           label="farmsim.jar: se genera con «mvn clean package» y se ejecuta con «java -jar farmsim.jar» (servidor y cliente) o con --server / --client por separado.\lContiene las clases de las capas, Spring Boot, Jackson, el driver de MongoDB y los assets gráficos (CC0 / CC-BY, opcionales).\lEl servidor solo escucha en 127.0.0.1. Jugar no requiere MongoDB: sin él, guardar y cargar responden ERROR_ES (RN-31).\lcolección partidas: cada documento guarda schemaVersion, savedAt, state y checksum SHA-256 (RN-31, RN-32); pesa ≤ 200 KB.\lSin internet ni nube: servidor, cliente y MongoDB están en el mismo equipo (W-01, W-03).\lui, client, api, application, domain e infrastructure son capas lógicas dentro del proceso Java, no nodos.\l"];
 }
 @enddot

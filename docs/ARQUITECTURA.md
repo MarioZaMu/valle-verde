@@ -2,7 +2,7 @@
 
 > **Versión 0.2 · 2026-11-22 · Fase 5.2b (migración a Spring Boot)**
 > Formaliza el diseño propuesto en los diagramas ([`DIAGRAMAS.md`](DIAGRAMAS.md)): capas, árbol de paquetes, decisiones técnicas y plan de implementación por fases con sus historias ([`HISTORIAS_DE_USUARIO.md`](HISTORIAS_DE_USUARIO.md) §7). El plan de pruebas está en [`PLAN_DE_PRUEBAS.md`](PLAN_DE_PRUEBAS.md).
-> **Estado:** las Fases 5.0 (§10), 5.1 (§11) y 5.2 (§12) están hechas. La **Fase 5.2b** (§13) migra el diseño a un servidor Spring Boot con API REST, un cliente Swing por HTTP y persistencia en MongoDB. La Fase 5.3 empieza solo con tu visto bueno.
+> **Estado:** las Fases 5.0 (§10), 5.1 (§11), 5.2 (§12) y 5.2b (§13, migración a servidor Spring Boot con API REST, cliente Swing por HTTP y persistencia en MongoDB) están hechas. La Fase 5.3 empieza solo con tu visto bueno.
 
 ## 1. Estilo arquitectónico
 
@@ -43,7 +43,7 @@ Las capas del servidor tienen los nombres del curso (*Controller → Service →
 | Aplicación | `application` | Casos de uso: coordinar, validar entradas y traducir | `GameCommands`, `GameController`, servicios, `GameSession`, `EventBus`, DTO, `Result` | dibujar, hablar HTTP, tocar MongoDB |
 | Dominio | `domain` | Reglas y estado del juego (RN-01 a RN-35) | agregado `GameState`, cultivos, animales, edificios, mercado, tiempo, logros, patrones | depender de otra capa o de bibliotecas de UI, Spring, JSON, MongoDB y E/S |
 | Infraestructura | `infrastructure` | Detalles técnicos: guardar y leer partidas en MongoDB | `MongoSaveRepository`, `SaveDocument`, `SaveCodec`, `Checksum` | contener reglas de negocio |
-| Configuración | `config` | Declarar los beans de Spring que no son componentes (`StateRandom`, `EventBus`, `GameSession`, pasos del día) y los tiempos de espera de MongoDB | `ServerConfig`, `MongoConfig` | contener reglas de negocio |
+| Configuración | `config` | Arrancar Spring Boot y declarar los beans que no son componentes (`EventBus`, `DayPipeline`); los tiempos de espera de MongoDB van en la URI de `application.properties` | `ServerApplication`, `ServerConfig` | contener reglas de negocio |
 
 ## 3. Árbol de paquetes
 
@@ -51,7 +51,7 @@ Paquete raíz `edu.ucc.farmsim`. Las clases entre paréntesis se muestran en los
 
 ```
 edu.ucc.farmsim
-├─ Main                                 raíz de composición: arranca el servidor Spring Boot y/o la ventana del cliente (`--server`, `--client`)
+├─ Main, LaunchOptions                  raíz de composición: arranca el servidor Spring Boot y/o la ventana del cliente (`--server`, `--client`)
 ├─ GameInfo                             nombre visible y versión del juego (única constante, RNF-12)
 ├─ ui
 │  ├─ screens      MainWindow, StartScreen, GameScreen, ScreenRouter
@@ -63,7 +63,7 @@ edu.ucc.farmsim
 │     RemoteGameClient (implementa GameCommands), EventDecoder
 ├─ api                                  (servidor: capa REST)
 │     GameRestController, ApiResponse, EventDto, ErrorStatusMapper, EventCollector, ApiExceptionHandler
-├─ config                               ServerConfig, MongoConfig (beans de Spring)
+├─ config                               ServerApplication, ServerConfig (Spring)
 ├─ application
 │  ├─ controller   GameCommands (puerto), GameController
 │  ├─ service      GameSession, FarmService, DayService, MarketService, BuildingService,
@@ -299,4 +299,33 @@ Ajustes surgidos al implementar: (1) `Main` se declara como capa «Composition»
 | HU-36 · CA-5 | `M`, `I`, `L`, `F5` y `F9` abren su función (hoy solo responden que llegará) | 5.3 y 5.5 |
 
 **Diagramas:** además de `tools/check_diagrams.py`, la nueva herramienta `tools/check_imports.py` compara los `import` reales entre paquetes del dominio con las flechas del diagrama de desarrollo: no falta ninguna.
+
+## 13. Estado de la Fase 5.2b (migración a Spring Boot)
+
+**Sin historias nuevas:** se migró la arquitectura exigida (Spring Boot) conservando todas las pruebas de aceptación. `python tools/traceability.py --upto 5.2` sigue sin errores.
+
+| Resultado | Valor |
+|---|---|
+| Pruebas | 222 (2 se omiten con aviso si no hay MongoDB: `MongoSaveRepositoryRealMongoTest`); `mvn clean verify` en verde con las dos barreras de cobertura |
+| Nuevas | 22 de la API (una por ruta y rechazo), 11 del cliente contra el servidor real (incluye «mismos resultados y eventos que el controlador en proceso»), 1 de las pantallas Swing sobre HTTP, 8 de reglas ArchUnit |
+| Arranque | `java -jar target/farmsim.jar`: la ventana «Valle Verde» aparece en **4,1 a 4,3 s** (RNF-02 pide ≤ 5 s) con servidor, Tomcat y cliente |
+| Sin MongoDB | el juego funciona; `GET /api/saves/any` responde `503 ERROR_ES` con el texto de RN-35 |
+| Patrón nuevo | Observer: `EventCollector` (el servidor guarda los eventos de cada orden para la respuesta) |
+
+**Decisiones tomadas al implementar:**
+
+| # | Decisión | Motivo |
+|---|---|---|
+| D-16 | `hasGameInProgress()` del cliente se deduce de `GET /api/game` y no tiene ruta propia | Una ruta menos y la misma semántica (sin partida = `404 SIN_PARTIDA`) |
+| D-17 | El cliente reconstruye el `Result` y **después** republica los eventos | Mismo orden que en proceso: la UI ve los eventos antes de recibir el resultado |
+| D-18 | `EventDto.data` es el propio *record* del evento; el cliente elige la clase por el nombre entre los subtipos permitidos de `GameEvent` | Un evento nuevo no exige tocar el decodificador |
+| D-19 | `MongoSaveRepository` lleva `@Profile("!no-mongo")`; las pruebas de API y cliente usan el perfil `no-mongo` con `FakeSaveRepository` | Esas pruebas no dependen de tener MongoDB (RT-11) |
+| D-20 | Todo error técnico de MongoDB se vuelve `SaveStorageException` (dominio) y `SaveGameService` lo traduce a `ERROR_ES`; `hasAnySave()` ahora devuelve `Result<Boolean>` | La aplicación no ve tipos de MongoDB y jugar no depende de la base |
+| D-21 | Surefire fija `java.awt.headless=false` | Spring Boot activa el modo sin pantalla y las pruebas Swing se omitían en silencio |
+| D-22 | Un `seedId` desconocido responde `500 ERROR_INTERNO` (no hay código de RN-35 para «semilla inexistente») | La UI nunca lo envía; no se inventó un código nuevo |
+| D-23 | `JsonSaveRepository` y Gson se eliminaron; la D-05 de la §11 queda sustituida por `MongoSaveRepository` | Persistencia en MongoDB (RN-31) |
+
+**Pendiente de la persistencia (5.5):** guardar, cargar y listar (`PUT`/`POST /api/saves/{slot}`), `SaveCodec` con Jackson, `Checksum` y `GameStateValidator`. El adaptador y el formato de documento (`SaveDocument`) ya existen.
+
+**Diagramas:** las 6 vistas se actualizaron (MongoDB, cliente, API REST, paquetes `client`/`api`/`config`, despliegue con servidor y cliente dentro de la JVM, y la secuencia A1 con el salto HTTP); `check_diagrams.py` y `check_imports.py` terminan sin errores.
 

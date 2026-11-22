@@ -23,7 +23,7 @@ digraph contexto {
 
   assets:e -> sistema:w [label="Sprites e iconos", labelfloat=false];
 
-  sistema:ne -> archivos:nw [label="  Partida (JSON + checksum)  "];
+  sistema:ne -> archivos:nw [label="  Partida (documento + checksum)  "];
   archivos:sw -> sistema:se [xlabel="Partida guardada  "];
 }
 @enddot
