@@ -14,17 +14,20 @@ import edu.ucc.farmsim.application.service.ViewMapper;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.springframework.stereotype.Component;
 
 /**
  * Pattern: Controller — Role: GRASP controller (the single entry point the UI calls).
  *
  * <p>It only orchestrates: it asks the services to do the work and always answers with a {@link Result}.
- * No exception ever reaches the UI: anything unexpected becomes {@code ERROR_INTERNO} (R-03, RNF-07), and
- * it never touches repositories (AR-4).
+ * No exception ever reaches the UI or the API: anything unexpected becomes {@code ERROR_INTERNO} (R-03,
+ * RNF-07), and it never touches repositories (AR-4). It is not the REST controller: the {@code api} package
+ * translates HTTP into calls to this class.
  *
  * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-28, HU-33, HU-35.
  */
-public final class GameController {
+@Component
+public final class GameController implements GameCommands {
 
     private static final Logger LOG = Logger.getLogger(GameController.class.getName());
 
@@ -56,6 +59,7 @@ public final class GameController {
     }
 
     /** True if a game is in progress (the UI asks for confirmation before discarding it). */
+    @Override
     public boolean hasGameInProgress() {
         try {
             return session.hasGame();
@@ -70,11 +74,13 @@ public final class GameController {
      *
      * @param seed seed of the random generator
      */
+    @Override
     public Result<HudView> newGame(long seed) {
         return guard(() -> progress.newGame(seed));
     }
 
     /** Ends the day: effects are resolved in the order of RN-03 and the new top bar is returned. */
+    @Override
     public Result<HudView> endDay() {
         return guard(day::endDay);
     }
@@ -86,6 +92,7 @@ public final class GameController {
      * @param row    row of the plot
      * @param seedId item id of the seed, for example {@code CARROT_SEED}
      */
+    @Override
     public Result<PlotView> plant(int col, int row, String seedId) {
         return guard(() -> farm.plant(col, row, seedId));
     }
@@ -96,6 +103,7 @@ public final class GameController {
      * @param col column of the plot
      * @param row row of the plot
      */
+    @Override
     public Result<PlotView> water(int col, int row) {
         return guard(() -> farm.water(col, row));
     }
@@ -106,6 +114,7 @@ public final class GameController {
      * @param col column of the plot
      * @param row row of the plot
      */
+    @Override
     public Result<PlotView> harvest(int col, int row) {
         return guard(() -> farm.harvest(col, row));
     }
@@ -116,21 +125,25 @@ public final class GameController {
      * @param col column of the plot
      * @param row row of the plot
      */
+    @Override
     public Result<PlotView> inspect(int col, int row) {
         return guard(() -> farm.inspect(col, row));
     }
 
     /** The whole farm map, for drawing it. A pure query. */
+    @Override
     public Result<MapView> map() {
         return guard(farm::map);
     }
 
     /** True if at least one of the save slots holds a game. */
+    @Override
     public Result<Boolean> hasSavedGames() {
-        return guard(() -> Result.ok(saves.hasAnySave()));
+        return guard(saves::hasAnySave);
     }
 
     /** The top bar of the game in progress. */
+    @Override
     public Result<HudView> hud() {
         return guard(() -> {
             if (!session.hasGame()) {

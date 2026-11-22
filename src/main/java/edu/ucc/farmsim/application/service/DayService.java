@@ -10,6 +10,7 @@ import edu.ucc.farmsim.domain.game.GameMemento;
 import edu.ucc.farmsim.domain.game.GameState;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.springframework.stereotype.Service;
 
 /**
  * Ends the day: runs the pipeline of RN-03 and publishes the events (step 9).
@@ -19,6 +20,7 @@ import java.util.logging.Logger;
  *
  * <p>Stories: HU-10.
  */
+@Service
 public final class DayService {
 
     private static final Logger LOG = Logger.getLogger(DayService.class.getName());

@@ -1,6 +1,6 @@
 package edu.ucc.farmsim.ui.screens;
 
-import edu.ucc.farmsim.application.controller.GameController;
+import edu.ucc.farmsim.application.controller.GameCommands;
 import edu.ucc.farmsim.application.event.EventBus;
 import edu.ucc.farmsim.ui.components.HudPanel;
 import edu.ucc.farmsim.ui.components.Shortcut;
@@ -40,7 +40,7 @@ public final class GameScreen extends JPanel {
      * @param bus        where game events are published (the top bar and the map listen to it)
      * @param navigator  switches screens
      */
-    public GameScreen(GameController controller, EventBus bus, ScreenNavigator navigator) {
+    public GameScreen(GameCommands controller, EventBus bus, ScreenNavigator navigator) {
         super(new BorderLayout());
         ToolModel tools = new ToolModel();
         JLabel status = new JLabel(" ");

@@ -1,6 +1,6 @@
 package edu.ucc.farmsim.ui.render;
 
-import edu.ucc.farmsim.application.controller.GameController;
+import edu.ucc.farmsim.application.controller.GameCommands;
 import edu.ucc.farmsim.application.dto.MapView;
 import edu.ucc.farmsim.application.dto.PlotView;
 import edu.ucc.farmsim.application.event.EventBus;
@@ -34,7 +34,7 @@ public final class MapPanel extends JPanel implements GameListener {
     private static final long serialVersionUID = 1L;
     private static final Dimension PREFERRED = new Dimension(1024, 600);
 
-    private final transient GameController controller;
+    private final transient GameCommands controller;
     private final transient PlotClickListener clicks;
     private final transient MapRenderer renderer = new MapRenderer();
     private transient MapView view;
@@ -47,7 +47,7 @@ public final class MapPanel extends JPanel implements GameListener {
      * @param bus        where game events are published
      * @param clicks     told when a plot is clicked
      */
-    public MapPanel(GameController controller, EventBus bus, PlotClickListener clicks) {
+    public MapPanel(GameCommands controller, EventBus bus, PlotClickListener clicks) {
         this.controller = controller;
         this.clicks = clicks;
         setPreferredSize(PREFERRED);

@@ -20,6 +20,7 @@ import edu.ucc.farmsim.domain.game.GameState;
 import edu.ucc.farmsim.domain.time.Season;
 import edu.ucc.farmsim.domain.time.Weather;
 import java.util.stream.Collectors;
+import org.springframework.stereotype.Service;
 
 /**
  * The crop use cases: sow, water, harvest and clear (RN-06 to RN-10). Each operation checks every rule
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
  *
  * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-35.
  */
+@Service
 public final class FarmService {
 
     private static final String SEASON_SEPARATOR = " y ";

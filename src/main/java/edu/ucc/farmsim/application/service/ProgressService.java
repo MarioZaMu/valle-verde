@@ -5,12 +5,14 @@ import edu.ucc.farmsim.application.event.EventBus;
 import edu.ucc.farmsim.application.event.GameEvent;
 import edu.ucc.farmsim.application.result.Result;
 import edu.ucc.farmsim.domain.game.GameState;
+import org.springframework.stereotype.Service;
 
 /**
  * Starts games (and, in later phases, tracks achievements and unlocks).
  *
  * <p>Stories: HU-28.
  */
+@Service
 public final class ProgressService {
 
     private final GameSession session;

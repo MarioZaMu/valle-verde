@@ -1,6 +1,6 @@
 package edu.ucc.farmsim.ui.screens;
 
-import edu.ucc.farmsim.application.controller.GameController;
+import edu.ucc.farmsim.application.controller.GameCommands;
 import edu.ucc.farmsim.application.dto.HudView;
 import edu.ucc.farmsim.application.dto.PlotView;
 import edu.ucc.farmsim.application.result.Result;
@@ -20,7 +20,7 @@ public final class GameScreenPresenter {
 
     private static final String CLEAR = "";
 
-    private final GameController controller;
+    private final GameCommands controller;
     private final ToolModel tools;
     private final Consumer<String> messages;
 
@@ -31,7 +31,7 @@ public final class GameScreenPresenter {
      * @param tools      the selected tool and seed
      * @param messages   where messages for the player are sent
      */
-    public GameScreenPresenter(GameController controller, ToolModel tools, Consumer<String> messages) {
+    public GameScreenPresenter(GameCommands controller, ToolModel tools, Consumer<String> messages) {
         this.controller = controller;
         this.tools = tools;
         this.messages = messages;

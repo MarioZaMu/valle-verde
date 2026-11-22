@@ -1,6 +1,6 @@
 package edu.ucc.farmsim.ui.screens;
 
-import edu.ucc.farmsim.application.controller.GameController;
+import edu.ucc.farmsim.application.controller.GameCommands;
 import edu.ucc.farmsim.application.dto.HudView;
 import edu.ucc.farmsim.application.result.Result;
 import edu.ucc.farmsim.ui.theme.Texts;
@@ -13,7 +13,7 @@ import java.util.function.LongSupplier;
  */
 public final class StartScreenPresenter {
 
-    private final GameController controller;
+    private final GameCommands controller;
     private final ScreenNavigator navigator;
     private final LongSupplier seeds;
 
@@ -24,7 +24,7 @@ public final class StartScreenPresenter {
      * @param navigator  switches screens and talks to the player
      * @param seeds      supplies the seed of each new game (the clock in production, a constant in tests)
      */
-    public StartScreenPresenter(GameController controller, ScreenNavigator navigator, LongSupplier seeds) {
+    public StartScreenPresenter(GameCommands controller, ScreenNavigator navigator, LongSupplier seeds) {
         this.controller = controller;
         this.navigator = navigator;
         this.seeds = seeds;

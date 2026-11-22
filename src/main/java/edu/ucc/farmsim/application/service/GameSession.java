@@ -1,6 +1,7 @@
 package edu.ucc.farmsim.application.service;
 
 import edu.ucc.farmsim.domain.game.GameState;
+import org.springframework.stereotype.Component;
 
 /**
  * Holds the game currently being played. Services read the state from here; loading a game builds a new
@@ -8,6 +9,7 @@ import edu.ucc.farmsim.domain.game.GameState;
  *
  * <p>Stories: HU-28.
  */
+@Component
 public class GameSession {
 
     private GameState current;
