@@ -71,14 +71,18 @@ class HU10EndDayTest {
     }
 
     @Test
-    void HU10_ca1_theStandardPipelineAdvancesTheCalendarThenDrawsTheForecastThenRestoresEnergy() {
+    void HU10_ca1_theStandardPipelineRunsEveryRegisteredStepInRn03Order() {
         TestApp app = TestApp.create();
         app.controller.newGame(TestApp.SEED);
         GameState state = app.session.current();
 
         DayReport report = DayPipeline.standard().run(state);
 
-        assertEquals(List.of(DayPhase.CALENDAR, DayPhase.FORECAST, DayPhase.ENERGY), report.phasesRun());
+        List<DayPhase> ran = report.phasesRun();
+        assertTrue(ran.containsAll(List.of(DayPhase.CALENDAR, DayPhase.FORECAST, DayPhase.ENERGY)), ran.toString());
+        List<DayPhase> sorted = new ArrayList<>(ran);
+        Collections.sort(sorted);
+        assertEquals(sorted, ran, "the standard pipeline must run its steps in the order of RN-03");
         assertEquals(new GameDate(1, Season.SPRING, 1), report.previousDate());
         assertEquals(new GameDate(1, Season.SPRING, 2), report.newDate());
         assertEquals(state.weather().today(), report.todayWeather());

@@ -3,7 +3,7 @@ package edu.ucc.farmsim.domain.crop;
 /**
  * Pattern: State — Role: ConcreteState (withered).
  *
- * <p>Stories: HU-01.
+ * <p>Stories: HU-01, HU-03.
  */
 final class WitheredState implements CropState {
 
@@ -26,5 +26,10 @@ final class WitheredState implements CropState {
     @Override
     public boolean canHarvest() {
         return false;
+    }
+
+    @Override
+    public void onDayEnd(Crop crop) {
+        // a withered crop neither grows nor needs water
     }
 }

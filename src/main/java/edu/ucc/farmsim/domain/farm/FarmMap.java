@@ -11,7 +11,7 @@ import java.util.List;
  * The farm grid: {@link GameRules#MAP_COLS} x {@link GameRules#MAP_ROWS} plots with coordinates
  * {@code (column, row)}, where {@code (0, 0)} is the top-left corner (RN-04).
  *
- * <p>Stories: HU-01, HU-28.
+ * <p>Stories: HU-01, HU-03, HU-28.
  */
 public final class FarmMap {
 
@@ -89,6 +89,17 @@ public final class FarmMap {
             }
         }
         return total;
+    }
+
+    /** Resolves the end of the day for every crop on the map (step 2 of RN-03). */
+    public void growCrops() {
+        for (Plot[] line : plots) {
+            for (Plot plot : line) {
+                if (plot.crop() != null) {
+                    plot.crop().endOfDay();
+                }
+            }
+        }
     }
 
     /** Copy of the crops of every plot in row-major order ({@code null} where there is none), for the memento. */

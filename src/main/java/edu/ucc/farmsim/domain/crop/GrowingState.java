@@ -3,9 +3,9 @@ package edu.ucc.farmsim.domain.crop;
 /**
  * Pattern: State — Role: ConcreteState (growing).
  *
- * <p>Stories: HU-01.
+ * <p>Stories: HU-01, HU-03.
  */
-final class GrowingState implements CropState {
+final class GrowingState extends GrowingPhaseState {
 
     static final GrowingState INSTANCE = new GrowingState();
 
@@ -16,15 +16,5 @@ final class GrowingState implements CropState {
     @Override
     public CropStage stage() {
         return CropStage.GROWING;
-    }
-
-    @Override
-    public boolean isAlive() {
-        return true;
-    }
-
-    @Override
-    public boolean canHarvest() {
-        return false;
     }
 }

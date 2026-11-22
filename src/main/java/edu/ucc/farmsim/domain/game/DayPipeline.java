@@ -10,15 +10,16 @@ import java.util.List;
  * <p>Steps can be registered in any order: the pipeline always runs them sorted by {@link DayPhase}, so
  * the order of RN-03 cannot be broken by whoever adds a step. Each story adds its own step.
  *
- * <p>Stories: HU-10.
+ * <p>Stories: HU-03, HU-10.
  */
 public final class DayPipeline {
 
     private final List<DayStep> steps = new ArrayList<>();
 
-    /** The pipeline with every step implemented so far (calendar, forecast and energy). */
+    /** The pipeline with every step implemented so far (growth, calendar, forecast and energy). */
     public static DayPipeline standard() {
         return new DayPipeline()
+                .add(new GrowthStep())
                 .add(new CalendarStep())
                 .add(new ForecastStep())
                 .add(new EnergyResetStep());

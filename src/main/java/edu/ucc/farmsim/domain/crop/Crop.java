@@ -6,7 +6,7 @@ package edu.ucc.farmsim.domain.crop;
  * <p>Holds what RN-06 to RN-10 track for a sown plant: days grown, days without water and whether it was
  * watered today. Its stage is derived from the progress and kept as a state object.
  *
- * <p>Stories: HU-01, HU-02.
+ * <p>Stories: HU-01, HU-02, HU-03.
  */
 public final class Crop {
 
@@ -91,6 +91,25 @@ public final class Crop {
         }
         watered = true;
         return true;
+    }
+
+    /**
+     * Resolves the end of the day for this crop (step 2 of RN-03): the current state decides what happens, and
+     * the watered mark is cleared for the next day.
+     */
+    public void endOfDay() {
+        state.onDayEnd(this);
+        watered = false;
+    }
+
+    void growOneDay() {
+        daysGrown++;
+        daysWithoutWater = 0;
+        state = CropState.forProgress(type, daysGrown, false);
+    }
+
+    void missWater() {
+        daysWithoutWater++;
     }
 
     /** Days still needed to mature (0 when mature or withered). */

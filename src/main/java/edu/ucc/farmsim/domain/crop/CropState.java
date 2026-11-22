@@ -6,7 +6,7 @@ package edu.ucc.farmsim.domain.crop;
  * <p>The states are stateless and shared; a {@link Crop} holds the current one and changes it as it grows,
  * so no code needs a chain of {@code if}s on the stage.
  *
- * <p>Stories: HU-01.
+ * <p>Stories: HU-01, HU-03.
  */
 public interface CropState {
 
@@ -18,6 +18,12 @@ public interface CropState {
 
     /** True only when the crop is mature and can be harvested. */
     boolean canHarvest();
+
+    /**
+     * What happens to the crop when the day ends (step 2 of RN-03): a living crop that was watered grows; one
+     * that was not counts a day without water. A mature or withered crop does nothing.
+     */
+    void onDayEnd(Crop crop);
 
     /**
      * The state that corresponds to a crop's progress (RN-08): Seed at 0 days; Sprout until half of the days
