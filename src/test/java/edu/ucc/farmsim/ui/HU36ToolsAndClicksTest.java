@@ -28,17 +28,7 @@ import org.junit.jupiter.api.Test;
  */
 class HU36ToolsAndClicksTest {
 
-    private static final edu.ucc.farmsim.ui.screens.GameDialogs NO_DIALOGS = new edu.ucc.farmsim.ui.screens.GameDialogs() {
-        @Override
-        public void showMarket() {
-            // not needed here
-        }
-
-        @Override
-        public void showInventory() {
-            // not needed here
-        }
-    };
+    private static final edu.ucc.farmsim.ui.screens.GameDialogs NO_DIALOGS = new edu.ucc.farmsim.support.RecordingDialogs();
 
     private static final int COL = GameFixtures.SOIL_COL;
     private static final int ROW = GameFixtures.SOIL_ROW;
@@ -165,20 +155,6 @@ class HU36ToolsAndClicksTest {
     }
 
     @Test
-    void HU36_theBuildAndFeedToolsCanBeSelectedButSayTheyAreNotAvailableYet() {
-        TestApp app = TestApp.startedGame();
-        GameMemento before = app.state().createMemento();
-
-        tools.select(Tool.BUILD);
-        presenter(app).onPlotClicked(COL, ROW);
-        tools.select(Tool.FEED);
-        presenter(app).onPlotClicked(COL, ROW);
-
-        assertEquals(List.of(Texts.TOOL_NOT_AVAILABLE_YET, Texts.TOOL_NOT_AVAILABLE_YET), messages);
-        assertEquals(before, app.state().createMemento());
-    }
-
-    @Test
     void HU36_ca5_everyShortcutIsMappedToItsKey() {
         assertEquals(KeyEvent.VK_ENTER, Shortcut.END_DAY.keyCode());
         assertEquals(KeyEvent.VK_M, Shortcut.MARKET.keyCode());
@@ -213,5 +189,84 @@ class HU36ToolsAndClicksTest {
             return;
         }
         throw new AssertionError("A non-seed item must be rejected");
+    }
+
+    @Test
+    void HU36_ca4_theHarvestToolCollectsTheProductsOfABuilding() {
+        TestApp app = TestApp.startedGame();
+        var coop = GameFixtures.coop(app.state());
+        GameFixtures.house(coop, edu.ucc.farmsim.domain.animal.AnimalType.HEN,
+                edu.ucc.farmsim.domain.animal.AnimalCondition.HEALTHY, 0, false, 2);
+        tools.select(Tool.HARVEST);
+
+        presenter(app).onPlotClicked(GameFixtures.GRASS_COL + 1, GameFixtures.GRASS_ROW + 1);
+
+        assertEquals(2, app.state().inventory().count(ItemType.EGG));
+        assertEquals(99, app.state().energy().current());
+        assertEquals(List.of(""), messages);
+    }
+
+    @Test
+    void HU36_ca4_collectingFromABuildingWithNothingWaitingShowsTheNotice() {
+        TestApp app = TestApp.startedGame();
+        GameFixtures.coop(app.state());
+        tools.select(Tool.HARVEST);
+
+        presenter(app).onPlotClicked(GameFixtures.GRASS_COL, GameFixtures.GRASS_ROW);
+
+        assertEquals(List.of("No hay productos que recoger."), messages);
+    }
+
+    @Test
+    void HU36_theFeedToolFeedsTheBuildingUnderTheClickAndTellsWhenThereIsNone() {
+        TestApp app = TestApp.startedGame();
+        var coop = GameFixtures.coop(app.state());
+        GameFixtures.hen(coop);
+        app.state().inventory().add(ItemType.HAY, 1);
+        tools.select(Tool.FEED);
+
+        presenter(app).onPlotClicked(COL, ROW);
+        presenter(app).onPlotClicked(GameFixtures.GRASS_COL, GameFixtures.GRASS_ROW);
+
+        assertEquals(List.of(Texts.NO_BUILDING_HERE, ""), messages);
+        assertTrue(coop.animals().get(0).isFedToday());
+        assertEquals(0, app.state().inventory().count(ItemType.HAY));
+    }
+
+    @Test
+    void HU36_theFeedToolShowsTheRejectionOfTheController() {
+        TestApp app = TestApp.startedGame();
+        GameFixtures.hen(GameFixtures.coop(app.state()));
+        tools.select(Tool.FEED);
+
+        presenter(app).onPlotClicked(GameFixtures.GRASS_COL, GameFixtures.GRASS_ROW);
+
+        assertEquals(List.of("Heno insuficiente: necesitas 1."), messages);
+    }
+
+    @Test
+    void HU36_theBuildToolOpensTheConstructionDialogOnTheClickedPlot() {
+        TestApp app = TestApp.startedGame();
+        edu.ucc.farmsim.support.RecordingDialogs dialogs = new edu.ucc.farmsim.support.RecordingDialogs();
+        tools.select(Tool.BUILD);
+
+        new GameScreenPresenter(app.controller, tools, messages::add, dialogs).onPlotClicked(2, 7);
+
+        assertEquals(List.of("construction:2,7"), dialogs.opened);
+        assertTrue(app.state().farm().buildings().isEmpty());
+    }
+
+    @Test
+    void HU36_withoutAToolClickingABuildingOpensItsPanelAndClickingAPlotDoesNothing() {
+        TestApp app = TestApp.startedGame();
+        GameFixtures.coop(app.state());
+        edu.ucc.farmsim.support.RecordingDialogs dialogs = new edu.ucc.farmsim.support.RecordingDialogs();
+        GameScreenPresenter presenter = new GameScreenPresenter(app.controller, tools, messages::add, dialogs);
+
+        presenter.onPlotClicked(COL, ROW);
+        presenter.onPlotClicked(GameFixtures.GRASS_COL + 1, GameFixtures.GRASS_ROW);
+
+        assertEquals(List.of("building:0"), dialogs.opened);
+        assertTrue(messages.isEmpty());
     }
 }

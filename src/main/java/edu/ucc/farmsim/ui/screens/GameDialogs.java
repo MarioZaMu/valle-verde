@@ -1,10 +1,12 @@
 package edu.ucc.farmsim.ui.screens;
 
+import edu.ucc.farmsim.application.dto.DaySummaryView;
+
 /**
- * What the game screen logic needs to open the dialogs of the shortcuts (M and I). The real one opens Swing
- * dialogs; tests use a fake, so no display is needed.
+ * What the game screen logic needs to open its dialogs (market, inventory, construction, a building and the
+ * summary of the day). The real one opens Swing dialogs; tests use a fake, so no display is needed.
  *
- * <p>Stories: HU-37, HU-38.
+ * <p>Stories: HU-17, HU-18, HU-37, HU-38.
  */
 public interface GameDialogs {
 
@@ -13,4 +15,22 @@ public interface GameDialogs {
 
     /** Opens the inventory (shortcut I). */
     void showInventory();
+
+    /**
+     * Opens the construction dialog for the plot that was clicked with the Build tool.
+     *
+     * @param col column of the plot, the top-left corner of the building
+     * @param row row of the plot
+     */
+    void showConstruction(int col, int row);
+
+    /**
+     * Opens the panel of a building: its animals and the buttons to feed, collect and cure.
+     *
+     * @param buildingId id of the building
+     */
+    void showBuilding(int buildingId);
+
+    /** Shows the summary of the day that just ended. */
+    void showSummary(DaySummaryView summary);
 }

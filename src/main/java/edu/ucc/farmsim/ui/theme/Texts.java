@@ -85,6 +85,63 @@ public final class Texts {
     /** Label of the seed chooser next to the tools. */
     public static final String SEED_LABEL = "Semilla:";
 
+    /** Shown when feeding or collecting on a plot without a building. */
+    public static final String NO_BUILDING_HERE = "No hay ningún edificio en esta parcela.";
+
+    /** Title of the construction dialog. */
+    public static final String CONSTRUCTION_TITLE = "Construir";
+
+    /** Table column: building. */
+    public static final String COL_BUILDING = "Edificio";
+
+    /** Table column: size. */
+    public static final String COL_SIZE = "Tamaño";
+
+    /** Table column: cost. */
+    public static final String COL_COST = "Costo";
+
+    /** Table column: state of a building offer. */
+    public static final String COL_STATE = "Estado";
+
+    /** Button that builds. */
+    public static final String BUILD = "Construir aquí";
+
+    /** Title of the building panel. */
+    public static final String BUILDING_TITLE = "Edificio";
+
+    /** Table column: animal. */
+    public static final String COL_ANIMAL = "Animal";
+
+    /** Table column: days without food. */
+    public static final String COL_DAYS_WITHOUT_FEED = "Días sin comer";
+
+    /** Table column: fed today. */
+    public static final String COL_FED_TODAY = "Comió hoy";
+
+    /** Table column: units waiting. */
+    public static final String COL_PENDING = "Pendiente";
+
+    /** Button that feeds a building. */
+    public static final String FEED_BUILDING = "Alimentar";
+
+    /** Button that collects the products of a building. */
+    public static final String COLLECT = "Recolectar";
+
+    /** Button that cures the selected animal. */
+    public static final String CURE = "Curar";
+
+    /** Title of the summary of the day. */
+    public static final String SUMMARY_TITLE = "Resumen del día";
+
+    /** Button that closes a dialog. */
+    public static final String CLOSE = "Cerrar";
+
+    /** Yes. */
+    public static final String YES = "sí";
+
+    /** No. */
+    public static final String NO = "no";
+
     /** Shown in the top bar when there is no game yet. */
     public static final String NO_VALUE = "—";
 
@@ -103,6 +160,11 @@ public final class Texts {
             case BUILD -> "Construir";
             case FEED -> "Alimentar";
         };
+    }
+
+    /** Size of a building, for example {@code 2 × 2}. */
+    public static String size(int width, int height) {
+        return width + " × " + height;
     }
 
     /** Spanish name of a season id (for example {@code SPRING}); unknown ids are returned unchanged. */

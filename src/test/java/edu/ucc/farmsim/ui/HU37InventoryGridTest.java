@@ -15,6 +15,7 @@ import edu.ucc.farmsim.ui.screens.GameDialogs;
 import edu.ucc.farmsim.ui.screens.GameScreenPresenter;
 import edu.ucc.farmsim.ui.components.Shortcut;
 import edu.ucc.farmsim.support.GameFixtures;
+import edu.ucc.farmsim.support.RecordingDialogs;
 import edu.ucc.farmsim.support.TestApp;
 import java.awt.GraphicsEnvironment;
 import java.util.ArrayList;
@@ -61,7 +62,7 @@ class HU37InventoryGridTest {
     @Test
     void HU37_ca2_aWarehouseGivesAGridOf36Slots() {
         TestApp app = TestApp.startedGame();
-        // (the Warehouse arrives in phase 5.4: the inventory view already reports whatever capacity it has)
+        // (the inventory view reports whatever capacity the game has)
         var inventory = new edu.ucc.farmsim.domain.economy.Inventory(36);
         inventory.add(ItemType.CARROT_SEED, 1);
         app.state().inventory().restoreFrom(inventory.snapshot());
@@ -137,18 +138,8 @@ class HU37InventoryGridTest {
     void HU37_theInventoryShortcutOpensTheGridAndClickingAHarvestDoesNotChooseASeed() {
         TestApp app = TestApp.startedGame();
         ToolModel tools = new ToolModel();
-        List<String> opened = new ArrayList<>();
-        GameDialogs dialogs = new GameDialogs() {
-            @Override
-            public void showMarket() {
-                opened.add("market");
-            }
-
-            @Override
-            public void showInventory() {
-                opened.add("inventory");
-            }
-        };
+        RecordingDialogs dialogs = new RecordingDialogs();
+        List<String> opened = dialogs.opened;
         GameScreenPresenter presenter = new GameScreenPresenter(app.controller, tools, m -> { }, dialogs);
         app.state().inventory().add(ItemType.CARROT, 1);
         InventoryModel model = modelOf(app, tools);
@@ -162,16 +153,18 @@ class HU37InventoryGridTest {
     }
 
     private static GameDialogs noDialogs() {
-        return new GameDialogs() {
-            @Override
-            public void showMarket() {
-                // not needed
-            }
+        return new RecordingDialogs();
+    }
 
-            @Override
-            public void showInventory() {
-                // not needed
-            }
-        };
+    @Test
+    void HU37_ca2_buildingTheWarehouseWidensTheGridToThirtySixSlotsThroughTheEvent() {
+        TestApp app = TestApp.startedGame();
+        edu.ucc.farmsim.support.GameFixtures.unlock(app.state(), edu.ucc.farmsim.domain.progress.Achievement.FIRST_HARVEST);
+        InventoryModel model = modelOf(app, new ToolModel());
+        assertEquals(24, model.slotCount());
+
+        app.controller.build("WAREHOUSE", 2, 7);
+
+        assertEquals(36, model.slotCount());
     }
 }

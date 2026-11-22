@@ -192,4 +192,34 @@ class HU38MarketDialogTest {
             }
         }
     }
+
+    @Test
+    void HU38_ca3_aCowWithoutMoneyIsBlockedWithTheSinFondosMessage() {
+        TestApp app = TestApp.startedGame();
+        GameFixtures.setMoney(app.state(), 100);
+        MarketPresenter presenter = presenterOf(app);
+
+        assertEquals(true, presenter.isAnimal("COW"));
+        assertFalse(presenter.canBuy("COW", 1));
+        assertEquals("Fondos insuficientes: faltan 700 m.", presenter.purchaseBlock("COW", 1));
+        assertEquals(1, presenter.maxQuantity(true, "COW"));
+        assertEquals(100, app.state().money());
+    }
+
+    @Test
+    void HU38_theHenCanBeBoughtWithACoopAndIsBlockedWithoutRoom() {
+        TestApp app = TestApp.startedGame();
+        MarketPresenter presenter = presenterOf(app);
+        assertFalse(presenter.canBuy("HEN", 1));
+        assertEquals("No hay espacio para más Gallinas: construye o amplía el edificio.",
+                presenter.purchaseBlock("HEN", 1));
+
+        GameFixtures.coop(app.state());
+        presenter.refresh();
+
+        assertTrue(presenter.canBuy("HEN", 1));
+        assertEquals("Compraste: Gallina. Vive en el Gallinero 1.", presenter.buyUnits("HEN", 1));
+        assertEquals(350, app.state().money());
+        assertFalse(presenter.canBuy("HEN", 2));
+    }
 }

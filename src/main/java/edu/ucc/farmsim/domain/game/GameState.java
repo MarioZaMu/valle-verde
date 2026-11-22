@@ -5,7 +5,7 @@ import edu.ucc.farmsim.domain.economy.Inventory;
 import edu.ucc.farmsim.domain.economy.ItemType;
 import edu.ucc.farmsim.domain.economy.Market;
 import edu.ucc.farmsim.domain.farm.FarmMap;
-import edu.ucc.farmsim.domain.progress.Progress;
+import edu.ucc.farmsim.domain.progress.AchievementTracker;
 import edu.ucc.farmsim.domain.time.GameClock;
 import edu.ucc.farmsim.domain.time.GameDate;
 import edu.ucc.farmsim.domain.time.StateRandom;
@@ -31,7 +31,7 @@ public final class GameState {
     private final StateRandom random;
     private final Market market;
     private final DayLedger ledger = new DayLedger();
-    private final Progress progress = new Progress();
+    private final AchievementTracker progress = new AchievementTracker();
 
     private GameState(int money, Energy energy, Inventory inventory, FarmMap farm,
                       WeatherCycle weather, StateRandom random, Market market) {
@@ -98,7 +98,7 @@ public final class GameState {
     }
 
     /** The achievements unlocked. */
-    public Progress progress() {
+    public AchievementTracker progress() {
         return progress;
     }
 

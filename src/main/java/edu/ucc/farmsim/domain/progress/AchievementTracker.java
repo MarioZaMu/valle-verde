@@ -5,11 +5,12 @@ import java.util.EnumSet;
 import java.util.Set;
 
 /**
- * The achievements the player has unlocked. An achievement is granted once and never revoked (RN-28).
+ * Keeps the achievements the player has unlocked. An achievement is granted once and never revoked (RN-28);
+ * the conditions that grant them are added by the progress stories.
  *
  * <p>Stories: HU-18.
  */
-public final class Progress {
+public final class AchievementTracker {
 
     private final Set<Achievement> unlocked = EnumSet.noneOf(Achievement.class);
 

@@ -1,5 +1,6 @@
 package edu.ucc.farmsim.ui.components;
 
+import edu.ucc.farmsim.application.dto.BuildingView;
 import edu.ucc.farmsim.application.dto.PlotView;
 import edu.ucc.farmsim.application.result.Names;
 
@@ -9,7 +10,7 @@ import edu.ucc.farmsim.application.result.Names;
  * <p>Examples: {@code Tomate · Brote · Regado: sí · Faltan 5 días}, {@code Tierra de cultivo (libre)},
  * {@code Zanahoria · Marchito}.
  *
- * <p>Stories: HU-07.
+ * <p>Stories: HU-07, HU-35.
  */
 public final class PlotText {
 
@@ -36,6 +37,19 @@ public final class PlotText {
         }
         return crop + SEPARATOR + stage + SEPARATOR + "Regado: " + (plot.watered() ? "sí" : "no")
                 + SEPARATOR + daysLeft(plot.daysToMature());
+    }
+
+    /** Describes a building as the tooltip shows it, for example {@code Gallinero 1 · 2/4 animales · 1 pendiente}. */
+    public static String describe(BuildingView building) {
+        StringBuilder text = new StringBuilder(building.name()).append(' ').append(building.id() + 1);
+        if (building.capacity() > 0) {
+            text.append(SEPARATOR).append(building.animals().size()).append('/').append(building.capacity())
+                    .append(" animales");
+        }
+        if (building.pendingProducts() > 0) {
+            text.append(SEPARATOR).append(building.pendingProducts()).append(" por recolectar");
+        }
+        return text.toString();
     }
 
     private static String daysLeft(int days) {

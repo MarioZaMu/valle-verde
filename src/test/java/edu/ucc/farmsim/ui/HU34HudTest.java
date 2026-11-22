@@ -30,17 +30,7 @@ import org.junit.jupiter.api.Test;
  */
 class HU34HudTest {
 
-    private static final edu.ucc.farmsim.ui.screens.GameDialogs NO_DIALOGS = new edu.ucc.farmsim.ui.screens.GameDialogs() {
-        @Override
-        public void showMarket() {
-            // not needed here
-        }
-
-        @Override
-        public void showInventory() {
-            // not needed here
-        }
-    };
+    private static final edu.ucc.farmsim.ui.screens.GameDialogs NO_DIALOGS = new edu.ucc.farmsim.support.RecordingDialogs();
 
     @Test
     void HU34_ca1_aNewGameShowsMoneyDateWeatherForecastAndFullEnergy() {

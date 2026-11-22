@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * HU-35: the farm map drawn with Java2D. Geometry and drawing are separate classes with no component, so they
- * are tested by painting on an image. Buildings and animals are drawn by HU-18 and HU-19 (phase 5.4).
+ * are tested by painting on an image. Buildings and animals are drawn over the plots (HU-35 · CA-3).
  */
 class HU35FarmMapViewTest {
 
@@ -197,5 +197,77 @@ class HU35FarmMapViewTest {
     @Test
     void HU35_geometryRejectsInvalidSizes() {
         assertEquals(1, MapGeometry.fit(16, 10, 0, 0).cellSize());
+    }
+
+    @Test
+    void HU35_ca3_aCoopWithTwoHensIsDrawnInItsPositionAndTheHensChangeWhatIsSeen() {
+        // Given a coop built at (2,7), which covers (2,7) to (3,8)
+        TestApp app = TestApp.startedGame();
+        var coop = GameFixtures.coop(app.state());
+        MapGeometry geometry = MapGeometry.fit(16, 10, WIDTH, HEIGHT);
+        MapView empty = app.controller.map().value();
+        MapView noBuildings = new MapView(empty.cols(), empty.rows(), empty.plots());
+        int[] grass = cellPixels(paint(noBuildings, null), geometry, 2, 8);
+        int[] coopEmpty = cellPixels(paint(empty, null), geometry, 2, 8);
+
+        // When two hens move in
+        GameFixtures.hen(coop);
+        GameFixtures.hen(coop);
+        MapView withHens = app.controller.map().value();
+        int[] coopWithHens = cellPixels(paint(withHens, null), geometry, 2, 8);
+
+        // Then the building replaces the grass, the hens change its look and the plot next to it is untouched
+        assertEquals(1, empty.buildings().size());
+        assertEquals(2, withHens.buildingAt(3, 8).animals().size());
+        assertNotEquals(Arrays.hashCode(grass), Arrays.hashCode(coopEmpty));
+        assertNotEquals(Arrays.hashCode(coopEmpty), Arrays.hashCode(coopWithHens));
+        assertEquals(Arrays.hashCode(cellPixels(paint(noBuildings, null), geometry, 4, 8)),
+                Arrays.hashCode(cellPixels(paint(withHens, null), geometry, 4, 8)));
+    }
+
+    @Test
+    void HU35_ca3_aSickHenAndTheProductsWaitingLookDifferentFromAHealthyOne() {
+        MapGeometry geometry = MapGeometry.fit(16, 10, WIDTH, HEIGHT);
+        int[] healthy = coopCell(edu.ucc.farmsim.domain.animal.AnimalCondition.HEALTHY, 0, geometry, 2, 8);
+        int[] sick = coopCell(edu.ucc.farmsim.domain.animal.AnimalCondition.SICK, 0, geometry, 2, 8);
+        int[] hungry = coopCell(edu.ucc.farmsim.domain.animal.AnimalCondition.HUNGRY, 0, geometry, 2, 8);
+        int[] noProducts = coopCell(edu.ucc.farmsim.domain.animal.AnimalCondition.HEALTHY, 0, geometry, 3, 7);
+        int[] products = coopCell(edu.ucc.farmsim.domain.animal.AnimalCondition.HEALTHY, 1, geometry, 3, 7);
+
+        assertNotEquals(Arrays.hashCode(healthy), Arrays.hashCode(sick));
+        assertNotEquals(Arrays.hashCode(healthy), Arrays.hashCode(hungry));
+        assertNotEquals(Arrays.hashCode(noProducts), Arrays.hashCode(products));
+    }
+
+    private static int[] coopCell(edu.ucc.farmsim.domain.animal.AnimalCondition condition, int pending,
+                                  MapGeometry geometry, int col, int row) {
+        TestApp app = TestApp.startedGame();
+        GameFixtures.house(GameFixtures.coop(app.state()), edu.ucc.farmsim.domain.animal.AnimalType.HEN, condition, 0,
+                false, pending);
+        return cellPixels(paint(app.controller.map().value(), null), geometry, col, row);
+    }
+
+    @Test
+    void HU35_everyKindOfBuildingHasItsOwnLook() {
+        MapGeometry geometry = MapGeometry.fit(16, 10, WIDTH, HEIGHT);
+        Set<Integer> looks = new HashSet<>();
+        for (var type : edu.ucc.farmsim.domain.building.BuildingType.values()) {
+            TestApp app = TestApp.startedGame();
+            GameFixtures.build(app.state(), type, 2, 7);
+            looks.add(Arrays.hashCode(cellPixels(paint(app.controller.map().value(), null), geometry, 2, 7)));
+        }
+        assertEquals(4, looks.size());
+    }
+
+    @Test
+    void HU35_theTooltipOfABuildingTellsItsAnimalsAndWhatWaits() {
+        TestApp app = TestApp.startedGame();
+        var coop = GameFixtures.coop(app.state());
+        GameFixtures.house(coop, edu.ucc.farmsim.domain.animal.AnimalType.HEN,
+                edu.ucc.farmsim.domain.animal.AnimalCondition.HEALTHY, 0, false, 1);
+
+        String text = edu.ucc.farmsim.ui.components.PlotText.describe(app.controller.buildings().value().buildings().get(0));
+
+        assertEquals("Gallinero 1 · 1/4 animales · 1 por recolectar", text);
     }
 }

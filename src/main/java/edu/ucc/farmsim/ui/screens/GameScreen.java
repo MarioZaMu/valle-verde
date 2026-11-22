@@ -1,7 +1,14 @@
 package edu.ucc.farmsim.ui.screens;
 
 import edu.ucc.farmsim.application.controller.GameCommands;
+import edu.ucc.farmsim.application.dto.DaySummaryView;
 import edu.ucc.farmsim.application.event.EventBus;
+import edu.ucc.farmsim.application.event.GameEvent;
+import edu.ucc.farmsim.ui.components.BuildingDialog;
+import edu.ucc.farmsim.ui.components.BuildingPresenter;
+import edu.ucc.farmsim.ui.components.ConstructionDialog;
+import edu.ucc.farmsim.ui.components.ConstructionPresenter;
+import edu.ucc.farmsim.ui.components.DaySummaryDialog;
 import edu.ucc.farmsim.ui.components.HudPanel;
 import edu.ucc.farmsim.ui.components.InventoryDialog;
 import edu.ucc.farmsim.ui.components.InventoryModel;
@@ -31,7 +38,7 @@ import javax.swing.SwingUtilities;
  * buttons "End day" and "Menu". Keys 1 to 5 pick a tool, Escape deselects it, and the shortcuts of RN-34 work
  * anywhere on the screen.
  *
- * <p>Stories: HU-33, HU-34, HU-35, HU-36, HU-37, HU-38.
+ * <p>Stories: HU-17, HU-18, HU-20, HU-22, HU-23, HU-33, HU-34, HU-35, HU-36, HU-37, HU-38.
  */
 public final class GameScreen extends JPanel {
 
@@ -63,8 +70,30 @@ public final class GameScreen extends JPanel {
             public void showInventory() {
                 new InventoryDialog(SwingUtilities.getWindowAncestor(GameScreen.this), inventory).setVisible(true);
             }
+
+            @Override
+            public void showConstruction(int col, int row) {
+                new ConstructionDialog(SwingUtilities.getWindowAncestor(GameScreen.this),
+                        new ConstructionPresenter(controller, col, row)).setVisible(true);
+            }
+
+            @Override
+            public void showBuilding(int buildingId) {
+                new BuildingDialog(SwingUtilities.getWindowAncestor(GameScreen.this),
+                        new BuildingPresenter(controller, buildingId)).setVisible(true);
+            }
+
+            @Override
+            public void showSummary(DaySummaryView summary) {
+                new DaySummaryDialog(SwingUtilities.getWindowAncestor(GameScreen.this), summary).setVisible(true);
+            }
         };
         GameScreenPresenter presenter = new GameScreenPresenter(controller, tools, status::setText, dialogs);
+        bus.subscribe(event -> {
+            if (event instanceof GameEvent.DaySummaryReady ready) {
+                presenter.onSummary(ready.summary());
+            }
+        });
 
         add(new HudPanel(bus), BorderLayout.NORTH);
         add(new MapPanel(controller, bus, presenter::onPlotClicked), BorderLayout.CENTER);

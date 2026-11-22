@@ -1,5 +1,7 @@
 package edu.ucc.farmsim.ui.render;
 
+import edu.ucc.farmsim.application.dto.AnimalView;
+import edu.ucc.farmsim.application.dto.BuildingView;
 import edu.ucc.farmsim.application.dto.MapView;
 import edu.ucc.farmsim.application.dto.PlotView;
 import edu.ucc.farmsim.ui.theme.Palette;
@@ -13,7 +15,7 @@ import java.awt.RenderingHints;
  * crop stage has its own look; it works on any {@link Graphics2D}, including one of an image, so it is tested
  * without a display.
  *
- * <p>Stories: HU-35.
+ * <p>Stories: HU-18, HU-19, HU-35.
  */
 public final class MapRenderer {
 
@@ -46,12 +48,80 @@ public final class MapRenderer {
             g.setColor(Palette.GRID);
             g.drawRect(cell.x, cell.y, cell.width - 1, cell.height - 1);
         }
+        for (BuildingView building : map.buildings()) {
+            drawBuilding(g, building, geometry);
+        }
         if (hover != null) {
             Rectangle cell = geometry.cellBounds(hover.col(), hover.row());
             g.setColor(Palette.HOVER);
             g.setStroke(new BasicStroke(HOVER_WIDTH));
             g.drawRect(cell.x + 1, cell.y + 1, cell.width - 3, cell.height - 3);
             g.setStroke(new BasicStroke(1f));
+        }
+    }
+
+    private void drawBuilding(Graphics2D g, BuildingView building, MapGeometry geometry) {
+        Rectangle first = geometry.cellBounds(building.col(), building.row());
+        Rectangle last = geometry.cellBounds(building.col() + building.width() - 1, building.row() + building.height() - 1);
+        Rectangle area = first.union(last);
+        int inset = Math.max(2, area.height / 16);
+        Rectangle body = new Rectangle(area.x + inset, area.y + inset, area.width - 2 * inset, area.height - 2 * inset);
+        if ("GREENHOUSE".equals(building.type())) {
+            g.setColor(Palette.GREENHOUSE_GLASS);
+            g.fillRect(body.x, body.y, body.width, body.height);
+            g.setColor(Palette.BUILDING_OUTLINE);
+            for (int i = 1; i < building.width(); i++) {
+                int x = body.x + body.width * i / building.width();
+                g.drawLine(x, body.y, x, body.y + body.height);
+            }
+        } else {
+            g.setColor(wallColor(building.type()));
+            g.fillRect(body.x, body.y, body.width, body.height);
+            int roofHeight = body.height / 3;
+            g.setColor(Palette.ROOF);
+            g.fillPolygon(new int[] {body.x - inset, body.x + body.width / 2, body.x + body.width + inset},
+                    new int[] {body.y + roofHeight, body.y - inset, body.y + roofHeight}, 3);
+        }
+        g.setColor(Palette.BUILDING_OUTLINE);
+        g.drawRect(body.x, body.y, body.width, body.height);
+        drawAnimals(g, building, body);
+        if (building.pendingProducts() > 0) {
+            int r = Math.max(4, area.width / 12);
+            g.setColor(Palette.PENDING);
+            g.fillOval(area.x + area.width - 2 * r, area.y, 2 * r, 2 * r);
+            g.setColor(Palette.BUILDING_OUTLINE);
+            g.drawOval(area.x + area.width - 2 * r, area.y, 2 * r, 2 * r);
+        }
+    }
+
+    private static java.awt.Color wallColor(String type) {
+        return switch (type) {
+            case "BARN" -> Palette.BARN_WALL;
+            case "WAREHOUSE" -> Palette.WAREHOUSE_WALL;
+            default -> Palette.COOP_WALL;
+        };
+    }
+
+    private void drawAnimals(Graphics2D g, BuildingView building, Rectangle body) {
+        int slots = Math.max(1, building.capacity());
+        int d = Math.max(4, body.width / (slots + 1));
+        for (AnimalView animal : building.animals()) {
+            int x = body.x + body.width * (2 * animal.index() + 1) / (2 * slots) - d / 2;
+            int y = body.y + body.height * 2 / 3 - d / 2;
+            g.setColor(switch (animal.condition()) {
+                case "SICK" -> Palette.ANIMAL_SICK;
+                case "HUNGRY" -> Palette.ANIMAL_HUNGRY;
+                default -> Palette.ANIMAL_HEALTHY;
+            });
+            if ("COW".equals(animal.type())) {
+                g.fillOval(x - d / 4, y, d + d / 2, d);
+                g.setColor(Palette.BUILDING_OUTLINE);
+                g.fillOval(x + d / 4, y + d / 4, d / 3, d / 3);
+            } else {
+                g.fillOval(x, y, d, d);
+                g.setColor(Palette.BARN_WALL);
+                g.fillOval(x + d / 3, y - d / 5, d / 3, d / 3);
+            }
         }
     }
 

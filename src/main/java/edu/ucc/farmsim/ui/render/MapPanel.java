@@ -1,6 +1,7 @@
 package edu.ucc.farmsim.ui.render;
 
 import edu.ucc.farmsim.application.controller.GameCommands;
+import edu.ucc.farmsim.application.dto.BuildingView;
 import edu.ucc.farmsim.application.dto.MapView;
 import edu.ucc.farmsim.application.dto.PlotView;
 import edu.ucc.farmsim.application.event.EventBus;
@@ -110,6 +111,10 @@ public final class MapPanel extends JPanel implements GameListener {
         CellPos pos = cellAt(event.getX(), event.getY());
         if (pos == null) {
             return null;
+        }
+        BuildingView building = view == null ? null : view.buildingAt(pos.col(), pos.row());
+        if (building != null) {
+            return PlotText.describe(building);
         }
         Result<PlotView> plot = controller.inspect(pos.col(), pos.row());
         return plot.isOk() ? PlotText.describe(plot.value()) : null;

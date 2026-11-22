@@ -39,6 +39,36 @@ public final class Palette {
     /** Border of the plot under the cursor. */
     public static final Color HOVER = new Color(0xFFFFFF);
 
+    /** Wall of a coop. */
+    public static final Color COOP_WALL = new Color(0xD9A066);
+
+    /** Wall of a barn. */
+    public static final Color BARN_WALL = new Color(0xB5473B);
+
+    /** Wall of a warehouse. */
+    public static final Color WAREHOUSE_WALL = new Color(0x9A8F7A);
+
+    /** Frame and glass of a greenhouse. */
+    public static final Color GREENHOUSE_GLASS = new Color(0xBDE8E0);
+
+    /** Roof of every building. */
+    public static final Color ROOF = new Color(0x5B2E1F);
+
+    /** Outline of a building. */
+    public static final Color BUILDING_OUTLINE = new Color(0x2A1A10);
+
+    /** A healthy animal. */
+    public static final Color ANIMAL_HEALTHY = new Color(0xFFFDF2);
+
+    /** A hungry animal. */
+    public static final Color ANIMAL_HUNGRY = new Color(0xF2C14E);
+
+    /** A sick animal. */
+    public static final Color ANIMAL_SICK = new Color(0x7FA36B);
+
+    /** Marker of products waiting to be collected. */
+    public static final Color PENDING = new Color(0xFFD23F);
+
     private Palette() {
         // constants holder
     }
