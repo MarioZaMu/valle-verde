@@ -32,3 +32,4 @@ edu.ucc.farmsim.domain.crop.TomatoFactory | Factory Method | ConcreteCreator (to
 edu.ucc.farmsim.domain.crop.CornFactory | Factory Method | ConcreteCreator (corn)
 edu.ucc.farmsim.domain.crop.PumpkinFactory | Factory Method | ConcreteCreator (pumpkin)
 edu.ucc.farmsim.ui.render.MapPanel | Observer | ConcreteObserver (the farm map, repainted when a map event arrives)
+edu.ucc.farmsim.api.EventCollector | Observer | ConcreteObserver (keeps the events of the current request so they travel in the response)

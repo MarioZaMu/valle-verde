@@ -1,0 +1,166 @@
+package edu.ucc.farmsim.client;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.ucc.farmsim.application.controller.GameCommands;
+import edu.ucc.farmsim.application.dto.HudView;
+import edu.ucc.farmsim.application.dto.MapView;
+import edu.ucc.farmsim.application.dto.PlotView;
+import edu.ucc.farmsim.application.event.EventBus;
+import edu.ucc.farmsim.application.event.GameEvent;
+import edu.ucc.farmsim.application.result.ErrorCode;
+import edu.ucc.farmsim.application.result.Result;
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ * Sends each order of the player to the REST server and rebuilds the {@link Result} the screens expect, so
+ * the UI cannot tell this class from the in-process {@code GameController} (DT-17). The events carried in
+ * the response are republished on the local {@link EventBus}, after the result is rebuilt and in the order
+ * the server produced them (DT-19).
+ *
+ * <p>Orders are sent synchronously from the calling thread with a time limit (DT-20). It never throws: an
+ * unreachable server, a timeout or an unreadable answer becomes {@code ERROR_INTERNO}.
+ *
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-28, HU-33, HU-35.
+ */
+public final class RemoteGameClient implements GameCommands {
+
+    private static final Logger LOG = Logger.getLogger(RemoteGameClient.class.getName());
+    private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(2);
+    private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(5);
+
+    private final URI baseUri;
+    private final EventBus bus;
+    private final HttpClient http = HttpClient.newBuilder().connectTimeout(CONNECT_TIMEOUT).build();
+    private final ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    private final EventDecoder decoder = new EventDecoder(mapper);
+
+    /**
+     * Creates the client.
+     *
+     * @param baseUri address of the server, for example {@code http://127.0.0.1:8080}
+     * @param bus     the local bus where the events of every response are republished
+     */
+    public RemoteGameClient(URI baseUri, EventBus bus) {
+        this.baseUri = baseUri;
+        this.bus = bus;
+    }
+
+    @Override
+    public boolean hasGameInProgress() {
+        return hud().isOk();
+    }
+
+    @Override
+    public Result<HudView> newGame(long seed) {
+        return send("POST", "/api/game", Map.of("seed", seed), HudView.class);
+    }
+
+    @Override
+    public Result<HudView> hud() {
+        return send("GET", "/api/game", null, HudView.class);
+    }
+
+    @Override
+    public Result<HudView> endDay() {
+        return send("POST", "/api/game/days", null, HudView.class);
+    }
+
+    @Override
+    public Result<PlotView> plant(int col, int row, String seedId) {
+        return send("POST", plot(col, row) + "/crop", Map.of("seedId", seedId), PlotView.class);
+    }
+
+    @Override
+    public Result<PlotView> water(int col, int row) {
+        return send("POST", plot(col, row) + "/watering", null, PlotView.class);
+    }
+
+    @Override
+    public Result<PlotView> harvest(int col, int row) {
+        return send("POST", plot(col, row) + "/harvest", null, PlotView.class);
+    }
+
+    @Override
+    public Result<PlotView> inspect(int col, int row) {
+        return send("GET", plot(col, row), null, PlotView.class);
+    }
+
+    @Override
+    public Result<MapView> map() {
+        return send("GET", "/api/farm/map", null, MapView.class);
+    }
+
+    @Override
+    public Result<Boolean> hasSavedGames() {
+        return send("GET", "/api/saves/any", null, Boolean.class);
+    }
+
+    private static String plot(int col, int row) {
+        return "/api/farm/plots/" + col + "/" + row;
+    }
+
+    private <T> Result<T> send(String method, String path, Object body, Class<T> type) {
+        try {
+            HttpRequest.BodyPublisher publisher = body == null
+                    ? HttpRequest.BodyPublishers.noBody()
+                    : HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body), StandardCharsets.UTF_8);
+            HttpRequest.Builder request = HttpRequest.newBuilder(baseUri.resolve(path))
+                    .timeout(REQUEST_TIMEOUT)
+                    .header("Accept", "application/json")
+                    .method(method, publisher);
+            if (body != null) {
+                request.header("Content-Type", "application/json");
+            }
+            HttpResponse<String> response = http.send(request.build(), HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+            return rebuild(response, type);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            LOG.log(Level.WARNING, "Interrupted while waiting for the server", e);
+            return Result.failWith(ErrorCode.ERROR_INTERNO);
+        } catch (IOException | RuntimeException e) {
+            LOG.log(Level.WARNING, "The server did not answer " + method + " " + path, e);
+            return Result.failWith(ErrorCode.ERROR_INTERNO);
+        }
+    }
+
+    private <T> Result<T> rebuild(HttpResponse<String> response, Class<T> type) throws IOException {
+        JsonNode root = mapper.readTree(response.body());
+        if (root == null || root.isMissingNode() || !root.isObject()) {
+            LOG.warning("The server answered " + response.statusCode() + " without a JSON body");
+            return Result.failWith(ErrorCode.ERROR_INTERNO);
+        }
+        if (response.statusCode() / 100 == 2) {
+            T value = mapper.treeToValue(root.get("data"), type);
+            for (GameEvent event : decoder.decode(root.get("events"))) {
+                bus.publish(event);
+            }
+            return Result.ok(value);
+        }
+        ErrorCode code = codeOf(root.path("code").asText());
+        if (code == null) {
+            LOG.warning("The server rejected the request: " + root);
+            return Result.failWith(ErrorCode.ERROR_INTERNO);
+        }
+        return Result.fail(code, root.path("message").asText());
+    }
+
+    private static ErrorCode codeOf(String name) {
+        for (ErrorCode code : ErrorCode.values()) {
+            if (code.name().equals(name)) {
+                return code;
+            }
+        }
+        return null;
+    }
+}
