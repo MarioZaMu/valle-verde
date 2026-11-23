@@ -7,6 +7,7 @@ import edu.ucc.farmsim.domain.building.BuildingType;
 import edu.ucc.farmsim.domain.config.GameRules;
 import edu.ucc.farmsim.domain.crop.Crop;
 import edu.ucc.farmsim.domain.crop.CropSnapshot;
+import edu.ucc.farmsim.domain.npc.Npc;
 import edu.ucc.farmsim.domain.time.Season;
 import edu.ucc.farmsim.domain.time.Weather;
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ import java.util.List;
  * The farm grid: {@link GameRules#MAP_COLS} x {@link GameRules#MAP_ROWS} plots with coordinates
  * {@code (column, row)}, where {@code (0, 0)} is the top-left corner (RN-04).
  *
- * <p>Stories: HU-01, HU-03, HU-05, HU-12, HU-18, HU-25, HU-28, HU-45.
+ * <p>Stories: HU-01, HU-03, HU-05, HU-12, HU-18, HU-25, HU-28, HU-45, HU-46.
  */
 public final class FarmMap {
 
@@ -87,14 +88,16 @@ public final class FarmMap {
 
     /**
      * True if the avatar can stand on the plot (RN-36): it is inside the map, it is grass or soil (with or without
-     * a crop) and no building covers it. Water and obstacles block the way.
+     * a crop), no building covers it and no person of the valley stands on it (RN-37). Water and obstacles
+     * block the way.
      */
     public boolean isWalkable(int col, int row) {
         if (!contains(col, row)) {
             return false;
         }
         Plot plot = plots[row][col];
-        return (plot.terrain() == Terrain.GRASS || plot.terrain() == Terrain.SOIL) && plot.building() == null;
+        return (plot.terrain() == Terrain.GRASS || plot.terrain() == Terrain.SOIL) && plot.building() == null
+                && Npc.at(col, row) == null;
     }
 
     /**

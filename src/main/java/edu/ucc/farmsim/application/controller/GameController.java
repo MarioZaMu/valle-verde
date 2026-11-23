@@ -5,10 +5,12 @@ import edu.ucc.farmsim.application.dto.AvatarView;
 import edu.ucc.farmsim.application.dto.BuildingActionView;
 import edu.ucc.farmsim.application.dto.BuildingView;
 import edu.ucc.farmsim.application.dto.BuildingsView;
+import edu.ucc.farmsim.application.dto.DialogueView;
 import edu.ucc.farmsim.application.dto.HudView;
 import edu.ucc.farmsim.application.dto.InventoryView;
 import edu.ucc.farmsim.application.dto.MapView;
 import edu.ucc.farmsim.application.dto.MarketView;
+import edu.ucc.farmsim.application.dto.NpcView;
 import edu.ucc.farmsim.application.dto.PlotView;
 import edu.ucc.farmsim.application.dto.SaveSlotView;
 import edu.ucc.farmsim.application.result.ErrorCode;
@@ -21,6 +23,7 @@ import edu.ucc.farmsim.application.service.DayService;
 import edu.ucc.farmsim.application.service.FarmService;
 import edu.ucc.farmsim.application.service.GameSession;
 import edu.ucc.farmsim.application.service.MarketService;
+import edu.ucc.farmsim.application.service.NpcService;
 import edu.ucc.farmsim.application.service.ProgressService;
 import edu.ucc.farmsim.application.service.SaveGameService;
 import edu.ucc.farmsim.application.service.ViewMapper;
@@ -38,7 +41,7 @@ import org.springframework.stereotype.Component;
  * RNF-07), and it never touches repositories (AR-4). It is not the REST controller: the {@code api} package
  * translates HTTP into calls to this class.
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-26, HU-28, HU-29, HU-30, HU-31, HU-32, HU-33, HU-35, HU-37, HU-38, HU-45.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-26, HU-28, HU-29, HU-30, HU-31, HU-32, HU-33, HU-35, HU-37, HU-38, HU-45, HU-46, HU-47.
  */
 @Component
 public final class GameController implements GameCommands {
@@ -56,6 +59,7 @@ public final class GameController implements GameCommands {
     private final AnimalService animals;
     private final AchievementService achievements;
     private final AvatarService avatar;
+    private final NpcService npcs;
 
     /**
      * Creates the controller.
@@ -71,11 +75,13 @@ public final class GameController implements GameCommands {
      * @param animals  animal care
      * @param achievements the achievements and their progress
      * @param avatar   walking with the avatar
+     * @param npcs     the people of the valley and their errands
      */
     public GameController(GameSession session, ViewMapper mapper, ProgressService progress, DayService day,
                           SaveGameService saves, FarmService farm, MarketService market,
                           BuildingService buildings, AnimalService animals,
-                          AchievementService achievements, AvatarService avatar) {
+                          AchievementService achievements, AvatarService avatar,
+                          NpcService npcs) {
         this.session = session;
         this.mapper = mapper;
         this.progress = progress;
@@ -87,6 +93,7 @@ public final class GameController implements GameCommands {
         this.animals = animals;
         this.achievements = achievements;
         this.avatar = avatar;
+        this.npcs = npcs;
     }
 
     /** True if a game is in progress (the UI asks for confirmation before discarding it). */
@@ -170,6 +177,21 @@ public final class GameController implements GameCommands {
     @Override
     public Result<AvatarView> move(String direction) {
         return guard(() -> avatar.move(direction));
+    }
+
+    @Override
+    public Result<List<NpcView>> npcs() {
+        return guard(npcs::npcs);
+    }
+
+    @Override
+    public Result<DialogueView> talk(String npcId) {
+        return guard(() -> npcs.talk(npcId));
+    }
+
+    @Override
+    public Result<DialogueView> deliver(String npcId) {
+        return guard(() -> npcs.deliver(npcId));
     }
 
     /** True if at least one of the save slots holds a game. */

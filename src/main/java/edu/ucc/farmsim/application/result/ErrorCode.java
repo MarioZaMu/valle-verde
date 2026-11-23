@@ -4,7 +4,7 @@ package edu.ucc.farmsim.application.result;
  * Every reason an operation can be rejected (RN-35). A rejection never changes the game state, with one exception
  * that RN-36 asks for: a blocked step ({@link #MOVIMIENTO_BLOQUEADO}) still turns the avatar.
  *
- * <p>Stories: HU-08, HU-45.
+ * <p>Stories: HU-08, HU-45, HU-46, HU-47.
  */
 public enum ErrorCode {
     SIN_PARTIDA,
@@ -28,6 +28,8 @@ public enum ErrorCode {
     SIN_MEDICINA,
     ANIMAL_ENFERMO,
     MOVIMIENTO_BLOQUEADO,
+    NPC_LEJOS,
+    ENCARGO_INCOMPLETO,
     ARCHIVO_INEXISTENTE,
     ARCHIVO_CORRUPTO,
     VERSION_NO_SOPORTADA,

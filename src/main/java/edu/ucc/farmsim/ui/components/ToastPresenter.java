@@ -11,7 +11,7 @@ import edu.ucc.farmsim.ui.theme.Texts;
  * screen asks it directly for the errors and information that come from the player's own orders. It has no
  * Swing.
  *
- * <p>Stories: HU-26, HU-39.
+ * <p>Stories: HU-26, HU-39, HU-47.
  */
 public final class ToastPresenter implements GameListener {
 
@@ -39,6 +39,8 @@ public final class ToastPresenter implements GameListener {
             season = now;
         } else if (event instanceof GameEvent.AchievementUnlocked unlocked) {
             queue.post(ToastKind.ACHIEVEMENT, Texts.achievementUnlocked(unlocked.name(), unlocked.reward()));
+        } else if (event instanceof GameEvent.ErrandCompleted errand) {
+            queue.post(ToastKind.INFO, Texts.errandCompleted(errand.name(), errand.reward()));
         }
     }
 

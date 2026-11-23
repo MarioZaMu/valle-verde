@@ -147,6 +147,32 @@ class GameRestControllerTest {
     }
 
     @Test
+    void HU46_GET_npcs_and_POST_talk_answerByDistanceAndHU47_POST_errand_rejectsAnIncompleteErrand() throws Exception {
+        newGame();
+        mvc.perform(get("/api/npcs")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", hasSize(4)))
+                .andExpect(jsonPath("$.data[0].name").value("Marta"))
+                .andExpect(jsonPath("$.data[0].errandDone").value(false));
+        mvc.perform(post("/api/npcs/MARTA/talk")).andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("NPC_LEJOS"))
+                .andExpect(jsonPath("$.message").value("Acércate a Marta para hablar."));
+        session.current().avatar().restoreFrom(new edu.ucc.farmsim.domain.farm.AvatarSnapshot(9, 1,
+                edu.ucc.farmsim.domain.farm.Direction.EAST));
+        mvc.perform(post("/api/npcs/MARTA/talk")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.name").value("Marta"))
+                .andExpect(jsonPath("$.events", hasSize(0)));
+        mvc.perform(post("/api/npcs/MARTA/errand")).andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("ENCARGO_INCOMPLETO"));
+        session.current().inventory().add(ItemType.CARROT, 5);
+        mvc.perform(post("/api/npcs/MARTA/errand")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.errandDone").value(true))
+                .andExpect(jsonPath("$.events[2].type").value("ErrandCompleted"));
+        mvc.perform(post("/api/npcs/NOBODY/talk")).andExpect(status().isInternalServerError());
+        session.replace(null);
+        mvc.perform(get("/api/npcs")).andExpect(status().isNotFound());
+    }
+
+    @Test
     void GET_plot_describesAPlotWithoutChangingIt() throws Exception {
         newGame();
         mvc.perform(get(PLOT)).andExpect(status().isOk())

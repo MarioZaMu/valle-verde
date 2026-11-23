@@ -411,6 +411,8 @@ El *tooltip* de una parcela aparece tras **300 ms** de reposo del cursor y muest
 | `VERSION_NO_SOPORTADA` | «La partida es de una versión no soportada.» |
 | `ERROR_ES` | «No se pudo acceder a las partidas guardadas: {detalle}.» |
 | `MOVIMIENTO_BLOQUEADO` | «No puedes pasar por ahí.» (RN-36; el avatar sí cambia su mirada) |
+| `NPC_LEJOS` | «Acércate a {nombre} para hablar.» (RN-37) |
+| `ENCARGO_INCOMPLETO` | «Te faltan {cantidad y artículo} para el encargo.» (RN-38) |
 
 - **Toasts:** duración **3 s** (desvanecimiento de 0,4 s; los logros duran **5 s**), máximo **4 visibles** a la vez, tres tipos: éxito, información y error.
 - La interfaz **nunca** recibe excepciones: solo recibe un `Result` con código y mensaje.
@@ -434,7 +436,7 @@ Cada RN se usa por al menos un requerimiento funcional; la tabla completa RF ↔
 - Posición inicial: parcela **(7, 7)**, la hierba justo al sur de la tierra de cultivo. No se puede **construir** sobre la parcela del avatar (`UBICACION_INVALIDA`, RN-21).
 
 ### RN-37 · Personajes (NPC) y diálogos
-- Hay **cuatro NPC** fijos, cada uno en una parcela de hierba de la configuración; **no se mueven** y **bloquean el paso** (RN-36).
+- Hay **cuatro NPC** fijos, cada uno en una parcela de hierba de la configuración — Marta **(10, 1)**, Don Tomás **(3, 1)**, Dra. Lucía **(15, 3)** e Inés **(11, 9)** —; **no se mueven**, **bloquean el paso** (RN-36) y no se puede construir sobre ellos (`UBICACION_INVALIDA`, RN-21).
 
 | NPC | Rol | De qué habla |
 |---|---|---|

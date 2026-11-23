@@ -5,8 +5,10 @@ import edu.ucc.farmsim.application.dto.AvatarView;
 import edu.ucc.farmsim.application.dto.BuildingActionView;
 import edu.ucc.farmsim.application.dto.BuildingView;
 import edu.ucc.farmsim.application.dto.DaySummaryView;
+import edu.ucc.farmsim.application.dto.DialogueView;
 import edu.ucc.farmsim.application.dto.HudView;
 import edu.ucc.farmsim.application.dto.MapView;
+import edu.ucc.farmsim.application.dto.NpcView;
 import edu.ucc.farmsim.application.dto.PlotView;
 import edu.ucc.farmsim.application.dto.SaveSlotView;
 import edu.ucc.farmsim.application.result.Result;
@@ -22,7 +24,7 @@ import java.util.function.Consumer;
  * Logic of the game screen, with no Swing: what happens when the player clicks a plot, presses a button or
  * uses a shortcut. Messages go to a sink (the status bar in production); an empty string clears the bar.
  *
- * <p>Stories: HU-10, HU-17, HU-18, HU-20, HU-22, HU-26, HU-29, HU-30, HU-34, HU-36, HU-39, HU-45.
+ * <p>Stories: HU-10, HU-17, HU-18, HU-20, HU-22, HU-26, HU-29, HU-30, HU-34, HU-36, HU-39, HU-45, HU-46.
  */
 public final class GameScreenPresenter {
 
@@ -89,6 +91,12 @@ public final class GameScreenPresenter {
      * click (HU-36 · CA-4).
      */
     public void onPlotClicked(int col, int row) {
+        Result<MapView> map = controller.map();
+        NpcView npc = map.isOk() ? map.value().npcAt(col, row) : null;
+        if (npc != null) {
+            onTalk(npc.id());
+            return;
+        }
         Tool tool = tools.current();
         if (tool == null) {
             BuildingView building = buildingAt(col, row);
@@ -163,6 +171,43 @@ public final class GameScreenPresenter {
             return;
         }
         onPlotClicked(col, row);
+    }
+
+    /**
+     * E: talk to the person in front of the avatar, or else to any person next to it (RN-37).
+     */
+    public void onTalkKey() {
+        Result<MapView> map = controller.map();
+        if (!map.isOk()) {
+            show(false, CLEAR, map.message());
+            return;
+        }
+        AvatarView avatar = map.value().avatar();
+        if (avatar == null) {
+            show(false, CLEAR, Texts.NOBODY_TO_TALK);
+            return;
+        }
+        NpcView npc = map.value().npcAt(avatar.frontCol(), avatar.frontRow());
+        if (npc == null) {
+            npc = map.value().npcs().stream().filter(n -> n.isNextTo(avatar.col(), avatar.row())).findFirst()
+                    .orElse(null);
+        }
+        if (npc == null) {
+            show(false, CLEAR, Texts.NOBODY_TO_TALK);
+            return;
+        }
+        onTalk(npc.id());
+    }
+
+    /** Talks to a person of the valley: its dialogue opens, or the reason it cannot (too far) is shown. */
+    public void onTalk(String npcId) {
+        Result<DialogueView> result = controller.talk(npcId);
+        if (result.isOk()) {
+            messages.accept(CLEAR);
+            dialogs.showDialogue(result.value());
+        } else {
+            show(false, CLEAR, result.message());
+        }
     }
 
     /** The summary of the day arrived: it is shown to the player (HU-17). */

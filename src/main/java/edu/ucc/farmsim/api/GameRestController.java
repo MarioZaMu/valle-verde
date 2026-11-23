@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
  * <p>There is one game per server (S-01), so every order runs under the same lock (DT-20). The events an
  * order causes travel in the response (DT-19). The routes are documented in {@code docs/API.md}.
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-26, HU-28, HU-29, HU-30, HU-31, HU-32, HU-33, HU-35, HU-37, HU-38, HU-45.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-26, HU-28, HU-29, HU-30, HU-31, HU-32, HU-33, HU-35, HU-37, HU-38, HU-45, HU-46, HU-47.
  */
 @RestController
 @RequestMapping("/api")
@@ -118,6 +118,24 @@ public class GameRestController {
     @PostMapping("/avatar/moves")
     public ResponseEntity<?> move(@Valid @RequestBody MoveRequest request) {
         return run(() -> game.move(request.direction()), HttpStatus.OK);
+    }
+
+    /** The people of the valley (RN-37). */
+    @GetMapping("/npcs")
+    public ResponseEntity<?> npcs() {
+        return run(game::npcs, HttpStatus.OK);
+    }
+
+    /** What a person of the valley says, if the avatar is next to it (RN-37). */
+    @PostMapping("/npcs/{id}/talk")
+    public ResponseEntity<?> talk(@PathVariable String id) {
+        return run(() -> game.talk(id), HttpStatus.OK);
+    }
+
+    /** Delivers the errand of a person of the valley (RN-38). */
+    @PostMapping("/npcs/{id}/errand")
+    public ResponseEntity<?> deliver(@PathVariable String id) {
+        return run(() -> game.deliver(id), HttpStatus.OK);
     }
 
     /** Describes one plot without changing anything. */

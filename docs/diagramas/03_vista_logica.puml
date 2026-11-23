@@ -142,6 +142,14 @@ package "application" #F6FBF6 {
   class AvatarService {
     +move(direction: String): Result
   }
+  class NpcService {
+    +npcs(): Result
+    +talk(npc: String): Result
+    +deliver(npc: String): Result
+  }
+  class DialogueService {
+    +dialogue(n: Npc, s: GameState): DialogueView
+  }
   class DayService {
     +endDay(): Result
   }
@@ -292,6 +300,21 @@ package "domain" #FFFCF5 {
     class Plot {
       -terrain: Terrain
       +isFree(): boolean
+    }
+  }
+
+  package "npc" #FFFFFF {
+    class Npc <<enumeration>> {
+      MARTA
+      TOMAS
+      LUCIA
+      INES
+      +isNextTo(col: int, row: int): boolean
+      +{static} at(col: int, row: int): Npc
+    }
+    class ErrandBook {
+      +isDone(n: Npc): boolean
+      +complete(n: Npc): void
     }
   }
 
@@ -447,6 +470,11 @@ GameController --> BuildingService
 GameController --> AnimalService
 GameController --> SaveGameService
 GameController --> AvatarService
+GameController --> NpcService
+NpcService --> GameSession
+NpcService --> EventBus
+NpcService --> DialogueService
+NpcService --> AchievementService
 AvatarService --> GameSession
 AvatarService --> EventBus
 GameController ..> Result : devuelve
@@ -476,6 +504,9 @@ GameState *-- "1" FarmMap
 GameState *-- "1" Avatar
 Avatar ..> FarmMap : isWalkable
 Avatar --> Direction
+GameState *-- "1" ErrandBook
+ErrandBook --> "0..4" Npc
+FarmMap ..> Npc : bloquean el paso
 GameState *-- "1" Inventory
 GameState *-- "1" Market
 GameState *-- "1" AchievementTracker

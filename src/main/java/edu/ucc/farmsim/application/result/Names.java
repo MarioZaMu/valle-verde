@@ -6,7 +6,7 @@ import java.util.Map;
  * Spanish display names for the ids the application hands to the UI (seasons, weather, crops, growth stages, buildings, animals, achievements),
  * so messages and screens always use the same words. Unknown ids are returned unchanged.
  *
- * <p>Stories: HU-01, HU-07, HU-18.
+ * <p>Stories: HU-01, HU-07, HU-18, HU-46, HU-47.
  */
 public final class Names {
 
@@ -27,6 +27,17 @@ public final class Names {
             Map.entry("POTATO", "Papa"), Map.entry("TOMATO", "Tomate"), Map.entry("CORN", "Maíz"),
             Map.entry("PUMPKIN", "Calabaza"), Map.entry("EGG", "Huevo"), Map.entry("MILK", "Leche"),
             Map.entry("HAY", "Heno"), Map.entry("MEDICINE", "Medicina"));
+
+    private static final Map<String, String> ITEMS_PLURAL = Map.ofEntries(
+            Map.entry("CARROT", "Zanahorias"), Map.entry("POTATO", "Papas"), Map.entry("TOMATO", "Tomates"),
+            Map.entry("CORN", "Mazorcas de Maíz"), Map.entry("PUMPKIN", "Calabazas"), Map.entry("EGG", "Huevos"),
+            Map.entry("MILK", "Leches"), Map.entry("HAY", "Heno"), Map.entry("MEDICINE", "Medicinas"));
+
+    private static final Map<String, String> NPCS = Map.of(
+            "MARTA", "Marta", "TOMAS", "Don Tomás", "LUCIA", "Dra. Lucía", "INES", "Inés");
+    private static final Map<String, String> NPC_ROLES = Map.of(
+            "MARTA", "Vendedora del mercado", "TOMAS", "Granjero veterano", "LUCIA", "Veterinaria",
+            "INES", "Vecina");
 
     private static final Map<String, String> BUILDINGS = Map.of(
             "COOP", "Gallinero", "BARN", "Establo", "WAREHOUSE", "Almacén", "GREENHOUSE", "Invernadero");
@@ -79,6 +90,24 @@ public final class Names {
     /** Spanish name of an item (seed, harvest, animal product or supply). */
     public static String item(String id) {
         return ITEMS.getOrDefault(id, id);
+    }
+
+    /**
+     * A quantity of an item, for example {@code 2 Zanahorias} or {@code 1 Zanahoria}. Hay is not counted in
+     * units, so it keeps its name: {@code 2 Heno}.
+     */
+    public static String itemCount(String id, int amount) {
+        return amount + " " + (amount == 1 ? item(id) : ITEMS_PLURAL.getOrDefault(id, item(id)));
+    }
+
+    /** Name of a person of the valley, for example {@code TOMAS} to {@code Don Tomás}. */
+    public static String npc(String id) {
+        return NPCS.getOrDefault(id, id);
+    }
+
+    /** What a person of the valley does, for example {@code LUCIA} to {@code Veterinaria}. */
+    public static String npcRole(String id) {
+        return NPC_ROLES.getOrDefault(id, id);
     }
 
     /** Building name, for example {@code COOP} to {@code Gallinero}. */

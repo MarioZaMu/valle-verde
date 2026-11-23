@@ -8,7 +8,7 @@ import edu.ucc.farmsim.application.dto.HudView;
  * Something that happened in the game and the screen may want to show. Events carry immutable views, never
  * domain objects, so the UI can react without importing the domain.
  *
- * <p>Stories: HU-01, HU-10, HU-14, HU-15, HU-17, HU-26, HU-34, HU-45.
+ * <p>Stories: HU-01, HU-10, HU-14, HU-15, HU-17, HU-26, HU-34, HU-45, HU-47.
  */
 public sealed interface GameEvent {
 
@@ -35,6 +35,9 @@ public sealed interface GameEvent {
 
     /** The avatar took a step (RN-36). */
     record AvatarMoved(AvatarView avatar) implements GameEvent { }
+
+    /** An errand of a person of the valley was delivered and paid (RN-38). */
+    record ErrandCompleted(String npcId, String name, int reward) implements GameEvent { }
 
     /** Energy changed after an action. */
     record EnergyChanged(int energy, int maxEnergy) implements GameEvent { }

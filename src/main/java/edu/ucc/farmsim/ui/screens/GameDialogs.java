@@ -1,12 +1,13 @@
 package edu.ucc.farmsim.ui.screens;
 
 import edu.ucc.farmsim.application.dto.DaySummaryView;
+import edu.ucc.farmsim.application.dto.DialogueView;
 
 /**
  * What the game screen logic needs to open its dialogs (market, inventory, construction, a building and the
  * summary of the day). The real one opens Swing dialogs; tests use a fake, so no display is needed.
  *
- * <p>Stories: HU-17, HU-18, HU-26, HU-29, HU-30, HU-37, HU-38.
+ * <p>Stories: HU-17, HU-18, HU-26, HU-29, HU-30, HU-37, HU-38, HU-46.
  */
 public interface GameDialogs {
 
@@ -44,4 +45,7 @@ public interface GameDialogs {
 
     /** Shows the summary of the day that just ended. */
     void showSummary(DaySummaryView summary);
+
+    /** Opens the dialogue box of a person of the valley with what it just said (HU-46). */
+    void showDialogue(DialogueView dialogue);
 }

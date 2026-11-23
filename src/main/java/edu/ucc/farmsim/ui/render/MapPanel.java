@@ -4,6 +4,7 @@ import edu.ucc.farmsim.application.controller.GameCommands;
 import edu.ucc.farmsim.application.dto.BuildingView;
 import edu.ucc.farmsim.application.dto.HudView;
 import edu.ucc.farmsim.application.dto.MapView;
+import edu.ucc.farmsim.application.dto.NpcView;
 import edu.ucc.farmsim.application.dto.PlotView;
 import edu.ucc.farmsim.application.event.EventBus;
 import edu.ucc.farmsim.application.event.GameEvent;
@@ -37,7 +38,7 @@ import javax.swing.ToolTipManager;
  * view are registered with {@link #addFloating}, and the plots are placed clear of them (HU-48). Hovering a plot
  * shows its tooltip after {@link #TOOLTIP_DELAY_MS}, and clicking tells the {@link PlotClickListener}.
  *
- * <p>Stories: HU-07, HU-25, HU-35, HU-40, HU-41, HU-45, HU-48.
+ * <p>Stories: HU-07, HU-25, HU-35, HU-40, HU-41, HU-45, HU-46, HU-48.
  */
 public final class MapPanel extends JPanel implements GameListener {
 
@@ -197,7 +198,8 @@ public final class MapPanel extends JPanel implements GameListener {
     @Override
     public void onEvent(GameEvent event) {
         if (event instanceof GameEvent.GameStarted || event instanceof GameEvent.DayEnded
-                || event instanceof GameEvent.MapChanged || event instanceof GameEvent.AvatarMoved) {
+                || event instanceof GameEvent.MapChanged || event instanceof GameEvent.AvatarMoved
+                || event instanceof GameEvent.ErrandCompleted) {
             if (SwingUtilities.isEventDispatchThread()) {
                 react(event);
             } else {
@@ -222,6 +224,10 @@ public final class MapPanel extends JPanel implements GameListener {
         CellPos pos = cellAt(event.getX(), event.getY());
         if (pos == null) {
             return null;
+        }
+        NpcView npc = view == null ? null : view.npcAt(pos.col(), pos.row());
+        if (npc != null) {
+            return npc.name() + " · " + npc.role();
         }
         BuildingView building = view == null ? null : view.buildingAt(pos.col(), pos.row());
         if (building != null && !GREENHOUSE.equals(building.type())) {

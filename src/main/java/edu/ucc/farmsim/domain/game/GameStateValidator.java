@@ -20,7 +20,7 @@ import java.util.List;
  * inventory, crops, buildings, animals, market, achievements and the avatar must make sense together. A game that fails
  * is never loaded.
  *
- * <p>Stories: HU-31, HU-45.
+ * <p>Stories: HU-31, HU-45, HU-47.
  */
 public final class GameStateValidator {
 
@@ -84,6 +84,7 @@ public final class GameStateValidator {
             checkAnimals(building, found);
         }
         checkAvatar(memento, map, found);
+        checkErrands(memento, found);
         var inventory = memento.inventory();
         int expected = GameRules.INVENTORY_BASE_SLOTS + warehouses * GameRules.WAREHOUSE_EXTRA_SLOTS;
         if (inventory.capacity() != expected || inventory.slots().size() != inventory.capacity()) {
@@ -106,6 +107,15 @@ public final class GameStateValidator {
         }
         if (avatar.facing() == null || !map.isWalkable(avatar.col(), avatar.row())) {
             found.add("the avatar is not on a plot it can walk on: " + avatar);
+        }
+    }
+
+    /** A save written before the errands has none; otherwise no person appears twice or empty (RN-38). */
+    private static void checkErrands(GameMemento memento, List<String> found) {
+        var done = memento.errandsDone();
+        if (done != null && (done.stream().anyMatch(java.util.Objects::isNull)
+                || done.stream().distinct().count() != done.size())) {
+            found.add("the errands done are not a list of different people: " + done);
         }
     }
 

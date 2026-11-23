@@ -50,6 +50,8 @@ public final class Messages {
         TEMPLATES.put(ErrorCode.SIN_MEDICINA, "No tienes Medicina.");
         TEMPLATES.put(ErrorCode.ANIMAL_ENFERMO, "Hay animales enfermos: cúralos con Medicina.");
         TEMPLATES.put(ErrorCode.MOVIMIENTO_BLOQUEADO, "No puedes pasar por ahí.");
+        TEMPLATES.put(ErrorCode.NPC_LEJOS, "Acércate a %s para hablar.");
+        TEMPLATES.put(ErrorCode.ENCARGO_INCOMPLETO, "Te faltan %s para el encargo.");
         TEMPLATES.put(ErrorCode.ARCHIVO_INEXISTENTE, "No existe una partida en la ranura %d.");
         TEMPLATES.put(ErrorCode.ARCHIVO_CORRUPTO,
                 "La partida está dañada y no se puede cargar. Tu partida actual no cambió.");

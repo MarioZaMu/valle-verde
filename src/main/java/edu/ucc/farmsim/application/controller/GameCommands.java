@@ -5,10 +5,12 @@ import edu.ucc.farmsim.application.dto.AvatarView;
 import edu.ucc.farmsim.application.dto.BuildingActionView;
 import edu.ucc.farmsim.application.dto.BuildingView;
 import edu.ucc.farmsim.application.dto.BuildingsView;
+import edu.ucc.farmsim.application.dto.DialogueView;
 import edu.ucc.farmsim.application.dto.HudView;
 import edu.ucc.farmsim.application.dto.InventoryView;
 import edu.ucc.farmsim.application.dto.MapView;
 import edu.ucc.farmsim.application.dto.MarketView;
+import edu.ucc.farmsim.application.dto.NpcView;
 import edu.ucc.farmsim.application.dto.PlotView;
 import edu.ucc.farmsim.application.dto.SaveSlotView;
 import edu.ucc.farmsim.application.result.Result;
@@ -21,7 +23,7 @@ import java.util.List;
  *
  * <p>Every operation answers with a {@link Result}; none of them throws (R-03, RNF-07).
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-26, HU-28, HU-29, HU-30, HU-31, HU-32, HU-33, HU-35, HU-37, HU-38, HU-45.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-26, HU-28, HU-29, HU-30, HU-31, HU-32, HU-33, HU-35, HU-37, HU-38, HU-45, HU-46, HU-47.
  */
 public interface GameCommands {
 
@@ -85,6 +87,26 @@ public interface GameCommands {
      * @return where the avatar stands now
      */
     Result<AvatarView> move(String direction);
+
+    /** The people of the valley, where they stand and how their errands are (RN-37). A pure query. */
+    Result<List<NpcView>> npcs();
+
+    /**
+     * What a person of the valley says (RN-37). The avatar must stand on one of the four plots next to it, or it
+     * is rejected with {@code NPC_LEJOS}. It costs nothing and changes nothing.
+     *
+     * @param npcId {@code MARTA}, {@code TOMAS}, {@code LUCIA} or {@code INES}
+     */
+    Result<DialogueView> talk(String npcId);
+
+    /**
+     * Delivers the errand of a person next to the avatar (RN-38): the items are taken and the reward paid once.
+     * {@code ENCARGO_INCOMPLETO} if the inventory lacks units; a done errand is only thanked.
+     *
+     * @param npcId {@code MARTA}, {@code TOMAS}, {@code LUCIA} or {@code INES}
+     * @return what the person says after it
+     */
+    Result<DialogueView> deliver(String npcId);
 
     /** True if at least one of the save slots holds a game. */
     Result<Boolean> hasSavedGames();

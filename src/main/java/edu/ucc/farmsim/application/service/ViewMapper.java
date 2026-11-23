@@ -8,6 +8,7 @@ import edu.ucc.farmsim.application.dto.BuildingsView;
 import edu.ucc.farmsim.application.dto.DaySummaryView;
 import edu.ucc.farmsim.application.dto.HudView;
 import edu.ucc.farmsim.application.dto.MapView;
+import edu.ucc.farmsim.application.dto.NpcView;
 import edu.ucc.farmsim.application.dto.PlotView;
 import edu.ucc.farmsim.application.result.Messages;
 import edu.ucc.farmsim.application.result.Names;
@@ -19,6 +20,7 @@ import edu.ucc.farmsim.domain.farm.Avatar;
 import edu.ucc.farmsim.domain.farm.Plot;
 import edu.ucc.farmsim.domain.game.DayReport;
 import edu.ucc.farmsim.domain.game.GameState;
+import edu.ucc.farmsim.domain.npc.Npc;
 import edu.ucc.farmsim.domain.progress.Achievement;
 import edu.ucc.farmsim.domain.time.GameDate;
 import java.util.ArrayList;
@@ -28,7 +30,7 @@ import org.springframework.stereotype.Component;
 /**
  * Turns the domain state into the immutable views the UI draws, so the UI never sees domain objects.
  *
- * <p>Stories: HU-01, HU-17, HU-18, HU-28, HU-34, HU-35, HU-45.
+ * <p>Stories: HU-01, HU-17, HU-18, HU-28, HU-34, HU-35, HU-45, HU-46.
  */
 @Component
 public final class ViewMapper {
@@ -62,7 +64,17 @@ public final class ViewMapper {
                 plots.add(plot(state, col, row));
             }
         }
-        return new MapView(cols, rows, List.copyOf(plots), buildingViews(state), avatar(state));
+        return new MapView(cols, rows, List.copyOf(plots), buildingViews(state), avatar(state), npcs(state));
+    }
+
+    /** The people of the valley, in a fixed order, with the state of their errands. */
+    public List<NpcView> npcs(GameState state) {
+        List<NpcView> all = new ArrayList<>();
+        for (Npc npc : Npc.values()) {
+            all.add(new NpcView(npc.name(), Names.npc(npc.name()), Names.npcRole(npc.name()), npc.col(), npc.row(),
+                    npc.errandItem().name(), npc.errandAmount(), npc.errandReward(), state.errands().isDone(npc)));
+        }
+        return List.copyOf(all);
     }
 
     /** Where the avatar stands and looks. */

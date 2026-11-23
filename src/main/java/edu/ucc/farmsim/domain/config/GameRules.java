@@ -119,6 +119,56 @@ public final class GameRules {
     /** Row of the grass plot where the avatar of a new game stands. */
     public static final int AVATAR_START_ROW = 7;
 
+    // ---- RN-37, RN-38: the people of the valley and their errands ----
+
+    /** Column of Marta, the market seller, north of the soil. */
+    public static final int NPC_MARTA_COL = 10;
+
+    /** Row of Marta. */
+    public static final int NPC_MARTA_ROW = 1;
+
+    /** Column of Don Tomás, the veteran farmer, at the top left. */
+    public static final int NPC_TOMAS_COL = 3;
+
+    /** Row of Don Tomás. */
+    public static final int NPC_TOMAS_ROW = 1;
+
+    /** Column of Dra. Lucía, the vet, on the east side. */
+    public static final int NPC_LUCIA_COL = 15;
+
+    /** Row of Dra. Lucía. */
+    public static final int NPC_LUCIA_ROW = 3;
+
+    /** Column of Inés, the neighbour, at the bottom right. */
+    public static final int NPC_INES_COL = 11;
+
+    /** Row of Inés. */
+    public static final int NPC_INES_ROW = 9;
+
+    /** Carrots Marta asks for. */
+    public static final int ERRAND_MARTA_AMOUNT = 5;
+
+    /** What Marta pays, in m. */
+    public static final int ERRAND_MARTA_REWARD = 60;
+
+    /** Potatoes Don Tomás asks for. */
+    public static final int ERRAND_TOMAS_AMOUNT = 3;
+
+    /** What Don Tomás pays, in m. */
+    public static final int ERRAND_TOMAS_REWARD = 50;
+
+    /** Rations of hay Dra. Lucía asks for. */
+    public static final int ERRAND_LUCIA_AMOUNT = 2;
+
+    /** What Dra. Lucía pays, in m. */
+    public static final int ERRAND_LUCIA_REWARD = 30;
+
+    /** Eggs Inés asks for. */
+    public static final int ERRAND_INES_AMOUNT = 4;
+
+    /** What Inés pays, in m. */
+    public static final int ERRAND_INES_REWARD = 80;
+
     // ---- RN-30: new game ----
 
     /** Money at the start of a game. */

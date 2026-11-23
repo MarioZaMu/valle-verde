@@ -106,6 +106,25 @@ class RemoteGameClientTest {
     }
 
     @Test
+    void HU46_HU47_talkingAndDeliveringThroughTheServerMatchTheLocalController() {
+        client.newGame(TestApp.SEED);
+        TestApp local = TestApp.startedGame();
+        for (var state : List.of(session.current(), local.state())) {
+            state.avatar().restoreFrom(new edu.ucc.farmsim.domain.farm.AvatarSnapshot(9, 1,
+                    edu.ucc.farmsim.domain.farm.Direction.EAST));
+            state.inventory().add(ItemType.CARROT, 5);
+        }
+        events.clear();
+
+        assertEquals(local.controller.npcs().value(), client.npcs().value());
+        assertEquals(local.controller.talk("MARTA").value(), client.talk("MARTA").value());
+        assertEquals(local.controller.deliver("MARTA").value(), client.deliver("MARTA").value());
+        assertEquals(local.events, events);
+        assertEquals(ErrorCode.NPC_LEJOS, client.talk("INES").code());
+        assertEquals(local.controller.map().value(), client.map().value());
+    }
+
+    @Test
     void sowingRepublishesTheEventsOfTheOrderInTheOrderTheServerProducedThem() {
         client.newGame(TestApp.SEED);
         events.clear();

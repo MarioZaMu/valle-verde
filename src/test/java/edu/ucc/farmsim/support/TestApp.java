@@ -11,6 +11,8 @@ import edu.ucc.farmsim.application.service.DayService;
 import edu.ucc.farmsim.application.service.FarmService;
 import edu.ucc.farmsim.application.service.GameSession;
 import edu.ucc.farmsim.application.service.MarketService;
+import edu.ucc.farmsim.application.service.NpcService;
+import edu.ucc.farmsim.application.service.DialogueService;
 import edu.ucc.farmsim.application.service.ProgressService;
 import edu.ucc.farmsim.application.service.SaveGameService;
 import edu.ucc.farmsim.application.service.ViewMapper;
@@ -95,6 +97,7 @@ public final class TestApp {
         AnimalService animals = new AnimalService(session, mapper, bus, achievements);
         return new TestApp(session, bus,
                 new GameController(session, mapper, progress, day, saves, farm, market, buildings, animals,
-                        achievements, new AvatarService(session, mapper, bus)));
+                        achievements, new AvatarService(session, mapper, bus),
+                        new NpcService(session, mapper, new DialogueService(), bus, achievements)));
     }
 }

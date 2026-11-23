@@ -2,6 +2,7 @@ package edu.ucc.farmsim.ui.screens;
 
 import edu.ucc.farmsim.application.controller.GameCommands;
 import edu.ucc.farmsim.application.dto.DaySummaryView;
+import edu.ucc.farmsim.application.dto.DialogueView;
 import edu.ucc.farmsim.application.event.EventBus;
 import edu.ucc.farmsim.application.event.GameEvent;
 import edu.ucc.farmsim.ui.components.AchievementsDialog;
@@ -11,6 +12,8 @@ import edu.ucc.farmsim.ui.components.BuildingPresenter;
 import edu.ucc.farmsim.ui.components.ConstructionDialog;
 import edu.ucc.farmsim.ui.components.ConstructionPresenter;
 import edu.ucc.farmsim.ui.components.DaySummaryDialog;
+import edu.ucc.farmsim.ui.components.DialogueDialog;
+import edu.ucc.farmsim.ui.components.DialoguePresenter;
 import edu.ucc.farmsim.ui.components.HudPanel;
 import edu.ucc.farmsim.ui.components.InventoryDialog;
 import edu.ucc.farmsim.ui.components.InventoryModel;
@@ -56,13 +59,14 @@ import javax.swing.SwingUtilities;
  * messages and the buttons "End day" and "Menu". Keys 1 to 5 pick a tool, Escape deselects it, and the
  * shortcuts of RN-34 work anywhere on the screen.
  *
- * <p>Stories: HU-17, HU-18, HU-20, HU-22, HU-23, HU-26, HU-29, HU-30, HU-33, HU-34, HU-35, HU-36, HU-37, HU-38, HU-39, HU-40, HU-41, HU-45, HU-48.
+ * <p>Stories: HU-17, HU-18, HU-20, HU-22, HU-23, HU-26, HU-29, HU-30, HU-33, HU-34, HU-35, HU-36, HU-37, HU-38, HU-39, HU-40, HU-41, HU-45, HU-46, HU-48.
  */
 public final class GameScreen extends JPanel {
 
     private static final long serialVersionUID = 1L;
     private static final String DESELECT = "deselect-tool";
     private static final String USE_TOOL = "use-tool";
+    private static final String TALK = "talk";
     private static final int GAP = 6;
     private static final int MARGIN = 8;
 
@@ -121,6 +125,12 @@ public final class GameScreen extends JPanel {
             @Override
             public void showSummary(DaySummaryView summary) {
                 new DaySummaryDialog(SwingUtilities.getWindowAncestor(GameScreen.this), summary).setVisible(true);
+            }
+
+            @Override
+            public void showDialogue(DialogueView dialogue) {
+                new DialogueDialog(SwingUtilities.getWindowAncestor(GameScreen.this),
+                        new DialoguePresenter(controller, dialogue)).setVisible(true);
             }
         };
         ToastQueue toastQueue = new ToastQueue(System::currentTimeMillis);
@@ -196,7 +206,8 @@ public final class GameScreen extends JPanel {
 
     /**
      * Arrows and W A S D walk with the avatar, one plot per press; a held key walks at the pace of the walk
-     * animation instead of the faster key repeat. Space uses the selected tool on the plot in front (HU-45).
+     * animation instead of the faster key repeat. Space uses the selected tool on the plot in front (HU-45) and
+     * E talks to the person next to the avatar (HU-46).
      */
     private void bindWalking(GameScreenPresenter presenter, MapPanel map) {
         InputMap keys = getInputMap(WHEN_IN_FOCUSED_WINDOW);
@@ -226,6 +237,15 @@ public final class GameScreen extends JPanel {
                 }
             });
         }
+        keys.put(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0), TALK);
+        getActionMap().put(TALK, new AbstractAction() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                presenter.onTalkKey();
+            }
+        });
         keys.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), USE_TOOL);
         getActionMap().put(USE_TOOL, new AbstractAction() {
             private static final long serialVersionUID = 1L;

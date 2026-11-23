@@ -4,6 +4,7 @@ import edu.ucc.farmsim.application.dto.AnimalView;
 import edu.ucc.farmsim.application.dto.AvatarView;
 import edu.ucc.farmsim.application.dto.BuildingView;
 import edu.ucc.farmsim.application.dto.MapView;
+import edu.ucc.farmsim.application.dto.NpcView;
 import edu.ucc.farmsim.application.dto.PlotView;
 import edu.ucc.farmsim.ui.assets.AssetManager;
 import edu.ucc.farmsim.ui.theme.Palette;
@@ -32,14 +33,15 @@ import java.util.Set;
  * drawn from back to front, each with its shadow. Something that hides a crop or the plot under the cursor
  * turns see-through. With the ambient life on, the water ripples, the trees sway, the animals wander and
  * clouds, butterflies or leaves cross the fields. The avatar stands among them and walks from plot to plot
- * with three frames (HU-45).
+ * with three frames (HU-45), and the people of the valley stand on their plots with a bubble that shows what
+ * their errand asks for while it is not done (HU-46, HU-47).
  *
  * <p>Without the pack each terrain and each crop stage is drawn with vector shapes, so the game needs no image
  * at all (HU-42); a single missing sprite also falls back to its vector shape. With a {@link VisualEffects}
  * it paints the palette of the season, the weather, the night tint and the animations (HU-40, HU-41). It works
  * on any {@link Graphics2D}, including one of an image, so it is tested without a display.
  *
- * <p>Stories: HU-18, HU-19, HU-25, HU-35, HU-40, HU-41, HU-42, HU-44, HU-45, HU-48.
+ * <p>Stories: HU-18, HU-19, HU-25, HU-35, HU-40, HU-41, HU-42, HU-44, HU-45, HU-46, HU-47, HU-48.
  */
 public final class MapRenderer {
 
@@ -65,6 +67,10 @@ public final class MapRenderer {
     private static final Color AVATAR_SKIN = new Color(0xF2C79B);
     private static final Color AVATAR_HAT = new Color(0xC8963E);
     private static final Color AVATAR_EYE = new Color(0x2A1A10);
+    private static final Color NPC_MARTA = new Color(0xC0504D);
+    private static final Color NPC_TOMAS = new Color(0x6B8E23);
+    private static final Color NPC_LUCIA = new Color(0xF2F2F2);
+    private static final Color NPC_INES = new Color(0x8E5BB5);
 
     private final AssetManager assets;
     private final PixelScaler scaler = new PixelScaler();
@@ -173,6 +179,9 @@ public final class MapRenderer {
         if (map.avatar() != null) {
             hidden.add(key(map.avatar().col(), map.avatar().row()));
         }
+        for (NpcView npc : npcs(map)) {
+            hidden.add(key(npc.col(), npc.row()));
+        }
         List<Rectangle> shadows = new ArrayList<>();
         List<Item> items = new ArrayList<>();
         List<Runnable> above = new ArrayList<>();
@@ -192,6 +201,9 @@ public final class MapRenderer {
         }
         if (map.avatar() != null) {
             avatar(g, map.avatar(), geo, fx, shadows, items);
+        }
+        for (NpcView npc : npcs(map)) {
+            npc(g, npc, geo, ambient, time, shadows, items, above);
         }
         Composite saved = g.getComposite();
         g.setColor(SHADOW);
@@ -453,8 +465,56 @@ public final class MapRenderer {
                 drawCrop(g, plot, geometry.cellBounds(plot.col(), plot.row()), fx);
             }
         }
+        for (NpcView npc : npcs(map)) {
+            Rectangle cell = geometry.cellBounds(npc.col(), npc.row());
+            drawPersonVector(g, cell, npcShirt(npc.id()), "SOUTH");
+            if (!npc.errandDone()) {
+                bubble(g, cell.x + cell.width / 2, cell.y + cell.height / 8, Math.max(12, cell.width / 2),
+                        errandIcon(npc), Palette.PENDING, 0);
+            }
+        }
         if (map.avatar() != null) {
             drawAvatarVector(g, avatarCell(map.avatar(), geometry, fx), map.avatar().facing());
+        }
+    }
+
+    // ------------------------------------------------------------------ people of the valley
+
+    private static List<NpcView> npcs(MapView map) {
+        return map.npcs() == null ? List.of() : map.npcs();
+    }
+
+    private static String errandIcon(NpcView npc) {
+        return "items/" + npc.errandItem() + ".png";
+    }
+
+    private static Color npcShirt(String id) {
+        return switch (id) {
+            case "MARTA" -> NPC_MARTA;
+            case "TOMAS" -> NPC_TOMAS;
+            case "LUCIA" -> NPC_LUCIA;
+            default -> NPC_INES;
+        };
+    }
+
+    private void npc(Graphics2D g, NpcView npc, MapGeometry geo, boolean ambient, long time, List<Rectangle> shadows,
+                     List<Item> items, List<Runnable> above) {
+        Rectangle cell = geo.cellBounds(npc.col(), npc.row());
+        int s = cell.width;
+        shadows.add(new Rectangle(cell.x + s / 5, cell.y + s - s / 6, s * 3 / 5, s / 5));
+        Optional<BufferedImage> sprite = assets.sprite("characters/" + npc.id() + ".png");
+        int breathe = ambient && (time / 600 + npc.col()) % 2 == 0 ? Math.max(1, s / 32) : 0;
+        items.add(new Item(cell.y + cell.height - 0.1, items.size(), () -> {
+            if (sprite.isPresent()) {
+                scaler.draw(g, sprite.get(), cell.x, cell.y - breathe, s, s);
+            } else {
+                drawPersonVector(g, cell, npcShirt(npc.id()), "SOUTH");
+            }
+        }));
+        if (!npc.errandDone()) {
+            int bob = ambient ? (int) Math.round(Math.sin(time / 350.0 + npc.col()) * s / 12.0) : 0;
+            above.add(() -> bubble(g, cell.x + s / 2, cell.y + s / 8, Math.max(14, s / 2), errandIcon(npc),
+                    Palette.PENDING, bob));
         }
     }
 
@@ -496,9 +556,14 @@ public final class MapRenderer {
 
     /** The avatar without sprites: a farmer with a straw hat, looking to its direction. */
     private static void drawAvatarVector(Graphics2D g, Rectangle c, String facing) {
+        drawPersonVector(g, c, AVATAR_SHIRT, facing);
+    }
+
+    /** A person drawn with shapes: shirt of the given colour, face, straw hat and eyes towards its direction. */
+    private static void drawPersonVector(Graphics2D g, Rectangle c, Color shirt, String facing) {
         int s = c.width;
         int cx = c.x + s / 2;
-        g.setColor(AVATAR_SHIRT);
+        g.setColor(shirt);
         g.fillRoundRect(cx - s / 5, c.y + s * 9 / 20, s * 2 / 5, s * 2 / 5, s / 6, s / 6);
         g.setColor(AVATAR_SKIN);
         g.fillOval(cx - s / 6, c.y + s / 5, s / 3, s / 3);

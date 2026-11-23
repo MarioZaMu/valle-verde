@@ -1,6 +1,7 @@
 package edu.ucc.farmsim.support;
 
 import edu.ucc.farmsim.application.dto.DaySummaryView;
+import edu.ucc.farmsim.application.dto.DialogueView;
 import edu.ucc.farmsim.ui.screens.GameDialogs;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,8 @@ public final class RecordingDialogs implements GameDialogs {
 
     /** What was opened, in order: {@code market}, {@code inventory}, {@code construction:col,row}, {@code building:id}. */
     public final List<String> opened = new ArrayList<>();
+    /** The dialogues opened. */
+    public final List<DialogueView> dialogues = new ArrayList<>();
     /** The summaries shown. */
     public final List<DaySummaryView> summaries = new ArrayList<>();
 
@@ -46,5 +49,11 @@ public final class RecordingDialogs implements GameDialogs {
     @Override
     public void showSummary(DaySummaryView summary) {
         summaries.add(summary);
+    }
+
+    @Override
+    public void showDialogue(DialogueView dialogue) {
+        opened.add("dialogue:" + dialogue.npcId());
+        dialogues.add(dialogue);
     }
 }
