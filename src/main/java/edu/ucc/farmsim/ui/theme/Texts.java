@@ -182,6 +182,9 @@ public final class Texts {
     /** Button that saves. */
     public static final String SAVE = "Guardar";
 
+    /** Tooltip of the Save button of the game screen, with its quick keys. */
+    public static final String SAVE_HINT = "Guardar la partida en una ranura (F5 guarda rápido, F9 carga)";
+
     /** Button that loads. */
     public static final String LOAD = "Cargar";
 

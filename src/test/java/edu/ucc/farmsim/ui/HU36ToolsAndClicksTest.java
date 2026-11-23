@@ -180,6 +180,20 @@ class HU36ToolsAndClicksTest {
     }
 
     @Test
+    void HU29_ca1_theSaveButtonAlwaysOpensTheSlotsToChooseWhereToSave() {
+        TestApp app = TestApp.startedGame();
+        edu.ucc.farmsim.support.RecordingDialogs dialogs = new edu.ucc.farmsim.support.RecordingDialogs();
+        GameScreenPresenter presenter = new GameScreenPresenter(app.controller, tools, messages::add, dialogs);
+
+        presenter.onSave();
+        presenter.useSlot(2);
+        presenter.onSave();
+
+        assertEquals(List.of("slots:save", "slots:save"), dialogs.opened, "even after F5 used a slot");
+        assertTrue(messages.isEmpty(), "nothing is saved until a slot is chosen");
+    }
+
+    @Test
     void HU36_ca5_f5AndF9OpenTheSlotsTheFirstTimeAndThenUseTheSlotUsedLast() {
         TestApp app = TestApp.startedGame();
         edu.ucc.farmsim.support.RecordingDialogs dialogs = new edu.ucc.farmsim.support.RecordingDialogs();

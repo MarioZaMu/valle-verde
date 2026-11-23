@@ -244,6 +244,11 @@ public final class GameScreenPresenter {
         return map.isOk() ? map.value().buildingAt(col, row) : null;
     }
 
+    /** The Save button: the slots open so the player chooses where to save (CU-14, HU-29). */
+    public void onSave() {
+        dialogs.showSlots(true);
+    }
+
     /** The slot saved or loaded last, or 0 if none has been used. */
     public int lastSlot() {
         return lastSlot;

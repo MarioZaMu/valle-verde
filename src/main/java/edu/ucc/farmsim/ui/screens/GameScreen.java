@@ -175,6 +175,9 @@ public final class GameScreen extends JPanel {
         statusBox.add(status, BorderLayout.CENTER);
         JButton endDay = new WoodButton(Texts.END_DAY);
         endDay.addActionListener(event -> presenter.onEndDay());
+        JButton save = new WoodButton(Texts.SAVE);
+        save.setToolTipText(Texts.SAVE_HINT);
+        save.addActionListener(event -> presenter.onSave());
         JButton menu = new WoodButton(Texts.MENU);
         menu.addActionListener(event -> navigator.showStart());
         JCheckBox effects = new JCheckBox(Texts.EFFECTS, true);
@@ -186,6 +189,7 @@ public final class GameScreen extends JPanel {
         effectsBox.add(effects, BorderLayout.CENTER);
         JPanel buttons = clear(new JPanel(new FlowLayout(FlowLayout.RIGHT, GAP, 0)));
         buttons.add(endDay);
+        buttons.add(save);
         buttons.add(menu);
         buttons.add(effectsBox);
         JPanel messageRow = clear(new JPanel(new BorderLayout(GAP, 0)));

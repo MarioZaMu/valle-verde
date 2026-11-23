@@ -445,7 +445,7 @@ Ajustes surgidos al implementar: (1) `Main` se declara como capa «Composition»
 | Criterio | Qué falta | Fase |
 |---|---|---|
 | HU-10 · CA-3, HU-29 · CA-4, HU-30 · CA-4 | los 9 cultivos del invernadero de la «plena carga» | 5.6 (HU-25) |
-| HU-29 · CA-2 | la prueba contra un MongoDB real que rechaza o no responde (la simulada sí está) | cuando haya MongoDB |
+| HU-29 · CA-2 | ~~la prueba contra un MongoDB real que rechaza o no responde~~ — **cubierta en la etapa 5.7h** (`HU29RealMongoTest`) | hecha |
 
 **Diagramas:** `03_vista_logica` y `04_vista_desarrollo` incluyen `AchievementService`, `GameStateValidator`, `SaveCodec`, `Checksum`, `SlotInfo` y sus dependencias (`domain.game → crop`, `domain.save → time`); las seis vistas se volvieron a renderizar. `check_diagrams.py` y `check_imports.py` terminan sin errores.
 
@@ -480,7 +480,7 @@ Ajustes surgidos al implementar: (1) `Main` se declara como capa «Composition»
 
 | Criterio | Qué falta | Cuándo |
 |---|---|---|
-| HU-29 · CA-2 | la prueba contra un MongoDB real que rechaza o no responde (la simulada sí está) | cuando haya MongoDB |
+| HU-29 · CA-2 | ~~la prueba contra un MongoDB real que rechaza o no responde~~ — **cubierta en la etapa 5.7h** (`HU29RealMongoTest`) | hecha |
 | RNF-02 · RT-09 | el arranque medido del `.jar` (servidor listo) fue de **4,96 s** en esta máquina, justo bajo el límite de 5 s; repetir en una máquina limpia | demostración final |
 
 **Diagramas:** `03_vista_logica` y `04_vista_desarrollo` incluyen `ToastPresenter`, `ToastQueue`, `ToastLayer`, `VisualEffects`, `Particle`, `SeasonPalette` y `AssetManager`; la secuencia anexa cambió `ToastLayer` por `ToastPresenter`. Las vistas se volvieron a renderizar.
@@ -552,3 +552,12 @@ Decisiones: **D-72** el tutorial avanza desde `GameController`, después de que 
 - **Interfaz:** `MapGeometry.cellFor` da parcelas de 48 píxeles de pantalla (38 lógicos con Windows al 125 %), nunca menos de 12 × 8 parcelas visibles; `MapGeometry.follow` centra la cámara en el avatar sin mostrar fuera del valle y la deja dentro de la zona libre de barras. `MapPanel` sigue la posición interpolada del paso (`VisualEffects.avatarPosition`), así la cámara se desliza sin saltos. `MapRenderer` dibuja camino, casas (`village/*.png`, con tejado una parcela por encima) y personas de 32 × 64 con los pies en su parcela; el bosque rodea el valle y ya no hay valla. El suelo se escala con un `PixelScaler` propio de 4 copias, para no acumular imágenes grandes. `WalkKeys` recuerda las teclas pulsadas: el primer paso sale al pulsar y, mientras se mantiene, uno cada 180 ms exactos sin la pausa de la repetición del sistema; manda la última tecla pulsada y al soltarla se sigue con la que aún esté abajo.
 
 Decisiones: **D-75** las casas del valle son terreno (`HOUSE`) y no edificios del jugador: no se compran, no guardan animales y no entran en el memento, porque son fijas como el estanque; **D-76** el esquema sube a la versión 3 porque cambia el tamaño del mapa guardado, y los documentos viejos se ensanchan al cargar (no se reescriben hasta el siguiente guardado); **D-77** la Dra. Lucía e Inés pasaron a la puerta sur de sus casas: en la vista 3/4 el tejado ocupa la parcela norte y las taparía; **D-78** el ritmo del paso lo marca la interfaz (`WalkKeys` con el tiempo de `VisualEffects.STEP_MS`), no el dominio: cada paso sigue siendo una orden `move` normal, así que el modo por red funciona igual.
+
+**Etapa 5.7h (hecha): las partidas se guardan en MongoDB (HU-29 a HU-32).** 576 pruebas en verde; cobertura de dominio y aplicación sobre la barrera; verificadores sin errores.
+
+- **Diagnóstico de «no guarda nada»:** el código cumplía RN-31: en esta máquina **no había ningún MongoDB** (nada en el puerto 27017, sin servicio ni Docker), así que guardar devolvía `ERROR_ES` y la partida seguía. Además, la pantalla de juego no tenía ninguna entrada visible para guardar: solo `F5` y `F9`, y «Menú» vuelve al inicio sin guardar.
+- **Corrección:** se instaló **MongoDB Community Server 8.0.23** como servicio de Windows de arranque automático (`winget install MongoDB.Server --version 8.0.23`). La 8.0 y no la 9 porque el driver de Java de Spring Boot 3.5 (5.5.2) admite servidores hasta la 8.x. La URI por defecto (`mongodb://localhost:27017/valleverde`) no cambia. La pantalla de juego suma un botón **«Guardar»** junto a «Terminar día» y «Menú» que siempre abre las ranuras (CU-14 paso 1), con `F5`/`F9` en su ayuda.
+- **Prueba con MongoDB real:** `HU29RealMongoTest` trabaja en la base `valleverde_test` (se borra antes y después de cada prueba, así nunca toca las partidas del jugador) y se omite sola si no hay MongoDB en el equipo. Cubre: el documento queda de verdad en `partidas` con versión, fecha y checksum; un MongoDB que **rechaza** la escritura (un validador de colección) da `ERROR_ES` y deja el documento previo intacto; uno que **no responde** falla en menos de 3 s; y una partida guardada se carga idéntica en otra sesión.
+- **Verificación manual:** con el `.jar`, se guardó una partida en la ranura 1, se cerró la aplicación, se volvió a abrir y «Cargar» devolvió el mismo día, clima y dinero.
+
+Decisiones: **D-79** no se agrega un respaldo en archivos: el estudiante eligió instalar MongoDB, que es el almacenamiento que pide RN-31; sin MongoDB el comportamiento sigue siendo el de RN-31 (`ERROR_ES`, la partida sigue); **D-80** la prueba real se omite, en vez de fallar, en un equipo sin MongoDB, igual que las pruebas que necesitan pantalla.

@@ -46,6 +46,21 @@ class ScreenRouterIntegrationTest {
     }
 
     @Test
+    void HU29_theGameScreenShowsASaveButtonNextToEndDayAndMenu() throws Exception {
+        assumeFalse(GraphicsEnvironment.isHeadless(), "needs a display");
+        TestApp app = TestApp.create();
+        ScreenRouter router = new ScreenRouter(app.controller, app.bus, () -> TestApp.SEED);
+        button(router, "Nueva partida").doClick();
+        flush();
+
+        AbstractButton save = button(router, "Guardar");
+
+        assertTrue(save.isVisible());
+        assertNotNull(button(router, "Terminar día"));
+        assertNotNull(button(router, "Menú"));
+    }
+
+    @Test
     void HU36_selectingTheSowToolAndClickingTheMapSowsAndTheHudShowsTheEnergy() throws Exception {
         assumeFalse(GraphicsEnvironment.isHeadless(), "needs a display");
         TestApp app = TestApp.create();
