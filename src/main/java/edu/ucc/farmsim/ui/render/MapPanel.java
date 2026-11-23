@@ -51,6 +51,9 @@ public final class MapPanel extends JPanel implements GameListener {
     /** Milliseconds between two frames of the effects: about 30 frames per second. */
     public static final int FRAME_DELAY_MS = 33;
 
+    /** Milliseconds between two frames while the avatar walks: about 60 frames per second, so the camera glides. */
+    public static final int WALK_FRAME_DELAY_MS = 16;
+
     private static final long serialVersionUID = 1L;
     private static final Dimension PREFERRED = new Dimension(1024, 640);
     private static final String GREENHOUSE = "GREENHOUSE";
@@ -291,7 +294,13 @@ public final class MapPanel extends JPanel implements GameListener {
         }
     }
 
+    /** Milliseconds between the frames drawn now: fewer while walking, so the walk looks smooth (HU-50 · CA-5). */
+    public int frameDelay() {
+        return frames.getDelay();
+    }
+
     private void nextFrame() {
+        frames.setDelay(effects.isWalking() ? WALK_FRAME_DELAY_MS : FRAME_DELAY_MS);
         effects.step();
         repaint();
         if (!effects.needsFrames() || !isShowing()) {
@@ -300,6 +309,7 @@ public final class MapPanel extends JPanel implements GameListener {
     }
 
     private void startOrStopFrames() {
+        frames.setDelay(effects.isWalking() ? WALK_FRAME_DELAY_MS : FRAME_DELAY_MS);
         boolean onlyAmbient = effects.isAmbient() && !isShowing();
         if (effects.needsFrames() && !onlyAmbient) {
             if (!frames.isRunning()) {

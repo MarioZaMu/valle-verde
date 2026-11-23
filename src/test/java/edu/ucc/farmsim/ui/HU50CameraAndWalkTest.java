@@ -205,6 +205,7 @@ class HU50CameraAndWalkTest {
         }
         javax.swing.SwingUtilities.invokeAndWait(() -> { });
 
+        assertEquals(MapPanel.WALK_FRAME_DELAY_MS, panel.frameDelay(), "while it walks the map is drawn 60 times a second");
         assertEquals(calls, mapCalls.get(), "a step does not ask for the 1152 plots again (it made the walk jerk)");
         assertEquals(app.controller.map().value().avatar(), panel.currentView().avatar(), "the avatar is where it went");
         assertEquals(way, panel.currentView().avatar().facing());
@@ -215,6 +216,25 @@ class HU50CameraAndWalkTest {
         assertEquals(new AvatarView(at.col(), at.row(), "NORTH"), panel.currentView().avatar(),
                 "a blocked step only turns the avatar, also without asking for the map");
         assertEquals(calls, mapCalls.get());
+    }
+
+    @Test
+    void HU50_ca5_aMovingCameraSlidesTheGroundAlreadyPaintedInsteadOfPaintingItAgainOnEveryRow() {
+        MapView valley = TestApp.startedGame().controller.map().value();
+        MapRenderer renderer = new MapRenderer(AssetManager.fromClasspath());
+        Rectangle free = new Rectangle(0, 120, 1920, 760);
+        BufferedImage image = new BufferedImage(1920, 1080, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = image.createGraphics();
+        for (double row = 0; row <= ROWS; row += 0.5) {
+            renderer.render(g, valley, MapGeometry.follow(COLS, ROWS, 48, free, 24, row), 1920, 1080, null, null);
+        }
+        for (double col = 0; col <= COLS; col += 0.5) {
+            renderer.render(g, valley, MapGeometry.follow(COLS, ROWS, 48, free, col, 12), 1920, 1080, null, null);
+        }
+        g.dispose();
+
+        assertEquals(1, renderer.groundPaints(),
+                "walking up and down (or across) the valley never repaints the ground: repainting it made the walk jerk");
     }
 
     @Test

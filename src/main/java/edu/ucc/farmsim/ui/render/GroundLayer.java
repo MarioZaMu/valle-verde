@@ -38,6 +38,8 @@ final class GroundLayer {
         }
     };
 
+    private int paints;
+
     GroundLayer(AssetManager assets) {
         this.assets = assets;
     }
@@ -62,7 +64,13 @@ final class GroundLayer {
         return cache.computeIfAbsent(key.toString(), k -> paint(map, season, frame, col0, row0, col1, row1));
     }
 
+    /** How many times the ground was really painted (not taken from the cache). */
+    int paints() {
+        return paints;
+    }
+
     private BufferedImage paint(MapView map, String season, int frame, int col0, int row0, int col1, int row1) {
+        paints++;
         int cols = col1 - col0;
         int rows = row1 - row0;
         String[] terrain = terrains(map);

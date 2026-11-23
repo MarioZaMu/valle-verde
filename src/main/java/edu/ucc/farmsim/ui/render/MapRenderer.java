@@ -80,6 +80,10 @@ public final class MapRenderer {
     private static final Color ROOF = new Color(0xA0442E);
     private static final Color DOOR = new Color(0x6B4226);
     private static final int GROUND_COPIES = 4;
+    /** Tiles of woods painted around the valley; more only when the window shows more than that outside it. */
+    private static final int GROUND_EDGE = 8;
+    /** Tiles beyond the window edge, for the trees that reach past it. */
+    private static final int GROUND_SPILL = 2;
 
     private final AssetManager assets;
     private final PixelScaler scaler = new PixelScaler();
@@ -164,15 +168,27 @@ public final class MapRenderer {
         }
     }
 
+    /** How many times the ground was painted; a moving camera reuses it (HU-50 · CA-5). */
+    public int groundPaints() {
+        return ground.paints();
+    }
+
+    /** Tiles of ground to paint beyond one side of the valley, which shows {@code outside} pixels past it. */
+    private static int edge(int outside, int cell) {
+        return Math.max(GROUND_EDGE, ceilDiv(Math.max(0, outside), cell) + GROUND_SPILL);
+    }
+
     // ------------------------------------------------------------------ pixel art
 
     private void paintPixelArt(Graphics2D g, MapView map, MapGeometry geo, int width, int height, CellPos hover,
                                VisualEffects fx, String season, boolean ambient, long time) {
         int s = geo.cellSize();
-        int col0 = -ceilDiv(geo.originX(), s) - 2;
-        int row0 = -ceilDiv(geo.originY(), s) - 2;
-        int col1 = map.cols() + ceilDiv(width - geo.originX() - map.cols() * s, s) + 2;
-        int row1 = map.rows() + ceilDiv(height - geo.originY() - map.rows() * s, s) + 2;
+        // The ground of the whole valley plus a border of woods, whatever the camera shows: walking only slides
+        // it. Bounds that followed the camera painted and scaled it again on every row and made the walk jerk.
+        int col0 = -edge(geo.originX(), s);
+        int row0 = -edge(geo.originY(), s);
+        int col1 = map.cols() + edge(width - geo.originX() - map.cols() * s, s);
+        int row1 = map.rows() + edge(height - geo.originY() - map.rows() * s, s);
         int frame = ambient ? (int) ((time / WATER_FRAME_MS) % GroundLayer.WATER_FRAMES) : 0;
         BufferedImage art = ground.image(map, season, frame, col0, row0, col1, row1);
         groundScaler.draw(g, art, geo.originX() + col0 * s, geo.originY() + row0 * s, (col1 - col0) * s, (row1 - row0) * s);
