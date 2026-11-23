@@ -648,7 +648,7 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 - **CA-2 · Casas y camino (negativo).** **Dado** una casa o el camino, **Entonces** por la casa no se pasa (`MOVIMIENTO_BLOQUEADO`), por el camino sí, y en ninguno de los dos se siembra ni se construye.
 - **CA-3 · Cámara.** **Dado** una ventana de 1920 × 1080, **Entonces** la parcela mide 48 px, la cámara centra al avatar, sigue su paso sin saltos y nunca muestra fuera del valle; y el clic sobre una parcela visible actúa sobre esa parcela.
 - **CA-4 · Personajes altos.** **Dado** el avatar y los NPC, **Entonces** se dibujan de 1 × 2 parcelas (sprites de 32 × 64) con los pies en su parcela.
-- **CA-5 · Caminar sin pausas.** **Cuando** mantengo una flecha, **Entonces** el avatar da un paso cada 180 ms desde el primero, sin pausa, la animación no se reinicia entre pasos y al soltar se detiene.
+- **CA-5 · Caminar sin pausas.** **Cuando** mantengo una flecha, **Entonces** el avatar da un paso cada 180 ms desde el primero, sin pausa, la animación no se reinicia entre pasos y al soltar se detiene; si mantengo dos teclas perpendiculares (como `W` y `D`) camina en diagonal al mismo ritmo, sin tirones.
 - **CA-6 · Partidas viejas (borde).** **Dado** un documento de versión 2 con un cultivo en (5, 3) y un Gallinero en (9, 7), **Cuando** lo cargo, **Entonces** el cultivo y el Gallinero siguen en (5, 3) y (9, 7) y al guardar el documento pasa a la versión 3.
 
 ---

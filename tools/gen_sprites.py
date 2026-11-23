@@ -943,12 +943,52 @@ def medicine():
 SKIN = ramp('#C98E64', '#E6B088', '#F6CBA4', '#FFE2C6')
 
 
-def person(direction, frame, shirt, pants, hair, hat=None, apron=None, coat=None, skirt=False):
+def hair_extras(d, direction, flip, side, h, h_dark, style):
+    """What makes a hair style: long hair over the shoulders, a bun on top, two braids, or thin grey hair."""
+    if style == 'long':
+        if direction == 'N':
+            d.rounded_rectangle([6, 12, 25, 36], radius=4, fill=h)
+            d.line([(12, 16), (12, 35)], fill=h_dark)
+            d.line([(19, 16), (19, 35)], fill=h_dark)
+        elif side:
+            bx = (6, 13) if not flip else (18, 25)
+            d.rounded_rectangle([bx[0], 12, bx[1], 36], radius=3, fill=h)
+            d.line([(bx[0] + 3, 18), (bx[0] + 3, 35)], fill=h_dark)
+        else:
+            d.rounded_rectangle([5, 14, 9, 36], radius=2, fill=h)
+            d.rounded_rectangle([22, 14, 26, 36], radius=2, fill=h)
+            d.line([(7, 18), (7, 35)], fill=h_dark)
+            d.line([(24, 18), (24, 35)], fill=h_dark)
+    elif style == 'bun':
+        if side:
+            bx = 4 if not flip else 20
+            d.ellipse([bx, 6, bx + 8, 14], fill=h)
+            d.arc([bx + 1, 7, bx + 7, 13], 200, 340, fill=h_dark)
+        else:
+            d.ellipse([11, 1, 20, 9], fill=h)
+            d.arc([12, 2, 19, 8], 200, 340, fill=h_dark)
+    elif style == 'braids':
+        xs = [(5, 8), (23, 26)] if not side else ([(5, 8)] if not flip else [(23, 26)])
+        for x0, x1 in xs:
+            for y in range(18, 36, 4):
+                d.ellipse([x0, y, x1, y + 4], fill=h)
+                d.line([(x0 + 1, y + 3), (x1 - 1, y + 3)], fill=h_dark)
+            d.rectangle([x0, 36, x1, 37], fill=c('#D8323A'))
+    elif style == 'thin':
+        d.rectangle([9, 9, 22, 11], fill=dark(h, 0.92))
+
+
+def person(direction, frame, shirt, pants, hair, hat=None, apron=None, coat=None, skirt=False, skin=None,
+           style='short', beard=False, glasses=False, cap=None, overalls=None, flower=None, earrings=False,
+           stethoscope=False, eyes='#2A1A10', wide=False):
     """A villager of 32 x 64 seen in 3/4: one plot wide and two tall, the feet on the bottom row (RN-40).
 
     A big head (about a third of the height) over a short body, as in classic farm games; frame 0 stands still,
-    frames 1 and 2 swing the legs and arms the opposite way.
+    frames 1 and 2 swing the legs and arms the opposite way. Each villager differs in skin, hair style (short,
+    long, bun, braids or grey and thin), face (beard, glasses, eye colour), build and what they wear, so no two
+    look like the same person.
     """
+    SKIN = ramp(*skin) if skin else globals()['SKIN']
     img, d = new(T, 2 * T)
     top = c(coat or shirt)
     top_lit = tuple(min(255, int(v * 1.12)) for v in top[:3]) + (255,)
@@ -980,7 +1020,8 @@ def person(direction, frame, shirt, pants, hair, hat=None, apron=None, coat=None
         d.rectangle([10, 59 - max(0, lift), 15, 62 - max(0, lift)], fill=shoe)
         d.rectangle([16, 59 - max(0, -lift), 21, 62 - max(0, -lift)], fill=shoe)
     # body
-    d.rounded_rectangle([9, 30, 22, 46], radius=3, fill=top)
+    bx0, bx1 = (8, 23) if wide else (9, 22)
+    d.rounded_rectangle([bx0, 30, bx1, 46], radius=3, fill=top)
     d.rectangle([10, 31, 12, 44], fill=top_lit)
     d.rectangle([19, 31, 22, 45], fill=top_dark)
     d.line([(9, 45), (22, 45)], fill=top_dark)
@@ -997,7 +1038,20 @@ def person(direction, frame, shirt, pants, hair, hat=None, apron=None, coat=None
         d.rectangle([11, 32, 12, 44], fill=legs)
         d.rectangle([19, 32, 20, 44], fill=legs)
         d.point([(11, 34), (20, 34)], fill=c('#E8C547'))
-    d.rectangle([9, 43, 22, 44], fill=dark(legs, 0.6) if not apron else dark(c(apron), 0.8))
+    if overalls and not side:
+        o = c(overalls)
+        d.rectangle([11, 36, 20, 46], fill=o)
+        d.rectangle([11, 30, 12, 36], fill=o)
+        d.rectangle([19, 30, 20, 36], fill=o)
+        d.rectangle([14, 38, 17, 40], fill=dark(o, 0.8))
+        if direction == 'S':
+            d.point([(12, 36), (19, 36)], fill=c('#E8C547'))
+    elif overalls:
+        d.rectangle([12, 36, 19, 46], fill=c(overalls))
+    if stethoscope and direction == 'S':
+        d.arc([11, 27, 20, 38], 20, 160, fill=c('#5A5A6A'))
+        d.rectangle([15, 38, 16, 39], fill=c('#9AA4B0'))
+    d.rectangle([bx0, 43, bx1, 44], fill=dark(legs, 0.6) if not apron else dark(c(apron), 0.8))
     # arms
     swing = (0, 2, -2)[frame]
     if side:
@@ -1028,8 +1082,8 @@ def person(direction, frame, shirt, pants, hair, hat=None, apron=None, coat=None
         if direction == 'S':
             d.polygon([(10, 15), (15, 15), (12, 18)], fill=h)
             d.polygon([(16, 15), (22, 15), (20, 18)], fill=h)
-            d.rectangle([11, 19, 12, 21], fill=c('#2A1A10'))
-            d.rectangle([19, 19, 20, 21], fill=c('#2A1A10'))
+            d.rectangle([11, 19, 12, 21], fill=c(eyes))
+            d.rectangle([19, 19, 20, 21], fill=c(eyes))
             d.point([(11, 19), (19, 19)], fill=c('#FFFFFF'))
             d.rectangle([9, 23, 10, 23], fill=c('#F2A0A0'))
             d.rectangle([21, 23, 22, 23], fill=c('#F2A0A0'))
@@ -1039,10 +1093,44 @@ def person(direction, frame, shirt, pants, hair, hat=None, apron=None, coat=None
             d.rectangle([back[0], 9, back[1], 24], fill=h)
             d.ellipse([back[0] + (2 if not flip else -2), 9, back[1] + (2 if not flip else -2), 26], fill=h)
             ex = 20 if not flip else 11
-            d.rectangle([ex, 19, ex + 1, 21], fill=c('#2A1A10'))
+            d.rectangle([ex, 19, ex + 1, 21], fill=c(eyes))
             nose = 24 if not flip else 7
             d.point((nose, 22), fill=SKIN[1])
             d.line([(ex - 1, 25), (ex + 1, 25)], fill=c('#B5654A'))
+    hair_extras(d, direction, flip, side, h, h_dark, style)
+    if beard and direction != 'N':
+        if side:
+            fx0 = 16 if not flip else 7
+            d.chord([fx0, 18, fx0 + 9, 30], 0, 180, fill=h)
+        else:
+            d.chord([8, 16, 23, 30], 20, 160, fill=h)
+            d.rectangle([12, 23, 19, 24], fill=h_dark)
+            d.line([(14, 26), (17, 26)], fill=c('#B5654A'))
+    if glasses and direction != 'N':
+        g = c('#3A3A4A')
+        if side:
+            gx = 19 if not flip else 10
+            d.rectangle([gx - 1, 18, gx + 2, 22], outline=g)
+        else:
+            d.rectangle([10, 18, 13, 22], outline=g)
+            d.rectangle([18, 18, 21, 22], outline=g)
+            d.line([(14, 19), (17, 19)], fill=g)
+    if earrings and not side and direction == 'S':
+        d.rectangle([7, 23, 7, 24], fill=c('#F2C94C'))
+        d.rectangle([24, 23, 24, 24], fill=c('#F2C94C'))
+    if flower and direction != 'N':
+        fx = 21 if not flip else 9
+        d.point([(fx, 8), (fx - 1, 9), (fx + 1, 9), (fx, 10)], fill=c(flower))
+        d.point((fx, 9), fill=c('#F7E08A'))
+    if cap:
+        cc = c(cap)
+        d.chord([7, 4, 24, 20], 180, 360, fill=cc)
+        d.line([(9, 6), (14, 5)], fill=tuple(min(255, int(v * 1.15)) for v in cc[:3]) + (255,))
+        if direction == 'S':
+            d.rectangle([7, 11, 24, 13], fill=dark(cc, 0.75))
+        elif side:
+            bx = 18 if not flip else 3
+            d.rectangle([bx, 11, bx + 10, 13], fill=dark(cc, 0.75))
     if hat:
         hc = c(hat)
         d.ellipse([3, 11, 28, 17], fill=dark(hc, 0.82))
@@ -1053,10 +1141,18 @@ def person(direction, frame, shirt, pants, hair, hat=None, apron=None, coat=None
 
 
 NPCS = {
-    'MARTA': dict(shirt='#D8323A', pants='#4A3A5A', hair='#7A3A1E', apron='#FFF4D6', skirt=True),
-    'TOMAS': dict(shirt='#6B8E4E', pants='#3A4A6A', hair='#C8C8C8', hat='#C9A66B'),
-    'LUCIA': dict(shirt='#FFFFFF', pants='#2F4F6F', hair='#2A1A10', coat='#F4F7FA'),
-    'INES': dict(shirt='#7A5AA8', pants='#5A3F86', hair='#E0A030', skirt=True),
+    # Marta: market seller, long auburn hair, earrings, red blouse with apron and skirt.
+    'MARTA': dict(shirt='#D8323A', pants='#4A3A5A', hair='#A0431E', apron='#FFF4D6', skirt=True, style='long',
+                  earrings=True, eyes='#3A6A2A', skin=('#B87A50', '#D69A6E', '#E8B488', '#F6CDA8')),
+    # Don Tomás: veteran farmer, grey beard, flat cap, broad, plaid green shirt under brown overalls.
+    'TOMAS': dict(shirt='#6B8E4E', pants='#5A4030', hair='#B8B8B8', cap='#6A5A48', beard=True, style='thin',
+                  overalls='#7A5A3A', wide=True, skin=('#A06A44', '#BE845A', '#D29C72', '#E2B48C')),
+    # Dra. Lucía: vet, black hair in a bun, glasses, white coat and stethoscope.
+    'LUCIA': dict(shirt='#7FB3D5', pants='#2F4F6F', hair='#1E1410', coat='#F4F7FA', style='bun', glasses=True,
+                  stethoscope=True, skin=('#D49A72', '#ECBA92', '#F8D4B4', '#FFE8D2')),
+    # Inés: neighbour, dark skin, two black braids with red ties, a flower, purple dress.
+    'INES': dict(shirt='#7A5AA8', pants='#5A3F86', hair='#2A1A14', skirt=True, style='braids', flower='#F28AB8',
+                 skin=('#6E4428', '#8A5A38', '#A0704A', '#B8885E')),
 }
 
 
@@ -1243,7 +1339,7 @@ def build():
     for direction in ('S', 'N', 'E', 'W'):
         for frame in range(3):
             files[f'characters/AVATAR_{direction}_{frame}.png'] = person(
-                direction, frame, '#3A7BD5', '#4A3A2A', '#5A3A1E', hat='#E8C547')
+                direction, frame, '#C8453A', '#3A5A8A', '#5A3A1E', hat='#E8C547', overalls='#3A6FB5')
     for npc, look in NPCS.items():
         files[f'characters/{npc}.png'] = person('S', 0, **look)
     files['icons/COIN.png'] = icon_coin()

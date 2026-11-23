@@ -146,6 +146,34 @@ class HU50CameraAndWalkTest {
     }
 
     @Test
+    void HU50_ca5_holdingTwoKeysLikeWAndDWalksDiagonallyAtTheSamePaceWithoutAnExtraStep() {
+        WalkKeys keys = new WalkKeys(VisualEffects.STEP_MS);
+
+        assertEquals("NORTH", keys.press("NORTH", 1_000));
+        assertNull(keys.press("EAST", 1_060), "the second key waits for the step under way: no jerk");
+        List<String> steps = new ArrayList<>();
+        List<Long> times = new ArrayList<>();
+        for (long t = 1_000; t <= 1_900; t += 10) {
+            String step = keys.tick(t);
+            if (step != null) {
+                steps.add(step);
+                times.add(t);
+            }
+        }
+        assertEquals(List.of("EAST", "NORTH", "EAST", "NORTH", "EAST"), steps, "it zigzags: a diagonal");
+        assertEquals(List.of(1_180L, 1_360L, 1_540L, 1_720L, 1_900L), times, "still one step every 180 ms");
+        assertEquals("NORTH", keys.alternative("EAST"), "if east is blocked, north is tried instead");
+
+        keys.release("NORTH");
+        assertEquals("EAST", keys.tick(2_080), "with one key left it walks straight");
+        assertEquals("EAST", keys.tick(2_260));
+        assertNull(keys.alternative("EAST"));
+        keys.press("WEST", 2_300);
+        assertEquals("WEST", keys.tick(2_440), "opposite keys do not zigzag: the last one leads");
+        assertEquals("WEST", keys.tick(2_620));
+    }
+
+    @Test
     void HU50_ca5_theWalkAnimationKeepsGoingAcrossStepsInsteadOfRestarting() {
         AtomicLong now = new AtomicLong(10_000);
         VisualEffects fx = new VisualEffects(now::get, new Random(1));

@@ -108,7 +108,7 @@ RF-49 a RF-50 | DialogueDialog, GameCommands, GameController, GameEvent, GameMem
 | RF-50 | Should | HU-50 | Avatar y personajes
 (NPC, encargos, tutorial)
 RF-45 a RF-47
-RF-49 a RF-50 | FarmMap, FarmMapSnapshot, GameMemento, GameScreen, GroundLayer, House, HouseView, MapGeometry, MapPanel, MapRenderer, MapView, SaveCodec, Terrain, ViewMapper, VisualEffects, WalkKeys | HU-50: 10 |
+RF-49 a RF-50 | FarmMap, FarmMapSnapshot, GameMemento, GameScreen, GroundLayer, House, HouseView, MapGeometry, MapPanel, MapRenderer, MapView, SaveCodec, Terrain, ViewMapper, VisualEffects, WalkKeys | HU-50: 11 |
 
 ## 2. Por historia de usuario
 
@@ -163,6 +163,6 @@ RF-49 a RF-50 | FarmMap, FarmMapSnapshot, GameMemento, GameScreen, GroundLayer, 
 | HU-47 · Encargos de los NPC | 5.7 | Could | 4 | 8 | completa | DialogueDialog, DialoguePresenter, DialogueService, DialogueView, ErrandBook, ErrorCode, GameCommands, GameController, GameEvent, GameMemento, GameRestController, GameState, GameStateValidator, MapRenderer, Names, Npc, NpcService, NpcView, RemoteGameClient, Texts, ToastPresenter |
 | HU-48 · Interfaz con aspecto de granja | 5.7 | Should | 8 | 13 | completa | AmbientPainter, AssetManager, EnergyBar, GameScreen, GroundLayer, HoverAnimator, HudModel, HudPanel, InventoryGrid, MapPanel, MapRenderer, PixelScaler, StartScreen, TitleScene, ToolBar, VisualEffects, WoodBox, WoodButton, WoodSlot, WoodStyle |
 | HU-49 · Tutorial de inicio guiado por el avatar | 5.7 | Should | 5 | 13 | completa | DialogueDialog, GameCommands, GameController, GameEvent, GameMemento, GameRestController, GameScreen, GameState, RemoteGameClient, Texts, ToastPresenter, Tutorial, TutorialBox, TutorialPresenter, TutorialService, TutorialStep, TutorialView |
-| HU-50 · Recorrer el valle: granja, aldea y cámara | 5.7 | Should | 6 | 10 | completa | FarmMap, FarmMapSnapshot, GameMemento, GameScreen, GroundLayer, House, HouseView, MapGeometry, MapPanel, MapRenderer, MapView, SaveCodec, Terrain, ViewMapper, VisualEffects, WalkKeys |
+| HU-50 · Recorrer el valle: granja, aldea y cámara | 5.7 | Should | 6 | 11 | completa | FarmMap, FarmMapSnapshot, GameMemento, GameScreen, GroundLayer, House, HouseView, MapGeometry, MapPanel, MapRenderer, MapView, SaveCodec, Terrain, ViewMapper, VisualEffects, WalkKeys |
 
-**Resumen:** 50 de 50 historias con todas sus pruebas; 452 pruebas `HUxx_` en total.
+**Resumen:** 50 de 50 historias con todas sus pruebas; 453 pruebas `HUxx_` en total.

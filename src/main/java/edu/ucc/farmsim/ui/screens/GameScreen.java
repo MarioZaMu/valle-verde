@@ -219,11 +219,21 @@ public final class GameScreen extends JPanel {
         return System.nanoTime() / 1_000_000L;
     }
 
-    /** One step; a blocked one only turns the avatar, which no event announces, so the map is asked again. */
-    private static void step(GameScreenPresenter presenter, MapPanel map, String direction) {
-        if (!presenter.onMove(direction)) {
-            map.reload();
+    /**
+     * One step. When it is blocked and another held key points at a right angle (walking in a diagonal along a
+     * fence of trees), that way is tried instead; a step that stays blocked only turns the avatar, which no event
+     * announces, so the map is asked again.
+     */
+    private static void step(GameScreenPresenter presenter, MapPanel map, WalkKeys walking, String direction) {
+        if (presenter.onMove(direction)) {
+            return;
         }
+        String instead = walking.alternative(direction);
+        if (instead != null && presenter.onMove(instead)) {
+            walking.steppedInstead(instead);
+            return;
+        }
+        map.reload();
     }
 
     private static JPanel clear(JPanel panel) {
@@ -232,8 +242,9 @@ public final class GameScreen extends JPanel {
     }
 
     /**
-     * Arrows and W A S D walk with the avatar: a press steps at once and a held key keeps walking, one plot
-     * every {@link VisualEffects#STEP_MS}, with no pause after the first step (RN-40). Space uses the selected
+     * Arrows and W A S D walk with the avatar: a press steps at once and held keys keep walking, one plot
+     * every {@link VisualEffects#STEP_MS}, with no pause after the first step; two perpendicular keys (W and D)
+     * walk in a diagonal (RN-40). Space uses the selected
      * tool on the plot in front (HU-45) and E talks to the person next to the avatar (HU-46).
      */
     private void bindWalking(GameScreenPresenter presenter, MapPanel map) {
@@ -247,7 +258,7 @@ public final class GameScreen extends JPanel {
             }
             String direction = walking.tick(now());
             if (direction != null) {
-                step(presenter, map, direction);
+                step(presenter, map, walking, direction);
             }
             if (!walking.isWalking()) {
                 pace.stop();
@@ -272,7 +283,7 @@ public final class GameScreen extends JPanel {
                 public void actionPerformed(ActionEvent e) {
                     String first = walking.press(direction, now());
                     if (first != null) {
-                        step(presenter, map, first);
+                        step(presenter, map, walking, first);
                         pace.start();
                     }
                 }
