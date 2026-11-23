@@ -31,6 +31,7 @@ import edu.ucc.farmsim.ui.components.ToolBar;
 import edu.ucc.farmsim.ui.components.ToolModel;
 import edu.ucc.farmsim.ui.components.TutorialBox;
 import edu.ucc.farmsim.ui.components.TutorialPresenter;
+import edu.ucc.farmsim.ui.components.WalkKeys;
 import edu.ucc.farmsim.ui.components.WoodBox;
 import edu.ucc.farmsim.ui.components.WoodButton;
 import edu.ucc.farmsim.ui.render.MapPanel;
@@ -40,6 +41,7 @@ import edu.ucc.farmsim.ui.theme.WoodStyle;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
@@ -54,6 +56,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 /**
  * The main game screen: the farm fills the window and the bars float over it in wooden boxes, the date,
@@ -62,7 +65,7 @@ import javax.swing.SwingUtilities;
  * shortcuts of RN-34 work anywhere on the screen. While the start tutorial runs, the avatar's box floats in the
  * top left corner (HU-49).
  *
- * <p>Stories: HU-17, HU-18, HU-20, HU-22, HU-23, HU-26, HU-29, HU-30, HU-33, HU-34, HU-35, HU-36, HU-37, HU-38, HU-39, HU-40, HU-41, HU-45, HU-46, HU-48, HU-49.
+ * <p>Stories: HU-17, HU-18, HU-20, HU-22, HU-23, HU-26, HU-29, HU-30, HU-33, HU-34, HU-35, HU-36, HU-37, HU-38, HU-39, HU-40, HU-41, HU-45, HU-46, HU-48, HU-49, HU-50.
  */
 public final class GameScreen extends JPanel {
 
@@ -72,6 +75,7 @@ public final class GameScreen extends JPanel {
     private static final String TALK = "talk";
     private static final int GAP = 6;
     private static final int MARGIN = 8;
+    private static final int WALK_TICK_MS = 15;
 
     /**
      * Builds the screen.
@@ -211,41 +215,74 @@ public final class GameScreen extends JPanel {
         bindWalking(presenter, map);
     }
 
+    private static long now() {
+        return System.nanoTime() / 1_000_000L;
+    }
+
+    /** One step; a blocked one only turns the avatar, which no event announces, so the map is asked again. */
+    private static void step(GameScreenPresenter presenter, MapPanel map, String direction) {
+        if (!presenter.onMove(direction)) {
+            map.reload();
+        }
+    }
+
     private static JPanel clear(JPanel panel) {
         panel.setOpaque(false);
         return panel;
     }
 
     /**
-     * Arrows and W A S D walk with the avatar, one plot per press; a held key walks at the pace of the walk
-     * animation instead of the faster key repeat. Space uses the selected tool on the plot in front (HU-45) and
-     * E talks to the person next to the avatar (HU-46).
+     * Arrows and W A S D walk with the avatar: a press steps at once and a held key keeps walking, one plot
+     * every {@link VisualEffects#STEP_MS}, with no pause after the first step (RN-40). Space uses the selected
+     * tool on the plot in front (HU-45) and E talks to the person next to the avatar (HU-46).
      */
     private void bindWalking(GameScreenPresenter presenter, MapPanel map) {
         InputMap keys = getInputMap(WHEN_IN_FOCUSED_WINDOW);
-        long[] lastStep = {Long.MIN_VALUE / 2};
+        WalkKeys walking = new WalkKeys(VisualEffects.STEP_MS);
+        Timer pace = new Timer(WALK_TICK_MS, null);
+        pace.addActionListener(event -> {
+            Window window = SwingUtilities.getWindowAncestor(this);
+            if (window == null || !window.isFocused()) {
+                walking.clear();
+            }
+            String direction = walking.tick(now());
+            if (direction != null) {
+                step(presenter, map, direction);
+            }
+            if (!walking.isWalking()) {
+                pace.stop();
+            }
+        });
         Object[][] walks = {
             {"NORTH", KeyEvent.VK_UP, KeyEvent.VK_W}, {"SOUTH", KeyEvent.VK_DOWN, KeyEvent.VK_S},
             {"EAST", KeyEvent.VK_RIGHT, KeyEvent.VK_D}, {"WEST", KeyEvent.VK_LEFT, KeyEvent.VK_A},
         };
         for (Object[] walk : walks) {
             String direction = (String) walk[0];
-            String name = "walk-" + direction;
-            keys.put(KeyStroke.getKeyStroke((Integer) walk[1], 0), name);
-            keys.put(KeyStroke.getKeyStroke((Integer) walk[2], 0), name);
-            getActionMap().put(name, new AbstractAction() {
+            String down = "walk-" + direction;
+            String up = "stop-" + direction;
+            for (int i = 1; i <= 2; i++) {
+                keys.put(KeyStroke.getKeyStroke((Integer) walk[i], 0, false), down);
+                keys.put(KeyStroke.getKeyStroke((Integer) walk[i], 0, true), up);
+            }
+            getActionMap().put(down, new AbstractAction() {
                 private static final long serialVersionUID = 1L;
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    long now = System.nanoTime() / 1_000_000;
-                    if (now - lastStep[0] < VisualEffects.STEP_MS) {
-                        return;
+                    String first = walking.press(direction, now());
+                    if (first != null) {
+                        step(presenter, map, first);
+                        pace.start();
                     }
-                    lastStep[0] = now;
-                    if (!presenter.onMove(direction)) {
-                        map.reload();
-                    }
+                }
+            });
+            getActionMap().put(up, new AbstractAction() {
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    walking.release(direction);
                 }
             });
         }

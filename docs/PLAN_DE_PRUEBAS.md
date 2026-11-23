@@ -5,7 +5,7 @@
 
 ## 1. Estrategia
 
-Las pruebas se escriben **antes** que el código, historia por historia (DoD 1). Hay 214 criterios de aceptación en las 42 historias: cada uno se convierte en **al menos una prueba**.
+Las pruebas se escriben **antes** que el código, historia por historia (DoD 1). Hay 220 criterios de aceptación en las 42 historias: cada uno se convierte en **al menos una prueba**.
 
 | Nivel | Qué verifica | Dónde | Herramienta | Velocidad |
 |---|---|---|---|---|
@@ -44,7 +44,7 @@ Las pruebas se escriben **antes** que el código, historia por historia (DoD 1).
 
 ## 4. Pruebas de aceptación por historia
 
-Total: **214 criterios** → **155** de dominio/aplicación y **59** de interfaz (HU-33 a HU-42). Los de interfaz se prueban con presentadores y componentes sin pantalla cuando es posible, y el resto con la lista de la §7.
+Total: **220 criterios** → **161** de dominio/aplicación y **59** de interfaz (HU-33 a HU-42). Los de interfaz se prueban con presentadores y componentes sin pantalla cuando es posible, y el resto con la lista de la §7.
 
 | Historia | Título | Prioridad | Fase | Clase de prueba | Criterios | Tipo |
 |---|---|---|---|---|---|---|
@@ -97,6 +97,7 @@ Total: **214 criterios** → **155** de dominio/aplicación y **59** de interfaz
 | HU-47 | Encargos de los NPC | Could | 5.7 | `acceptance.HU47NpcErrandsTest` | 4 | Aceptación |
 | HU-48 | Interfaz con aspecto de granja | Should | 5.7 | `ui.HU48FarmStyleInterfaceTest` | 8 | UI + visual |
 | HU-49 | Tutorial de inicio guiado por el avatar | Should | 5.7 | `acceptance.HU49StartTutorialTest` | 5 | Aceptación |
+| HU-50 | Recorrer el valle: granja, aldea y cámara | Should | 5.7 | `acceptance.HU50ValleyAndCameraTest` | 6 | Aceptación |
 
 **Criterios por fase:**
 
@@ -108,7 +109,7 @@ Total: **214 criterios** → **155** de dominio/aplicación y **59** de interfaz
 | 5.4 | 7 | 31 |
 | 5.5 | 7 | 29 |
 | 5.6 | 5 | 21 |
-| 5.7 | 7 | 36 |
+| 5.7 | 8 | 42 |
 
 ## 5. Pruebas críticas obligatorias
 

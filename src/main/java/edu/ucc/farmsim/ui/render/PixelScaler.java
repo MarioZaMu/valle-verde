@@ -19,6 +19,8 @@ final class PixelScaler {
 
     private static final int MAX_ENTRIES = 600;
 
+    private final int maxEntries;
+
     private record Key(BufferedImage image, int width, int height) {
     }
 
@@ -27,9 +29,19 @@ final class PixelScaler {
 
         @Override
         protected boolean removeEldestEntry(Map.Entry<Key, BufferedImage> eldest) {
-            return size() > MAX_ENTRIES;
+            return size() > maxEntries;
         }
     };
+
+    /** A scaler that keeps up to 600 scaled copies: enough for every sprite at a few sizes. */
+    PixelScaler() {
+        this(MAX_ENTRIES);
+    }
+
+    /** A scaler that keeps at most {@code maxEntries} scaled copies; few for large images such as the ground. */
+    PixelScaler(int maxEntries) {
+        this.maxEntries = maxEntries;
+    }
 
     /** The image at the given size in device pixels. */
     BufferedImage scaled(BufferedImage source, int width, int height) {

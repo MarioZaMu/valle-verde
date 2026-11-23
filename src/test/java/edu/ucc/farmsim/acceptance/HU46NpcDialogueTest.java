@@ -34,9 +34,7 @@ class HU46NpcDialogueTest {
 
     /** Puts the avatar on the plot west of the person, looking at it (south of it for Lucía, east for Inés). */
     static void nextTo(TestApp app, Npc npc) {
-        int col = npc == Npc.LUCIA ? npc.col() : (npc == Npc.INES ? npc.col() + 1 : npc.col() - 1);
-        int row = npc == Npc.LUCIA ? npc.row() + 1 : npc.row();
-        app.state().avatar().restoreFrom(new AvatarSnapshot(col, row, Direction.NORTH));
+        app.state().avatar().restoreFrom(new AvatarSnapshot(npc.col() - 1, npc.row(), Direction.EAST));
     }
 
     private static String say(TestApp app, Npc npc) {
@@ -139,10 +137,10 @@ class HU46NpcDialogueTest {
         assertEquals("EAST", app.controller.map().value().avatar().facing());
         GameFixtures.setMoney(app.state(), 5_000);
         assertEquals(ErrorCode.UBICACION_INVALIDA,
-                app.controller.build("COOP", Npc.INES.col() - 1, Npc.INES.row() - 1).code());
+                app.controller.build("COOP", Npc.INES.col(), Npc.INES.row()).code());
         List<NpcView> drawn = app.controller.map().value().npcs();
         assertEquals(4, drawn.size());
-        assertEquals(new NpcView("INES", "Inés", "Vecina", 11, 9, "EGG", 4, 80, false), drawn.get(3));
+        assertEquals(new NpcView("INES", "Inés", "Vecina", 37, 17, "EGG", 4, 80, false), drawn.get(3));
     }
 
     @Test

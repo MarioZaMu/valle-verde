@@ -100,7 +100,7 @@ class RemoteGameClientTest {
         assertEquals(local.events, events);
         assertEquals(here.value(), client.map().value().avatar());
         client.move("SOUTH");
-        client.move("SOUTH");
+        client.move("WEST");
         Result<AvatarView> blocked = client.move("SOUTH");
         assertEquals(ErrorCode.MOVIMIENTO_BLOQUEADO, blocked.code());
         assertEquals("No puedes pasar por ahí.", blocked.message());
@@ -129,7 +129,7 @@ class RemoteGameClientTest {
         client.newGame(TestApp.SEED);
         TestApp local = TestApp.startedGame();
         for (var state : List.of(session.current(), local.state())) {
-            state.avatar().restoreFrom(new edu.ucc.farmsim.domain.farm.AvatarSnapshot(9, 1,
+            state.avatar().restoreFrom(new edu.ucc.farmsim.domain.farm.AvatarSnapshot(28, 11,
                     edu.ucc.farmsim.domain.farm.Direction.EAST));
             state.inventory().add(ItemType.CARROT, 5);
         }
@@ -187,7 +187,8 @@ class RemoteGameClientTest {
         Result<PlotView> plot = client.inspect(COL, ROW);
 
         assertTrue(map.isOk());
-        assertEquals(16, map.value().cols());
+        assertEquals(48, map.value().cols());
+        assertEquals(5, map.value().houses().size());
         assertEquals("CARROT", map.value().plotAt(COL, ROW).crop());
         assertEquals(map.value().plotAt(COL, ROW), plot.value());
     }

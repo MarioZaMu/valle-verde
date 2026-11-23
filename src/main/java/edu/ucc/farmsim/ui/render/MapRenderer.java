@@ -3,6 +3,7 @@ package edu.ucc.farmsim.ui.render;
 import edu.ucc.farmsim.application.dto.AnimalView;
 import edu.ucc.farmsim.application.dto.AvatarView;
 import edu.ucc.farmsim.application.dto.BuildingView;
+import edu.ucc.farmsim.application.dto.HouseView;
 import edu.ucc.farmsim.application.dto.MapView;
 import edu.ucc.farmsim.application.dto.NpcView;
 import edu.ucc.farmsim.application.dto.PlotView;
@@ -28,20 +29,22 @@ import java.util.Set;
  * Draws the farm map with Java2D, in one of two ways.
  *
  * <p>With the pixel-art pack (HU-44, HU-48) the view is a piece of countryside seen from above at three
- * quarters: one continuous ground where soil and water blend into the grass, the land around the farm with
- * its fence and woods, and trees, buildings, crops and animals that stand on their tile, rise above it and are
- * drawn from back to front, each with its shadow. Something that hides a crop or the plot under the cursor
+ * quarters: one continuous ground where soil, the path and water blend into the grass, woods around the valley,
+ * and trees, houses, buildings, crops and animals that stand on their tile, rise above it and are drawn from
+ * back to front, each with its shadow. The farm lies to the west and the village with its houses to the east
+ * (HU-50). Something that hides a crop or the plot under the cursor
  * turns see-through. With the ambient life on, the water ripples, the trees sway, the animals wander and
  * clouds, butterflies or leaves cross the fields. The avatar stands among them and walks from plot to plot
  * with three frames (HU-45), and the people of the valley stand on their plots with a bubble that shows what
- * their errand asks for while it is not done (HU-46, HU-47).
+ * their errand asks for while it is not done (HU-46, HU-47). People are one plot wide and two tall: their feet
+ * are on their plot and their head rises into the plot above (HU-50).
  *
  * <p>Without the pack each terrain and each crop stage is drawn with vector shapes, so the game needs no image
  * at all (HU-42); a single missing sprite also falls back to its vector shape. With a {@link VisualEffects}
  * it paints the palette of the season, the weather, the night tint and the animations (HU-40, HU-41). It works
  * on any {@link Graphics2D}, including one of an image, so it is tested without a display.
  *
- * <p>Stories: HU-18, HU-19, HU-25, HU-35, HU-40, HU-41, HU-42, HU-44, HU-45, HU-46, HU-47, HU-48.
+ * <p>Stories: HU-18, HU-19, HU-25, HU-35, HU-40, HU-41, HU-42, HU-44, HU-45, HU-46, HU-47, HU-48, HU-50.
  */
 public final class MapRenderer {
 
@@ -71,9 +74,16 @@ public final class MapRenderer {
     private static final Color NPC_TOMAS = new Color(0x6B8E23);
     private static final Color NPC_LUCIA = new Color(0xF2F2F2);
     private static final Color NPC_INES = new Color(0x8E5BB5);
+    private static final Color PANTS = new Color(0x4A3B2A);
+    private static final Color PATH = new Color(0xC9A66B);
+    private static final Color WALL = new Color(0xE8D7B0);
+    private static final Color ROOF = new Color(0xA0442E);
+    private static final Color DOOR = new Color(0x6B4226);
+    private static final int GROUND_COPIES = 4;
 
     private final AssetManager assets;
     private final PixelScaler scaler = new PixelScaler();
+    private final PixelScaler groundScaler = new PixelScaler(GROUND_COPIES);
     private final GroundLayer ground;
 
     /** One thing that stands on the map, drawn in order of its foot (the lower, the later). */
@@ -159,13 +169,13 @@ public final class MapRenderer {
     private void paintPixelArt(Graphics2D g, MapView map, MapGeometry geo, int width, int height, CellPos hover,
                                VisualEffects fx, String season, boolean ambient, long time) {
         int s = geo.cellSize();
-        int col0 = -ceilDiv(geo.originX(), s) - 1;
-        int row0 = -ceilDiv(geo.originY(), s) - 1;
-        int col1 = map.cols() + ceilDiv(width - geo.originX() - map.cols() * s, s) + 1;
+        int col0 = -ceilDiv(geo.originX(), s) - 2;
+        int row0 = -ceilDiv(geo.originY(), s) - 2;
+        int col1 = map.cols() + ceilDiv(width - geo.originX() - map.cols() * s, s) + 2;
         int row1 = map.rows() + ceilDiv(height - geo.originY() - map.rows() * s, s) + 2;
         int frame = ambient ? (int) ((time / WATER_FRAME_MS) % GroundLayer.WATER_FRAMES) : 0;
         BufferedImage art = ground.image(map, season, frame, col0, row0, col1, row1);
-        scaler.draw(g, art, geo.originX() + col0 * s, geo.originY() + row0 * s, (col1 - col0) * s, (row1 - row0) * s);
+        groundScaler.draw(g, art, geo.originX() + col0 * s, geo.originY() + row0 * s, (col1 - col0) * s, (row1 - row0) * s);
 
         Set<Long> hidden = new HashSet<>();
         for (PlotView plot : map.plots()) {
@@ -199,6 +209,9 @@ public final class MapRenderer {
         for (BuildingView building : map.buildings()) {
             building(g, building, geo, fx, ambient, time, hidden, shadows, items, above);
         }
+        for (HouseView house : houses(map)) {
+            house(g, house, geo, hidden, shadows, items);
+        }
         if (map.avatar() != null) {
             avatar(g, map.avatar(), geo, fx, shadows, items);
         }
@@ -220,7 +233,7 @@ public final class MapRenderer {
         }
     }
 
-    /** The fence around the farm and the woods beyond it, on the tiles outside the map. */
+    /** The woods beyond the edges of the valley, on the tiles outside the map. */
     private void surroundings(Graphics2D g, MapView map, MapGeometry geo, String season, boolean ambient, long time,
                               int col0, int row0, int col1, int row1, List<Rectangle> shadows, List<Item> items) {
         int s = geo.cellSize();
@@ -233,13 +246,6 @@ public final class MapRenderer {
                     continue;
                 }
                 Rectangle cell = geo.cellBounds(col, row);
-                if (distance == 1) {
-                    boolean horizontal = dy == 1 && dx == 0;
-                    Optional<BufferedImage> fence = assets.sprite(horizontal ? "terrain/FENCE_H.png" : "terrain/FENCE_V.png");
-                    fence.ifPresent(img -> items.add(new Item(cell.y + cell.height - 1, items.size(),
-                            () -> scaler.draw(g, img, cell.x, cell.y, s, s))));
-                    continue;
-                }
                 int h = hash(col, row) % 100;
                 if (h < 42) {
                     String kind = h % 3 == 0 ? "PINE" : "TREE";
@@ -369,6 +375,59 @@ public final class MapRenderer {
         }
     }
 
+    /** A house of the valley: its sprite stands on its plots and its roof rises one plot above them. */
+    private void house(Graphics2D g, HouseView house, MapGeometry geo, Set<Long> hidden, List<Rectangle> shadows,
+                       List<Item> items) {
+        Rectangle foot = footprint(geo, house);
+        int s = geo.cellSize();
+        int bottom = foot.y + foot.height;
+        Optional<BufferedImage> sprite = assets.sprite(houseSprite(house));
+        boolean behind = false;
+        for (int col = house.col(); col < house.col() + house.width(); col++) {
+            behind |= hidden.contains(key(col, house.row() - 1));
+        }
+        float alpha = behind ? BEHIND_ALPHA : 1f;
+        shadows.add(new Rectangle(foot.x - s / 6, bottom - s / 3, foot.width + s / 3, s / 2));
+        items.add(new Item(bottom, items.size(), () -> {
+            if (sprite.isEmpty()) {
+                drawHouseVector(g, foot, s);
+                return;
+            }
+            BufferedImage img = sprite.get();
+            int drawW = img.getWidth() * s / T;
+            int drawH = img.getHeight() * s / T;
+            Composite saved = g.getComposite();
+            if (alpha < 1f) {
+                g.setComposite(AlphaComposite.SrcOver.derive(alpha));
+            }
+            scaler.draw(g, img, foot.x, bottom - drawH, drawW, drawH);
+            g.setComposite(saved);
+        }));
+    }
+
+    /** The sprite of a house of the valley. */
+    static String houseSprite(HouseView house) {
+        return "village/" + house.id() + ".png";
+    }
+
+    private static Rectangle footprint(MapGeometry geo, HouseView house) {
+        return geo.cellBounds(house.col(), house.row())
+                .union(geo.cellBounds(house.col() + house.width() - 1, house.row() + house.height() - 1));
+    }
+
+    /** A house without sprites: light walls with a door and a red roof over its upper plot. */
+    private static void drawHouseVector(Graphics2D g, Rectangle foot, int s) {
+        int roofH = Math.max(2, foot.height / 2);
+        g.setColor(WALL);
+        g.fillRect(foot.x, foot.y + roofH, foot.width, foot.height - roofH);
+        g.setColor(ROOF);
+        g.fillPolygon(new int[] {foot.x - s / 8, foot.x + foot.width + s / 8, foot.x + foot.width - s / 3, foot.x + s / 3},
+                new int[] {foot.y + roofH, foot.y + roofH, foot.y, foot.y}, 4);
+        g.setColor(DOOR);
+        int doorW = Math.max(2, s / 2);
+        g.fillRect(foot.x + (foot.width - doorW) / 2, foot.y + foot.height - s * 3 / 4, doorW, s * 3 / 4);
+    }
+
     /** A speech bubble with an item in it, for what an animal needs or what waits to be collected. */
     private void bubble(Graphics2D g, int cx, int bottom, int size, String icon, Color fallback, int bob) {
         int x = cx - size / 2;
@@ -460,6 +519,9 @@ public final class MapRenderer {
         for (BuildingView building : map.buildings()) {
             drawBuilding(g, building, geometry, fx);
         }
+        for (HouseView house : houses(map)) {
+            drawHouseVector(g, footprint(geometry, house), geometry.cellSize());
+        }
         for (PlotView plot : map.plots()) {
             if (plot.crop() != null && plot.sheltered()) {
                 drawCrop(g, plot, geometry.cellBounds(plot.col(), plot.row()), fx);
@@ -469,7 +531,7 @@ public final class MapRenderer {
             Rectangle cell = geometry.cellBounds(npc.col(), npc.row());
             drawPersonVector(g, cell, npcShirt(npc.id()), "SOUTH");
             if (!npc.errandDone()) {
-                bubble(g, cell.x + cell.width / 2, cell.y + cell.height / 8, Math.max(12, cell.width / 2),
+                bubble(g, cell.x + cell.width / 2, cell.y - cell.height + cell.height / 8, Math.max(12, cell.width / 2),
                         errandIcon(npc), Palette.PENDING, 0);
             }
         }
@@ -482,6 +544,23 @@ public final class MapRenderer {
 
     private static List<NpcView> npcs(MapView map) {
         return map.npcs() == null ? List.of() : map.npcs();
+    }
+
+    private static List<HouseView> houses(MapView map) {
+        return map.houses() == null ? List.of() : map.houses();
+    }
+
+    /** The shadow at the feet of a person, inside its own plot. */
+    private static Rectangle feet(Rectangle cell) {
+        int s = cell.width;
+        return new Rectangle(cell.x + s / 5, cell.y + s - s / 5, s * 3 / 5, s / 5);
+    }
+
+    /** Draws a person sprite one plot wide, standing on {@code cell} and as tall as its art says. */
+    private void standing(Graphics2D g, BufferedImage sprite, Rectangle cell, int lift) {
+        int s = cell.width;
+        int h = sprite.getHeight() * s / sprite.getWidth();
+        scaler.draw(g, sprite, cell.x, cell.y + s - h - lift, s, h);
     }
 
     private static String errandIcon(NpcView npc) {
@@ -501,19 +580,19 @@ public final class MapRenderer {
                      List<Item> items, List<Runnable> above) {
         Rectangle cell = geo.cellBounds(npc.col(), npc.row());
         int s = cell.width;
-        shadows.add(new Rectangle(cell.x + s / 5, cell.y + s - s / 6, s * 3 / 5, s / 5));
+        shadows.add(feet(cell));
         Optional<BufferedImage> sprite = assets.sprite("characters/" + npc.id() + ".png");
         int breathe = ambient && (time / 600 + npc.col()) % 2 == 0 ? Math.max(1, s / 32) : 0;
         items.add(new Item(cell.y + cell.height - 0.1, items.size(), () -> {
             if (sprite.isPresent()) {
-                scaler.draw(g, sprite.get(), cell.x, cell.y - breathe, s, s);
+                standing(g, sprite.get(), cell, breathe);
             } else {
                 drawPersonVector(g, cell, npcShirt(npc.id()), "SOUTH");
             }
         }));
         if (!npc.errandDone()) {
             int bob = ambient ? (int) Math.round(Math.sin(time / 350.0 + npc.col()) * s / 12.0) : 0;
-            above.add(() -> bubble(g, cell.x + s / 2, cell.y + s / 8, Math.max(14, s / 2), errandIcon(npc),
+            above.add(() -> bubble(g, cell.x + s / 2, cell.y - s + s / 8, Math.max(14, s / 2), errandIcon(npc),
                     Palette.PENDING, bob));
         }
     }
@@ -541,13 +620,12 @@ public final class MapRenderer {
     private void avatar(Graphics2D g, AvatarView avatar, MapGeometry geo, VisualEffects fx, List<Rectangle> shadows,
                         List<Item> items) {
         Rectangle cell = avatarCell(avatar, geo, fx);
-        int s = cell.width;
-        shadows.add(new Rectangle(cell.x + s / 5, cell.y + s - s / 6, s * 3 / 5, s / 5));
+        shadows.add(feet(cell));
         int frame = fx == null ? 0 : fx.avatarFrame();
         Optional<BufferedImage> sprite = assets.sprite(avatarSprite(avatar.facing(), frame));
         items.add(new Item(cell.y + cell.height - 0.1, items.size(), () -> {
             if (sprite.isPresent()) {
-                scaler.draw(g, sprite.get(), cell.x, cell.y, s, s);
+                standing(g, sprite.get(), cell, 0);
             } else {
                 drawAvatarVector(g, cell, avatar.facing());
             }
@@ -559,25 +637,31 @@ public final class MapRenderer {
         drawPersonVector(g, c, AVATAR_SHIRT, facing);
     }
 
-    /** A person drawn with shapes: shirt of the given colour, face, straw hat and eyes towards its direction. */
+    /**
+     * A person drawn with shapes, one plot wide and two tall with the feet on {@code c}: trousers, a shirt of the
+     * given colour, a face, a straw hat and eyes towards its direction.
+     */
     private static void drawPersonVector(Graphics2D g, Rectangle c, Color shirt, String facing) {
         int s = c.width;
         int cx = c.x + s / 2;
+        int top = c.y - s;
+        g.setColor(PANTS);
+        g.fillRect(cx - s / 5, top + s * 3 / 2, s * 2 / 5, s * 2 / 5);
         g.setColor(shirt);
-        g.fillRoundRect(cx - s / 5, c.y + s * 9 / 20, s * 2 / 5, s * 2 / 5, s / 6, s / 6);
+        g.fillRoundRect(cx - s / 4, top + s * 19 / 20, s / 2, s * 13 / 20, s / 6, s / 6);
         g.setColor(AVATAR_SKIN);
-        g.fillOval(cx - s / 6, c.y + s / 5, s / 3, s / 3);
+        g.fillOval(cx - s / 4, top + s * 9 / 20, s / 2, s / 2);
         g.setColor(AVATAR_HAT);
-        g.fillRect(cx - s / 4, c.y + s / 5, s / 2, Math.max(2, s / 14));
-        g.fillOval(cx - s / 8, c.y + s / 10, s / 4, s / 6);
+        g.fillRect(cx - s / 3, top + s / 2, s * 2 / 3, Math.max(2, s / 12));
+        g.fillOval(cx - s / 5, top + s * 3 / 10, s * 2 / 5, s / 4);
         if (!"NORTH".equals(facing)) {
-            int shift = "EAST".equals(facing) ? s / 12 : ("WEST".equals(facing) ? -s / 12 : 0);
-            int eye = Math.max(2, s / 16);
-            int ey = c.y + s / 3 + s / 20;
+            int shift = "EAST".equals(facing) ? s / 10 : ("WEST".equals(facing) ? -s / 10 : 0);
+            int eye = Math.max(2, s / 14);
+            int ey = top + s * 3 / 4;
             g.setColor(AVATAR_EYE);
             if (shift == 0) {
-                g.fillRect(cx - s / 12 - eye / 2, ey, eye, eye);
-                g.fillRect(cx + s / 12 - eye / 2, ey, eye, eye);
+                g.fillRect(cx - s / 10 - eye / 2, ey, eye, eye);
+                g.fillRect(cx + s / 10 - eye / 2, ey, eye, eye);
             } else {
                 g.fillRect(cx + shift - eye / 2, ey, eye, eye);
             }
@@ -788,6 +872,7 @@ public final class MapRenderer {
             case "SOIL" -> plot.watered() ? "terrain/SOIL_WATERED.png" : "terrain/SOIL.png";
             case "WATER" -> "terrain/WATER.png";
             case "OBSTACLE" -> "terrain/OBSTACLE.png";
+            case "PATH" -> "terrain/PATH.png";
             default -> "terrain/GRASS_" + season + ".png";
         };
         Optional<BufferedImage> sprite = assets.sprite(name);
@@ -814,6 +899,10 @@ public final class MapRenderer {
                 g.drawArc(c.x + c.width / 2, y - c.height / 10, c.width / 3, c.height / 5, 0, 180);
             }
             case "OBSTACLE" -> drawObstacleVector(g, c);
+            case "PATH" -> {
+                g.setColor(PATH);
+                g.fillRect(c.x, c.y, c.width, c.height);
+            }
             default -> {
                 g.setColor(grass);
                 g.fillRect(c.x, c.y, c.width, c.height);

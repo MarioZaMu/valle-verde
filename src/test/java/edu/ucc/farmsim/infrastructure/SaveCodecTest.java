@@ -27,7 +27,7 @@ class SaveCodecTest {
         SaveDocument document = codec.encode(3, memento, Instant.parse("2026-11-22T10:30:00Z"));
 
         assertEquals("slot3", document.id());
-        assertEquals(2, document.schemaVersion());
+        assertEquals(3, document.schemaVersion());
         assertEquals(Checksum.of(document.state()), document.checksum());
         assertEquals(memento, codec.decode(document));
     }

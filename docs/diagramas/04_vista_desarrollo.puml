@@ -67,6 +67,7 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
       class EnergyBar
       class TutorialBox
       class TutorialPresenter
+      class WalkKeys
     }
     package "render" as UI_REN #FFFFFF {
       class MapPanel
@@ -146,6 +147,7 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
       class NpcView
       class DialogueView
       class TutorialView
+      class HouseView
     }
     package "result" as APP_RES #FFFFFF {
       class Result
@@ -173,6 +175,7 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
       class Plot
       class Avatar
       class Direction
+      class House
     }
     package "npc" as D_NPC #FFFFFF {
       class Npc

@@ -287,6 +287,18 @@ package "domain" #FFFCF5 {
       +witherOutOfSeason(s: Season): int
       +isWalkable(col: int, row: int): boolean
       +nearestWalkable(col: int, row: int): int[]
+      +houses(): List<House>
+    }
+    class House <<enumeration>> {
+      HOME
+      SHOP
+      FARMHOUSE
+      CLINIC
+      COTTAGE
+      +col(): int
+      +row(): int
+      +width(): int
+      +height(): int
     }
     class Avatar {
       -col: int
@@ -523,6 +535,7 @@ Avatar --> Direction
 GameState *-- "1" ErrandBook
 ErrandBook --> "0..4" Npc
 FarmMap ..> Npc : bloquean el paso
+FarmMap ..> House : casas del valle (HU-50)
 GameState *-- "1" Inventory
 GameState *-- "1" Market
 GameState *-- "1" AchievementTracker

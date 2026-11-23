@@ -1,6 +1,6 @@
 # Recursos gráficos y licencias — Valle Verde
 
-> **Versión 2.1 · Fase 5.7c (revisión visual) · HU-42, HU-44, HU-48**
+> **Versión 2.2 · Fase 5.7g (el valle) · HU-42, HU-44, HU-48, HU-50**
 
 ## 1. Qué se usa
 
@@ -17,12 +17,13 @@ Todo paquete debe constar aquí **en el mismo commit** que lo agrega. Solo se ac
 
 | Carpeta | Contenido | Autor y fuente | Licencia |
 |---|---|---|---|
-| `terrain/` | hierba de las 4 estaciones (4 variantes: lisa, matas, flores u hojas, piedritas), tierra seca y regada, agua (3 cuadros), roca, roble y pino de las 4 estaciones, arbusto, valla horizontal y vertical | trabajo propio, `tools/gen_sprites.py` | CC0 |
+| `terrain/` | hierba de las 4 estaciones (4 variantes: lisa, matas, flores u hojas, piedritas), tierra seca y regada, agua (3 cuadros), roca, roble y pino de las 4 estaciones, arbusto, camino de tierra | trabajo propio, `tools/gen_sprites.py` | CC0 |
 | `crops/` | 5 cultivos × 5 etapas (semilla, brote, creciendo, maduro, marchito) | trabajo propio, `tools/gen_sprites.py` | CC0 |
 | `animals/` | gallina y vaca, 3 cuadros de animación cada una | trabajo propio, `tools/gen_sprites.py` | CC0 |
 | `buildings/` | Gallinero, Establo, Almacén e Invernadero | trabajo propio, `tools/gen_sprites.py` | CC0 |
 | `items/` | iconos de semillas, cosechas, huevo, leche, heno y medicina | trabajo propio, `tools/gen_sprites.py` | CC0 |
-| `characters/` | avatar (4 direcciones × 3 cuadros) y 4 personajes (Marta, Don Tomás, Dra. Lucía, Inés) | trabajo propio, `tools/gen_sprites.py` | CC0 |
+| `characters/` | avatar (4 direcciones × 3 cuadros) y 4 personajes (Marta, Don Tomás, Dra. Lucía, Inés), de 32 × 64 (una parcela de ancho y dos de alto) | trabajo propio, `tools/gen_sprites.py` | CC0 |
+| `village/` | casas del valle: tu casa, la tienda de Marta, la casa de Don Tomás, la clínica de la Dra. Lucía y la casa de Inés (128 × 128 o 160 × 128, el tejado sube una parcela sobre su base) | trabajo propio, `tools/gen_sprites.py` | CC0 |
 | `icons/` | herramientas, monedas, energía, estaciones y clima | trabajo propio, `tools/gen_sprites.py` | CC0 |
 
 ## 3. Nombres que lee el `AssetManager`
@@ -30,10 +31,11 @@ Todo paquete debe constar aquí **en el mismo commit** que lo agrega. Solo se ac
 | Qué | Nombre | Ejemplo |
 |---|---|---|
 | Terreno | `terrain/<TERRENO>.png`, `terrain/GRASS_<ESTACIÓN>[_<VARIANTE>].png`, `terrain/WATER[_<CUADRO>].png` | `terrain/GRASS_AUTUMN_2.png` |
-| Árboles y valla | `terrain/TREE_<ESTACIÓN>.png`, `terrain/PINE_<ESTACIÓN>.png`, `terrain/BUSH_<ESTACIÓN>.png`, `terrain/FENCE_H.png`, `terrain/FENCE_V.png` | `terrain/TREE_WINTER.png` |
+| Árboles y camino | `terrain/TREE_<ESTACIÓN>.png`, `terrain/PINE_<ESTACIÓN>.png`, `terrain/BUSH_<ESTACIÓN>.png`, `terrain/PATH.png` | `terrain/TREE_WINTER.png` |
 | Cultivo | `crops/<CULTIVO>_<ETAPA>.png` | `crops/CARROT_MATURE.png` |
 | Animal | `animals/<ANIMAL>_<CUADRO>.png` | `animals/HEN_1.png` |
 | Edificio | `buildings/<EDIFICIO>.png` | `buildings/BARN.png` |
+| Casa del valle | `village/<CASA>.png` | `village/SHOP.png` |
 | Ítem | `items/<ÍTEM>.png` | `items/CARROT_SEED.png` |
 | Personaje | `characters/AVATAR_<DIRECCIÓN>_<CUADRO>.png`, `characters/<NPC>.png` | `characters/MARTA.png` |
 | Icono | `icons/<ID>.png` | `icons/RAINY.png` |

@@ -6,6 +6,7 @@ import edu.ucc.farmsim.application.dto.BuildingOfferView;
 import edu.ucc.farmsim.application.dto.BuildingView;
 import edu.ucc.farmsim.application.dto.BuildingsView;
 import edu.ucc.farmsim.application.dto.DaySummaryView;
+import edu.ucc.farmsim.application.dto.HouseView;
 import edu.ucc.farmsim.application.dto.HudView;
 import edu.ucc.farmsim.application.dto.MapView;
 import edu.ucc.farmsim.application.dto.NpcView;
@@ -17,6 +18,7 @@ import edu.ucc.farmsim.domain.building.Building;
 import edu.ucc.farmsim.domain.building.BuildingType;
 import edu.ucc.farmsim.domain.crop.Crop;
 import edu.ucc.farmsim.domain.farm.Avatar;
+import edu.ucc.farmsim.domain.farm.House;
 import edu.ucc.farmsim.domain.farm.Plot;
 import edu.ucc.farmsim.domain.game.DayReport;
 import edu.ucc.farmsim.domain.game.GameState;
@@ -30,10 +32,14 @@ import org.springframework.stereotype.Component;
 /**
  * Turns the domain state into the immutable views the UI draws, so the UI never sees domain objects.
  *
- * <p>Stories: HU-01, HU-17, HU-18, HU-28, HU-34, HU-35, HU-45, HU-46.
+ * <p>Stories: HU-01, HU-17, HU-18, HU-28, HU-34, HU-35, HU-45, HU-46, HU-50.
  */
 @Component
 public final class ViewMapper {
+
+    /** The houses never move, so their views are made once. */
+    private static final List<HouseView> HOUSES = java.util.Arrays.stream(House.values())
+            .map(h -> new HouseView(h.name(), h.col(), h.row(), h.width(), h.height())).toList();
 
     /** The top bar of a game state. */
     public HudView hud(GameState state) {
@@ -64,7 +70,7 @@ public final class ViewMapper {
                 plots.add(plot(state, col, row));
             }
         }
-        return new MapView(cols, rows, List.copyOf(plots), buildingViews(state), avatar(state), npcs(state));
+        return new MapView(cols, rows, List.copyOf(plots), buildingViews(state), avatar(state), npcs(state), HOUSES);
     }
 
     /** The people of the valley, in a fixed order, with the state of their errands. */

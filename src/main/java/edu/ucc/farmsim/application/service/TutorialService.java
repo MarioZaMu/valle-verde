@@ -25,7 +25,7 @@ public final class TutorialService {
             TutorialStep.SOW, "Elige Sembrar con la tecla 1, ponte frente a la tierra y pulsa Espacio "
                     + "(o haz clic en una parcela de tierra).",
             TutorialStep.WATER, "Ahora elige Regar con la tecla 2 y riega lo que sembraste.",
-            TutorialStep.TALK, "Los vecinos dan consejos y encargos. Acércate a uno y pulsa E.",
+            TutorialStep.TALK, "Los vecinos viven en la aldea, al este por el camino. Acércate a uno y pulsa E.",
             TutorialStep.END_DAY, "Cuando acabes, pulsa Enter o «Terminar día» para que crezcan tus cultivos.",
             TutorialStep.DONE, "¡Listo! Ya sabes lo básico. ¡Buena suerte en el valle!",
             TutorialStep.SKIPPED, "Tutorial saltado."));

@@ -14,6 +14,7 @@ import edu.ucc.farmsim.ui.components.PlotText;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
 import java.awt.Rectangle;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.MouseAdapter;
@@ -35,10 +36,11 @@ import javax.swing.ToolTipManager;
  * only draws frames of the {@link VisualEffects} (rain, snow, night tint, animals, growing crops and the
  * ambient life of the valley) while the panel is on screen and something moves, and stops otherwise; the
  * effects can be switched off at any time and never touch the game (HU-40, HU-41). Bars that float over the
- * view are registered with {@link #addFloating}, and the plots are placed clear of them (HU-48). Hovering a plot
+ * view are registered with {@link #addFloating}. The plots are 48 screen pixels and a camera follows the avatar
+ * through the valley, always keeping it in the part of the view the bars leave free (HU-48, HU-50). Hovering a plot
  * shows its tooltip after {@link #TOOLTIP_DELAY_MS}, and clicking tells the {@link PlotClickListener}.
  *
- * <p>Stories: HU-07, HU-25, HU-35, HU-40, HU-41, HU-45, HU-46, HU-48.
+ * <p>Stories: HU-07, HU-25, HU-35, HU-40, HU-41, HU-45, HU-46, HU-48, HU-50.
  */
 public final class MapPanel extends JPanel implements GameListener {
 
@@ -53,6 +55,8 @@ public final class MapPanel extends JPanel implements GameListener {
     private static final String GREENHOUSE = "GREENHOUSE";
     private static final long PARTICLE_SEED = 20_261_122L;
     private static final int RESERVE_GAP = 6;
+    private static final int DEFAULT_COLS = 48;
+    private static final int DEFAULT_ROWS = 24;
 
     private final transient GameCommands controller;
     private final transient PlotClickListener clicks;
@@ -146,40 +150,51 @@ public final class MapPanel extends JPanel implements GameListener {
         floating.add(bar);
     }
 
-    /** Where each plot is drawn now, at the current size of the panel. */
+    /**
+     * Where each plot is drawn now: plots of {@link MapGeometry#SCREEN_CELL} screen pixels with the camera on
+     * the avatar (on the spot where it is drawn while it walks), kept inside the part of the panel the floating
+     * bars leave free and never showing beyond the edges of the valley (RN-40).
+     */
     public MapGeometry geometry() {
-        int cols = view == null ? 16 : view.cols();
-        int rows = view == null ? 10 : view.rows();
+        int cols = view == null ? DEFAULT_COLS : view.cols();
+        int rows = view == null ? DEFAULT_ROWS : view.rows();
+        int width = Math.max(1, getWidth());
+        int height = Math.max(1, getHeight());
+        int cell = MapGeometry.cellFor(width, height, deviceScale());
+        double[] focus = effects.avatarPosition();
+        double col = focus == null ? cols / 2.0 : focus[0];
+        double row = focus == null ? rows / 2.0 : focus[1];
+        return MapGeometry.follow(cols, rows, cell, freeArea(width, height), col, row);
+    }
+
+    /** The part of the panel not covered by the bars that float over it, at the top and at the bottom. */
+    private Rectangle freeArea(int width, int height) {
         int top = 0;
         int bottom = 0;
-        MapGeometry geometry = MapGeometry.fit(cols, rows, getWidth(), getHeight());
-        for (int pass = 0; pass < 3; pass++) {
-            Rectangle area = geometry.area();
-            boolean changed = false;
-            for (JComponent bar : floating) {
-                if (!bar.isVisible() || bar.getParent() == null || bar.getWidth() == 0) {
-                    continue;
-                }
-                Rectangle box = SwingUtilities.convertRectangle(bar.getParent(), bar.getBounds(), this);
-                if (!box.intersects(area)) {
-                    continue;
-                }
-                if (box.y + box.height / 2 < getHeight() / 2) {
-                    int needed = box.y + box.height + RESERVE_GAP;
-                    changed |= needed > top;
-                    top = Math.max(top, needed);
-                } else {
-                    int needed = getHeight() - box.y + RESERVE_GAP;
-                    changed |= needed > bottom;
-                    bottom = Math.max(bottom, needed);
-                }
+        for (JComponent bar : floating) {
+            if (!bar.isVisible() || bar.getParent() == null || bar.getWidth() == 0) {
+                continue;
             }
-            if (!changed) {
-                break;
+            Rectangle box = SwingUtilities.convertRectangle(bar.getParent(), bar.getBounds(), this);
+            if (box.y + box.height / 2 < height / 2) {
+                top = Math.max(top, box.y + box.height + RESERVE_GAP);
+            } else {
+                bottom = Math.max(bottom, height - box.y + RESERVE_GAP);
             }
-            geometry = MapGeometry.fit(cols, rows, getWidth(), getHeight(), top, bottom);
         }
-        return geometry;
+        if (top + bottom >= height) {
+            return new Rectangle(0, 0, width, height);
+        }
+        return new Rectangle(0, top, width, height - top - bottom);
+    }
+
+    private double deviceScale() {
+        GraphicsConfiguration config = getGraphicsConfiguration();
+        if (config == null) {
+            return 1.0;
+        }
+        double scale = config.getDefaultTransform().getScaleX();
+        return scale > 0 ? scale : 1.0;
     }
 
     /** True while the frame timer is running, that is, while something is moving on the map. */

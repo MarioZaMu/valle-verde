@@ -18,7 +18,7 @@ import java.util.List;
  * The farm grid: {@link GameRules#MAP_COLS} x {@link GameRules#MAP_ROWS} plots with coordinates
  * {@code (column, row)}, where {@code (0, 0)} is the top-left corner (RN-04).
  *
- * <p>Stories: HU-01, HU-03, HU-05, HU-12, HU-18, HU-25, HU-28, HU-45, HU-46.
+ * <p>Stories: HU-01, HU-03, HU-05, HU-12, HU-18, HU-25, HU-28, HU-45, HU-46, HU-50.
  */
 public final class FarmMap {
 
@@ -29,7 +29,10 @@ public final class FarmMap {
         this.plots = plots;
     }
 
-    /** Builds the fixed initial map of a new game: a soil block, a pond, 12 obstacles and grass elsewhere. */
+    /**
+     * Builds the fixed initial map of a new game: the soil block, the pond, the obstacles, the path and the
+     * houses of the valley, and grass elsewhere (RN-04).
+     */
     public static FarmMap initial() {
         Plot[][] grid = new Plot[GameRules.MAP_ROWS][GameRules.MAP_COLS];
         for (int row = 0; row < GameRules.MAP_ROWS; row++) {
@@ -46,6 +49,16 @@ public final class FarmMap {
         }
         if (inside(col, row, GameRules.POND_COL, GameRules.POND_ROW, GameRules.POND_WIDTH, GameRules.POND_HEIGHT)) {
             return Terrain.WATER;
+        }
+        for (House house : House.values()) {
+            if (inside(col, row, house.col(), house.row(), house.width(), house.height())) {
+                return Terrain.HOUSE;
+            }
+        }
+        for (int[] path : GameRules.PATHS) {
+            if (inside(col, row, path[0], path[1], path[2], path[3])) {
+                return Terrain.PATH;
+            }
         }
         for (int[] obstacle : GameRules.OBSTACLES) {
             if (obstacle[0] == col && obstacle[1] == row) {
@@ -87,16 +100,17 @@ public final class FarmMap {
     }
 
     /**
-     * True if the avatar can stand on the plot (RN-36): it is inside the map, it is grass or soil (with or without
-     * a crop), no building covers it and no person of the valley stands on it (RN-37). Water and obstacles
-     * block the way.
+     * True if the avatar can stand on the plot (RN-36): it is inside the map, it is grass, soil (with or without
+     * a crop) or the path, no building covers it and no person of the valley stands on it (RN-37). Water,
+     * obstacles and houses block the way.
      */
     public boolean isWalkable(int col, int row) {
         if (!contains(col, row)) {
             return false;
         }
         Plot plot = plots[row][col];
-        return (plot.terrain() == Terrain.GRASS || plot.terrain() == Terrain.SOIL) && plot.building() == null
+        Terrain ground = plot.terrain();
+        return (ground == Terrain.GRASS || ground == Terrain.SOIL || ground == Terrain.PATH) && plot.building() == null
                 && Npc.at(col, row) == null;
     }
 

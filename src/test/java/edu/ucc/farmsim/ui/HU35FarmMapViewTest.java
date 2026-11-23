@@ -35,6 +35,9 @@ class HU35FarmMapViewTest {
     private static final int WIDTH = 1024;
     private static final int HEIGHT = 600;
 
+    /** Where the renderer puts the plots of the whole valley when it is drawn without a camera. */
+    private static final MapGeometry VALLEY = MapGeometry.fit(48, 24, WIDTH, HEIGHT);
+
     private static BufferedImage paint(MapView map, CellPos hover) {
         BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = image.createGraphics();
@@ -66,12 +69,12 @@ class HU35FarmMapViewTest {
     }
 
     @Test
-    void HU35_ca1_theMapShows16x10PlotsAndTheFourTerrainsLookDifferent() {
+    void HU35_ca1_theMapShowsThe48x24ValleyAndTheFourTerrainsLookDifferent() {
         // Given a new game
         TestApp app = TestApp.startedGame();
         MapView map = app.controller.map().value();
-        assertEquals(160, map.plots().size());
-        MapGeometry geometry = MapGeometry.fit(16, 10, WIDTH, HEIGHT);
+        assertEquals(48 * 24, map.plots().size());
+        MapGeometry geometry = VALLEY;
 
         // When it is drawn
         BufferedImage image = paint(map, null);
@@ -122,7 +125,7 @@ class HU35FarmMapViewTest {
     @Test
     void HU35_theHoveredPlotIsHighlighted() {
         MapView map = TestApp.startedGame().controller.map().value();
-        MapGeometry geometry = MapGeometry.fit(16, 10, WIDTH, HEIGHT);
+        MapGeometry geometry = VALLEY;
 
         int[] plain = cellPixels(paint(map, null), geometry, 5, 3);
         int[] hovered = cellPixels(paint(map, new CellPos(5, 3)), geometry, 5, 3);
@@ -155,7 +158,7 @@ class HU35FarmMapViewTest {
         panel.handleClick(-10, -10);
         assertTrue(clicks.isEmpty());
 
-        var inside = MapGeometry.fit(16, 10, WIDTH, HEIGHT).cellBounds(5, 3);
+        var inside = panel.geometry().cellBounds(5, 3);
         panel.handleClick(inside.x + 4, inside.y + 4);
         assertEquals(List.of(new CellPos(5, 3)), clicks);
     }
@@ -217,7 +220,7 @@ class HU35FarmMapViewTest {
         // Given a coop built at (2,7), which covers (2,7) to (3,8)
         TestApp app = TestApp.startedGame();
         var coop = GameFixtures.coop(app.state());
-        MapGeometry geometry = MapGeometry.fit(16, 10, WIDTH, HEIGHT);
+        MapGeometry geometry = VALLEY;
         MapView empty = app.controller.map().value();
         MapView noBuildings = new MapView(empty.cols(), empty.rows(), empty.plots());
         int[] grass = cellPixels(paint(noBuildings, null), geometry, 2, 8);
@@ -240,7 +243,7 @@ class HU35FarmMapViewTest {
 
     @Test
     void HU35_ca3_aSickHenAndTheProductsWaitingLookDifferentFromAHealthyOne() {
-        MapGeometry geometry = MapGeometry.fit(16, 10, WIDTH, HEIGHT);
+        MapGeometry geometry = VALLEY;
         int[] healthy = coopCell(edu.ucc.farmsim.domain.animal.AnimalCondition.HEALTHY, 0, geometry, 2, 8);
         int[] sick = coopCell(edu.ucc.farmsim.domain.animal.AnimalCondition.SICK, 0, geometry, 2, 8);
         int[] hungry = coopCell(edu.ucc.farmsim.domain.animal.AnimalCondition.HUNGRY, 0, geometry, 2, 8);
@@ -262,7 +265,7 @@ class HU35FarmMapViewTest {
 
     @Test
     void HU35_everyKindOfBuildingHasItsOwnLook() {
-        MapGeometry geometry = MapGeometry.fit(16, 10, WIDTH, HEIGHT);
+        MapGeometry geometry = VALLEY;
         Set<Integer> looks = new HashSet<>();
         for (var type : edu.ucc.farmsim.domain.building.BuildingType.values()) {
             TestApp app = TestApp.startedGame();

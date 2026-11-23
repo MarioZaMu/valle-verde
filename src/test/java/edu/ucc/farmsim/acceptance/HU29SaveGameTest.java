@@ -35,12 +35,12 @@ class HU29SaveGameTest {
         // When the player saves in slot 2
         Result<SaveSlotView> result = app.controller.save(2);
 
-        // Then the document slot2 exists with schemaVersion 2 (1 before the avatar), savedAt, state and the SHA-256 of the state
+        // Then the document slot2 exists with schemaVersion 3 (1 before the avatar, 2 before the valley), savedAt, state and the SHA-256 of the state
         assertTrue(result.isOk(), String.valueOf(result.message()));
         SaveDocument document = mongo.document(2);
         assertNotNull(document);
         assertEquals("slot2", document.id());
-        assertEquals(2, document.schemaVersion());
+        assertEquals(3, document.schemaVersion());
         assertEquals(TestApp.FIXED_CLOCK.instant(), document.savedAt());
         assertTrue(document.state().startsWith("{"));
         assertEquals(Checksum.of(document.state()), document.checksum());

@@ -74,13 +74,19 @@ public final class GameRules {
     /** Energy cost of curing an animal. */
     public static final int ENERGY_COST_CURE = 1;
 
-    // ---- RN-04: farm map (16 x 10 = 160 plots) ----
+    // ---- RN-04: the valley (48 x 24 = 1152 plots): the farm to the west, the village to the east ----
 
     /** Number of plot columns. */
-    public static final int MAP_COLS = 16;
+    public static final int MAP_COLS = 48;
 
     /** Number of plot rows. */
-    public static final int MAP_ROWS = 10;
+    public static final int MAP_ROWS = 24;
+
+    /** Columns of the map before phase 5.7g; saves of version 1 and 2 hold that many (RN-40). */
+    public static final int LEGACY_MAP_COLS = 16;
+
+    /** Rows of the map before phase 5.7g. */
+    public static final int LEGACY_MAP_ROWS = 10;
 
     /** Column of the top-left plot of the soil block (8 x 5 = 40 soil plots). */
     public static final int SOIL_COL = 4;
@@ -106,10 +112,21 @@ public final class GameRules {
     /** Height of the pond. */
     public static final int POND_HEIGHT = 2;
 
-    /** Fixed positions {column, row} of the 12 obstacles (trees and rocks). */
+    /** Fixed positions {column, row} of the 30 obstacles (trees and rocks): 12 on the old farm, 18 around. */
     public static final int[][] OBSTACLES = {
-        {0, 0}, {1, 0}, {0, 1}, {8, 0}, {0, 5}, {15, 5}, {0, 9}, {1, 9}, {7, 9}, {14, 9}, {15, 9}, {15, 8}
+        {0, 0}, {1, 0}, {0, 1}, {8, 0}, {0, 5}, {15, 5}, {0, 9}, {1, 9}, {7, 9}, {14, 9}, {15, 9}, {15, 8},
+        {21, 1}, {22, 4}, {20, 9}, {23, 17}, {21, 21}, {10, 15}, {3, 13}, {14, 19}, {6, 20},
+        {25, 3}, {33, 4}, {44, 6}, {46, 10}, {41, 19}, {31, 21}, {45, 22}, {26, 20}, {40, 2}
     };
+
+    /** The dirt path {column, row, width, height}: from your house south, then east through the village. */
+    public static final int[][] PATHS = {{18, 6, 1, 7}, {19, 12, 27, 1}};
+
+    /**
+     * The houses {column, row, width, height} in the order of {@code House}: your house on the farm, then the
+     * shop of Marta, the house of Don Tomás, the clinic of Dra. Lucía and the house of Inés in the village.
+     */
+    public static final int[][] HOUSES = {{16, 3, 4, 3}, {27, 8, 5, 3}, {36, 8, 4, 3}, {27, 14, 5, 3}, {36, 14, 4, 3}};
 
     // ---- RN-36: avatar ----
 
@@ -121,29 +138,29 @@ public final class GameRules {
 
     // ---- RN-37, RN-38: the people of the valley and their errands ----
 
-    /** Column of Marta, the market seller, north of the soil. */
-    public static final int NPC_MARTA_COL = 10;
+    /** Column of Marta, the market seller, in front of her shop. */
+    public static final int NPC_MARTA_COL = 29;
 
-    /** Row of Marta. */
-    public static final int NPC_MARTA_ROW = 1;
+    /** Row of Marta, just south of her shop and north of the path. */
+    public static final int NPC_MARTA_ROW = 11;
 
-    /** Column of Don Tomás, the veteran farmer, at the top left. */
-    public static final int NPC_TOMAS_COL = 3;
+    /** Column of Don Tomás, the veteran farmer, in front of his house. */
+    public static final int NPC_TOMAS_COL = 37;
 
     /** Row of Don Tomás. */
-    public static final int NPC_TOMAS_ROW = 1;
+    public static final int NPC_TOMAS_ROW = 11;
 
-    /** Column of Dra. Lucía, the vet, on the east side. */
-    public static final int NPC_LUCIA_COL = 15;
+    /** Column of Dra. Lucía, the vet, in front of her clinic. */
+    public static final int NPC_LUCIA_COL = 29;
 
-    /** Row of Dra. Lucía. */
-    public static final int NPC_LUCIA_ROW = 3;
+    /** Row of Dra. Lucía, just south of her clinic, at its door. */
+    public static final int NPC_LUCIA_ROW = 17;
 
-    /** Column of Inés, the neighbour, at the bottom right. */
-    public static final int NPC_INES_COL = 11;
+    /** Column of Inés, the neighbour, in front of her house. */
+    public static final int NPC_INES_COL = 37;
 
     /** Row of Inés. */
-    public static final int NPC_INES_ROW = 9;
+    public static final int NPC_INES_ROW = 17;
 
     /** Carrots Marta asks for. */
     public static final int ERRAND_MARTA_AMOUNT = 5;

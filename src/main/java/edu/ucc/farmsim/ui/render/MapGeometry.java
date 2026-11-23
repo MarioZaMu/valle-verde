@@ -3,10 +3,11 @@ package edu.ucc.farmsim.ui.render;
 import java.awt.Rectangle;
 
 /**
- * Where each plot is drawn: square cells as large as the area allows, centered. Also answers which plot lies
- * under a pixel. No Swing component involved, so it is tested without a display.
+ * Where each plot is drawn: either the whole map fitted into an area ({@link #fit}), or plots of a fixed size
+ * with a camera that follows the avatar ({@link #follow}, RN-40). Also answers which plot lies under a pixel.
+ * No Swing component involved, so it is tested without a display.
  *
- * <p>Stories: HU-35, HU-44.
+ * <p>Stories: HU-35, HU-44, HU-50.
  *
  * @param cols     number of columns
  * @param rows     number of rows
@@ -18,6 +19,13 @@ public record MapGeometry(int cols, int rows, int cellSize, int originX, int ori
 
     /** Side in pixels of one sprite: a cell that is a whole multiple of it keeps the pixel art sharp. */
     public static final int TILE = 32;
+
+    /** Side of a plot on the screen, in screen pixels, when the camera follows the avatar (RN-40). */
+    public static final int SCREEN_CELL = 48;
+
+    /** Plots across and down that always fit: a smaller window gets smaller plots. */
+    private static final int MIN_COLS_SHOWN = 12;
+    private static final int MIN_ROWS_SHOWN = 8;
 
     /** A whole scale is used when it fills at least this fraction (in quarters) of what fits. */
     private static final int WHOLE_SCALE_MIN_QUARTERS = 3;
@@ -43,6 +51,41 @@ public record MapGeometry(int cols, int rows, int cellSize, int originX, int ori
     public static MapGeometry fit(int cols, int rows, int width, int height, int top, int bottom) {
         MapGeometry inner = fit(cols, rows, width, Math.max(1, height - top - bottom));
         return new MapGeometry(cols, rows, inner.cellSize(), inner.originX(), inner.originY() + top);
+    }
+
+    /**
+     * The side of a plot in logical pixels: {@link #SCREEN_CELL} screen pixels (so with Windows at 125 % a
+     * plot is 38 logical pixels), but never so big that fewer than 12 x 8 plots fit in the area.
+     *
+     * @param deviceScale screen pixels per logical pixel
+     */
+    public static int cellFor(int width, int height, double deviceScale) {
+        int wanted = (int) Math.round(SCREEN_CELL / Math.max(deviceScale, 0.1));
+        return Math.max(1, Math.min(wanted, Math.min(width / MIN_COLS_SHOWN, height / MIN_ROWS_SHOWN)));
+    }
+
+    /**
+     * Plots of the given size with a camera on a point of the map: the point goes to the middle of the view,
+     * but the camera stops at the edges of the map so nothing outside it is shown; along an axis where the
+     * whole map fits, the map is centered in the view.
+     *
+     * @param cell     side of a plot in pixels
+     * @param view     the part of the area left free by the bars, where the point must stay
+     * @param focusCol column of the point, in plots; it may be between two plots while the avatar walks
+     * @param focusRow row of the point, in plots
+     */
+    public static MapGeometry follow(int cols, int rows, int cell, Rectangle view, double focusCol, double focusRow) {
+        int originX = axis(cols * cell, view.x, view.width, (focusCol + 0.5) * cell);
+        int originY = axis(rows * cell, view.y, view.height, (focusRow + 0.5) * cell);
+        return new MapGeometry(cols, rows, cell, originX, originY);
+    }
+
+    private static int axis(int length, int start, int size, double focus) {
+        if (length <= size) {
+            return start + (size - length) / 2;
+        }
+        int origin = (int) Math.round(start + size / 2.0 - focus);
+        return Math.max(start + size - length, Math.min(start, origin));
     }
 
     /** Pixel rectangle of the whole map. */

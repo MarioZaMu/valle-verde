@@ -27,7 +27,7 @@
 | CU-16 | Consultar logros | Progresión | RF-26, RF-27 |
 | CU-17 | Consultar inventario | Economía | RF-13, RF-37 |
 | CU-18 | Observar la granja | Interfaz | RF-10, RF-34, RF-35, RF-36, RF-39, RF-40, RF-41, RF-42, RF-43, RF-44, RF-48 |
-| CU-19 | Caminar por la granja | Mundo | RF-45 |
+| CU-19 | Caminar por el valle | Mundo | RF-45, RF-50 |
 | CU-20 | Hablar con un NPC | Mundo | RF-46, RF-47 |
 | CU-21 | Seguir el tutorial de inicio | Mundo | RF-49 |
 
@@ -239,12 +239,12 @@
 - **Alternativas:** **A1.** Si no hay sprites disponibles, el sistema dibuja gráficos vectoriales de respaldo. **A4.** Los efectos (tinte, partículas) cambian con la estación y el clima, sin alterar el estado del juego.
 - **Postcondición:** la pantalla refleja siempre el estado actual del juego.
 
-## CU-19 · Caminar por la granja
-- **Actor:** Jugador · **RF:** RF-45 · **RN:** RN-36
+## CU-19 · Caminar por el valle
+- **Actor:** Jugador · **RF:** RF-45, RF-50 · **RN:** RN-36, RN-40
 - **Precondición:** hay una partida en curso.
 - **Flujo principal:**
   1. El Jugador pulsa una flecha o `W` `A` `S` `D`.
-  2. El sistema mueve al avatar una parcela en esa dirección, actualiza su mirada y lo anima.
+  2. El sistema mueve al avatar una parcela en esa dirección, actualiza su mirada, lo anima y la cámara lo sigue; mientras la tecla siga apretada da un paso cada 180 ms sin pausas (RN-40).
   3. El Jugador elige una herramienta y pulsa `Espacio`: el sistema la aplica a la parcela que tiene enfrente (CU-02, CU-03, CU-04, CU-11).
 - **Alternativas:** **A2.** El destino es agua, obstáculo, edificio, NPC o el borde: se rechaza con `MOVIMIENTO_BLOQUEADO` y el avatar solo cambia su mirada. **A3.** El Jugador hace clic sobre una parcela: la herramienta actúa sobre ella como siempre.
 - **Postcondición:** la posición y la mirada quedan en el estado y se guardan con la partida.
@@ -325,5 +325,6 @@
 | RF-47 | Los NPC ofrecerán encargos de un solo uso con recompensa en m | Could | CU-20 | HU-47 |
 | RF-48 | La interfaz tendrá aspecto de granja: barra de herramientas con iconos, HUD con iconos e inventario … | Should | CU-18 | HU-48 |
 | RF-49 | Una partida nueva empezará con un tutorial de 5 pasos guiado por el avatar, que se puede saltar … | Should | CU-21 | HU-49 |
+| RF-50 | El jugador recorrerá un valle de 48 × 24 con su granja y una aldea, con cámara que sigue al avatar … | Should | CU-19 | HU-50 |
 
 > Las historias de usuario están en [`HISTORIAS_DE_USUARIO.md`](HISTORIAS_DE_USUARIO.md).

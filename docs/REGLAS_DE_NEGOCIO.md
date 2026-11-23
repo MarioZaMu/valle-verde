@@ -18,7 +18,7 @@
 | Progresión | RN-28 a RN-29 |
 | Partida y persistencia | RN-30 a RN-33 |
 | Interfaz | RN-34 a RN-35 |
-| Avatar y personajes | RN-36 a RN-39 |
+| Avatar y personajes | RN-36 a RN-40 |
 
 ---
 
@@ -66,16 +66,21 @@ Al ejecutar «Terminar día» el sistema aplica, **siempre en este orden**:
 
 ## 2. Mapa
 
-### RN-04 · Mapa de la granja
-- Cuadrícula de **16 columnas × 10 filas = 160 parcelas**. Coordenadas `(columna, fila)`, con `(0,0)` arriba a la izquierda.
+### RN-04 · Mapa del valle
+- Cuadrícula de **48 columnas × 24 filas = 1152 parcelas** (desde la Fase 5.7g; antes, 16 × 10). Coordenadas `(columna, fila)`, con `(0,0)` arriba a la izquierda.
+- **Sin valla:** al **oeste** está la granja (columnas 0 a 21: la tierra de cultivo, el estanque y la casa del jugador) y al **este** la **aldea** (columnas 26 a 47), unidas por un **camino** de tierra. Árboles sueltos marcan el paisaje sin cerrar ninguna zona.
 - Tipos de terreno y distribución inicial (fija y determinista):
 
 | Terreno | Cantidad | Uso |
 |---|---|---|
-| **TIERRA** (cultivable) | 40 (bloque de 8 × 5) | Solo aquí se siembra |
-| **HIERBA** (construible) | 102 | Solo aquí se construye |
-| **AGUA** (estanque 3 × 2) | 6 | Decorativo, no utilizable |
-| **OBSTÁCULO** (árboles y rocas) | 12 | Decorativo, no utilizable |
+| **TIERRA** (cultivable) | 40 (bloque de 8 × 5 en (4, 2)) | Solo aquí se siembra |
+| **HIERBA** (construible) | 976 | Solo aquí se construye |
+| **AGUA** (estanque 3 × 2 en (13, 0)) | 6 | Decorativo, no utilizable |
+| **OBSTÁCULO** (árboles y rocas) | 30 | Decorativo, no utilizable |
+| **CAMINO** | 34 (de (18, 6) a (18, 12) y de (19, 12) a (45, 12)) | Se camina; no se siembra ni se construye |
+| **CASA** | 66 | No se camina, no se siembra ni se construye |
+
+- Casas fijas (esquina superior izquierda, ancho × alto): **Tu casa** (16, 3) 4 × 3 · **Tienda de Marta** (27, 8) 5 × 3 · **Casa de Don Tomás** (36, 8) 4 × 3 · **Clínica de la Dra. Lucía** (27, 14) 5 × 3 · **Casa de Inés** (36, 14) 4 × 3.
 
 - Una parcela ocupada por un edificio no admite cultivos ni otro edificio.
 
@@ -351,7 +356,7 @@ Después se pone `alimentadoHoy = falso`.
 - Metadatos visibles por ranura: Año, estación y día, dinero, fecha y hora real del guardado.
 
 ### RN-32 · Formato e integridad del documento
-- Documento con los campos `_id`, `schemaVersion` (= **2** desde la Fase 5.7, que agregó el avatar; se siguen leyendo documentos de versión **1**, RN-36), `savedAt`, `state` (el estado como texto JSON UTF-8) y `checksum` (**SHA-256** en hexadecimal de `state`).
+- Documento con los campos `_id`, `schemaVersion` (= **3** desde la Fase 5.7g, que agrandó el mapa; se siguen leyendo documentos de versión **1** y **2**, RN-36 y RN-40), `savedAt`, `state` (el estado como texto JSON UTF-8) y `checksum` (**SHA-256** en hexadecimal de `state`).
 - `state` incluye: calendario, energía, dinero, inventario, parcelas y cultivos, edificios y animales (con pendientes), mercado (demanda y precio anterior), clima y pronóstico, logros y contadores, y el **estado interno del generador aleatorio** (un entero de 64 bits que expone `StateRandom`), para continuar exactamente la misma secuencia al cargar.
 - Tamaño típico ≤ 200 KB (el límite de un documento de MongoDB es 16 MB).
 - **Guardar → cargar devuelve un estado idéntico** al original (igualdad estructural, incluida la secuencia futura de sorteos).
@@ -432,11 +437,11 @@ Cada RN se usa por al menos un requerimiento funcional; la tabla completa RF ↔
 - Dar **un paso** (flechas o `W` `A` `S` `D`) lo mueve a la parcela vecina en esa dirección. Moverse **no cuesta energía y no avanza el día**.
 - El paso se **rechaza** (`MOVIMIENTO_BLOQUEADO`, «No puedes pasar por ahí.») si el destino está fuera del mapa, es agua u obstáculo, está cubierto por un edificio o lo ocupa un NPC. Aun así, el avatar **cambia su mirada** hacia esa dirección.
 - La **parcela frente al avatar** es la vecina en la dirección que mira. La tecla `Espacio` aplica la herramienta elegida a esa parcela con las mismas reglas de siempre (RN-06 a RN-10, RN-24, RN-26); el **clic** sobre una parcela sigue aplicándola a la parcela clicada, sin exigir cercanía.
-- Posición y mirada forman parte de la partida guardada (RN-32), que pasa a **`schemaVersion` 2**. Un documento de versión 1 (sin avatar) se acepta y deja al avatar en su posición inicial, o en la parcela transitable más cercana si allí se construyó (RN-33); una versión menor que 1 o mayor que 2 se rechaza con `VERSION_NO_SOPORTADA`. Un documento cuyo avatar no está en una parcela transitable se rechaza con `ARCHIVO_CORRUPTO`.
+- Posición y mirada forman parte de la partida guardada (RN-32), que pasó a **`schemaVersion` 2** (hoy 3, RN-40). Un documento de versión 1 (sin avatar) se acepta y deja al avatar en su posición inicial, o en la parcela transitable más cercana si allí se construyó (RN-33); una versión menor que 1 o mayor que la actual se rechaza con `VERSION_NO_SOPORTADA`. Un documento cuyo avatar no está en una parcela transitable se rechaza con `ARCHIVO_CORRUPTO`.
 - Posición inicial: parcela **(7, 7)**, la hierba justo al sur de la tierra de cultivo. No se puede **construir** sobre la parcela del avatar (`UBICACION_INVALIDA`, RN-21).
 
 ### RN-37 · Personajes (NPC) y diálogos
-- Hay **cuatro NPC** fijos, cada uno en una parcela de hierba de la configuración — Marta **(10, 1)**, Don Tomás **(3, 1)**, Dra. Lucía **(15, 3)** e Inés **(11, 9)** —; **no se mueven**, **bloquean el paso** (RN-36) y no se puede construir sobre ellos (`UBICACION_INVALIDA`, RN-21).
+- Hay **cuatro NPC** fijos que viven en la **aldea**, cada uno en la hierba frente a su casa (RN-04) — Marta **(29, 11)**, Don Tomás **(37, 11)**, Dra. Lucía **(29, 17)** e Inés **(37, 17)** —; **no se mueven**, **bloquean el paso** (RN-36) y no se puede construir sobre ellos (`UBICACION_INVALIDA`, RN-21).
 
 | NPC | Rol | De qué habla |
 |---|---|---|
@@ -469,7 +474,7 @@ Cada RN se usa por al menos un requerimiento funcional; la tabla completa RF ↔
 | 1 · Caminar | «¡Hola! Soy tu granjero. Camina por la granja con las flechas o con W A S D.» | el avatar da un paso (no basta con girar contra un obstáculo) |
 | 2 · Sembrar | «Elige Sembrar con la tecla 1, ponte frente a la tierra y pulsa Espacio (o haz clic en una parcela de tierra).» | se siembra una semilla |
 | 3 · Regar | «Ahora elige Regar con la tecla 2 y riega lo que sembraste.» | se riega un cultivo |
-| 4 · Hablar | «Los vecinos dan consejos y encargos. Acércate a uno y pulsa E.» | se habla con un NPC |
+| 4 · Hablar | «Los vecinos viven en la aldea, al este por el camino. Acércate a uno y pulsa E.» | se habla con un NPC |
 | 5 · Terminar el día | «Cuando acabes, pulsa Enter o «Terminar día» para que crezcan tus cultivos.» | se termina el día |
 
 - Los pasos van **en orden**: una acción solo cuenta si es la del paso actual, y una acción **rechazada** no cuenta.
@@ -477,3 +482,10 @@ Cada RN se usa por al menos un requerimiento funcional; la tabla completa RF ↔
 - «Saltar tutorial» lo da por terminado en cualquier paso; un tutorial terminado o saltado **no vuelve**.
 - El tutorial **no cambia** la energía, el dinero, el inventario ni el día: solo guía.
 - El paso actual se guarda con la partida (RN-32) sin subir la `schemaVersion`; un documento escrito antes del tutorial se carga con el tutorial **terminado** (una partida que ya se jugaba no lo repite).
+
+### RN-40 · Vista del valle, cámara y caminata
+- La parcela se dibuja de **48 px** (los sprites de 32 px ampliados sin desenfocar); si la ventana es tan chica que no caben 12 × 8 parcelas, se usa la parcela que quepa.
+- La **cámara** sigue al avatar (también durante el paso, sin saltos) y nunca muestra fuera del valle; en un eje donde el valle cabe entero se centra. Las barras flotan sobre el paisaje.
+- El avatar y los NPC ocupan **una parcela** (la de sus pies), pero se dibujan de **1 parcela de ancho por 2 de alto** (sprites de 32 × 64). Las reglas solo usan la parcela de los pies.
+- **Caminar sin pausas:** mientras se mantiene una flecha o `W` `A` `S` `D`, el avatar da un paso cada **180 ms**, sin la pausa de repetición del teclado después del primero, y la animación sigue sin reiniciarse; al soltar la tecla se detiene. Si se mantienen dos, manda la última pulsada.
+- El mapa más grande sube el documento a **`schemaVersion` 3**. Un documento de versión 1 o 2 (mapa de 16 × 10) se acepta: sus cultivos, edificios, avatar y encargos quedan en las **mismas coordenadas**, que ahora son la esquina noroeste de la granja.

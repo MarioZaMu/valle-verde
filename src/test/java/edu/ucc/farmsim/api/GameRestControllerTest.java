@@ -118,9 +118,11 @@ class GameRestControllerTest {
     void GET_map_returnsThePlots() throws Exception {
         newGame();
         mvc.perform(get("/api/farm/map")).andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.cols").value(16))
-                .andExpect(jsonPath("$.data.rows").value(10))
-                .andExpect(jsonPath("$.data.plots", hasSize(16 * 10)));
+                .andExpect(jsonPath("$.data.cols").value(48))
+                .andExpect(jsonPath("$.data.rows").value(24))
+                .andExpect(jsonPath("$.data.plots", hasSize(48 * 24)))
+                .andExpect(jsonPath("$.data.houses", hasSize(5)))
+                .andExpect(jsonPath("$.data.houses[1].id").value("SHOP"));
     }
 
     @Test
@@ -132,8 +134,9 @@ class GameRestControllerTest {
                 .andExpect(jsonPath("$.data.col").value(8))
                 .andExpect(jsonPath("$.data.facing").value("EAST"))
                 .andExpect(jsonPath("$.events[0].type").value("AvatarMoved"));
-        for (int i = 0; i < 2; i++) {
-            mvc.perform(post("/api/avatar/moves").contentType(MediaType.APPLICATION_JSON).content("{\"direction\": \"SOUTH\"}"));
+        for (String step : new String[] {"SOUTH", "WEST"}) {
+            mvc.perform(post("/api/avatar/moves").contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"direction\": \"" + step + "\"}")).andExpect(status().isOk());
         }
         mvc.perform(post("/api/avatar/moves").contentType(MediaType.APPLICATION_JSON).content("{\"direction\": \"SOUTH\"}"))
                 .andExpect(status().isConflict())
@@ -179,7 +182,7 @@ class GameRestControllerTest {
         mvc.perform(post("/api/npcs/MARTA/talk")).andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value("NPC_LEJOS"))
                 .andExpect(jsonPath("$.message").value("Acércate a Marta para hablar."));
-        session.current().avatar().restoreFrom(new edu.ucc.farmsim.domain.farm.AvatarSnapshot(9, 1,
+        session.current().avatar().restoreFrom(new edu.ucc.farmsim.domain.farm.AvatarSnapshot(28, 11,
                 edu.ucc.farmsim.domain.farm.Direction.EAST));
         mvc.perform(post("/api/npcs/MARTA/talk")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.name").value("Marta"))

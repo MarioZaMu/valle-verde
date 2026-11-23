@@ -18,7 +18,7 @@ import java.util.List;
  * from it. It holds everything that changes during play: crops, buildings and animals, the market, the daily
  * ledger, the achievements, the avatar, the errands done and the step of the start tutorial.
  *
- * <p>Stories: HU-01, HU-10, HU-15, HU-16, HU-17, HU-18, HU-26, HU-45, HU-47, HU-49.
+ * <p>Stories: HU-01, HU-10, HU-15, HU-16, HU-17, HU-18, HU-26, HU-45, HU-47, HU-49, HU-50.
  *
  * @param date        calendar date
  * @param money       coins
@@ -61,5 +61,11 @@ public record GameMemento(GameDate date, int money, int energy, InventorySnapsho
                        Weather today, Weather forecast, long randomState, MarketSnapshot market,
                        LedgerSnapshot ledger, ProgressSnapshot progress) {
         this(date, money, energy, inventory, farm, today, forecast, randomState, market, ledger, progress, null);
+    }
+
+    /** The same snapshot with another map (a save of the old 16 x 10 map widened to the valley, RN-40). */
+    public GameMemento withFarm(FarmMapSnapshot other) {
+        return new GameMemento(date, money, energy, inventory, other, today, forecast, randomState, market, ledger,
+                progress, avatar, errandsDone, tutorial);
     }
 }

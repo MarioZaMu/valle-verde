@@ -125,4 +125,4 @@ Limpiar parcelas marchitas, tendencia de precios, curar animales, Almacén, desb
 | Assets con licencia incompatible | Media | Medio | Solo CC0 / CC-BY, registro en `ASSETS.md`, respaldo vectorial |
 | Reglas de negocio incoherentes entre documentos | Media | Alto | Valores únicos en `REGLAS_DE_NEGOCIO.md`; constantes en una sola clase de configuración |
 | Aleatoriedad que vuelve las pruebas frágiles | Media | Medio | `Random` inyectado con semilla fija en todas las pruebas |
-| Alcance excesivo (49 RF) | Media | Medio | MoSCoW: 30 *Must* forman el MVP; el resto se recorta sin afectar el diseño |
+| Alcance excesivo (50 RF) | Media | Medio | MoSCoW: 30 *Must* forman el MVP; el resto se recorta sin afectar el diseño |

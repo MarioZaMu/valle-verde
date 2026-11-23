@@ -9,7 +9,7 @@ where trees and buildings rise above the tiles they stand on).
     python tools/gen_sprites.py --check    fails if a file on disk differs from what this script draws
     python tools/gen_sprites.py --sheet F  also writes a contact sheet of every sprite to F (for review)
 
-Folders:  terrain/  crops/  animals/  buildings/  items/  characters/  icons/
+Folders:  terrain/  crops/  animals/  buildings/  village/  items/  characters/  icons/
 
 Sizes: every image is 32 x 32 except the tall ones, which are whole tiles: trees 64 x 64, the coop and the
 warehouse 64 x 96, the barn 96 x 96 and the greenhouse 96 x 128 (one tile of roof above the ground they use).
@@ -381,29 +381,6 @@ def bush(season):
 FENCE = ramp('#4A2F18', '#6E4826', '#986636', '#BD8A50')
 
 
-def fence_post(d, x0):
-    d.rectangle([x0, 9, x0 + 5, 28], fill=FENCE[1])
-    d.rectangle([x0, 9, x0 + 1, 28], fill=FENCE[2])
-    d.rectangle([x0 + 5, 9, x0 + 5, 28], fill=FENCE[0])
-    d.rectangle([x0, 8, x0 + 5, 9], fill=FENCE[3])
-
-
-def fence(horizontal):
-    img, d = new()
-    if horizontal:
-        for y in (13, 20):
-            d.rectangle([0, y, T - 1, y + 2], fill=FENCE[2])
-            d.line([(0, y), (T - 1, y)], fill=FENCE[3])
-            d.line([(0, y + 2), (T - 1, y + 2)], fill=FENCE[0])
-        fence_post(d, 2)
-    else:
-        d.rectangle([14, 0, 17, T - 1], fill=FENCE[2])
-        d.line([(14, 0), (14, T - 1)], fill=FENCE[3])
-        d.line([(17, 0), (17, T - 1)], fill=FENCE[0])
-        fence_post(d, 13)
-    return auto_outline(img, 0.55)
-
-
 # ---------------------------------------------------------------- buildings
 def shingles(img, box, R, row=6, width=6):
     """Fills `box` with rows of overlapping shingles; the top row is the ridge."""
@@ -569,6 +546,130 @@ def greenhouse():
     d.point((53, 111), fill=c('#E8C547'))
     foundation(d, 1, 94, 124)
     return img
+
+
+# ---------------------------------------------------------------- path and village
+PATH = ramp('#7A5B36', '#977445', '#AE8A55', '#C4A068', '#D8B880')
+
+
+def path_tile():
+    """Packed dirt of the path: lighter than the soil, no furrows, a few pebbles; it repeats without seams."""
+    img, _ = new()
+    p = img.load()
+    for y in range(T):
+        for x in range(T):
+            v = noise('path', x, y, 8) * 0.6 + noise('path2', x, y, 4) * 0.4
+            p[x, y] = PATH[1] if v < 0.33 else (PATH[3] if v > 0.66 else PATH[2])
+    r = rng('pebbles')
+    for _ in range(10):
+        x, y = r.randrange(T), r.randrange(T)
+        put(p, x, y, PATH[4])
+        put(p, x + 1, y + 1, PATH[0])
+    return img
+
+
+PLASTER = ramp('#B9A88A', '#D6C6A6', '#EDE0C4', '#FFF6E2')
+WHITE_WALL = ramp('#A9B4BE', '#CBD4DC', '#E8EEF2', '#FFFFFF')
+STONE = ramp('#5E5A58', '#7E7A76', '#9C9790', '#BDB8B0')
+
+
+def door(img, d, x0, y0, x1, y1, R=None):
+    R = R or ramp('#4A2C16', '#5E3A1E', '#764A27', '#946640')
+    d.rectangle([x0 - 1, y0 - 1, x1 + 1, y1], fill=WOOD[0])
+    planks(img, (x0, y0, x1, y1), R, width=3, seed=f'door{x0}{y0}')
+    d.point((x1 - 2, (y0 + y1) // 2), fill=c('#E8C547'))
+    d.rectangle([x0 - 3, y1 + 1, x1 + 3, y1 + 2], fill=STONE[2])
+
+
+def house_body(img, d, w, h, wall, roof, seed, roof_h=None):
+    """A house seen in 3/4: a roof that takes the upper part and a front wall with a foundation."""
+    roof_h = roof_h or h // 2
+    if callable(wall):
+        wall(img, (3, roof_h, w - 4, h - 6))
+    else:
+        planks(img, (3, roof_h, w - 4, h - 6), wall, width=5, vertical=False, seed=seed)
+    roof_shape(img, (0, 4, w - 1, roof_h - 1), roof, inset=8)
+    foundation(d, 3, w - 4, h - 6)
+
+
+def home():
+    img, d = new(128, 128)
+    house_body(img, d, 128, 128, WOOD, ramp('#5E2018', '#8A2F22', '#B04434', '#D06650'), 'home')
+    d.rectangle([92, 6, 103, 26], fill=STONE[1])
+    d.rectangle([92, 6, 103, 8], fill=STONE[3])
+    door(img, d, 56, 92, 71, 121)
+    window(d, 16, 84, 16, 14, WOOD)
+    window(d, 96, 84, 16, 14, WOOD)
+    for x in (14, 96):
+        d.rectangle([x, 100, x + 19, 104], fill=WOOD[1])
+        for k in range(4):
+            d.point((x + 3 + k * 5, 99), fill=c('#E85A7A' if k % 2 else '#FFD23F'))
+    return auto_outline(img, 0.5)
+
+
+def shop():
+    img, d = new(160, 128)
+    house_body(img, d, 160, 128, lambda im, box: planks(im, box, PLASTER, width=6, vertical=False, seed='shop'),
+               ramp('#2F4F2A', '#3F6A36', '#548A46', '#74AA5E'), 'shop')
+    for i in range(10):
+        col = c('#D8323A') if i % 2 == 0 else c('#FFF4D6')
+        d.polygon([(8 + i * 14, 70), (22 + i * 14, 70), (22 + i * 14, 80), (8 + i * 14, 80)], fill=col)
+    d.line([(8, 80), (148, 80)], fill=c('#8F1F25'))
+    d.rectangle([58, 54, 101, 66], fill=WOOD[1])
+    d.rectangle([60, 56, 99, 64], fill=c('#F2E3B8'))
+    for k, col in enumerate(('#E07B24', '#D8323A', '#56A03A', '#E8C547', '#7A5AA8')):
+        d.rectangle([64 + k * 7, 58, 68 + k * 7, 62], fill=c(col))
+    door(img, d, 72, 92, 87, 121)
+    window(d, 18, 88, 22, 16, WOOD)
+    window(d, 118, 88, 22, 16, WOOD)
+    for x in (16, 120):
+        d.rectangle([x, 110, x + 22, 121], fill=WOOD[2])
+        for k in range(4):
+            blob(d, x + 4 + k * 5, 109, 3, ramp('#9E3A1A', '#E07B24', '#FFB060'))
+    return auto_outline(img, 0.5)
+
+
+def farmhouse():
+    img, d = new(128, 128)
+    house_body(img, d, 128, 128, lambda im, box: stones(im, box, STONE, seed='farmhouse'),
+               ramp('#3A2A1E', '#56402C', '#735840', '#927458'), 'farmhouse')
+    door(img, d, 56, 92, 71, 121)
+    window(d, 18, 86, 16, 14, WOOD)
+    window(d, 94, 86, 16, 14, WOOD)
+    d.rectangle([100, 104, 118, 121], fill=c('#C9A66B'))
+    d.line([(100, 112), (118, 112)], fill=c('#8A6A3A'))
+    d.line([(109, 104), (109, 121)], fill=c('#8A6A3A'))
+    return auto_outline(img, 0.5)
+
+
+def clinic():
+    img, d = new(160, 128)
+    house_body(img, d, 160, 128, lambda im, box: planks(im, box, WHITE_WALL, width=6, vertical=False, seed='clinic'),
+               ramp('#1F3F6E', '#2C5490', '#3E6EB5', '#6A95D6'), 'clinic')
+    d.rectangle([70, 58, 89, 77], fill=WHITE_WALL[3])
+    d.rectangle([77, 60, 82, 75], fill=c('#D8323A'))
+    d.rectangle([72, 65, 87, 70], fill=c('#D8323A'))
+    door(img, d, 72, 92, 87, 121, ramp('#4C6A84', '#5E7E9A', '#7494B0', '#9AB6CE'))
+    window(d, 20, 88, 22, 16, WHITE_WALL)
+    window(d, 118, 88, 22, 16, WHITE_WALL)
+    return auto_outline(img, 0.5)
+
+
+def cottage():
+    img, d = new(128, 128)
+    house_body(img, d, 128, 128, lambda im, box: planks(im, box, PLASTER, width=5, vertical=False, seed='cottage'),
+               ramp('#3E2A5E', '#55397E', '#7050A0', '#9478C2'), 'cottage')
+    door(img, d, 56, 92, 71, 121)
+    window(d, 18, 86, 16, 14, WOOD)
+    window(d, 94, 86, 16, 14, WOOD)
+    for x in (16, 92):
+        d.rectangle([x, 102, x + 19, 106], fill=WOOD[1])
+        for k in range(4):
+            d.point((x + 3 + k * 5, 101), fill=c('#F7A8C8' if k % 2 else '#FFFFFF'))
+    for k, col in enumerate(('#E85A7A', '#FFD23F', '#7FB2F0')):
+        blob(d, 10 + k * 8, 120, 3, ramp('#2C5E22', '#3E7D2C', '#56A03A'))
+        d.point((10 + k * 8, 118), fill=c(col))
+    return auto_outline(img, 0.5)
 
 
 # ---------------------------------------------------------------- crops
@@ -842,67 +943,120 @@ def medicine():
 SKIN = ramp('#C98E64', '#E6B088', '#F6CBA4', '#FFE2C6')
 
 
-def person(direction, frame, shirt, pants, hair, hat=None, apron=None, coat=None):
-    img, d = new()
+def person(direction, frame, shirt, pants, hair, hat=None, apron=None, coat=None, skirt=False):
+    """A villager of 32 x 64 seen in 3/4: one plot wide and two tall, the feet on the bottom row (RN-40).
+
+    A big head (about a third of the height) over a short body, as in classic farm games; frame 0 stands still,
+    frames 1 and 2 swing the legs and arms the opposite way.
+    """
+    img, d = new(T, 2 * T)
     top = c(coat or shirt)
-    top_dark = dark(top, 0.78)
+    top_lit = tuple(min(255, int(v * 1.12)) for v in top[:3]) + (255,)
+    top_dark = dark(top, 0.74)
     legs = c(pants)
-    step = (0, 2, -2)[frame]
-    if direction in ('S', 'N'):
-        d.rectangle([12, 21 + (1 if frame == 1 else 0), 15, 28], fill=legs)
-        d.rectangle([17, 21 + (1 if frame == 2 else 0), 20, 28], fill=dark(legs, 0.85))
+    legs_dark = dark(legs, 0.78)
+    shoe = c('#3A2A1A')
+    side = direction in ('E', 'W')
+    flip = direction == 'W'
+    lift = (0, 1, -1)[frame]
+    # legs and shoes
+    if skirt:
+        d.polygon([(9, 43), (22, 43), (24, 55), (7, 55)], fill=legs)
+        d.line([(16, 45), (16, 54)], fill=legs_dark)
+        d.rectangle([11, 55, 14, 59 - max(0, lift)], fill=SKIN[1])
+        d.rectangle([17, 55, 20, 59 - max(0, -lift)], fill=SKIN[1])
+        d.rectangle([10, 59 - max(0, lift), 15, 62 - max(0, lift)], fill=shoe)
+        d.rectangle([16, 59 - max(0, -lift), 21, 62 - max(0, -lift)], fill=shoe)
+    elif side:
+        stride = (0, 3, -3)[frame]
+        d.rectangle([13 - stride, 45, 17 - stride, 59], fill=legs_dark)
+        d.rectangle([14 + stride, 45, 18 + stride, 59], fill=legs)
+        d.rectangle([12 - stride, 59, 18 - stride, 62], fill=shoe)
+        d.rectangle([13 + stride, 59, 19 + stride, 62], fill=shoe)
     else:
-        d.rectangle([13 + step, 21, 16 + step, 28], fill=legs)
-        d.rectangle([16 - step, 21, 19 - step, 28], fill=dark(legs, 0.8))
-    d.rectangle([11, 28, 15, 30], fill=c('#3A2A1A'))
-    d.rectangle([17, 28, 21, 30], fill=c('#3A2A1A'))
-    d.rectangle([10, 13, 21, 22], fill=top)
-    d.rectangle([19, 13, 21, 22], fill=top_dark)
-    d.line([(10, 22), (21, 22)], fill=top_dark)
+        d.rectangle([11, 45, 15, 59 - max(0, lift)], fill=legs)
+        d.rectangle([16, 45, 20, 59 - max(0, -lift)], fill=legs_dark)
+        d.line([(15, 45), (15, 58)], fill=legs_dark)
+        d.rectangle([10, 59 - max(0, lift), 15, 62 - max(0, lift)], fill=shoe)
+        d.rectangle([16, 59 - max(0, -lift), 21, 62 - max(0, -lift)], fill=shoe)
+    # body
+    d.rounded_rectangle([9, 30, 22, 46], radius=3, fill=top)
+    d.rectangle([10, 31, 12, 44], fill=top_lit)
+    d.rectangle([19, 31, 22, 45], fill=top_dark)
+    d.line([(9, 45), (22, 45)], fill=top_dark)
     if apron:
-        d.rectangle([13, 15, 18, 22], fill=c(apron))
-    elif direction == 'S':
-        d.rectangle([12, 15, 13, 21], fill=c(pants))
-        d.rectangle([18, 15, 19, 21], fill=c(pants))
-    swing = (0, 1, -1)[frame]
-    d.rectangle([8, 14 + swing, 10, 21 + swing], fill=top)
-    d.rectangle([21, 14 - swing, 23, 21 - swing], fill=top_dark)
-    d.rectangle([8, 21 + swing, 10, 22 + swing], fill=SKIN[2])
-    d.rectangle([21, 21 - swing, 23, 22 - swing], fill=SKIN[1])
-    d.ellipse([10, 3, 21, 14], fill=SKIN[2])
-    d.rectangle([19, 6, 21, 12], fill=SKIN[1])
-    h = c(hair)
-    if direction == 'N':
-        d.ellipse([10, 3, 21, 12], fill=h)
-        d.line([(19, 6), (19, 10)], fill=dark(h, 0.75))
-    else:
-        d.rectangle([10, 3, 21, 7], fill=h)
-        d.point((12, 8), fill=h)
+        d.rectangle([12, 35, 19, 46], fill=c(apron))
+        d.line([(12, 35), (19, 35)], fill=dark(c(apron), 0.85))
+    elif coat and not side:
+        d.line([(15, 31), (15, 45)], fill=top_dark)
+        d.rectangle([12, 31, 13, 37], fill=c(shirt))
+        d.rectangle([18, 31, 19, 37], fill=c(shirt))
         if direction == 'S':
-            d.point([(13, 9), (18, 9)], fill=c('#2A1A10'))
-            d.point([(12, 11), (19, 11)], fill=c('#F2A0A0'))
-            d.line([(15, 12), (16, 12)], fill=c('#B5654A'))
-        elif direction == 'E':
-            d.point((18, 9), fill=c('#2A1A10'))
-            d.rectangle([10, 3, 13, 11], fill=h)
-            d.point((21, 10), fill=SKIN[1])
+            d.rectangle([17, 38, 19, 40], fill=c('#D8323A'))
+    elif direction == 'S':
+        d.rectangle([11, 32, 12, 44], fill=legs)
+        d.rectangle([19, 32, 20, 44], fill=legs)
+        d.point([(11, 34), (20, 34)], fill=c('#E8C547'))
+    d.rectangle([9, 43, 22, 44], fill=dark(legs, 0.6) if not apron else dark(c(apron), 0.8))
+    # arms
+    swing = (0, 2, -2)[frame]
+    if side:
+        ax = 13 if not flip else 15
+        d.rectangle([ax, 32 + swing, ax + 3, 42 + swing], fill=top_dark)
+        d.rectangle([ax, 42 + swing, ax + 3, 44 + swing], fill=SKIN[2])
+    else:
+        d.rectangle([6, 32 + swing, 8, 42 + swing], fill=top)
+        d.rectangle([23, 32 - swing, 25, 42 - swing], fill=top_dark)
+        d.rectangle([6, 42 + swing, 8, 44 + swing], fill=SKIN[2])
+        d.rectangle([23, 42 - swing, 25, 44 - swing], fill=SKIN[1])
+    # neck and head
+    d.rectangle([14, 27, 17, 30], fill=SKIN[1])
+    d.ellipse([7, 9, 24, 29], fill=SKIN[2])
+    d.ellipse([8, 10, 20, 22], fill=SKIN[3])
+    if not side:
+        d.chord([7, 9, 24, 29], 300, 60, fill=SKIN[1])
+    h = c(hair)
+    h_dark = dark(h, 0.75)
+    if direction == 'N':
+        d.ellipse([7, 8, 24, 28], fill=h)
+        d.arc([9, 12, 22, 26], 200, 340, fill=h_dark)
+        d.line([(15, 12), (15, 26)], fill=h_dark)
+    else:
+        d.chord([7, 7, 24, 24], 180, 360, fill=h)
+        d.rectangle([7, 15, 9, 22], fill=h)
+        d.rectangle([22, 15, 24, 22], fill=h)
+        if direction == 'S':
+            d.polygon([(10, 15), (15, 15), (12, 18)], fill=h)
+            d.polygon([(16, 15), (22, 15), (20, 18)], fill=h)
+            d.rectangle([11, 19, 12, 21], fill=c('#2A1A10'))
+            d.rectangle([19, 19, 20, 21], fill=c('#2A1A10'))
+            d.point([(11, 19), (19, 19)], fill=c('#FFFFFF'))
+            d.rectangle([9, 23, 10, 23], fill=c('#F2A0A0'))
+            d.rectangle([21, 23, 22, 23], fill=c('#F2A0A0'))
+            d.line([(14, 25), (17, 25)], fill=c('#B5654A'))
         else:
-            d.point((13, 9), fill=c('#2A1A10'))
-            d.rectangle([18, 3, 21, 11], fill=h)
+            back = (7, 15) if not flip else (16, 24)
+            d.rectangle([back[0], 9, back[1], 24], fill=h)
+            d.ellipse([back[0] + (2 if not flip else -2), 9, back[1] + (2 if not flip else -2), 26], fill=h)
+            ex = 20 if not flip else 11
+            d.rectangle([ex, 19, ex + 1, 21], fill=c('#2A1A10'))
+            nose = 24 if not flip else 7
+            d.point((nose, 22), fill=SKIN[1])
+            d.line([(ex - 1, 25), (ex + 1, 25)], fill=c('#B5654A'))
     if hat:
         hc = c(hat)
-        d.rectangle([7, 5, 24, 6], fill=dark(hc, 0.8))
-        d.rectangle([11, 0, 20, 5], fill=hc)
-        d.rectangle([11, 3, 20, 4], fill=c('#B5473B'))
-        d.line([(12, 0), (15, 0)], fill=c('#FFF2B0'))
+        d.ellipse([3, 11, 28, 17], fill=dark(hc, 0.82))
+        d.rounded_rectangle([9, 3, 22, 14], radius=4, fill=hc)
+        d.rectangle([9, 11, 22, 13], fill=c('#B5473B'))
+        d.line([(11, 4), (16, 4)], fill=c('#FFF2B0'))
     return auto_outline(img, 0.45)
 
 
 NPCS = {
-    'MARTA': dict(shirt='#D8323A', pants='#4A3A5A', hair='#7A3A1E', apron='#FFF4D6'),
+    'MARTA': dict(shirt='#D8323A', pants='#4A3A5A', hair='#7A3A1E', apron='#FFF4D6', skirt=True),
     'TOMAS': dict(shirt='#6B8E4E', pants='#3A4A6A', hair='#C8C8C8', hat='#C9A66B'),
     'LUCIA': dict(shirt='#FFFFFF', pants='#2F4F6F', hair='#2A1A10', coat='#F4F7FA'),
-    'INES': dict(shirt='#7A5AA8', pants='#7A5AA8', hair='#E0A030'),
+    'INES': dict(shirt='#7A5AA8', pants='#5A3F86', hair='#E0A030', skirt=True),
 }
 
 
@@ -1064,8 +1218,12 @@ def build():
     files['terrain/WATER_1.png'] = water(1)
     files['terrain/WATER_2.png'] = water(2)
     files['terrain/OBSTACLE.png'] = rock()
-    files['terrain/FENCE_H.png'] = fence(True)
-    files['terrain/FENCE_V.png'] = fence(False)
+    files['terrain/PATH.png'] = path_tile()
+    files['village/HOME.png'] = home()
+    files['village/SHOP.png'] = shop()
+    files['village/FARMHOUSE.png'] = farmhouse()
+    files['village/CLINIC.png'] = clinic()
+    files['village/COTTAGE.png'] = cottage()
     for name in CROPS:
         for stage in STAGES:
             files[f'crops/{name}_{stage}.png'] = crop(name, stage)

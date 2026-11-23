@@ -23,7 +23,7 @@ Las columnas de tipo usan los *records* de `application.dto` (`HudView`, `PlotVi
 | `POST /api/game` | `newGame(seed)` | `{ "seed": 2026 }` | `HudView` | `201` |
 | `GET /api/game` | `hud()` | — | `HudView` | `200` |
 | `POST /api/game/days` | `endDay()` | — | `HudView` | `200` |
-| `GET /api/farm/map` | `map()` | — | `MapView` | `200` |
+| `GET /api/farm/map` | `map()` | — | `MapView` (48 × 24 parcelas, edificios, avatar, `npcs` y `houses`: id, columna, fila, ancho y alto de cada casa del valle) | `200` |
 | `POST /api/avatar/moves` | `move(direction)` | `{ "direction": "EAST" }` (`NORTH`, `SOUTH`, `EAST` o `WEST`; otro valor es `400`) | `AvatarView` (`col`, `row`, `facing`); evento `AvatarMoved` | `200` |
 | `GET /api/npcs` | `npcs()` | — | lista de `NpcView` (id, nombre, rol, parcela, encargo y si está cumplido) | `200` |
 | `POST /api/npcs/{id}/talk` | `talk(id)` | — | `DialogueView` (nombre, rol, texto, línea del encargo); sin eventos | `200` |

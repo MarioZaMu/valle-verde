@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import edu.ucc.farmsim.support.TestApp;
-import edu.ucc.farmsim.ui.render.MapGeometry;
 import edu.ucc.farmsim.ui.render.MapPanel;
 import edu.ucc.farmsim.ui.screens.ScreenRouter;
 import java.awt.Component;
@@ -58,7 +57,7 @@ class ScreenRouterIntegrationTest {
         button(router, "1 Sembrar").doClick();
         MapPanel map = first(router, MapPanel.class);
         map.setSize(1024, 600);
-        var cell = MapGeometry.fit(16, 10, 1024, 600).cellBounds(5, 3);
+        var cell = map.geometry().cellBounds(5, 3);
         map.handleClick(cell.x + 5, cell.y + 5);
         flush();
 

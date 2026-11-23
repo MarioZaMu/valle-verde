@@ -61,7 +61,7 @@ class HU49TutorialBoxTest {
         app.controller.plant(8, 6, "CARROT_SEED");
         app.controller.water(8, 6);
         assertEquals("Paso 4 de 5", box.stepText());
-        app.state().avatar().restoreFrom(new edu.ucc.farmsim.domain.farm.AvatarSnapshot(9, 1,
+        app.state().avatar().restoreFrom(new edu.ucc.farmsim.domain.farm.AvatarSnapshot(28, 11,
                 edu.ucc.farmsim.domain.farm.Direction.EAST));
         app.controller.talk("MARTA");
         assertTrue(queue.visible().isEmpty(), "no notice before the end");

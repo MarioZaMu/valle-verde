@@ -39,6 +39,13 @@ class HU44PixelSpritesTest {
         if (name.startsWith("terrain/TREE_") || name.startsWith("terrain/PINE_")) {
             return new int[] {64, 64};
         }
+        if (name.startsWith("characters/")) {
+            return new int[] {32, 64};
+        }
+        if (name.startsWith("village/")) {
+            return name.equals("village/SHOP.png") || name.equals("village/CLINIC.png") ? new int[] {160, 128}
+                    : new int[] {128, 128};
+        }
         return SHEETS.get(name);
     }
 
@@ -75,7 +82,9 @@ class HU44PixelSpritesTest {
         }
         List<String> need = new ArrayList<>(List.of("terrain/SOIL.png", "terrain/SOIL_WATERED.png", "terrain/WATER.png",
                 "terrain/OBSTACLE.png", "buildings/COOP.png", "buildings/BARN.png", "buildings/WAREHOUSE.png",
-                "buildings/GREENHOUSE.png", "icons/COIN.png", "icons/ENERGY.png"));
+                "buildings/GREENHOUSE.png", "icons/COIN.png", "icons/ENERGY.png", "terrain/PATH.png",
+                "village/HOME.png", "village/SHOP.png", "village/FARMHOUSE.png", "village/CLINIC.png",
+                "village/COTTAGE.png"));
         for (String season : List.of("SPRING", "SUMMER", "AUTUMN", "WINTER")) {
             need.add("terrain/GRASS_" + season + ".png");
             need.add("icons/" + season + ".png");

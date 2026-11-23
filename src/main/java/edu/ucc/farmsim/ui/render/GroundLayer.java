@@ -10,12 +10,12 @@ import java.util.Optional;
 
 /**
  * The ground of the farm and of the land around it, painted at the size of the art (32 pixels a tile) as one
- * continuous image: grass with a few variants chosen by position, tilled soil, and water. Where soil or water
- * meets grass, the grass grows a ragged pixel edge over it and casts a short shadow, so the plots read as one
+ * continuous image: grass with a few variants chosen by position, tilled soil, the path of the valley and water
+ * (houses stand on grass). Where soil, path or water meets grass, the grass grows a ragged pixel edge over it and casts a short shadow, so the plots read as one
  * field and one pond instead of a grid of squares. The image only changes when a terrain, a watered plot, the
  * season or the frame of the water changes, so it is built once and reused frame after frame.
  *
- * <p>Stories: HU-35, HU-44, HU-48.
+ * <p>Stories: HU-35, HU-44, HU-48, HU-50.
  */
 final class GroundLayer {
 
@@ -23,7 +23,7 @@ final class GroundLayer {
     static final int WATER_FRAMES = 3;
 
     private static final int T = MapGeometry.TILE;
-    private static final int MAX_ENTRIES = 8;
+    private static final int MAX_ENTRIES = 4;
     private static final double SOIL_SHADOW = 0.70;
     private static final double BANK_SHADOW = 0.72;
     private static final int FOAM = 0xFF8EC6EE;
@@ -76,8 +76,9 @@ final class GroundLayer {
                 BufferedImage grassTile = sprite(grassName(season, variant(col, row))).orElseGet(
                         () -> sprite(grassName(season, 0)).orElseThrow());
                 grassTile.getRGB(0, 0, T, T, grass, 0, T);
-                if ("SOIL".equals(here) || "WATER".equals(here)) {
+                if ("SOIL".equals(here) || "WATER".equals(here) || "PATH".equals(here)) {
                     String name = "WATER".equals(here) ? waterName(frame)
+                            : "PATH".equals(here) ? pathName()
                             : watered[row * map.cols() + col] ? "terrain/SOIL_WATERED.png" : "terrain/SOIL.png";
                     BufferedImage base = sprite(name).orElseGet(() -> sprite("terrain/WATER.png").orElseThrow());
                     base.getRGB(0, 0, T, T, tile, 0, T);
@@ -142,6 +143,11 @@ final class GroundLayer {
         return "terrain/GRASS_" + season + (variant == 0 ? "" : "_" + variant) + ".png";
     }
 
+    /** The trodden earth of the path, or plain soil when the pack has no path tile. */
+    private String pathName() {
+        return sprite("terrain/PATH.png").isPresent() ? "terrain/PATH.png" : "terrain/SOIL.png";
+    }
+
     static String waterName(int frame) {
         return frame == 0 ? "terrain/WATER.png" : "terrain/WATER_" + frame + ".png";
     }
@@ -153,7 +159,8 @@ final class GroundLayer {
     private static String[] terrains(MapView map) {
         String[] all = new String[map.cols() * map.rows()];
         for (PlotView plot : map.plots()) {
-            all[plot.row() * map.cols() + plot.col()] = "OBSTACLE".equals(plot.terrain()) ? "GRASS" : plot.terrain();
+            String t = plot.terrain();
+            all[plot.row() * map.cols() + plot.col()] = "OBSTACLE".equals(t) || "HOUSE".equals(t) ? "GRASS" : t;
         }
         return all;
     }

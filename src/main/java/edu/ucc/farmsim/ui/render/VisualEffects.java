@@ -18,7 +18,7 @@ import java.util.function.LongSupplier;
  * the events, the map views) and never calls the game, so switching it off cannot change the state (RN-08,
  * RN-25). It takes its clock from outside and has no Swing, so it is tested without waiting.
  *
- * <p>Stories: HU-40, HU-41, HU-45, HU-48.
+ * <p>Stories: HU-40, HU-41, HU-45, HU-48, HU-50.
  */
 public final class VisualEffects {
 
@@ -191,6 +191,22 @@ public final class VisualEffects {
     /** How far the avatar is on its way from the plot it left, from 0 (still there) to 1 (arrived). */
     public double avatarProgress() {
         return isWalking() ? (clock.getAsLong() - stepStart) / (double) STEP_MS : 1.0;
+    }
+
+    /**
+     * Where the avatar is drawn now, in plots: between the plot it left and the one it goes to while it walks,
+     * on its plot at rest; {@code null} without avatar. The camera follows this point (RN-40).
+     */
+    public double[] avatarPosition() {
+        if (avatarAt == null) {
+            return null;
+        }
+        if (!isWalking() || avatarFrom == null) {
+            return new double[] {avatarAt[0], avatarAt[1]};
+        }
+        double t = avatarProgress();
+        return new double[] {avatarFrom[0] + (avatarAt[0] - avatarFrom[0]) * t,
+            avatarFrom[1] + (avatarAt[1] - avatarFrom[1]) * t};
     }
 
     /** The plot {column, row} the avatar is walking from, or {@code null} at rest. */

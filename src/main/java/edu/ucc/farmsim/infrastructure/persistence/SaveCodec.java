@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import edu.ucc.farmsim.domain.config.GameRules;
 import edu.ucc.farmsim.domain.game.GameMemento;
 import edu.ucc.farmsim.domain.save.SaveLoadException;
 import edu.ucc.farmsim.domain.save.SaveLoadException.Reason;
@@ -13,14 +14,18 @@ import java.time.Instant;
  * Turns a game into the document of a slot and back (RN-32, DT-11): the state as JSON text with Jackson, the
  * format version and the checksum. Reading follows the order of RN-33: well-formed text, supported version,
  * matching checksum and, last, a game that can be built from the text. Version 2 added the avatar (RN-36); a
- * document of version 1 is still read, and its game has no avatar, so it starts at its place.
+ * document of version 1 is still read, and its game has no avatar, so it starts at its place. Version 3 grew the
+ * map to the valley of 48 x 24 (RN-40): the crops of an older document keep their plots in its north-west corner.
  *
- * <p>Stories: HU-29, HU-30, HU-31, HU-45.
+ * <p>Stories: HU-29, HU-30, HU-31, HU-45, HU-50.
  */
 public final class SaveCodec {
 
     /** Version of the format of {@code state} that is written. */
-    public static final int SCHEMA_VERSION = 2;
+    public static final int SCHEMA_VERSION = 3;
+
+    /** First version with the valley of 48 x 24; older documents hold the crops of the 16 x 10 map. */
+    public static final int VALLEY_VERSION = 3;
 
     /** Oldest version that can still be read: version 1 has no avatar. */
     public static final int OLDEST_READABLE_VERSION = 1;
@@ -65,6 +70,11 @@ public final class SaveCodec {
             GameMemento memento = mapper.readValue(state, GameMemento.class);
             if (memento == null) {
                 throw new SaveLoadException(Reason.CORRUPT, "the state is empty");
+            }
+            if (document.schemaVersion() < VALLEY_VERSION && memento.farm() != null && memento.farm().crops() != null
+                    && memento.farm().crops().size() == GameRules.LEGACY_MAP_COLS * GameRules.LEGACY_MAP_ROWS) {
+                return memento.withFarm(memento.farm().widened(GameRules.LEGACY_MAP_COLS, GameRules.MAP_COLS,
+                        GameRules.MAP_ROWS));
             }
             return memento;
         } catch (JsonProcessingException | RuntimeException e) {

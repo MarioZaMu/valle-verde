@@ -7,7 +7,7 @@
 
 | Elemento | Convención |
 |---|---|
-| ID | `HU-01` … `HU-49`. El orden numérico sigue las épicas; el **orden de implementación** está en §6 |
+| ID | `HU-01` … `HU-50`. El orden numérico sigue las épicas; el **orden de implementación** está en §6 |
 | Prioridad | MoSCoW heredada de los RF: **Must** (MVP), **Should**, **Could** |
 | Puntos | Fibonacci (1, 2, 3, 5). **Ninguna historia supera 5**: si una pasaba de 5, se dividió |
 | Rol | Todas las historias son del único actor humano, el **Jugador** |
@@ -385,7 +385,7 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 
 **Criterios de aceptación**
 - **CA-1 · Valores iniciales.** **Dado** que elijo Nueva partida, **Entonces** el estado es Año 1, Primavera, día 1, Soleado, 500 m, energía 100, inventario con 10 semillas de Zanahoria y 5 de Papa, sin edificios ni animales, demanda 100 en todos los productos y logros bloqueados con contadores en 0.
-- **CA-2 · Mapa inicial.** **Dado** una partida nueva, **Entonces** el mapa tiene 16 × 10 = 160 parcelas: 40 de TIERRA (bloque 8 × 5), 102 de HIERBA, 6 de AGUA y 12 de OBSTÁCULO.
+- **CA-2 · Mapa inicial.** **Dado** una partida nueva, **Entonces** el valle tiene 48 × 24 = 1152 parcelas (RN-04): 40 de TIERRA (bloque 8 × 5), 976 de HIERBA, 6 de AGUA, 30 de OBSTÁCULO, 34 de CAMINO y 66 de CASA.
 - **CA-3 · Partida en curso (negativo).** **Dado** una partida en curso, **Cuando** elijo Nueva partida, **Entonces** se pide confirmación; si cancelo, la partida actual queda intacta.
 - **CA-4 · Determinismo (borde).** **Dado** la misma semilla del generador, **Cuando** creo dos partidas nuevas, **Entonces** ambas tienen el mismo pronóstico del día 2.
 
@@ -395,7 +395,7 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 **Como** jugador **quiero** guardar mi partida en una de 3 ranuras **para** continuarla más tarde.
 
 **Criterios de aceptación**
-- **CA-1 · Guardado correcto.** **Dado** una partida en curso, **Cuando** guardo en la ranura 2, **Entonces** se crea o reemplaza el documento `slot2` de la colección `partidas` con `schemaVersion = 2` (era 1 antes del avatar, RN-36), `savedAt`, `state` y un `checksum` SHA-256 del `state`.
+- **CA-1 · Guardado correcto.** **Dado** una partida en curso, **Cuando** guardo en la ranura 2, **Entonces** se crea o reemplaza el documento `slot2` de la colección `partidas` con `schemaVersion = 3` (1 antes del avatar, RN-36; 2 antes del valle de 48 × 24, RN-40), `savedAt`, `state` y un `checksum` SHA-256 del `state`.
 - **CA-2 · Escritura atómica (negativo).** **Dado** un documento previo en la ranura y una falla de escritura (MongoDB rechaza la operación o no responde en 2 s), **Cuando** guardo, **Entonces** se informa `ERROR_ES`, el documento previo **queda intacto** y la partida sigue en juego.
 - **CA-3 · Sobrescritura.** **Dado** una ranura ocupada, **Cuando** elijo guardar en ella, **Entonces** se pide confirmación y, al aceptar, el documento se reemplaza.
 - **CA-4 · Tamaño y tiempo (borde).** **Dado** una granja a plena carga, **Cuando** guardo, **Entonces** el documento pesa ≤ 200 KB y la operación toma ≤ 1 s.
@@ -465,7 +465,7 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 **Como** jugador **quiero** ver mi granja dibujada como un mapa **para** reconocer mis parcelas, cultivos, edificios y animales.
 
 **Criterios de aceptación**
-- **CA-1 · Terreno.** **Dado** una partida nueva, **Entonces** se dibujan 16 × 10 parcelas y se distinguen TIERRA, HIERBA, AGUA y OBSTÁCULO (con gráficos vectoriales si no hay sprites).
+- **CA-1 · Terreno.** **Dado** una partida nueva, **Entonces** se dibuja el valle de 48 × 24 parcelas (la parte que la cámara muestra) y se distinguen TIERRA, HIERBA, AGUA, OBSTÁCULO, CAMINO y CASA (con gráficos vectoriales si no hay sprites).
 - **CA-2 · Etapas del cultivo.** **Dado** cultivos en Semilla, Brote, Crecimiento, Maduro y Marchito, **Entonces** cada etapa se dibuja con un aspecto **distinto**.
 - **CA-3 · Edificios y animales.** **Dado** un Gallinero con 2 Gallinas, **Entonces** el edificio y los animales se dibujan en su posición.
 - **CA-4 · Clic fuera del mapa (negativo).** **Cuando** hago clic fuera del área del mapa, **Entonces** no ocurre ninguna acción ni error.
@@ -566,7 +566,7 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 **Como** jugador **quiero** ver sprites pixel-art de estilo granja **para** que el juego tenga aspecto de videojuego.
 
 **Criterios de aceptación**
-- **CA-1 · Tamaño.** **Dado** el paquete de sprites, **Entonces** cada imagen mide exactamente 32 × 32 px (las hojas de cuadros y los sprites que se elevan sobre su parcela, como árboles y edificios, un múltiplo de 32 en cada lado).
+- **CA-1 · Tamaño.** **Dado** el paquete de sprites, **Entonces** cada imagen mide exactamente 32 × 32 px (las hojas de cuadros y los sprites que se elevan sobre su parcela, como árboles, edificios, casas y personajes de 32 × 64, un múltiplo de 32 en cada lado).
 - **CA-2 · Cobertura.** **Dado** el paquete completo, **Entonces** existen sprites de los 4 terrenos, de los 5 cultivos en sus 5 etapas, de la gallina y la vaca en 3 cuadros, de los 4 edificios, de los ítems del inventario, del avatar y de los 4 NPC, y el mapa los usa en lugar de los gráficos vectoriales.
 - **CA-3 · Nitidez (borde).** **Dado** una ventana de cualquier tamaño, **Entonces** el mapa se amplía por un factor entero con interpolación de vecino más cercano (sin bordes borrosos); si el área es menor que 512 × 320 px se admite una escala menor.
 - **CA-4 · Sprite faltante (negativo).** **Dado** un archivo ausente, **Cuando** se dibuja el elemento, **Entonces** se usa el gráfico vectorial de respaldo de HU-42.
@@ -583,7 +583,7 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 - **CA-3 · Inventario.** **Dado** el inventario abierto, **Entonces** cada casilla ocupada muestra el icono del ítem y su cantidad.
 - **CA-4 · Sin texto cortado (borde).** **Dado** una ventana de 1024 × 768, **Entonces** ningún texto de la pantalla de juego ni de los diálogos aparece cortado.
 - **CA-5 · Sin iconos (negativo).** **Dado** que faltan los sprites, **Entonces** los botones y casillas se muestran solo con texto.
-- **CA-6 · Vista continua en 3/4.** **Dado** el mapa con el paquete de sprites, **Entonces** no hay líneas de cuadrícula entre parcelas, la tierra y el agua se funden con la hierba con un borde irregular, los árboles y edificios se elevan por encima de su parcela con sombra, y si tapan un cultivo o la parcela bajo el cursor se vuelven translúcidos. Las barras flotan sobre el paisaje sin tapar ninguna parcela.
+- **CA-6 · Vista continua en 3/4.** **Dado** el mapa con el paquete de sprites, **Entonces** no hay líneas de cuadrícula entre parcelas, la tierra y el agua se funden con la hierba con un borde irregular, los árboles y edificios se elevan por encima de su parcela con sombra, y si tapan un cultivo o la parcela bajo el cursor se vuelven translúcidos. Las barras flotan sobre el paisaje y la cámara (RN-40) mantiene al avatar en la parte libre de la vista.
 - **CA-7 · Vida ambiental.** **Dado** los efectos activados y la pantalla visible, **Entonces** el agua ondula, los árboles se mecen, los animales pasean y pasan nubes, mariposas u hojas según la estación; **con los efectos apagados o la pantalla oculta (borde)** no corre ningún temporizador y el dibujo es fijo.
 - **CA-8 · Pantalla de inicio animada.** **Dado** la pantalla de inicio, **Entonces** se ve una escena de granja animada (cielo, nubes, colinas, granja, gallinas y granjero) bajo el nombre del juego y los botones de madera; **sin sprites (negativo)** la escena se dibuja solo con formas y no falla.
 
@@ -637,6 +637,19 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 - **CA-3 · Fuera de orden (negativo).** **Dado** el paso 1, **Cuando** termino el día, siembro o intento pasar contra un obstáculo, **Entonces** el paso no cambia; y una acción rechazada nunca hace avanzar el tutorial.
 - **CA-4 · Saltar.** **Dado** cualquier paso, **Cuando** pulso «Saltar tutorial», **Entonces** el cuadro desaparece y el tutorial no vuelve; y el tutorial nunca cambia la energía, el dinero, el inventario ni el día.
 - **CA-5 · Persistencia (borde).** **Dado** el tutorial en el paso 3, **Cuando** guardo y cargo, **Entonces** sigue en el paso 3; y una partida guardada antes del tutorial se carga con el tutorial terminado.
+
+### HU-50 · Recorrer el valle: granja, aldea y cámara
+**Épica:** Mundo y personajes · **Prioridad:** Should · **Puntos:** 5 · **RF:** RF-50 · **RN:** RN-04, RN-37, RN-40 · **Depende de:** HU-45, HU-46
+
+**Como** jugador **quiero** recorrer un valle con mi granja y una aldea, con la cámara siguiéndome **para** sentir que vivo en un pueblo y no en un tablero.
+
+**Criterios de aceptación**
+- **CA-1 · Valle.** **Dado** una partida nueva, **Entonces** el mapa mide 48 × 24, la granja (sin valla) está al oeste y la aldea al este unidas por un camino, y cada NPC está frente a su casa en la aldea.
+- **CA-2 · Casas y camino (negativo).** **Dado** una casa o el camino, **Entonces** por la casa no se pasa (`MOVIMIENTO_BLOQUEADO`), por el camino sí, y en ninguno de los dos se siembra ni se construye.
+- **CA-3 · Cámara.** **Dado** una ventana de 1920 × 1080, **Entonces** la parcela mide 48 px, la cámara centra al avatar, sigue su paso sin saltos y nunca muestra fuera del valle; y el clic sobre una parcela visible actúa sobre esa parcela.
+- **CA-4 · Personajes altos.** **Dado** el avatar y los NPC, **Entonces** se dibujan de 1 × 2 parcelas (sprites de 32 × 64) con los pies en su parcela.
+- **CA-5 · Caminar sin pausas.** **Cuando** mantengo una flecha, **Entonces** el avatar da un paso cada 180 ms desde el primero, sin pausa, la animación no se reinicia entre pasos y al soltar se detiene.
+- **CA-6 · Partidas viejas (borde).** **Dado** un documento de versión 2 con un cultivo en (5, 3) y un Gallinero en (9, 7), **Cuando** lo cargo, **Entonces** el cultivo y el Gallinero siguen en (5, 3) y (9, 7) y al guardar el documento pasa a la versión 3.
 
 ---
 
@@ -728,7 +741,7 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 | 4 | HU-40 · Efectos visuales de estación y clima | Interfaz | Could | 5 | HU-11, HU-35 |
 | 5 | HU-41 · Animaciones suaves | Interfaz | Could | 3 | HU-35, HU-42 |
 
-### Fase 5.7 · Interfaz profesional, avatar y NPC (pedido del estudiante) — 27 puntos (7 historias)
+### Fase 5.7 · Interfaz profesional, avatar y NPC (pedido del estudiante) — 32 puntos (8 historias)
 
 | Orden | Historia | Épica | Prioridad | Puntos | Depende de |
 |---|---|---|---|---|---|
@@ -739,6 +752,7 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 | 5 | HU-46 · Hablar con los NPC | Mundo y personajes | Should | 5 | HU-44, HU-45 |
 | 6 | HU-47 · Encargos de los NPC | Mundo y personajes | Could | 3 | HU-26, HU-46 |
 | 7 | HU-49 · Tutorial de inicio guiado por el avatar | Mundo y personajes | Should | 3 | HU-45, HU-46 |
+| 8 | HU-50 · Recorrer el valle: granja, aldea y cámara | Mundo y personajes | Should | 5 | HU-45, HU-46 |
 
 ### Resumen de puntos
 
@@ -750,10 +764,10 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 | 5.4 · Construcción y animales | 21 | 98 | 17 | 2 | 2 |
 | 5.5 · Progresión y persistencia | 24 | 122 | 18 | 6 | 0 |
 | 5.6 · Interfaz visual y extras (recortable) | 19 | 141 | 0 | 6 | 13 |
-| 5.7 · Interfaz profesional, avatar y NPC | 27 | 168 | 0 | 24 | 3 |
-| **Total** | **168** | **168** | **109** | **41** | **18** |
+| 5.7 · Interfaz profesional, avatar y NPC | 32 | 173 | 0 | 29 | 3 |
+| **Total** | **173** | **173** | **109** | **46** | **18** |
 
-> **MVP (todas las *Must*): 109 puntos** en 30 historias. Lo *Should* y *Could* (59 puntos) se puede recortar sin afectar el diseño base.
+> **MVP (todas las *Must*): 109 puntos** en 30 historias. Lo *Should* y *Could* (64 puntos) se puede recortar sin afectar el diseño base.
 
 ## 8. Mapa de historias (épica → historias)
 
@@ -765,7 +779,7 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 | Construcción y animales | HU-18 Construir edificios, HU-19 Comprar animales, HU-20 Alimentar animales, HU-21 Estados del animal, HU-22 Producción y recolección, HU-23 Curar animales enfermos, HU-24 Construir y usar el almacén, HU-25 Construir y usar el invernadero | 26 |
 | Progresión y persistencia | HU-26 Registrar logros, HU-27 Desbloquear edificios por logros, HU-28 Iniciar nueva partida, HU-29 Guardar partida, HU-30 Cargar partida, HU-31 Rechazar partidas inválidas sin alterar la partida, HU-32 Listar ranuras de guardado | 25 |
 | Interfaz | HU-33 Pantalla de inicio, HU-34 HUD superior, HU-35 Mapa de la granja, HU-36 Herramientas y clic sobre parcelas, HU-37 Inventario en grilla, HU-38 Mercado modal, HU-39 Notificaciones (toasts), HU-40 Efectos visuales de estación y clima, HU-41 Animaciones suaves, HU-42 Carga de sprites con respaldo vectorial, HU-43 Tema visual profesional con FlatLaf, HU-44 Sprites pixel-art propios de 32 × 32, HU-48 Interfaz con aspecto de granja | 49 |
-| Mundo y personajes | HU-45 Mover el avatar por la granja, HU-46 Hablar con los NPC, HU-47 Encargos de los NPC, HU-49 Tutorial de inicio guiado por el avatar | 16 |
+| Mundo y personajes | HU-45 Mover el avatar por la granja, HU-46 Hablar con los NPC, HU-47 Encargos de los NPC, HU-49 Tutorial de inicio guiado por el avatar, HU-50 Recorrer el valle: granja, aldea y cámara | 21 |
 
 ## 9. Trazabilidad RF → HU → caso de uso
 
@@ -820,3 +834,4 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 | RF-47 | Could | HU-47 | CU-20 |
 | RF-48 | Should | HU-48 | CU-18 |
 | RF-49 | Should | HU-49 | CU-21 |
+| RF-50 | Should | HU-50 | CU-19 |

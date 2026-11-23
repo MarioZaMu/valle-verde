@@ -136,7 +136,7 @@ class HU48ValleyViewTest {
     }
 
     @Test
-    void HU48_ca6_thePlotsAreNeverPlacedUnderAFloatingBar() {
+    void HU48_ca6_theCameraNeverPutsTheAvatarNorTheEdgeOfTheValleyUnderAFloatingBar() {
         TestApp app = TestApp.startedGame();
         MapPanel panel = new MapPanel(app.controller, app.bus, (col, row) -> { });
         JPanel bar = new JPanel();
@@ -150,9 +150,16 @@ class HU48ValleyViewTest {
 
         panel.addFloating(bar);
 
+        for (int row : new int[] {7, 22, 23}) {
+            app.state().avatar().restoreFrom(new edu.ucc.farmsim.domain.farm.AvatarSnapshot(7, row,
+                    edu.ucc.farmsim.domain.farm.Direction.SOUTH));
+            panel.reload();
+            Rectangle avatar = panel.geometry().cellBounds(7, row);
+            assertFalse(avatar.intersects(bar.getBounds()), avatar + " under " + bar.getBounds());
+        }
         Rectangle area = panel.geometry().area();
-        assertFalse(area.intersects(bar.getBounds()), area + " under " + bar.getBounds());
-        assertEquals(panel.geometry().cellAt(area.x + 1, area.y + 1).col(), 0);
+        assertTrue(area.y + area.height <= bar.getY(), "the last row of the valley stays above the bar: " + area);
+        assertEquals(0, panel.geometry().cellAt(area.x + 1, area.y + area.height - 1).col());
     }
 
     @Test

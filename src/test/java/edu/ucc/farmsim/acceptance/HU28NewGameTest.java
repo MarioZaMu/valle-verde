@@ -67,19 +67,24 @@ class HU28NewGameTest {
     }
 
     @Test
-    void HU28_ca2_initialMapHas160PlotsWith40Soil102Grass6WaterAnd12Obstacles() {
+    void HU28_ca2_initialValleyHas1152PlotsWith40Soil976Grass6Water30Obstacles34PathAnd66House() {
         // When a new game is created
         FarmMap map = GameState.newGame(TestApp.SEED).farm();
 
-        // Then the map is 16 x 10 = 160 plots with the RN-04 distribution
-        assertEquals(16, map.cols());
-        assertEquals(10, map.rows());
+        // Then the valley is 48 x 24 = 1152 plots with the RN-04 distribution
+        assertEquals(48, map.cols());
+        assertEquals(24, map.rows());
         assertEquals(40, map.count(Terrain.SOIL));
-        assertEquals(102, map.count(Terrain.GRASS));
+        assertEquals(976, map.count(Terrain.GRASS));
         assertEquals(6, map.count(Terrain.WATER));
-        assertEquals(12, map.count(Terrain.OBSTACLE));
-        assertEquals(160, map.count(Terrain.SOIL) + map.count(Terrain.GRASS)
-                + map.count(Terrain.WATER) + map.count(Terrain.OBSTACLE));
+        assertEquals(30, map.count(Terrain.OBSTACLE));
+        assertEquals(34, map.count(Terrain.PATH));
+        assertEquals(66, map.count(Terrain.HOUSE));
+        int total = 0;
+        for (Terrain terrain : Terrain.values()) {
+            total += map.count(terrain);
+        }
+        assertEquals(1152, total);
 
         // And the 40 soil plots form one 8 x 5 block
         for (int row = 0; row < map.rows(); row++) {

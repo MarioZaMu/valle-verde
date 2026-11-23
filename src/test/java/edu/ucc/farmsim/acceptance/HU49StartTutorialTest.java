@@ -93,7 +93,7 @@ class HU49StartTutorialTest {
         assertEquals("Elige Sembrar con la tecla 1, ponte frente a la tierra y pulsa Espacio "
                 + "(o haz clic en una parcela de tierra).", seen.get(0).text());
         assertEquals("Ahora elige Regar con la tecla 2 y riega lo que sembraste.", seen.get(1).text());
-        assertEquals("Los vecinos dan consejos y encargos. Acércate a uno y pulsa E.", seen.get(2).text());
+        assertEquals("Los vecinos viven en la aldea, al este por el camino. Acércate a uno y pulsa E.", seen.get(2).text());
         assertEquals("Cuando acabes, pulsa Enter o «Terminar día» para que crezcan tus cultivos.", seen.get(3).text());
         TutorialView done = tutorial(app);
         assertTrue(done.finished());

@@ -95,8 +95,9 @@ Los requerimientos se agrupan en las **6 épicas** que también organizarán las
 | RF-47 | Los NPC ofrecerán **encargos** de un solo uso que el jugador cumple entregando artículos a cambio de una recompensa en m | Could | RN-38 |
 | RF-48 | La interfaz tendrá aspecto de granja: barra de herramientas con iconos, HUD con iconos e inventario con los sprites de los ítems | Should | RN-34 |
 | RF-49 | Una partida nueva empezará con un **tutorial** de 5 pasos guiado por el avatar (caminar, sembrar, regar, hablar con un NPC y terminar el día), que se puede saltar y se guarda con la partida | Should | RN-39 |
+| RF-50 | El jugador recorrerá un **valle de 48 × 24** con su granja al oeste y una **aldea** al este donde viven los NPC, con una **cámara** que sigue al avatar, personajes de 1 × 2 parcelas y caminata continua al mantener las teclas | Should | RN-04, RN-37, RN-40 |
 
-**Totales:** 49 RF → 30 *Must* · 14 *Should* · 5 *Could* (los RF-43 a RF-49 se agregaron en la Fase 5.7 por pedido expreso del estudiante).
+**Totales:** 50 RF → 30 *Must* · 15 *Should* · 5 *Could* (los RF-43 a RF-50 se agregaron en la Fase 5.7 por pedido expreso del estudiante).
 
 ## 3. Requerimientos no funcionales (medibles)
 
@@ -166,6 +167,7 @@ Referencia de hardware: equipo de desarrollo con Windows 11, ≥ 8 GB de RAM y J
 | RN-37 | Personajes (NPC) y diálogos | RF-46 |
 | RN-38 | Encargos de los NPC | RF-47 |
 | RN-39 | Tutorial de inicio | RF-49 |
+| RN-40 | Vista del valle, cámara y caminata | RF-50 |
 
 ## 5. Fuera de alcance (*Won't*)
 
