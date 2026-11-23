@@ -42,19 +42,19 @@
 | RF-33 | Must | HU-33 | Interfaz de usuario
 (Swing + FlatLaf)
 RF-33 a RF-41
-RF-43, 48 | GameCommands, GameController, GameRestController, GameRules, GameScreen, Main, MongoSaveRepository, RemoteGameClient, SaveDocument, SaveGameService, SaveRepository, SaveStorageException, ScreenNavigator, ScreenRouter, StartScreen, StartScreenPresenter, Texts | HU-33: 11 |
+RF-43, 48 | GameCommands, GameController, GameRestController, GameRules, GameScreen, Main, MongoSaveRepository, RemoteGameClient, SaveDocument, SaveGameService, SaveRepository, SaveStorageException, ScreenNavigator, ScreenRouter, StartScreen, StartScreenPresenter, Texts, TitleScene, WoodButton | HU-33: 11 |
 | RF-34 | Must | HU-34 | Interfaz de usuario
 (Swing + FlatLaf)
 RF-33 a RF-41
-RF-43, 48 | GameEvent, GameScreen, GameScreenPresenter, HudModel, HudPanel, HudView, Texts, ViewMapper | HU-34: 8 |
+RF-43, 48 | EnergyBar, GameEvent, GameScreen, GameScreenPresenter, HudModel, HudPanel, HudView, Texts, ViewMapper | HU-34: 8 |
 | RF-35 | Must | HU-35 | Interfaz de usuario
 (Swing + FlatLaf)
 RF-33 a RF-41
-RF-43, 48 | AnimalView, BuildingView, CellPos, FarmService, GameCommands, GameController, GameRestController, GameScreen, MapGeometry, MapPanel, MapRenderer, MapView, Palette, PlotClickListener, PlotText, RemoteGameClient, ViewMapper | HU-35: 14 |
+RF-43, 48 | AnimalView, BuildingView, CellPos, FarmService, GameCommands, GameController, GameRestController, GameScreen, GroundLayer, MapGeometry, MapPanel, MapRenderer, MapView, Palette, PlotClickListener, PlotText, RemoteGameClient, ViewMapper | HU-35: 14 |
 | RF-36 | Must | HU-36 | Interfaz de usuario
 (Swing + FlatLaf)
 RF-33 a RF-41
-RF-43, 48 | GameScreen, GameScreenPresenter, Shortcut, Texts, Tool, ToolBar, ToolModel | HU-36: 20 |
+RF-43, 48 | GameScreen, GameScreenPresenter, Shortcut, Texts, Tool, ToolBar, ToolModel, WoodSlot | HU-36: 20 |
 | RF-37 | Must | HU-37 | Interfaz de usuario
 (Swing + FlatLaf)
 RF-33 a RF-41
@@ -74,17 +74,17 @@ RF-43, 48 | GameScreen, MapPanel, MapRenderer, Particle, SeasonPalette, VisualEf
 | RF-41 | Could | HU-41 | Interfaz de usuario
 (Swing + FlatLaf)
 RF-33 a RF-41
-RF-43, 48 | GameScreen, MapPanel, MapRenderer, VisualEffects | HU-41: 7 |
+RF-43, 48 | AmbientPainter, GameScreen, MapPanel, MapRenderer, VisualEffects | HU-41: 7 |
 | RF-42 | Should | HU-42 | Gestor de assets
 (AssetManager)
 RF-42, 44 | AssetManager, MapRenderer | HU-42: 8 |
 | RF-43 | Should | HU-43 | Interfaz de usuario
 (Swing + FlatLaf)
 RF-33 a RF-41
-RF-43, 48 | Contrast, Main, Palette, UiTheme | HU-43: 5 |
+RF-43, 48 | Contrast, Main, Palette, UiTheme, WoodStyle | HU-43: 5 |
 | RF-44 | Should | HU-44 | Gestor de assets
 (AssetManager)
-RF-42, 44 | AssetManager, MapGeometry, MapRenderer | HU-44: 7 |
+RF-42, 44 | AssetManager, GroundLayer, MapGeometry, MapRenderer, PixelScaler | HU-44: 7 |
 | RF-45 | Should | HU-45 | Avatar y personajes
 (NPC y encargos)
 RF-45 a RF-47 | pendiente | HU-45: 0 |
@@ -97,7 +97,7 @@ RF-45 a RF-47 | pendiente | HU-47: 0 |
 | RF-48 | Should | HU-48 | Interfaz de usuario
 (Swing + FlatLaf)
 RF-33 a RF-41
-RF-43, 48 | AssetManager, HudModel, HudPanel, InventoryGrid, ToolBar | HU-48: 5 |
+RF-43, 48 | AmbientPainter, AssetManager, EnergyBar, GameScreen, GroundLayer, HoverAnimator, HudModel, HudPanel, InventoryGrid, MapPanel, MapRenderer, PixelScaler, StartScreen, TitleScene, ToolBar, WoodBox, WoodButton, WoodSlot, WoodStyle | HU-48: 13 |
 
 ## 2. Por historia de usuario
 
@@ -135,21 +135,21 @@ RF-43, 48 | AssetManager, HudModel, HudPanel, InventoryGrid, ToolBar | HU-48: 5 
 | HU-30 · Cargar partida | 5.5 | Must | 4 | 7 | completa | GameCommands, GameController, GameDialogs, GameRestController, GameScreen, GameScreenPresenter, MongoSaveRepository, ProgressSnapshot, RemoteGameClient, SaveCodec, SaveGameService, SaveLoadException, SaveRepository, SlotsDialog, SlotsPresenter, StartScreenPresenter |
 | HU-31 · Rechazar partidas inválidas sin alterar la partida | 5.5 | Must | 5 | 11 | completa | Checksum, GameCommands, GameController, GameRestController, GameStateValidator, MongoSaveRepository, RemoteGameClient, SaveCodec, SaveGameService, SaveLoadException, SaveRepository |
 | HU-32 · Listar ranuras de guardado | 5.5 | Should | 3 | 5 | completa | GameCommands, GameController, GameRestController, MongoSaveRepository, RemoteGameClient, SaveGameService, SaveRepository, SaveSlotView, SlotInfo, SlotsDialog, SlotsPresenter |
-| HU-33 · Pantalla de inicio | 5.1 | Must | 4 | 11 | completa | GameCommands, GameController, GameRestController, GameRules, GameScreen, Main, MongoSaveRepository, RemoteGameClient, SaveDocument, SaveGameService, SaveRepository, SaveStorageException, ScreenNavigator, ScreenRouter, StartScreen, StartScreenPresenter, Texts |
-| HU-34 · HUD superior | 5.1 | Must | 4 | 8 | completa | GameEvent, GameScreen, GameScreenPresenter, HudModel, HudPanel, HudView, Texts, ViewMapper |
-| HU-35 · Mapa de la granja | 5.2 | Must | 5 | 14 | completa | AnimalView, BuildingView, CellPos, FarmService, GameCommands, GameController, GameRestController, GameScreen, MapGeometry, MapPanel, MapRenderer, MapView, Palette, PlotClickListener, PlotText, RemoteGameClient, ViewMapper |
-| HU-36 · Herramientas y clic sobre parcelas | 5.2 | Must | 5 | 20 | completa | GameScreen, GameScreenPresenter, Shortcut, Texts, Tool, ToolBar, ToolModel |
+| HU-33 · Pantalla de inicio | 5.1 | Must | 4 | 11 | completa | GameCommands, GameController, GameRestController, GameRules, GameScreen, Main, MongoSaveRepository, RemoteGameClient, SaveDocument, SaveGameService, SaveRepository, SaveStorageException, ScreenNavigator, ScreenRouter, StartScreen, StartScreenPresenter, Texts, TitleScene, WoodButton |
+| HU-34 · HUD superior | 5.1 | Must | 4 | 8 | completa | EnergyBar, GameEvent, GameScreen, GameScreenPresenter, HudModel, HudPanel, HudView, Texts, ViewMapper |
+| HU-35 · Mapa de la granja | 5.2 | Must | 5 | 14 | completa | AnimalView, BuildingView, CellPos, FarmService, GameCommands, GameController, GameRestController, GameScreen, GroundLayer, MapGeometry, MapPanel, MapRenderer, MapView, Palette, PlotClickListener, PlotText, RemoteGameClient, ViewMapper |
+| HU-36 · Herramientas y clic sobre parcelas | 5.2 | Must | 5 | 20 | completa | GameScreen, GameScreenPresenter, Shortcut, Texts, Tool, ToolBar, ToolModel, WoodSlot |
 | HU-37 · Inventario en grilla | 5.3 | Must | 4 | 9 | completa | GameCommands, GameController, GameDialogs, GameRestController, GameScreen, InventoryDialog, InventoryGrid, InventoryModel, InventoryView, MarketService, RemoteGameClient, SlotView |
 | HU-38 · Mercado modal | 5.3 | Must | 4 | 10 | completa | AnimalOfferView, BuyOfferView, GameCommands, GameController, GameDialogs, GameRestController, GameScreen, MarketDialog, MarketPresenter, MarketService, MarketView, RemoteGameClient, SellOfferView |
 | HU-39 · Notificaciones (toasts) | 5.6 | Should | 4 | 10 | completa | GameScreen, GameScreenPresenter, OverlayPanel, Palette, ToastKind, ToastLayer, ToastPresenter, ToastQueue, ToastView |
 | HU-40 · Efectos visuales de estación y clima | 5.6 | Could | 4 | 8 | completa | GameScreen, MapPanel, MapRenderer, Particle, SeasonPalette, VisualEffects |
-| HU-41 · Animaciones suaves | 5.6 | Could | 4 | 7 | completa | GameScreen, MapPanel, MapRenderer, VisualEffects |
+| HU-41 · Animaciones suaves | 5.6 | Could | 4 | 7 | completa | AmbientPainter, GameScreen, MapPanel, MapRenderer, VisualEffects |
 | HU-42 · Carga de sprites con respaldo vectorial | 5.6 | Should | 4 | 8 | completa | AssetManager, MapRenderer |
-| HU-43 · Tema visual profesional con FlatLaf | 5.7 | Should | 4 | 5 | completa | Contrast, Main, Palette, UiTheme |
-| HU-44 · Sprites pixel-art propios de 32 × 32 | 5.7 | Should | 5 | 7 | completa | AssetManager, MapGeometry, MapRenderer |
+| HU-43 · Tema visual profesional con FlatLaf | 5.7 | Should | 4 | 5 | completa | Contrast, Main, Palette, UiTheme, WoodStyle |
+| HU-44 · Sprites pixel-art propios de 32 × 32 | 5.7 | Should | 5 | 7 | completa | AssetManager, GroundLayer, MapGeometry, MapRenderer, PixelScaler |
 | HU-45 · Mover el avatar por la granja | 5.7 | Should | 5 | 0 | sin pruebas | pendiente |
 | HU-46 · Hablar con los NPC | 5.7 | Should | 5 | 0 | sin pruebas | pendiente |
 | HU-47 · Encargos de los NPC | 5.7 | Could | 4 | 0 | sin pruebas | pendiente |
-| HU-48 · Interfaz con aspecto de granja | 5.7 | Should | 5 | 5 | completa | AssetManager, HudModel, HudPanel, InventoryGrid, ToolBar |
+| HU-48 · Interfaz con aspecto de granja | 5.7 | Should | 8 | 13 | completa | AmbientPainter, AssetManager, EnergyBar, GameScreen, GroundLayer, HoverAnimator, HudModel, HudPanel, InventoryGrid, MapPanel, MapRenderer, PixelScaler, StartScreen, TitleScene, ToolBar, WoodBox, WoodButton, WoodSlot, WoodStyle |
 
-**Resumen:** 45 de 48 historias con todas sus pruebas; 388 pruebas `HUxx_` en total.
+**Resumen:** 45 de 48 historias con todas sus pruebas; 396 pruebas `HUxx_` en total.

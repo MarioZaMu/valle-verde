@@ -6,38 +6,67 @@ import edu.ucc.farmsim.application.dto.MapView;
 import edu.ucc.farmsim.application.dto.PlotView;
 import edu.ucc.farmsim.ui.assets.AssetManager;
 import edu.ucc.farmsim.ui.theme.Palette;
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
- * Draws the farm map with Java2D. Each terrain and each crop stage has its own look, drawn with vector shapes;
- * if a sprite exists in the {@link AssetManager} it is used instead, and when it does not the vector graphic
- * is the fallback, so the game needs no image at all (HU-42). With a {@link VisualEffects} it also paints the
- * palette of the season, the weather, the night tint and the animations (HU-40, HU-41). It works on any
- * {@link Graphics2D}, including one of an image, so it is tested without a display.
+ * Draws the farm map with Java2D, in one of two ways.
  *
- * <p>Stories: HU-18, HU-19, HU-25, HU-35, HU-40, HU-41, HU-42, HU-44.
+ * <p>With the pixel-art pack (HU-44, HU-48) the view is a piece of countryside seen from above at three
+ * quarters: one continuous ground where soil and water blend into the grass, the land around the farm with
+ * its fence and woods, and trees, buildings, crops and animals that stand on their tile, rise above it and are
+ * drawn from back to front, each with its shadow. Something that hides a crop or the plot under the cursor
+ * turns see-through. With the ambient life on, the water ripples, the trees sway, the animals wander and
+ * clouds, butterflies or leaves cross the fields.
+ *
+ * <p>Without the pack each terrain and each crop stage is drawn with vector shapes, so the game needs no image
+ * at all (HU-42); a single missing sprite also falls back to its vector shape. With a {@link VisualEffects}
+ * it paints the palette of the season, the weather, the night tint and the animations (HU-40, HU-41). It works
+ * on any {@link Graphics2D}, including one of an image, so it is tested without a display.
+ *
+ * <p>Stories: HU-18, HU-19, HU-25, HU-35, HU-40, HU-41, HU-42, HU-44, HU-48.
  */
 public final class MapRenderer {
 
+    private static final int T = MapGeometry.TILE;
     private static final float STEM = 0.30f;
     private static final float LEAF_W = 0.22f;
     private static final float LEAF_H = 0.12f;
     private static final float FRUIT = 0.16f;
-    private static final int HOVER_WIDTH = 3;
     private static final int NIGHT_MAX_ALPHA = 150;
+    private static final float BEHIND_ALPHA = 0.5f;
+    private static final int WATER_FRAME_MS = 450;
+    private static final double TREE_TRUNK_FROM = 44.0 / 64.0;
     private static final Color NIGHT = new Color(10, 20, 60);
     private static final Color SUN = new Color(0xFFC21A);
     private static final Color SNOWFLAKE = new Color(0xFFFFFF);
     private static final Color RAIN = new Color(0xBFD9FF);
+    private static final Color SHADOW = new Color(0, 0, 0, 56);
+    private static final Color CURSOR = new Color(0xFFFFFF);
+    private static final Color CURSOR_EDGE = new Color(0x3B2412);
+    private static final Color CURSOR_FILL = new Color(255, 255, 255, 48);
+    private static final Color BUBBLE = new Color(0xFFF8E7);
 
     private final AssetManager assets;
+    private final PixelScaler scaler = new PixelScaler();
+    private final GroundLayer ground;
+
+    /** One thing that stands on the map, drawn in order of its foot (the lower, the later). */
+    private record Item(double depth, int order, Runnable paint) {
+    }
 
     /** Creates a renderer that looks for sprites in the {@code assets} folder of the class path. */
     public MapRenderer() {
@@ -51,6 +80,7 @@ public final class MapRenderer {
      */
     public MapRenderer(AssetManager assets) {
         this.assets = assets;
+        this.ground = new GroundLayer(assets);
     }
 
     /**
@@ -77,22 +107,331 @@ public final class MapRenderer {
      * @param effects the season, weather and animations to show, or {@code null} for the plain look
      */
     public void render(Graphics2D g, MapView map, int width, int height, CellPos hover, VisualEffects effects) {
+        render(g, map, MapGeometry.fit(map.cols(), map.rows(), width, height), width, height, hover, effects);
+    }
+
+    /**
+     * Paints the whole map with the given placement of the plots; the land around them fills the rest.
+     *
+     * @param g        where to paint
+     * @param map      the map to draw
+     * @param geometry where each plot goes
+     * @param width    width of the area
+     * @param height   height of the area
+     * @param hover    plot under the cursor, or {@code null}
+     * @param effects  the season, weather and animations to show, or {@code null} for the plain look
+     */
+    public void render(Graphics2D g, MapView map, MapGeometry geometry, int width, int height, CellPos hover,
+                       VisualEffects effects) {
         VisualEffects fx = effects != null && effects.isEnabled() ? effects : null;
+        boolean ambient = fx != null && fx.isAmbient();
+        long time = fx == null ? 0 : fx.time();
+        String season = fx == null ? "SPRING" : fx.season();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+        if (ground.available(season)) {
+            paintPixelArt(g, map, geometry, width, height, hover, fx, season, ambient, time);
+        } else {
+            paintVector(g, map, geometry, width, height, fx, season);
+        }
+        if (hover != null && hover.col() >= 0 && hover.row() >= 0 && hover.col() < map.cols() && hover.row() < map.rows()) {
+            drawCursor(g, geometry.cellBounds(hover.col(), hover.row()), ambient, time);
+        }
+        if (fx != null) {
+            drawAmbience(g, fx, geometry, width, height, ambient);
+        }
+    }
+
+    // ------------------------------------------------------------------ pixel art
+
+    private void paintPixelArt(Graphics2D g, MapView map, MapGeometry geo, int width, int height, CellPos hover,
+                               VisualEffects fx, String season, boolean ambient, long time) {
+        int s = geo.cellSize();
+        int col0 = -ceilDiv(geo.originX(), s) - 1;
+        int row0 = -ceilDiv(geo.originY(), s) - 1;
+        int col1 = map.cols() + ceilDiv(width - geo.originX() - map.cols() * s, s) + 1;
+        int row1 = map.rows() + ceilDiv(height - geo.originY() - map.rows() * s, s) + 2;
+        int frame = ambient ? (int) ((time / WATER_FRAME_MS) % GroundLayer.WATER_FRAMES) : 0;
+        BufferedImage art = ground.image(map, season, frame, col0, row0, col1, row1);
+        scaler.draw(g, art, geo.originX() + col0 * s, geo.originY() + row0 * s, (col1 - col0) * s, (row1 - row0) * s);
+
+        Set<Long> hidden = new HashSet<>();
+        for (PlotView plot : map.plots()) {
+            if (plot.crop() != null) {
+                hidden.add(key(plot.col(), plot.row()));
+            }
+        }
+        if (hover != null) {
+            hidden.add(key(hover.col(), hover.row()));
+        }
+        List<Rectangle> shadows = new ArrayList<>();
+        List<Item> items = new ArrayList<>();
+        List<Runnable> above = new ArrayList<>();
+        surroundings(g, map, geo, season, ambient, time, col0, row0, col1, row1, shadows, items);
+        for (PlotView plot : map.plots()) {
+            Rectangle cell = geo.cellBounds(plot.col(), plot.row());
+            if ("OBSTACLE".equals(plot.terrain())) {
+                obstacle(g, plot.col(), plot.row(), cell, season, ambient, time, hidden, shadows, items);
+            }
+            if (plot.crop() != null) {
+                double depth = cell.y + cell.height - (plot.sheltered() ? 0.5 : 0.25);
+                items.add(new Item(depth, items.size(), () -> drawCropArt(g, plot, cell, fx)));
+            }
+        }
+        for (BuildingView building : map.buildings()) {
+            building(g, building, geo, fx, ambient, time, hidden, shadows, items, above);
+        }
+        Composite saved = g.getComposite();
+        g.setColor(SHADOW);
+        for (Rectangle shadow : shadows) {
+            g.fillOval(shadow.x, shadow.y, shadow.width, shadow.height);
+        }
+        g.setComposite(saved);
+        items.sort(Comparator.comparingDouble(Item::depth).thenComparingInt(Item::order));
+        for (Item item : items) {
+            item.paint().run();
+        }
+        for (Runnable bubble : above) {
+            bubble.run();
+        }
+    }
+
+    /** The fence around the farm and the woods beyond it, on the tiles outside the map. */
+    private void surroundings(Graphics2D g, MapView map, MapGeometry geo, String season, boolean ambient, long time,
+                              int col0, int row0, int col1, int row1, List<Rectangle> shadows, List<Item> items) {
+        int s = geo.cellSize();
+        for (int row = row0; row < row1; row++) {
+            for (int col = col0; col < col1; col++) {
+                int dx = col < 0 ? -col : Math.max(0, col - map.cols() + 1);
+                int dy = row < 0 ? -row : Math.max(0, row - map.rows() + 1);
+                int distance = Math.max(dx, dy);
+                if (distance == 0) {
+                    continue;
+                }
+                Rectangle cell = geo.cellBounds(col, row);
+                if (distance == 1) {
+                    boolean horizontal = dy == 1 && dx == 0;
+                    Optional<BufferedImage> fence = assets.sprite(horizontal ? "terrain/FENCE_H.png" : "terrain/FENCE_V.png");
+                    fence.ifPresent(img -> items.add(new Item(cell.y + cell.height - 1, items.size(),
+                            () -> scaler.draw(g, img, cell.x, cell.y, s, s))));
+                    continue;
+                }
+                int h = hash(col, row) % 100;
+                if (h < 42) {
+                    String kind = h % 3 == 0 ? "PINE" : "TREE";
+                    tree(g, "terrain/" + kind + "_" + season + ".png", col, row, cell, ambient, time, false, shadows, items);
+                } else if (h < 52) {
+                    assets.sprite("terrain/BUSH_" + season + ".png").ifPresent(img -> {
+                        shadows.add(new Rectangle(cell.x + s / 8, cell.y + s * 3 / 4, s * 3 / 4, s / 4));
+                        items.add(new Item(cell.y + cell.height - 1, items.size(), () -> scaler.draw(g, img, cell.x, cell.y, s, s)));
+                    });
+                }
+            }
+        }
+    }
+
+    private void obstacle(Graphics2D g, int col, int row, Rectangle cell, String season, boolean ambient, long time,
+                          Set<Long> hidden, List<Rectangle> shadows, List<Item> items) {
+        int h = hash(col, row);
+        if (h % 4 == 0) {
+            Optional<BufferedImage> rock = assets.sprite("terrain/OBSTACLE.png");
+            if (rock.isPresent()) {
+                shadows.add(new Rectangle(cell.x + cell.width / 10, cell.y + cell.height * 3 / 4, cell.width * 4 / 5, cell.height / 4));
+                items.add(new Item(cell.y + cell.height - 1, items.size(),
+                        () -> scaler.draw(g, rock.get(), cell.x, cell.y, cell.width, cell.height)));
+                return;
+            }
+        }
+        String kind = h % 3 == 0 ? "PINE" : "TREE";
+        boolean behind = hidden.contains(key(col, row - 1)) || hidden.contains(key(col - 1, row - 1))
+                || hidden.contains(key(col + 1, row - 1));
+        if (!tree(g, "terrain/" + kind + "_" + season + ".png", col, row, cell, ambient, time, behind, shadows, items)) {
+            items.add(new Item(cell.y + cell.height - 1, items.size(), () -> drawObstacleVector(g, cell)));
+        }
+    }
+
+    private boolean tree(Graphics2D g, String name, int col, int row, Rectangle cell, boolean ambient, long time,
+                         boolean behind, List<Rectangle> shadows, List<Item> items) {
+        Optional<BufferedImage> sprite = assets.sprite(name);
+        if (sprite.isEmpty()) {
+            return false;
+        }
+        int s = cell.width;
+        shadows.add(new Rectangle(cell.x + s / 20, cell.y + s * 3 / 4, s * 9 / 10, s / 3));
+        double sway = ambient ? Math.sin(time / 1100.0 + col * 0.9 + row * 0.5) * s / 28.0 : 0;
+        items.add(new Item(cell.y + cell.height - 1, items.size(), () -> drawSplit(g, sprite.get(),
+                cell.x - s / 2, cell.y - s, 2 * s, 2 * s, TREE_TRUNK_FROM, (int) Math.round(sway), behind ? BEHIND_ALPHA : 1f)));
+        return true;
+    }
+
+    /** Draws a tall sprite whose upper part (the crown) can lean sideways while the lower part stays still. */
+    private void drawSplit(Graphics2D g, BufferedImage img, int x, int y, int w, int h, double split, int lean, float alpha) {
+        Composite saved = g.getComposite();
+        if (alpha < 1f) {
+            g.setComposite(AlphaComposite.SrcOver.derive(alpha));
+        }
+        if (lean == 0) {
+            scaler.draw(g, img, x, y, w, h);
+        } else {
+            double device = PixelScaler.deviceScale(g);
+            BufferedImage ready = scaler.scaled(img, (int) Math.round(w * device), (int) Math.round(h * device));
+            int cut = (int) Math.round(h * split);
+            int cutDevice = (int) Math.round(ready.getHeight() * split);
+            g.drawImage(ready, x + lean, y, x + lean + w, y + cut, 0, 0, ready.getWidth(), cutDevice, null);
+            g.drawImage(ready, x, y + cut, x + w, y + h, 0, cutDevice, ready.getWidth(), ready.getHeight(), null);
+        }
+        g.setComposite(saved);
+    }
+
+    private void building(Graphics2D g, BuildingView building, MapGeometry geo, VisualEffects fx, boolean ambient,
+                          long time, Set<Long> hidden, List<Rectangle> shadows, List<Item> items, List<Runnable> above) {
+        Rectangle foot = geo.cellBounds(building.col(), building.row())
+                .union(geo.cellBounds(building.col() + building.width() - 1, building.row() + building.height() - 1));
+        int s = geo.cellSize();
+        int bottom = foot.y + foot.height;
+        Optional<BufferedImage> sheet = assets.sprite("buildings/" + building.type() + ".png");
+        if (sheet.isEmpty()) {
+            items.add(new Item(bottom, items.size(), () -> drawBuilding(g, building, geo, fx)));
+            return;
+        }
+        BufferedImage img = sheet.get();
+        int drawH = img.getHeight() * s / T;
+        int drawW = img.getWidth() * s / T;
+        int top = bottom - drawH;
+        boolean behind = false;
+        for (int col = building.col(); col < building.col() + building.width(); col++) {
+            behind |= hidden.contains(key(col, building.row() - 1));
+        }
+        float alpha = behind ? BEHIND_ALPHA : 1f;
+        shadows.add(new Rectangle(foot.x - s / 6, bottom - s / 3, foot.width + s / 3, s / 2));
+        items.add(new Item(bottom, items.size(), () -> {
+            Composite saved = g.getComposite();
+            if (alpha < 1f) {
+                g.setComposite(AlphaComposite.SrcOver.derive(alpha));
+            }
+            scaler.draw(g, img, foot.x, top, drawW, drawH);
+            g.setComposite(saved);
+        }));
+        int slots = Math.max(1, building.capacity());
+        for (AnimalView animal : building.animals()) {
+            int frame = fx == null ? 0 : fx.animalFrame(animal.index());
+            int lane = foot.width / slots;
+            double phase = time / 1700.0 + animal.index() * 1.9;
+            int roam = ambient ? (int) Math.round(Math.sin(phase) * Math.max(0, lane - s) / 2.0) : 0;
+            boolean left = ambient && Math.cos(phase) < 0;
+            int x = foot.x + animal.index() * lane + (lane - s) / 2 + roam;
+            int y = bottom - s + s / 16;
+            shadows.add(new Rectangle(x + s / 6, bottom - s / 6, s * 2 / 3, s / 5));
+            items.add(new Item(bottom + 1, items.size(), () -> {
+                Optional<BufferedImage> sprite = assets.sprite("animals/" + animal.type() + "_" + frame + ".png");
+                if (sprite.isPresent()) {
+                    scaler.draw(g, sprite.get(), x, y, left ? -s : s, s);
+                } else {
+                    drawAnimalVector(g, animal, x, y, s, frame);
+                }
+            }));
+            String need = "SICK".equals(animal.condition()) ? "items/MEDICINE.png"
+                    : "HUNGRY".equals(animal.condition()) ? "items/HAY.png" : null;
+            if (need != null) {
+                Color fallback = "SICK".equals(animal.condition()) ? Palette.ANIMAL_SICK : Palette.ANIMAL_HUNGRY;
+                above.add(() -> bubble(g, x + s / 2, y + s / 8, Math.max(12, s / 2), need, fallback, 0));
+            }
+        }
+        if (building.pendingProducts() > 0) {
+            String product = "BARN".equals(building.type()) ? "items/MILK.png" : "items/EGG.png";
+            int bob = ambient ? (int) Math.round(Math.sin(time / 300.0) * s / 12.0) : 0;
+            above.add(() -> bubble(g, foot.x + foot.width - s / 2, top + s / 2, Math.max(14, s * 3 / 5), product,
+                    Palette.PENDING, bob));
+        }
+    }
+
+    /** A speech bubble with an item in it, for what an animal needs or what waits to be collected. */
+    private void bubble(Graphics2D g, int cx, int bottom, int size, String icon, Color fallback, int bob) {
+        int x = cx - size / 2;
+        int y = bottom - size - size / 4 + bob;
+        int arc = Math.max(4, size / 3);
+        g.setColor(CURSOR_EDGE);
+        g.fillRoundRect(x - 2, y - 2, size + 4, size + 4, arc + 2, arc + 2);
+        g.fillPolygon(new int[] {cx - size / 6 - 2, cx + size / 6 + 2, cx}, new int[] {y + size, y + size, y + size + size / 4 + 2}, 3);
+        g.setColor(BUBBLE);
+        g.fillRoundRect(x, y, size, size, arc, arc);
+        g.fillPolygon(new int[] {cx - size / 6, cx + size / 6, cx}, new int[] {y + size - 1, y + size - 1, y + size + size / 4}, 3);
+        Optional<BufferedImage> sprite = assets.sprite(icon);
+        int inset = Math.max(1, size / 10);
+        if (sprite.isPresent()) {
+            scaler.draw(g, sprite.get(), x + inset, y + inset, size - 2 * inset, size - 2 * inset);
+        } else {
+            g.setColor(fallback);
+            g.fillOval(x + inset * 2, y + inset * 2, size - 4 * inset, size - 4 * inset);
+        }
+    }
+
+    private void drawCropArt(Graphics2D g, PlotView plot, Rectangle c, VisualEffects fx) {
+        float scale = fx == null ? 1f : fx.cropScale(plot.col(), plot.row());
+        Optional<BufferedImage> sprite = assets.sprite("crops/" + plot.crop() + "_" + plot.stage() + ".png");
+        if (sprite.isEmpty()) {
+            drawCrop(g, plot, c, fx);
+            return;
+        }
+        int size = Math.max(1, Math.round(c.width * scale));
+        scaler.draw(g, sprite.get(), c.x + (c.width - size) / 2, c.y + c.height - size, size, size);
+    }
+
+    /** Pixel brackets on the corners of the plot under the cursor, over a light veil; they breathe slowly. */
+    private static void drawCursor(Graphics2D g, Rectangle cell, boolean ambient, long time) {
+        int pulse = ambient ? (int) Math.round((Math.sin(time / 220.0) + 1) * cell.width / 48.0) : 0;
+        int x = cell.x - pulse;
+        int y = cell.y - pulse;
+        int w = cell.width + 2 * pulse;
+        int h = cell.height + 2 * pulse;
+        g.setColor(CURSOR_FILL);
+        g.fillRect(cell.x, cell.y, cell.width, cell.height);
+        int len = Math.max(4, cell.width / 4);
+        int t = Math.max(2, cell.width / 16);
+        for (int pass = 0; pass < 2; pass++) {
+            int o = pass == 0 ? 1 : 0;
+            g.setColor(pass == 0 ? CURSOR_EDGE : CURSOR);
+            int[][] corners = {{x, y, 1, 1}, {x + w, y, -1, 1}, {x, y + h, 1, -1}, {x + w, y + h, -1, -1}};
+            for (int[] k : corners) {
+                int cx = k[0];
+                int cy = k[1];
+                int hx = k[2] > 0 ? cx : cx - len;
+                int vy = k[3] > 0 ? cy : cy - len;
+                int tx = k[2] > 0 ? cx : cx - t;
+                int ty = k[3] > 0 ? cy : cy - t;
+                g.fillRect(hx - o, ty - o, len + 2 * o, t + 2 * o);
+                g.fillRect(tx - o, vy - o, t + 2 * o, len + 2 * o);
+            }
+        }
+    }
+
+    private static long key(int col, int row) {
+        return ((long) row << 32) ^ (col & 0xFFFFFFFFL);
+    }
+
+    private static int hash(int col, int row) {
+        int h = col * 374_761_393 + row * 668_265_263;
+        h = (h ^ (h >>> 13)) * 1_274_126_177;
+        return (h ^ (h >>> 16)) & 0x7FFFFFFF;
+    }
+
+    private static int ceilDiv(int a, int b) {
+        return a <= 0 ? 0 : (a + b - 1) / b;
+    }
+
+    // ------------------------------------------------------------------ vector fallback
+
+    private void paintVector(Graphics2D g, MapView map, MapGeometry geometry, int width, int height, VisualEffects fx,
+                             String season) {
         g.setColor(Palette.BACKGROUND);
         g.fillRect(0, 0, width, height);
-        MapGeometry geometry = MapGeometry.fit(map.cols(), map.rows(), width, height);
         Color grass = fx == null ? Palette.GRASS : SeasonPalette.grass(fx.season());
-        String season = fx == null ? "SPRING" : fx.season();
         for (PlotView plot : map.plots()) {
             Rectangle cell = geometry.cellBounds(plot.col(), plot.row());
             drawTerrain(g, plot, cell, grass, season);
             if (plot.crop() != null && !plot.sheltered()) {
                 drawCrop(g, plot, cell, fx);
             }
-            g.setColor(Palette.GRID);
-            g.drawRect(cell.x, cell.y, cell.width - 1, cell.height - 1);
         }
         for (BuildingView building : map.buildings()) {
             drawBuilding(g, building, geometry, fx);
@@ -102,23 +441,17 @@ public final class MapRenderer {
                 drawCrop(g, plot, geometry.cellBounds(plot.col(), plot.row()), fx);
             }
         }
-        if (fx != null) {
-            drawAmbience(g, fx, geometry.area(), width, height);
-        }
-        if (hover != null) {
-            Rectangle cell = geometry.cellBounds(hover.col(), hover.row());
-            g.setColor(Palette.HOVER);
-            g.setStroke(new BasicStroke(HOVER_WIDTH));
-            g.drawRect(cell.x + 1, cell.y + 1, cell.width - 3, cell.height - 3);
-            g.setStroke(new BasicStroke(1f));
-        }
     }
 
-    private void drawAmbience(Graphics2D g, VisualEffects fx, Rectangle area, int width, int height) {
+    private void drawAmbience(Graphics2D g, VisualEffects fx, MapGeometry geometry, int width, int height, boolean ambient) {
+        Rectangle area = geometry.area();
+        if (ambient) {
+            AmbientPainter.paint(g, area, geometry.cellSize(), fx.time(), fx.season(), fx.weather());
+        }
         Color tint = SeasonPalette.tint(fx.weather());
         if (tint != null) {
             g.setColor(tint);
-            g.fillRect(area.x, area.y, area.width, area.height);
+            g.fillRect(ambient ? 0 : area.x, ambient ? 0 : area.y, ambient ? width : area.width, ambient ? height : area.height);
         }
         for (Particle particle : fx.particles()) {
             int x = area.x + (int) Math.round(particle.x() * area.width);
@@ -132,6 +465,9 @@ public final class MapRenderer {
             }
         }
         drawIndicator(g, fx.weather(), area);
+        if (ambient) {
+            AmbientPainter.vignette(g, width, height);
+        }
         float night = fx.nightAlpha();
         if (night > 0f) {
             g.setColor(new Color(NIGHT.getRed(), NIGHT.getGreen(), NIGHT.getBlue(), Math.round(night * NIGHT_MAX_ALPHA)));
@@ -336,19 +672,21 @@ public final class MapRenderer {
                 g.drawArc(c.x + c.width / 6, y - c.height / 10, c.width / 3, c.height / 5, 0, 180);
                 g.drawArc(c.x + c.width / 2, y - c.height / 10, c.width / 3, c.height / 5, 0, 180);
             }
-            case "OBSTACLE" -> {
-                g.setColor(Palette.OBSTACLE);
-                g.fillRect(c.x, c.y, c.width, c.height);
-                g.setColor(Palette.TRUNK);
-                g.fillRect(c.x + c.width * 9 / 20, c.y + c.height / 2, c.width / 10, c.height * 2 / 5);
-                g.setColor(Palette.LEAF);
-                g.fillOval(c.x + c.width / 5, c.y + c.height / 8, c.width * 3 / 5, c.height * 3 / 5);
-            }
+            case "OBSTACLE" -> drawObstacleVector(g, c);
             default -> {
                 g.setColor(grass);
                 g.fillRect(c.x, c.y, c.width, c.height);
             }
         }
+    }
+
+    private static void drawObstacleVector(Graphics2D g, Rectangle c) {
+        g.setColor(Palette.OBSTACLE);
+        g.fillRect(c.x, c.y, c.width, c.height);
+        g.setColor(Palette.TRUNK);
+        g.fillRect(c.x + c.width * 9 / 20, c.y + c.height / 2, c.width / 10, c.height * 2 / 5);
+        g.setColor(Palette.LEAF);
+        g.fillOval(c.x + c.width / 5, c.y + c.height / 8, c.width * 3 / 5, c.height * 3 / 5);
     }
 
     private void drawCrop(Graphics2D g, PlotView plot, Rectangle c, VisualEffects fx) {

@@ -1,6 +1,8 @@
 package edu.ucc.farmsim.ui.screens;
 
 import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
@@ -19,7 +21,10 @@ public final class MainWindow extends JFrame {
     /** Minimum window height in pixels. */
     public static final int MIN_HEIGHT = 768;
 
-    /** Opening width: room for the map at twice the size of its 32-pixel sprites plus the bars around it. */
+    /**
+     * Opening width before the window is maximized: room for the map at twice the size of its 32-pixel sprites.
+     * The window opens maximized and never larger than the usable part of the screen.
+     */
     public static final int DEFAULT_WIDTH = 1100;
 
     /** Opening height: the map at twice the size (640 px) plus the top bar, tool bar and buttons. */
@@ -35,8 +40,18 @@ public final class MainWindow extends JFrame {
     public MainWindow(String title) {
         super(title);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setMinimumSize(new Dimension(MIN_WIDTH, MIN_HEIGHT));
-        setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        Rectangle usable = usableScreen();
+        setMinimumSize(new Dimension(Math.min(MIN_WIDTH, usable.width), Math.min(MIN_HEIGHT, usable.height)));
+        setSize(Math.min(DEFAULT_WIDTH, usable.width), Math.min(DEFAULT_HEIGHT, usable.height));
         setLocationRelativeTo(null);
+        setExtendedState(getExtendedState() | MAXIMIZED_BOTH);
+    }
+
+    /** The part of the screen a window may cover (without the task bar); the default size if there is none. */
+    private static Rectangle usableScreen() {
+        if (GraphicsEnvironment.isHeadless()) {
+            return new Rectangle(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        }
+        return GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
     }
 }

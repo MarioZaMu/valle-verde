@@ -5,7 +5,7 @@
 
 ## 1. Estrategia
 
-Las pruebas se escriben **antes** que el código, historia por historia (DoD 1). Hay 206 criterios de aceptación en las 42 historias: cada uno se convierte en **al menos una prueba**.
+Las pruebas se escriben **antes** que el código, historia por historia (DoD 1). Hay 209 criterios de aceptación en las 42 historias: cada uno se convierte en **al menos una prueba**.
 
 | Nivel | Qué verifica | Dónde | Herramienta | Velocidad |
 |---|---|---|---|---|
@@ -44,7 +44,7 @@ Las pruebas se escriben **antes** que el código, historia por historia (DoD 1).
 
 ## 4. Pruebas de aceptación por historia
 
-Total: **206 criterios** → **150** de dominio/aplicación y **56** de interfaz (HU-33 a HU-42). Los de interfaz se prueban con presentadores y componentes sin pantalla cuando es posible, y el resto con la lista de la §7.
+Total: **209 criterios** → **150** de dominio/aplicación y **59** de interfaz (HU-33 a HU-42). Los de interfaz se prueban con presentadores y componentes sin pantalla cuando es posible, y el resto con la lista de la §7.
 
 | Historia | Título | Prioridad | Fase | Clase de prueba | Criterios | Tipo |
 |---|---|---|---|---|---|---|
@@ -95,7 +95,7 @@ Total: **206 criterios** → **150** de dominio/aplicación y **56** de interfaz
 | HU-45 | Mover el avatar por la granja | Should | 5.7 | `acceptance.HU45AvatarMovementTest` | 5 | Aceptación |
 | HU-46 | Hablar con los NPC | Should | 5.7 | `acceptance.HU46NpcDialogueTest` | 5 | Aceptación |
 | HU-47 | Encargos de los NPC | Could | 5.7 | `acceptance.HU47NpcErrandsTest` | 4 | Aceptación |
-| HU-48 | Interfaz con aspecto de granja | Should | 5.7 | `ui.HU48FarmStyleInterfaceTest` | 5 | UI + visual |
+| HU-48 | Interfaz con aspecto de granja | Should | 5.7 | `ui.HU48FarmStyleInterfaceTest` | 8 | UI + visual |
 
 **Criterios por fase:**
 
@@ -107,7 +107,7 @@ Total: **206 criterios** → **150** de dominio/aplicación y **56** de interfaz
 | 5.4 | 7 | 31 |
 | 5.5 | 7 | 29 |
 | 5.6 | 5 | 21 |
-| 5.7 | 6 | 28 |
+| 5.7 | 6 | 31 |
 
 ## 5. Pruebas críticas obligatorias
 

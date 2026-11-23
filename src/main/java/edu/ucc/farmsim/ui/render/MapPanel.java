@@ -13,9 +13,14 @@ import edu.ucc.farmsim.ui.components.PlotText;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.event.HierarchyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -26,12 +31,13 @@ import javax.swing.ToolTipManager;
  *
  * <p>The panel keeps the last {@link MapView}. It asks the controller for a new one only when an event says
  * the map changed (game started, day ended, map changed): it never polls the game. Its own {@link Timer}
- * only draws frames of the {@link VisualEffects} (rain, snow, night tint, animals, growing crops) while
- * something moves, and stops when nothing does; the effects can be switched off at any time and never touch
- * the game (HU-40, HU-41). Hovering a plot shows its tooltip after {@link #TOOLTIP_DELAY_MS}, and clicking
- * tells the {@link PlotClickListener}.
+ * only draws frames of the {@link VisualEffects} (rain, snow, night tint, animals, growing crops and the
+ * ambient life of the valley) while the panel is on screen and something moves, and stops otherwise; the
+ * effects can be switched off at any time and never touch the game (HU-40, HU-41). Bars that float over the
+ * view are registered with {@link #addFloating}, and the plots are placed clear of them (HU-48). Hovering a plot
+ * shows its tooltip after {@link #TOOLTIP_DELAY_MS}, and clicking tells the {@link PlotClickListener}.
  *
- * <p>Stories: HU-07, HU-25, HU-35, HU-40, HU-41.
+ * <p>Stories: HU-07, HU-25, HU-35, HU-40, HU-41, HU-48.
  */
 public final class MapPanel extends JPanel implements GameListener {
 
@@ -45,12 +51,14 @@ public final class MapPanel extends JPanel implements GameListener {
     private static final Dimension PREFERRED = new Dimension(1024, 640);
     private static final String GREENHOUSE = "GREENHOUSE";
     private static final long PARTICLE_SEED = 20_261_122L;
+    private static final int RESERVE_GAP = 6;
 
     private final transient GameCommands controller;
     private final transient PlotClickListener clicks;
     private final transient MapRenderer renderer = new MapRenderer();
     private final transient VisualEffects effects = new VisualEffects(() -> System.nanoTime() / 1_000_000L, new Random(PARTICLE_SEED));
     private final transient Timer frames = new Timer(FRAME_DELAY_MS, event -> nextFrame());
+    private final transient List<JComponent> floating = new ArrayList<>();
     private transient MapView view;
     private transient CellPos hover;
 
@@ -90,6 +98,12 @@ public final class MapPanel extends JPanel implements GameListener {
         };
         addMouseListener(mouse);
         addMouseMotionListener(mouse);
+        effects.setAmbient(true);
+        addHierarchyListener(event -> {
+            if ((event.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
+                startOrStopFrames();
+            }
+        });
         bus.subscribe(this);
         Result<HudView> hud = controller.hud();
         if (hud.isOk()) {
@@ -113,6 +127,50 @@ public final class MapPanel extends JPanel implements GameListener {
         effects.setEnabled(on);
         startOrStopFrames();
         repaint();
+    }
+
+    /**
+     * Registers a bar that floats over the view: the plots are placed so that none ends up under it, while the
+     * land around the farm is still drawn below it.
+     */
+    public void addFloating(JComponent bar) {
+        floating.add(bar);
+    }
+
+    /** Where each plot is drawn now, at the current size of the panel. */
+    public MapGeometry geometry() {
+        int cols = view == null ? 16 : view.cols();
+        int rows = view == null ? 10 : view.rows();
+        int top = 0;
+        int bottom = 0;
+        MapGeometry geometry = MapGeometry.fit(cols, rows, getWidth(), getHeight());
+        for (int pass = 0; pass < 3; pass++) {
+            Rectangle area = geometry.area();
+            boolean changed = false;
+            for (JComponent bar : floating) {
+                if (!bar.isVisible() || bar.getParent() == null || bar.getWidth() == 0) {
+                    continue;
+                }
+                Rectangle box = SwingUtilities.convertRectangle(bar.getParent(), bar.getBounds(), this);
+                if (!box.intersects(area)) {
+                    continue;
+                }
+                if (box.y + box.height / 2 < getHeight() / 2) {
+                    int needed = box.y + box.height + RESERVE_GAP;
+                    changed |= needed > top;
+                    top = Math.max(top, needed);
+                } else {
+                    int needed = getHeight() - box.y + RESERVE_GAP;
+                    changed |= needed > bottom;
+                    bottom = Math.max(bottom, needed);
+                }
+            }
+            if (!changed) {
+                break;
+            }
+            geometry = MapGeometry.fit(cols, rows, getWidth(), getHeight(), top, bottom);
+        }
+        return geometry;
     }
 
     /** True while the frame timer is running, that is, while something is moving on the map. */
@@ -169,7 +227,7 @@ public final class MapPanel extends JPanel implements GameListener {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         if (view != null) {
-            renderer.render((Graphics2D) g, view, getWidth(), getHeight(), hover, effects);
+            renderer.render((Graphics2D) g, view, geometry(), getWidth(), getHeight(), hover, effects);
         }
     }
 
@@ -186,13 +244,14 @@ public final class MapPanel extends JPanel implements GameListener {
     private void nextFrame() {
         effects.step();
         repaint();
-        if (!effects.needsFrames()) {
+        if (!effects.needsFrames() || !isShowing()) {
             frames.stop();
         }
     }
 
     private void startOrStopFrames() {
-        if (effects.needsFrames()) {
+        boolean onlyAmbient = effects.isAmbient() && !isShowing();
+        if (effects.needsFrames() && !onlyAmbient) {
             if (!frames.isRunning()) {
                 frames.start();
             }
@@ -205,6 +264,6 @@ public final class MapPanel extends JPanel implements GameListener {
         if (view == null) {
             return null;
         }
-        return MapGeometry.fit(view.cols(), view.rows(), getWidth(), getHeight()).cellAt(x, y);
+        return geometry().cellAt(x, y);
     }
 }

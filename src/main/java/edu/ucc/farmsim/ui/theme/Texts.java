@@ -21,6 +21,9 @@ public final class Texts {
     /** Start screen: leave the application. */
     public static final String START_EXIT = "Salir";
 
+    /** Line under the game name on the start screen. */
+    public static final String START_SUBTITLE = "Siembra, cuida tus animales y haz crecer tu granja";
+
     /** Shown when "Load" is chosen and no slot holds a game. */
     public static final String NO_SAVED_GAMES = "No hay partidas guardadas.";
 

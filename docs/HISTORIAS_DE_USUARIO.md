@@ -566,7 +566,7 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 **Como** jugador **quiero** ver sprites pixel-art de estilo granja **para** que el juego tenga aspecto de videojuego.
 
 **Criterios de aceptación**
-- **CA-1 · Tamaño.** **Dado** el paquete de sprites, **Entonces** cada imagen mide exactamente 32 × 32 px (las hojas de cuadros, un múltiplo de 32 en cada lado).
+- **CA-1 · Tamaño.** **Dado** el paquete de sprites, **Entonces** cada imagen mide exactamente 32 × 32 px (las hojas de cuadros y los sprites que se elevan sobre su parcela, como árboles y edificios, un múltiplo de 32 en cada lado).
 - **CA-2 · Cobertura.** **Dado** el paquete completo, **Entonces** existen sprites de los 4 terrenos, de los 5 cultivos en sus 5 etapas, de la gallina y la vaca en 3 cuadros, de los 4 edificios, de los ítems del inventario, del avatar y de los 4 NPC, y el mapa los usa en lugar de los gráficos vectoriales.
 - **CA-3 · Nitidez (borde).** **Dado** una ventana de cualquier tamaño, **Entonces** el mapa se amplía por un factor entero con interpolación de vecino más cercano (sin bordes borrosos); si el área es menor que 512 × 320 px se admite una escala menor.
 - **CA-4 · Sprite faltante (negativo).** **Dado** un archivo ausente, **Cuando** se dibuja el elemento, **Entonces** se usa el gráfico vectorial de respaldo de HU-42.
@@ -583,6 +583,9 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 - **CA-3 · Inventario.** **Dado** el inventario abierto, **Entonces** cada casilla ocupada muestra el icono del ítem y su cantidad.
 - **CA-4 · Sin texto cortado (borde).** **Dado** una ventana de 1024 × 768, **Entonces** ningún texto de la pantalla de juego ni de los diálogos aparece cortado.
 - **CA-5 · Sin iconos (negativo).** **Dado** que faltan los sprites, **Entonces** los botones y casillas se muestran solo con texto.
+- **CA-6 · Vista continua en 3/4.** **Dado** el mapa con el paquete de sprites, **Entonces** no hay líneas de cuadrícula entre parcelas, la tierra y el agua se funden con la hierba con un borde irregular, los árboles y edificios se elevan por encima de su parcela con sombra, y si tapan un cultivo o la parcela bajo el cursor se vuelven translúcidos. Las barras flotan sobre el paisaje sin tapar ninguna parcela.
+- **CA-7 · Vida ambiental.** **Dado** los efectos activados y la pantalla visible, **Entonces** el agua ondula, los árboles se mecen, los animales pasean y pasan nubes, mariposas u hojas según la estación; **con los efectos apagados o la pantalla oculta (borde)** no corre ningún temporizador y el dibujo es fijo.
+- **CA-8 · Pantalla de inicio animada.** **Dado** la pantalla de inicio, **Entonces** se ve una escena de granja animada (cielo, nubes, colinas, granja, gallinas y granjero) bajo el nombre del juego y los botones de madera; **sin sprites (negativo)** la escena se dibuja solo con formas y no falla.
 
 ---
 

@@ -36,6 +36,15 @@ public record MapGeometry(int cols, int rows, int cellSize, int originX, int ori
         return new MapGeometry(cols, rows, size, originX, originY);
     }
 
+    /**
+     * Fits the map into an area of which a band at the top and one at the bottom are kept free (for the bars
+     * that float over the view); the land around the map is still drawn under them.
+     */
+    public static MapGeometry fit(int cols, int rows, int width, int height, int top, int bottom) {
+        MapGeometry inner = fit(cols, rows, width, Math.max(1, height - top - bottom));
+        return new MapGeometry(cols, rows, inner.cellSize(), inner.originX(), inner.originY() + top);
+    }
+
     /** Pixel rectangle of the whole map. */
     public Rectangle area() {
         return new Rectangle(originX, originY, cols * cellSize, rows * cellSize);

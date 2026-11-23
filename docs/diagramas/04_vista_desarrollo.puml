@@ -61,6 +61,10 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
       class ToastKind
       class ToastView
       class OverlayPanel
+      class WoodBox
+      class WoodButton
+      class WoodSlot
+      class EnergyBar
     }
     package "render" as UI_REN #FFFFFF {
       class MapPanel
@@ -69,6 +73,10 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
       class VisualEffects
       class Particle
       class SeasonPalette
+      class GroundLayer
+      class PixelScaler
+      class AmbientPainter
+      class TitleScene
     }
     package "assets" as UI_AST #FFFFFF {
       class AssetManager
@@ -76,6 +84,9 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
     package "theme" as UI_THM #FFFFFF {
       class Texts
       class Palette
+      class UiTheme
+      class WoodStyle
+      class HoverAnimator
     }
   }
 

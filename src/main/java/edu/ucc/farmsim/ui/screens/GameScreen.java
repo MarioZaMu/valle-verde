@@ -26,12 +26,19 @@ import edu.ucc.farmsim.ui.components.ToastQueue;
 import edu.ucc.farmsim.ui.components.Tool;
 import edu.ucc.farmsim.ui.components.ToolBar;
 import edu.ucc.farmsim.ui.components.ToolModel;
+import edu.ucc.farmsim.ui.components.WoodBox;
+import edu.ucc.farmsim.ui.components.WoodButton;
 import edu.ucc.farmsim.ui.render.MapPanel;
 import edu.ucc.farmsim.ui.theme.Texts;
+import edu.ucc.farmsim.ui.theme.WoodStyle;
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.InputMap;
@@ -43,16 +50,19 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 /**
- * The main game screen: the top bar (HUD), the farm map, the tool bar, a status line for messages and the
- * buttons "End day" and "Menu". Keys 1 to 5 pick a tool, Escape deselects it, and the shortcuts of RN-34 work
- * anywhere on the screen.
+ * The main game screen: the farm fills the window and the bars float over it in wooden boxes, the date,
+ * weather, money and energy in the top right corner (HUD), and at the bottom the tool bar, a status line for
+ * messages and the buttons "End day" and "Menu". Keys 1 to 5 pick a tool, Escape deselects it, and the
+ * shortcuts of RN-34 work anywhere on the screen.
  *
- * <p>Stories: HU-17, HU-18, HU-20, HU-22, HU-23, HU-26, HU-29, HU-30, HU-33, HU-34, HU-35, HU-36, HU-37, HU-38, HU-39, HU-40, HU-41.
+ * <p>Stories: HU-17, HU-18, HU-20, HU-22, HU-23, HU-26, HU-29, HU-30, HU-33, HU-34, HU-35, HU-36, HU-37, HU-38, HU-39, HU-40, HU-41, HU-48.
  */
 public final class GameScreen extends JPanel {
 
     private static final long serialVersionUID = 1L;
     private static final String DESELECT = "deselect-tool";
+    private static final int GAP = 6;
+    private static final int MARGIN = 8;
 
     /**
      * Builds the screen.
@@ -124,31 +134,61 @@ public final class GameScreen extends JPanel {
             }
         });
 
-        add(new HudPanel(bus), BorderLayout.NORTH);
         MapPanel map = new MapPanel(controller, bus, presenter::onPlotClicked);
-        OverlayPanel stage = new OverlayPanel(map);
-        stage.addOnTop(new ToastLayer(toastQueue));
-        add(stage, BorderLayout.CENTER);
+        HudPanel hud = new HudPanel(bus);
 
-        JPanel bottom = new JPanel();
-        bottom.setLayout(new BoxLayout(bottom, BoxLayout.Y_AXIS));
-        bottom.add(new ToolBar(tools));
-        bottom.add(status);
-        JPanel buttons = new JPanel();
-        JButton endDay = new JButton(Texts.END_DAY);
+        WoodBox toolBox = new WoodBox(new BorderLayout());
+        toolBox.add(new ToolBar(tools), BorderLayout.CENTER);
+        JPanel toolRow = clear(new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0)));
+        toolRow.add(toolBox);
+
+        status.setForeground(WoodStyle.INK);
+        status.setFont(status.getFont().deriveFont(Font.BOLD));
+        WoodBox statusBox = new WoodBox(new BorderLayout());
+        statusBox.add(status, BorderLayout.CENTER);
+        JButton endDay = new WoodButton(Texts.END_DAY);
         endDay.addActionListener(event -> presenter.onEndDay());
-        JButton menu = new JButton(Texts.MENU);
+        JButton menu = new WoodButton(Texts.MENU);
         menu.addActionListener(event -> navigator.showStart());
         JCheckBox effects = new JCheckBox(Texts.EFFECTS, true);
         effects.setFocusable(false);
+        effects.setOpaque(false);
+        effects.setForeground(WoodStyle.INK);
         effects.addActionListener(event -> map.setEffectsEnabled(effects.isSelected()));
+        WoodBox effectsBox = new WoodBox(new BorderLayout());
+        effectsBox.add(effects, BorderLayout.CENTER);
+        JPanel buttons = clear(new JPanel(new FlowLayout(FlowLayout.RIGHT, GAP, 0)));
         buttons.add(endDay);
         buttons.add(menu);
-        buttons.add(effects);
-        bottom.add(buttons);
-        add(bottom, BorderLayout.SOUTH);
+        buttons.add(effectsBox);
+        JPanel messageRow = clear(new JPanel(new BorderLayout(GAP, 0)));
+        messageRow.add(statusBox, BorderLayout.CENTER);
+        messageRow.add(buttons, BorderLayout.EAST);
+
+        JPanel bottom = clear(new JPanel());
+        bottom.setLayout(new BoxLayout(bottom, BoxLayout.Y_AXIS));
+        bottom.add(toolRow);
+        bottom.add(Box.createVerticalStrut(GAP));
+        bottom.add(messageRow);
+
+        JPanel bars = clear(new JPanel(new BorderLayout()));
+        bars.setBorder(BorderFactory.createEmptyBorder(MARGIN, MARGIN, MARGIN, MARGIN));
+        bars.add(hud, BorderLayout.NORTH);
+        bars.add(bottom, BorderLayout.SOUTH);
+        map.addFloating(hud.box());
+        map.addFloating(bottom);
+
+        OverlayPanel stage = new OverlayPanel(map);
+        stage.addOnTop(bars);
+        stage.addOnTop(new ToastLayer(toastQueue));
+        add(stage, BorderLayout.CENTER);
 
         bindKeys(tools, presenter);
+    }
+
+    private static JPanel clear(JPanel panel) {
+        panel.setOpaque(false);
+        return panel;
     }
 
     private void bindKeys(ToolModel tools, GameScreenPresenter presenter) {

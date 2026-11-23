@@ -53,6 +53,7 @@ public final class VisualEffects {
     private long lastStep = -1;
     private boolean seenMap;
     private boolean animals;
+    private boolean ambient;
 
     /**
      * Creates the effects.
@@ -80,6 +81,24 @@ public final class VisualEffects {
             dayEndedAt = -1;
             grownAt.clear();
         }
+    }
+
+    /**
+     * Switches the ambient life on or off: water that ripples, trees that sway in the wind, animals that wander,
+     * clouds, butterflies and leaves (HU-48). With it on, the view keeps drawing frames while it is shown.
+     */
+    public void setAmbient(boolean on) {
+        this.ambient = on;
+    }
+
+    /** True when the ambient life is on and the effects are enabled. */
+    public boolean isAmbient() {
+        return ambient && enabled;
+    }
+
+    /** The current time of the effects clock, in milliseconds. */
+    public long time() {
+        return clock.getAsLong();
     }
 
     /** The season id and weather id the world is in now. */
@@ -186,7 +205,7 @@ public final class VisualEffects {
         }
         long now = clock.getAsLong();
         boolean growing = grownAt.values().stream().anyMatch(start -> now - start < GROWTH_MS);
-        return !particles.isEmpty() || nightAlpha() > 0f || growing || animals;
+        return ambient || !particles.isEmpty() || nightAlpha() > 0f || growing || animals;
     }
 
     private void rebuildParticles() {

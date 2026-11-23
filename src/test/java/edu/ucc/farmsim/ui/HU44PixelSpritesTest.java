@@ -30,9 +30,17 @@ import org.junit.jupiter.api.Test;
 class HU44PixelSpritesTest {
 
     private static final Path ASSETS = Path.of("src/main/resources/assets");
+    /** Tall sprites: buildings have one tile of roof above the ground they use, trees are two tiles high. */
     private static final Map<String, int[]> SHEETS = Map.of(
-            "buildings/COOP.png", new int[] {64, 64}, "buildings/BARN.png", new int[] {96, 64},
-            "buildings/WAREHOUSE.png", new int[] {64, 64}, "buildings/GREENHOUSE.png", new int[] {96, 96});
+            "buildings/COOP.png", new int[] {64, 96}, "buildings/BARN.png", new int[] {96, 96},
+            "buildings/WAREHOUSE.png", new int[] {64, 96}, "buildings/GREENHOUSE.png", new int[] {96, 128});
+
+    private static int[] sheet(String name) {
+        if (name.startsWith("terrain/TREE_") || name.startsWith("terrain/PINE_")) {
+            return new int[] {64, 64};
+        }
+        return SHEETS.get(name);
+    }
 
     private static List<Path> images() throws IOException {
         try (Stream<Path> files = Files.walk(ASSETS)) {
@@ -48,7 +56,7 @@ class HU44PixelSpritesTest {
     void HU44_ca1_everyImageIs32x32AndTheBuildingSheetsAreWholeTiles() throws IOException {
         for (Path path : images()) {
             BufferedImage image = ImageIO.read(path.toFile());
-            int[] sheet = SHEETS.get(rel(path));
+            int[] sheet = sheet(rel(path));
             if (sheet == null) {
                 assertEquals(32, image.getWidth(), rel(path));
                 assertEquals(32, image.getHeight(), rel(path));

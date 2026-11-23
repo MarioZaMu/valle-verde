@@ -33,6 +33,12 @@ public final class OverlayPanel extends JPanel {
         add(overlay, 0);
     }
 
+    /** The layers overlap, so Swing must paint every one of them, not only the one that asked. */
+    @Override
+    public boolean isOptimizedDrawingEnabled() {
+        return false;
+    }
+
     @Override
     public Dimension getPreferredSize() {
         return base.getPreferredSize();
