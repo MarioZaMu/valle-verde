@@ -123,6 +123,7 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
       class AchievementService
       class SaveGameService
       class ProgressService
+      class AvatarService
       class ViewMapper
       class GameSession
     }
@@ -136,6 +137,7 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
       class MapView
       class GameView
       class PlotView
+      class AvatarView
     }
     package "result" as APP_RES #FFFFFF {
       class Result
@@ -161,6 +163,8 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
     package "farm" as D_FARM #FFFFFF {
       class FarmMap
       class Plot
+      class Avatar
+      class Direction
     }
     package "crop" as D_CROP #FFFFFF {
       class Crop

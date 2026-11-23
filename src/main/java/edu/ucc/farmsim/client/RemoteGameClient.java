@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.ucc.farmsim.application.controller.GameCommands;
 import com.fasterxml.jackson.core.type.TypeReference;
 import edu.ucc.farmsim.application.dto.AchievementView;
+import edu.ucc.farmsim.application.dto.AvatarView;
 import edu.ucc.farmsim.application.dto.BuildingActionView;
 import edu.ucc.farmsim.application.dto.BuildingView;
 import edu.ucc.farmsim.application.dto.BuildingsView;
@@ -41,7 +42,7 @@ import java.util.logging.Logger;
  * <p>Orders are sent synchronously from the calling thread with a time limit (DT-20). It never throws: an
  * unreachable server, a timeout or an unreadable answer becomes {@code ERROR_INTERNO}.
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-26, HU-28, HU-29, HU-30, HU-31, HU-32, HU-33, HU-35, HU-37, HU-38.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-26, HU-28, HU-29, HU-30, HU-31, HU-32, HU-33, HU-35, HU-37, HU-38, HU-45.
  */
 public final class RemoteGameClient implements GameCommands {
 
@@ -109,6 +110,11 @@ public final class RemoteGameClient implements GameCommands {
     @Override
     public Result<MapView> map() {
         return send("GET", "/api/farm/map", null, MapView.class);
+    }
+
+    @Override
+    public Result<AvatarView> move(String direction) {
+        return send("POST", "/api/avatar/moves", Map.of("direction", direction), AvatarView.class);
     }
 
     @Override

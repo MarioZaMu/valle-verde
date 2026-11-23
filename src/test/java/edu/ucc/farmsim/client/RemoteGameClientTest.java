@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import edu.ucc.farmsim.application.dto.AvatarView;
 import edu.ucc.farmsim.application.dto.BuildingActionView;
 import edu.ucc.farmsim.application.dto.BuildingView;
 import edu.ucc.farmsim.application.dto.BuildingsView;
@@ -82,6 +83,26 @@ class RemoteGameClientTest {
         assertFalse(client.hasGameInProgress());
         client.newGame(TestApp.SEED);
         assertTrue(client.hasGameInProgress());
+    }
+
+    @Test
+    void HU45_aStepThroughTheServerGivesTheSameAnswerAndEventAsTheLocalController() {
+        client.newGame(TestApp.SEED);
+        TestApp local = TestApp.startedGame();
+        events.clear();
+
+        Result<AvatarView> remote = client.move("EAST");
+        Result<AvatarView> here = local.controller.move("EAST");
+
+        assertTrue(remote.isOk(), String.valueOf(remote.message()));
+        assertEquals(here.value(), remote.value());
+        assertEquals(local.events, events);
+        assertEquals(here.value(), client.map().value().avatar());
+        client.move("SOUTH");
+        client.move("SOUTH");
+        Result<AvatarView> blocked = client.move("SOUTH");
+        assertEquals(ErrorCode.MOVIMIENTO_BLOQUEADO, blocked.code());
+        assertEquals("No puedes pasar por ahí.", blocked.message());
     }
 
     @Test

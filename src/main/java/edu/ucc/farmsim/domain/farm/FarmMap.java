@@ -17,7 +17,7 @@ import java.util.List;
  * The farm grid: {@link GameRules#MAP_COLS} x {@link GameRules#MAP_ROWS} plots with coordinates
  * {@code (column, row)}, where {@code (0, 0)} is the top-left corner (RN-04).
  *
- * <p>Stories: HU-01, HU-03, HU-05, HU-12, HU-18, HU-25, HU-28.
+ * <p>Stories: HU-01, HU-03, HU-05, HU-12, HU-18, HU-25, HU-28, HU-45.
  */
 public final class FarmMap {
 
@@ -83,6 +83,39 @@ public final class FarmMap {
             throw new IllegalArgumentException("outside the map: (" + col + ", " + row + ")");
         }
         return plots[row][col];
+    }
+
+    /**
+     * True if the avatar can stand on the plot (RN-36): it is inside the map, it is grass or soil (with or without
+     * a crop) and no building covers it. Water and obstacles block the way.
+     */
+    public boolean isWalkable(int col, int row) {
+        if (!contains(col, row)) {
+            return false;
+        }
+        Plot plot = plots[row][col];
+        return (plot.terrain() == Terrain.GRASS || plot.terrain() == Terrain.SOIL) && plot.building() == null;
+    }
+
+    /**
+     * The walkable plot nearest to the given one, counting steps along columns and rows; ties go to the upper
+     * row, then to the left column. The given plot itself if it is walkable.
+     *
+     * @return {column, row}
+     * @throws IllegalStateException if no plot of the map can be walked on
+     */
+    public int[] nearestWalkable(int col, int row) {
+        for (int distance = 0; distance <= cols() + rows(); distance++) {
+            for (int r = row - distance; r <= row + distance; r++) {
+                int rest = distance - Math.abs(r - row);
+                for (int c : rest == 0 ? new int[] {col} : new int[] {col - rest, col + rest}) {
+                    if (isWalkable(c, r)) {
+                        return new int[] {c, r};
+                    }
+                }
+            }
+        }
+        throw new IllegalStateException("no plot of the map can be walked on");
     }
 
     /** The buildings in the order they were built; the index of a building is its id. */

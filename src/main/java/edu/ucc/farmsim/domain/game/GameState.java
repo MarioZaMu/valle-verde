@@ -4,6 +4,8 @@ import edu.ucc.farmsim.domain.config.GameRules;
 import edu.ucc.farmsim.domain.economy.Inventory;
 import edu.ucc.farmsim.domain.economy.ItemType;
 import edu.ucc.farmsim.domain.economy.Market;
+import edu.ucc.farmsim.domain.farm.Avatar;
+import edu.ucc.farmsim.domain.farm.Direction;
 import edu.ucc.farmsim.domain.farm.FarmMap;
 import edu.ucc.farmsim.domain.progress.Achievement;
 import edu.ucc.farmsim.domain.progress.AchievementTracker;
@@ -23,7 +25,7 @@ import java.util.List;
  * {@link #createMemento()} and {@link #restore(GameMemento)} undo a failed end of the day (HU-10) and
  * will back saving and loading (HU-29, HU-30).
  *
- * <p>Stories: HU-01, HU-10, HU-14, HU-15, HU-17, HU-18, HU-26, HU-28.
+ * <p>Stories: HU-01, HU-10, HU-14, HU-15, HU-17, HU-18, HU-26, HU-28, HU-45.
  */
 public final class GameState {
 
@@ -36,6 +38,7 @@ public final class GameState {
     private final Market market;
     private final DayLedger ledger = new DayLedger();
     private final AchievementTracker progress = new AchievementTracker();
+    private final Avatar avatar = Avatar.start();
 
     private GameState(int money, Energy energy, Inventory inventory, FarmMap farm,
                       WeatherCycle weather, StateRandom random, Market market) {
@@ -167,6 +170,21 @@ public final class GameState {
         return weather;
     }
 
+    /** The player's character: where it stands and where it looks (RN-36). */
+    public Avatar avatar() {
+        return avatar;
+    }
+
+    /**
+     * One step of the avatar (RN-36): it turns to the direction and moves there if the plot can be walked on.
+     * It costs no energy and does not move the calendar.
+     *
+     * @return {@code true} if it moved; {@code false} if the way was blocked and it only turned
+     */
+    public boolean stepAvatar(Direction direction) {
+        return avatar.step(direction, farm);
+    }
+
     /** The random generator of this game. */
     public StateRandom random() {
         return random;
@@ -176,7 +194,7 @@ public final class GameState {
     public GameMemento createMemento() {
         return new GameMemento(date(), money, energy.current(), inventory.snapshot(),
                 farm.snapshot(), weather.today(), weather.forecast(), random.state(), market.snapshot(),
-                ledger.snapshot(), progress.snapshot());
+                ledger.snapshot(), progress.snapshot(), avatar.snapshot());
     }
 
     /** Puts the state back exactly as it was when the snapshot was taken. */
@@ -191,6 +209,11 @@ public final class GameState {
         market.restoreFrom(memento.market());
         ledger.restoreFrom(memento.ledger());
         progress.restoreFrom(memento.progress());
+        if (memento.avatar() == null) {
+            avatar.returnToStart(farm);
+        } else {
+            avatar.restoreFrom(memento.avatar());
+        }
     }
 
     /** Current calendar date. */

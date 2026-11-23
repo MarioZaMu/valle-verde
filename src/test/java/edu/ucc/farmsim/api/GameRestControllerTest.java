@@ -124,6 +124,29 @@ class GameRestControllerTest {
     }
 
     @Test
+    void HU45_POST_moves_stepsTheAvatarAndABlockedStepIsAConflict() throws Exception {
+        newGame();
+        mvc.perform(get("/api/farm/map")).andExpect(jsonPath("$.data.avatar.facing").value("SOUTH"));
+        mvc.perform(post("/api/avatar/moves").contentType(MediaType.APPLICATION_JSON).content("{\"direction\": \"EAST\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.col").value(8))
+                .andExpect(jsonPath("$.data.facing").value("EAST"))
+                .andExpect(jsonPath("$.events[0].type").value("AvatarMoved"));
+        for (int i = 0; i < 2; i++) {
+            mvc.perform(post("/api/avatar/moves").contentType(MediaType.APPLICATION_JSON).content("{\"direction\": \"SOUTH\"}"));
+        }
+        mvc.perform(post("/api/avatar/moves").contentType(MediaType.APPLICATION_JSON).content("{\"direction\": \"SOUTH\"}"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("MOVIMIENTO_BLOQUEADO"))
+                .andExpect(jsonPath("$.message").value("No puedes pasar por ahí."));
+        mvc.perform(post("/api/avatar/moves").contentType(MediaType.APPLICATION_JSON).content("{\"direction\": \"UP\"}"))
+                .andExpect(status().isBadRequest());
+        session.replace(null);
+        mvc.perform(post("/api/avatar/moves").contentType(MediaType.APPLICATION_JSON).content("{\"direction\": \"EAST\"}"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void GET_plot_describesAPlotWithoutChangingIt() throws Exception {
         newGame();
         mvc.perform(get(PLOT)).andExpect(status().isOk())

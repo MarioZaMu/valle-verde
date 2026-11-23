@@ -1,6 +1,7 @@
 package edu.ucc.farmsim.application.service;
 
 import edu.ucc.farmsim.application.dto.AnimalView;
+import edu.ucc.farmsim.application.dto.AvatarView;
 import edu.ucc.farmsim.application.dto.BuildingOfferView;
 import edu.ucc.farmsim.application.dto.BuildingView;
 import edu.ucc.farmsim.application.dto.BuildingsView;
@@ -14,6 +15,7 @@ import edu.ucc.farmsim.domain.animal.Animal;
 import edu.ucc.farmsim.domain.building.Building;
 import edu.ucc.farmsim.domain.building.BuildingType;
 import edu.ucc.farmsim.domain.crop.Crop;
+import edu.ucc.farmsim.domain.farm.Avatar;
 import edu.ucc.farmsim.domain.farm.Plot;
 import edu.ucc.farmsim.domain.game.DayReport;
 import edu.ucc.farmsim.domain.game.GameState;
@@ -26,7 +28,7 @@ import org.springframework.stereotype.Component;
 /**
  * Turns the domain state into the immutable views the UI draws, so the UI never sees domain objects.
  *
- * <p>Stories: HU-01, HU-17, HU-18, HU-28, HU-34, HU-35.
+ * <p>Stories: HU-01, HU-17, HU-18, HU-28, HU-34, HU-35, HU-45.
  */
 @Component
 public final class ViewMapper {
@@ -60,7 +62,13 @@ public final class ViewMapper {
                 plots.add(plot(state, col, row));
             }
         }
-        return new MapView(cols, rows, List.copyOf(plots), buildingViews(state));
+        return new MapView(cols, rows, List.copyOf(plots), buildingViews(state), avatar(state));
+    }
+
+    /** Where the avatar stands and looks. */
+    public AvatarView avatar(GameState state) {
+        Avatar avatar = state.avatar();
+        return new AvatarView(avatar.col(), avatar.row(), avatar.facing().name());
     }
 
     /** One building with its animals. */

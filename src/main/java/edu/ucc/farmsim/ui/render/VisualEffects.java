@@ -1,5 +1,6 @@
 package edu.ucc.farmsim.ui.render;
 
+import edu.ucc.farmsim.application.dto.AvatarView;
 import edu.ucc.farmsim.application.dto.MapView;
 import edu.ucc.farmsim.application.dto.PlotView;
 import java.util.ArrayList;
@@ -13,11 +14,11 @@ import java.util.function.LongSupplier;
 /**
  * Everything that moves or changes colour on the map and is not the game: the palette of the season, the rain
  * and the snow, the night tint of the end-of-day transition, the frames of the animals and the growth of a crop
- * that changes stage (HU-40, HU-41). It only receives what the screen already knows (the season and weather of
+ * that changes stage (HU-40, HU-41) and the walk of the avatar between two plots (HU-45). It only receives what the screen already knows (the season and weather of
  * the events, the map views) and never calls the game, so switching it off cannot change the state (RN-08,
  * RN-25). It takes its clock from outside and has no Swing, so it is tested without waiting.
  *
- * <p>Stories: HU-40, HU-41.
+ * <p>Stories: HU-40, HU-41, HU-45, HU-48.
  */
 public final class VisualEffects {
 
@@ -32,6 +33,12 @@ public final class VisualEffects {
 
     /** Frames of the animal animation. */
     public static final int ANIMAL_FRAMES = 3;
+
+    /** How long the avatar takes to walk from one plot to the next, in milliseconds (HU-45 · CA-5). */
+    public static final int STEP_MS = 180;
+
+    /** Frames of the avatar's walk; at rest it shows the first one. */
+    public static final int AVATAR_FRAMES = 3;
 
     /** Most particles on screen, so a frame stays cheap. */
     public static final int MAX_PARTICLES = 120;
@@ -54,6 +61,10 @@ public final class VisualEffects {
     private boolean seenMap;
     private boolean animals;
     private boolean ambient;
+    private int[] avatarAt;
+    private int[] avatarFrom;
+    private long stepStart = -1;
+    private long walkingSince = -1;
 
     /**
      * Creates the effects.
@@ -114,6 +125,9 @@ public final class VisualEffects {
         grownAt.clear();
         seenMap = false;
         dayEndedAt = -1;
+        avatarAt = null;
+        avatarFrom = null;
+        stepStart = -1;
     }
 
     /** The state already advanced to the next day; the night tint starts now. */
@@ -140,6 +154,48 @@ public final class VisualEffects {
         }
         seenMap = true;
         animals = map.buildings().stream().anyMatch(b -> !b.animals().isEmpty());
+        onAvatar(map.avatar(), now);
+    }
+
+    /** A step to a neighbour plot starts the walk; a jump (a game loaded) just puts the avatar there. */
+    private void onAvatar(AvatarView avatar, long now) {
+        if (avatar == null) {
+            avatarAt = null;
+            return;
+        }
+        int[] here = {avatar.col(), avatar.row()};
+        if (avatarAt != null && Math.abs(here[0] - avatarAt[0]) + Math.abs(here[1] - avatarAt[1]) == 1) {
+            if (stepStart < 0 || now - stepStart > STEP_MS * 2L) {
+                walkingSince = now;
+            }
+            avatarFrom = avatarAt;
+            stepStart = now;
+        }
+        avatarAt = here;
+    }
+
+    /** True while the avatar is walking from one plot to the next. */
+    public boolean isWalking() {
+        return enabled && stepStart >= 0 && clock.getAsLong() - stepStart < STEP_MS;
+    }
+
+    /** Which frame of the walk the avatar shows: one of {@link #AVATAR_FRAMES} while it walks, 0 at rest. */
+    public int avatarFrame() {
+        if (!isWalking()) {
+            return 0;
+        }
+        long walked = clock.getAsLong() - walkingSince;
+        return (int) ((walked * AVATAR_FRAMES / STEP_MS) % AVATAR_FRAMES);
+    }
+
+    /** How far the avatar is on its way from the plot it left, from 0 (still there) to 1 (arrived). */
+    public double avatarProgress() {
+        return isWalking() ? (clock.getAsLong() - stepStart) / (double) STEP_MS : 1.0;
+    }
+
+    /** The plot {column, row} the avatar is walking from, or {@code null} at rest. */
+    public int[] avatarFrom() {
+        return isWalking() ? avatarFrom.clone() : null;
     }
 
     /** The season id shown. */
@@ -205,7 +261,7 @@ public final class VisualEffects {
         }
         long now = clock.getAsLong();
         boolean growing = grownAt.values().stream().anyMatch(start -> now - start < GROWTH_MS);
-        return ambient || !particles.isEmpty() || nightAlpha() > 0f || growing || animals;
+        return ambient || !particles.isEmpty() || nightAlpha() > 0f || growing || animals || isWalking();
     }
 
     private void rebuildParticles() {

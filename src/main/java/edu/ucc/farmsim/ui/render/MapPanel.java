@@ -37,7 +37,7 @@ import javax.swing.ToolTipManager;
  * view are registered with {@link #addFloating}, and the plots are placed clear of them (HU-48). Hovering a plot
  * shows its tooltip after {@link #TOOLTIP_DELAY_MS}, and clicking tells the {@link PlotClickListener}.
  *
- * <p>Stories: HU-07, HU-25, HU-35, HU-40, HU-41, HU-48.
+ * <p>Stories: HU-07, HU-25, HU-35, HU-40, HU-41, HU-45, HU-48.
  */
 public final class MapPanel extends JPanel implements GameListener {
 
@@ -109,6 +109,14 @@ public final class MapPanel extends JPanel implements GameListener {
         if (hud.isOk()) {
             effects.onWorld(hud.value().season(), hud.value().weather());
         }
+        refresh();
+    }
+
+    /**
+     * Asks the game for the map again and redraws it; used after a step was blocked, because then the avatar
+     * only turned and no event announces it.
+     */
+    public void reload() {
         refresh();
     }
 
@@ -189,7 +197,7 @@ public final class MapPanel extends JPanel implements GameListener {
     @Override
     public void onEvent(GameEvent event) {
         if (event instanceof GameEvent.GameStarted || event instanceof GameEvent.DayEnded
-                || event instanceof GameEvent.MapChanged) {
+                || event instanceof GameEvent.MapChanged || event instanceof GameEvent.AvatarMoved) {
             if (SwingUtilities.isEventDispatchThread()) {
                 react(event);
             } else {

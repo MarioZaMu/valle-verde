@@ -351,7 +351,7 @@ Después se pone `alimentadoHoy = falso`.
 - Metadatos visibles por ranura: Año, estación y día, dinero, fecha y hora real del guardado.
 
 ### RN-32 · Formato e integridad del documento
-- Documento con los campos `_id`, `schemaVersion` (= **1**), `savedAt`, `state` (el estado como texto JSON UTF-8) y `checksum` (**SHA-256** en hexadecimal de `state`).
+- Documento con los campos `_id`, `schemaVersion` (= **2** desde la Fase 5.7, que agregó el avatar; se siguen leyendo documentos de versión **1**, RN-36), `savedAt`, `state` (el estado como texto JSON UTF-8) y `checksum` (**SHA-256** en hexadecimal de `state`).
 - `state` incluye: calendario, energía, dinero, inventario, parcelas y cultivos, edificios y animales (con pendientes), mercado (demanda y precio anterior), clima y pronóstico, logros y contadores, y el **estado interno del generador aleatorio** (un entero de 64 bits que expone `StateRandom`), para continuar exactamente la misma secuencia al cargar.
 - Tamaño típico ≤ 200 KB (el límite de un documento de MongoDB es 16 MB).
 - **Guardar → cargar devuelve un estado idéntico** al original (igualdad estructural, incluida la secuencia futura de sorteos).
@@ -410,6 +410,7 @@ El *tooltip* de una parcela aparece tras **300 ms** de reposo del cursor y muest
 | `ARCHIVO_CORRUPTO` | «La partida está dañada y no se puede cargar. Tu partida actual no cambió.» |
 | `VERSION_NO_SOPORTADA` | «La partida es de una versión no soportada.» |
 | `ERROR_ES` | «No se pudo acceder a las partidas guardadas: {detalle}.» |
+| `MOVIMIENTO_BLOQUEADO` | «No puedes pasar por ahí.» (RN-36; el avatar sí cambia su mirada) |
 
 - **Toasts:** duración **3 s** (desvanecimiento de 0,4 s; los logros duran **5 s**), máximo **4 visibles** a la vez, tres tipos: éxito, información y error.
 - La interfaz **nunca** recibe excepciones: solo recibe un `Result` con código y mensaje.
@@ -429,7 +430,8 @@ Cada RN se usa por al menos un requerimiento funcional; la tabla completa RF ↔
 - Dar **un paso** (flechas o `W` `A` `S` `D`) lo mueve a la parcela vecina en esa dirección. Moverse **no cuesta energía y no avanza el día**.
 - El paso se **rechaza** (`MOVIMIENTO_BLOQUEADO`, «No puedes pasar por ahí.») si el destino está fuera del mapa, es agua u obstáculo, está cubierto por un edificio o lo ocupa un NPC. Aun así, el avatar **cambia su mirada** hacia esa dirección.
 - La **parcela frente al avatar** es la vecina en la dirección que mira. La tecla `Espacio` aplica la herramienta elegida a esa parcela con las mismas reglas de siempre (RN-06 a RN-10, RN-24, RN-26); el **clic** sobre una parcela sigue aplicándola a la parcela clicada, sin exigir cercanía.
-- Posición y mirada forman parte de la partida guardada (RN-32). Un documento de versión 1 (sin avatar) se acepta y deja al avatar en su posición inicial (RN-33).
+- Posición y mirada forman parte de la partida guardada (RN-32), que pasa a **`schemaVersion` 2**. Un documento de versión 1 (sin avatar) se acepta y deja al avatar en su posición inicial, o en la parcela transitable más cercana si allí se construyó (RN-33); una versión menor que 1 o mayor que 2 se rechaza con `VERSION_NO_SOPORTADA`. Un documento cuyo avatar no está en una parcela transitable se rechaza con `ARCHIVO_CORRUPTO`.
+- Posición inicial: parcela **(7, 7)**, la hierba justo al sur de la tierra de cultivo. No se puede **construir** sobre la parcela del avatar (`UBICACION_INVALIDA`, RN-21).
 
 ### RN-37 · Personajes (NPC) y diálogos
 - Hay **cuatro NPC** fijos, cada uno en una parcela de hierba de la configuración; **no se mueven** y **bloquean el paso** (RN-36).

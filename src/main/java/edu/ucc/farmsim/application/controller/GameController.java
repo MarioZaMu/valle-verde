@@ -1,6 +1,7 @@
 package edu.ucc.farmsim.application.controller;
 
 import edu.ucc.farmsim.application.dto.AchievementView;
+import edu.ucc.farmsim.application.dto.AvatarView;
 import edu.ucc.farmsim.application.dto.BuildingActionView;
 import edu.ucc.farmsim.application.dto.BuildingView;
 import edu.ucc.farmsim.application.dto.BuildingsView;
@@ -14,6 +15,7 @@ import edu.ucc.farmsim.application.result.ErrorCode;
 import edu.ucc.farmsim.application.result.Result;
 import edu.ucc.farmsim.application.service.AchievementService;
 import edu.ucc.farmsim.application.service.AnimalService;
+import edu.ucc.farmsim.application.service.AvatarService;
 import edu.ucc.farmsim.application.service.BuildingService;
 import edu.ucc.farmsim.application.service.DayService;
 import edu.ucc.farmsim.application.service.FarmService;
@@ -36,7 +38,7 @@ import org.springframework.stereotype.Component;
  * RNF-07), and it never touches repositories (AR-4). It is not the REST controller: the {@code api} package
  * translates HTTP into calls to this class.
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-26, HU-28, HU-29, HU-30, HU-31, HU-32, HU-33, HU-35, HU-37, HU-38.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-26, HU-28, HU-29, HU-30, HU-31, HU-32, HU-33, HU-35, HU-37, HU-38, HU-45.
  */
 @Component
 public final class GameController implements GameCommands {
@@ -53,6 +55,7 @@ public final class GameController implements GameCommands {
     private final BuildingService buildings;
     private final AnimalService animals;
     private final AchievementService achievements;
+    private final AvatarService avatar;
 
     /**
      * Creates the controller.
@@ -67,11 +70,12 @@ public final class GameController implements GameCommands {
      * @param buildings construction
      * @param animals  animal care
      * @param achievements the achievements and their progress
+     * @param avatar   walking with the avatar
      */
     public GameController(GameSession session, ViewMapper mapper, ProgressService progress, DayService day,
                           SaveGameService saves, FarmService farm, MarketService market,
                           BuildingService buildings, AnimalService animals,
-                          AchievementService achievements) {
+                          AchievementService achievements, AvatarService avatar) {
         this.session = session;
         this.mapper = mapper;
         this.progress = progress;
@@ -82,6 +86,7 @@ public final class GameController implements GameCommands {
         this.buildings = buildings;
         this.animals = animals;
         this.achievements = achievements;
+        this.avatar = avatar;
     }
 
     /** True if a game is in progress (the UI asks for confirmation before discarding it). */
@@ -160,6 +165,11 @@ public final class GameController implements GameCommands {
     @Override
     public Result<MapView> map() {
         return guard(farm::map);
+    }
+
+    @Override
+    public Result<AvatarView> move(String direction) {
+        return guard(() -> avatar.move(direction));
     }
 
     /** True if at least one of the save slots holds a game. */

@@ -12,14 +12,18 @@ import java.time.Instant;
 /**
  * Turns a game into the document of a slot and back (RN-32, DT-11): the state as JSON text with Jackson, the
  * format version and the checksum. Reading follows the order of RN-33: well-formed text, supported version,
- * matching checksum and, last, a game that can be built from the text.
+ * matching checksum and, last, a game that can be built from the text. Version 2 added the avatar (RN-36); a
+ * document of version 1 is still read, and its game has no avatar, so it starts at its place.
  *
- * <p>Stories: HU-29, HU-30, HU-31.
+ * <p>Stories: HU-29, HU-30, HU-31, HU-45.
  */
 public final class SaveCodec {
 
-    /** Version of the format of {@code state}. */
-    public static final int SCHEMA_VERSION = 1;
+    /** Version of the format of {@code state} that is written. */
+    public static final int SCHEMA_VERSION = 2;
+
+    /** Oldest version that can still be read: version 1 has no avatar. */
+    public static final int OLDEST_READABLE_VERSION = 1;
 
     private final ObjectMapper mapper = new ObjectMapper()
             .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true)
@@ -51,7 +55,7 @@ public final class SaveCodec {
         } catch (JsonProcessingException e) {
             throw new SaveLoadException(Reason.CORRUPT, "the state is not well-formed JSON: " + e.getOriginalMessage());
         }
-        if (document.schemaVersion() != SCHEMA_VERSION) {
+        if (document.schemaVersion() < OLDEST_READABLE_VERSION || document.schemaVersion() > SCHEMA_VERSION) {
             throw new SaveLoadException(Reason.UNSUPPORTED_VERSION, "schemaVersion " + document.schemaVersion());
         }
         if (!Checksum.of(state).equals(document.checksum())) {

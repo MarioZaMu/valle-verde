@@ -5,6 +5,7 @@ import edu.ucc.farmsim.application.result.Result;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import java.util.List;
 import java.util.function.Supplier;
 import org.springframework.http.HttpStatus;
@@ -26,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
  * <p>There is one game per server (S-01), so every order runs under the same lock (DT-20). The events an
  * order causes travel in the response (DT-19). The routes are documented in {@code docs/API.md}.
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-26, HU-28, HU-29, HU-30, HU-31, HU-32, HU-33, HU-35, HU-37, HU-38.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-26, HU-28, HU-29, HU-30, HU-31, HU-32, HU-33, HU-35, HU-37, HU-38, HU-45.
  */
 @RestController
 @RequestMapping("/api")
@@ -61,6 +62,9 @@ public class GameRestController {
 
     /** Body of {@code POST /api/animals}. */
     public record AnimalPurchaseRequest(@NotBlank String animalId) { }
+
+    /** Body of {@code POST /api/avatar/moves}. */
+    public record MoveRequest(@NotNull @Pattern(regexp = "NORTH|SOUTH|EAST|WEST") String direction) { }
 
     /** Every achievement with the player's progress. */
     @GetMapping("/achievements")
@@ -108,6 +112,12 @@ public class GameRestController {
     @GetMapping("/farm/map")
     public ResponseEntity<?> map() {
         return run(game::map, HttpStatus.OK);
+    }
+
+    /** One step of the avatar (RN-36). */
+    @PostMapping("/avatar/moves")
+    public ResponseEntity<?> move(@Valid @RequestBody MoveRequest request) {
+        return run(() -> game.move(request.direction()), HttpStatus.OK);
     }
 
     /** Describes one plot without changing anything. */

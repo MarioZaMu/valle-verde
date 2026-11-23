@@ -1,5 +1,6 @@
 package edu.ucc.farmsim.application.event;
 
+import edu.ucc.farmsim.application.dto.AvatarView;
 import edu.ucc.farmsim.application.dto.DaySummaryView;
 import edu.ucc.farmsim.application.dto.HudView;
 
@@ -7,7 +8,7 @@ import edu.ucc.farmsim.application.dto.HudView;
  * Something that happened in the game and the screen may want to show. Events carry immutable views, never
  * domain objects, so the UI can react without importing the domain.
  *
- * <p>Stories: HU-01, HU-10, HU-14, HU-15, HU-17, HU-26, HU-34.
+ * <p>Stories: HU-01, HU-10, HU-14, HU-15, HU-17, HU-26, HU-34, HU-45.
  */
 public sealed interface GameEvent {
 
@@ -31,6 +32,9 @@ public sealed interface GameEvent {
 
     /** Something in the inventory changed. */
     record InventoryChanged() implements GameEvent { }
+
+    /** The avatar took a step (RN-36). */
+    record AvatarMoved(AvatarView avatar) implements GameEvent { }
 
     /** Energy changed after an action. */
     record EnergyChanged(int energy, int maxEnergy) implements GameEvent { }

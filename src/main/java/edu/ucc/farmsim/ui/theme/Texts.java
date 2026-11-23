@@ -8,7 +8,7 @@ import java.util.Locale;
  * Every text the player reads on screen, in Spanish. Keeping them here means the screens contain no
  * literals and the language is easy to review (RNF-10).
  *
- * <p>Stories: HU-33, HU-34, HU-36.
+ * <p>Stories: HU-33, HU-34, HU-36, HU-45.
  */
 public final class Texts {
 
@@ -81,6 +81,9 @@ public final class Texts {
 
     /** Shown when feeding or collecting on a plot without a building. */
     public static final String NO_BUILDING_HERE = "No hay ningún edificio en esta parcela.";
+
+    /** Shown when Space is pressed and the avatar looks out of the farm. */
+    public static final String NOTHING_IN_FRONT = "No hay ninguna parcela frente a ti.";
 
     /** Title of the construction dialog. */
     public static final String CONSTRUCTION_TITLE = "Construir";

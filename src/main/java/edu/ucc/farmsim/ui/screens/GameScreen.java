@@ -29,6 +29,7 @@ import edu.ucc.farmsim.ui.components.ToolModel;
 import edu.ucc.farmsim.ui.components.WoodBox;
 import edu.ucc.farmsim.ui.components.WoodButton;
 import edu.ucc.farmsim.ui.render.MapPanel;
+import edu.ucc.farmsim.ui.render.VisualEffects;
 import edu.ucc.farmsim.ui.theme.Texts;
 import edu.ucc.farmsim.ui.theme.WoodStyle;
 import java.awt.BorderLayout;
@@ -55,12 +56,13 @@ import javax.swing.SwingUtilities;
  * messages and the buttons "End day" and "Menu". Keys 1 to 5 pick a tool, Escape deselects it, and the
  * shortcuts of RN-34 work anywhere on the screen.
  *
- * <p>Stories: HU-17, HU-18, HU-20, HU-22, HU-23, HU-26, HU-29, HU-30, HU-33, HU-34, HU-35, HU-36, HU-37, HU-38, HU-39, HU-40, HU-41, HU-48.
+ * <p>Stories: HU-17, HU-18, HU-20, HU-22, HU-23, HU-26, HU-29, HU-30, HU-33, HU-34, HU-35, HU-36, HU-37, HU-38, HU-39, HU-40, HU-41, HU-45, HU-48.
  */
 public final class GameScreen extends JPanel {
 
     private static final long serialVersionUID = 1L;
     private static final String DESELECT = "deselect-tool";
+    private static final String USE_TOOL = "use-tool";
     private static final int GAP = 6;
     private static final int MARGIN = 8;
 
@@ -184,11 +186,55 @@ public final class GameScreen extends JPanel {
         add(stage, BorderLayout.CENTER);
 
         bindKeys(tools, presenter);
+        bindWalking(presenter, map);
     }
 
     private static JPanel clear(JPanel panel) {
         panel.setOpaque(false);
         return panel;
+    }
+
+    /**
+     * Arrows and W A S D walk with the avatar, one plot per press; a held key walks at the pace of the walk
+     * animation instead of the faster key repeat. Space uses the selected tool on the plot in front (HU-45).
+     */
+    private void bindWalking(GameScreenPresenter presenter, MapPanel map) {
+        InputMap keys = getInputMap(WHEN_IN_FOCUSED_WINDOW);
+        long[] lastStep = {Long.MIN_VALUE / 2};
+        Object[][] walks = {
+            {"NORTH", KeyEvent.VK_UP, KeyEvent.VK_W}, {"SOUTH", KeyEvent.VK_DOWN, KeyEvent.VK_S},
+            {"EAST", KeyEvent.VK_RIGHT, KeyEvent.VK_D}, {"WEST", KeyEvent.VK_LEFT, KeyEvent.VK_A},
+        };
+        for (Object[] walk : walks) {
+            String direction = (String) walk[0];
+            String name = "walk-" + direction;
+            keys.put(KeyStroke.getKeyStroke((Integer) walk[1], 0), name);
+            keys.put(KeyStroke.getKeyStroke((Integer) walk[2], 0), name);
+            getActionMap().put(name, new AbstractAction() {
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    long now = System.nanoTime() / 1_000_000;
+                    if (now - lastStep[0] < VisualEffects.STEP_MS) {
+                        return;
+                    }
+                    lastStep[0] = now;
+                    if (!presenter.onMove(direction)) {
+                        map.reload();
+                    }
+                }
+            });
+        }
+        keys.put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0), USE_TOOL);
+        getActionMap().put(USE_TOOL, new AbstractAction() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                presenter.onUseTool();
+            }
+        });
     }
 
     private void bindKeys(ToolModel tools, GameScreenPresenter presenter) {

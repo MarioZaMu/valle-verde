@@ -1,6 +1,7 @@
 package edu.ucc.farmsim.ui.screens;
 
 import edu.ucc.farmsim.application.controller.GameCommands;
+import edu.ucc.farmsim.application.dto.AvatarView;
 import edu.ucc.farmsim.application.dto.BuildingActionView;
 import edu.ucc.farmsim.application.dto.BuildingView;
 import edu.ucc.farmsim.application.dto.DaySummaryView;
@@ -21,7 +22,7 @@ import java.util.function.Consumer;
  * Logic of the game screen, with no Swing: what happens when the player clicks a plot, presses a button or
  * uses a shortcut. Messages go to a sink (the status bar in production); an empty string clears the bar.
  *
- * <p>Stories: HU-10, HU-17, HU-18, HU-20, HU-22, HU-26, HU-29, HU-30, HU-34, HU-36, HU-39.
+ * <p>Stories: HU-10, HU-17, HU-18, HU-20, HU-22, HU-26, HU-29, HU-30, HU-34, HU-36, HU-39, HU-45.
  */
 public final class GameScreenPresenter {
 
@@ -33,6 +34,7 @@ public final class GameScreenPresenter {
     private final GameDialogs dialogs;
     private final ToastPresenter toasts;
     private int lastSlot;
+    private boolean blocked;
 
     /**
      * Creates the presenter.
@@ -119,6 +121,48 @@ public final class GameScreenPresenter {
             };
             show(result.isOk(), CLEAR, result.message());
         }
+    }
+
+    /**
+     * An arrow or W A S D: one step of the avatar (RN-36). A blocked step shows its message; holding the key
+     * against a wall shows the notice once, not on every repeat.
+     *
+     * @param direction {@code NORTH}, {@code SOUTH}, {@code EAST} or {@code WEST}
+     * @return {@code true} if the avatar moved; {@code false} if it only turned (or there is no game)
+     */
+    public boolean onMove(String direction) {
+        Result<AvatarView> result = controller.move(direction);
+        if (result.isOk()) {
+            blocked = false;
+            messages.accept(CLEAR);
+            return true;
+        }
+        messages.accept(result.message());
+        if (!blocked) {
+            toasts.error(result.message());
+        }
+        blocked = true;
+        return false;
+    }
+
+    /**
+     * Space: the selected tool acts on the plot in front of the avatar, with the same rules as a click there
+     * (RN-36).
+     */
+    public void onUseTool() {
+        Result<MapView> map = controller.map();
+        if (!map.isOk()) {
+            show(false, CLEAR, map.message());
+            return;
+        }
+        AvatarView avatar = map.value().avatar();
+        int col = avatar == null ? -1 : avatar.frontCol();
+        int row = avatar == null ? -1 : avatar.frontRow();
+        if (col < 0 || row < 0 || col >= map.value().cols() || row >= map.value().rows()) {
+            show(false, CLEAR, Texts.NOTHING_IN_FRONT);
+            return;
+        }
+        onPlotClicked(col, row);
     }
 
     /** The summary of the day arrived: it is shown to the player (HU-17). */

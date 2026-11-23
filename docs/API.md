@@ -24,6 +24,7 @@ Las columnas de tipo usan los *records* de `application.dto` (`HudView`, `PlotVi
 | `GET /api/game` | `hud()` | — | `HudView` | `200` |
 | `POST /api/game/days` | `endDay()` | — | `HudView` | `200` |
 | `GET /api/farm/map` | `map()` | — | `MapView` | `200` |
+| `POST /api/avatar/moves` | `move(direction)` | `{ "direction": "EAST" }` (`NORTH`, `SOUTH`, `EAST` o `WEST`; otro valor es `400`) | `AvatarView` (`col`, `row`, `facing`); evento `AvatarMoved` | `200` |
 | `GET /api/farm/plots/{col}/{row}` | `inspect(col, row)` | — | `PlotView` | `200` |
 | `POST /api/farm/plots/{col}/{row}/crop` | `plant(col, row, seedId)` | `{ "seedId": "CARROT_SEED" }` | `PlotView` | `201` |
 | `POST /api/farm/plots/{col}/{row}/watering` | `water(col, row)` | — | `PlotView` | `200` |
@@ -53,7 +54,9 @@ El **resumen del día** no tiene ruta: `POST /api/game/days` añade a sus evento
 
 Cargar una ranura rechazada **no cambia la partida en curso** (RN-33): `404 ARCHIVO_INEXISTENTE` si no hay documento, `422 ARCHIVO_CORRUPTO` si el texto, la suma de control o los datos no son válidos, `422 VERSION_NO_SOPORTADA` y `503 ERROR_ES` si MongoDB no responde en 2 s. Una ranura fuera de 1 a 3 responde `500 ERROR_INTERNO` (la interfaz nunca la envía). Los logros desbloqueados viajan como evento `AchievementUnlocked` en la respuesta de la orden que los causó.
 
-**Rutas planificadas:** ninguna por ahora; cada historia nueva agrega su ruta y su prueba (DoD 11).
+**Avatar (HU-45, RN-36):** `GET /api/farm/map` incluye `avatar` (`col`, `row`, `facing`). Un paso bloqueado responde `409 MOVIMIENTO_BLOQUEADO` sin eventos, aunque el avatar sí gira: el cliente vuelve a pedir el mapa para mostrar la nueva mirada.
+
+**Rutas planificadas:** `GET /api/npcs` y `POST /api/npcs/{id}/talk` (Etapa 5.7e); cada historia nueva agrega su ruta y su prueba (DoD 11).
 
 ### Ejemplo
 
@@ -74,7 +77,7 @@ POST /api/farm/plots/5/3/crop        {"seedId":"PUMPKIN_SEED"}      (en Primaver
 |---|---|---|
 | `400` | `CANTIDAD_INVALIDA` | la entrada del jugador no es válida |
 | `404` | `SIN_PARTIDA`, `SIN_CULTIVO`, `ARCHIVO_INEXISTENTE` | lo que se pide no existe |
-| `409` | `FUERA_DE_ESTACION`, `SIN_ENERGIA`, `SIN_FONDOS`, `INVENTARIO_LLENO`, `SIN_SEMILLAS`, `PARCELA_NO_CULTIVABLE`, `PARCELA_OCUPADA`, `YA_REGADO`, `NO_MADURO`, `CULTIVO_MARCHITO`, `EDIFICIO_BLOQUEADO`, `UBICACION_INVALIDA`, `LIMITE_EDIFICIOS`, `SIN_ESPACIO_ANIMALES`, `SIN_HENO`, `SIN_MEDICINA`, `ANIMAL_ENFERMO` | una regla de negocio impide la orden |
+| `409` | `FUERA_DE_ESTACION`, `SIN_ENERGIA`, `SIN_FONDOS`, `INVENTARIO_LLENO`, `SIN_SEMILLAS`, `PARCELA_NO_CULTIVABLE`, `PARCELA_OCUPADA`, `YA_REGADO`, `NO_MADURO`, `CULTIVO_MARCHITO`, `EDIFICIO_BLOQUEADO`, `UBICACION_INVALIDA`, `LIMITE_EDIFICIOS`, `SIN_ESPACIO_ANIMALES`, `SIN_HENO`, `SIN_MEDICINA`, `ANIMAL_ENFERMO`, `MOVIMIENTO_BLOQUEADO` | una regla de negocio impide la orden |
 | `422` | `ARCHIVO_CORRUPTO`, `VERSION_NO_SOPORTADA` | la partida guardada existe pero no se puede usar |
 | `503` | `ERROR_ES` | MongoDB no responde (la partida en curso no cambia) |
 | `500` | `ERROR_INTERNO` | error inesperado; el estado no cambió |

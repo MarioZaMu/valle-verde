@@ -395,7 +395,7 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 **Como** jugador **quiero** guardar mi partida en una de 3 ranuras **para** continuarla más tarde.
 
 **Criterios de aceptación**
-- **CA-1 · Guardado correcto.** **Dado** una partida en curso, **Cuando** guardo en la ranura 2, **Entonces** se crea o reemplaza el documento `slot2` de la colección `partidas` con `schemaVersion = 1`, `savedAt`, `state` y un `checksum` SHA-256 del `state`.
+- **CA-1 · Guardado correcto.** **Dado** una partida en curso, **Cuando** guardo en la ranura 2, **Entonces** se crea o reemplaza el documento `slot2` de la colección `partidas` con `schemaVersion = 2` (era 1 antes del avatar, RN-36), `savedAt`, `state` y un `checksum` SHA-256 del `state`.
 - **CA-2 · Escritura atómica (negativo).** **Dado** un documento previo en la ranura y una falla de escritura (MongoDB rechaza la operación o no responde en 2 s), **Cuando** guardo, **Entonces** se informa `ERROR_ES`, el documento previo **queda intacto** y la partida sigue en juego.
 - **CA-3 · Sobrescritura.** **Dado** una ranura ocupada, **Cuando** elijo guardar en ella, **Entonces** se pide confirmación y, al aceptar, el documento se reemplaza.
 - **CA-4 · Tamaño y tiempo (borde).** **Dado** una granja a plena carga, **Cuando** guardo, **Entonces** el documento pesa ≤ 200 KB y la operación toma ≤ 1 s.

@@ -139,6 +139,9 @@ package "application" #F6FBF6 {
   class ProgressService {
     +newGame(seed: long): Result
   }
+  class AvatarService {
+    +move(direction: String): Result
+  }
   class DayService {
     +endDay(): Result
   }
@@ -269,6 +272,22 @@ package "domain" #FFFCF5 {
       +plotAt(col: int, row: int): Plot
       +growCrops(w: Weather): int
       +witherOutOfSeason(s: Season): int
+      +isWalkable(col: int, row: int): boolean
+      +nearestWalkable(col: int, row: int): int[]
+    }
+    class Avatar {
+      -col: int
+      -row: int
+      -facing: Direction
+      +step(d: Direction, f: FarmMap): boolean
+      +frontCol(): int
+      +frontRow(): int
+    }
+    class Direction <<enumeration>> {
+      NORTH
+      SOUTH
+      EAST
+      WEST
     }
     class Plot {
       -terrain: Terrain
@@ -427,6 +446,9 @@ GameController --> MarketService
 GameController --> BuildingService
 GameController --> AnimalService
 GameController --> SaveGameService
+GameController --> AvatarService
+AvatarService --> GameSession
+AvatarService --> EventBus
 GameController ..> Result : devuelve
 DayService --> GameSession
 DayService --> DayPipeline
@@ -451,6 +473,9 @@ AnimalService --> EventBus
 
 ' ---------- Dominio: agregado ----------
 GameState *-- "1" FarmMap
+GameState *-- "1" Avatar
+Avatar ..> FarmMap : isWalkable
+Avatar --> Direction
 GameState *-- "1" Inventory
 GameState *-- "1" Market
 GameState *-- "1" AchievementTracker

@@ -6,18 +6,24 @@ import java.util.List;
  * The whole farm map as the screen draws it: its size and one {@link PlotView} per plot in row-major order.
  * Immutable.
  *
- * <p>Stories: HU-35.
+ * <p>Stories: HU-35, HU-45.
  *
  * @param cols      number of columns
  * @param rows      number of rows
  * @param plots     every plot, row by row
  * @param buildings the buildings drawn over the plots, with their animals
+ * @param avatar    where the avatar stands and looks, or {@code null} if it is not drawn
  */
-public record MapView(int cols, int rows, List<PlotView> plots, List<BuildingView> buildings) {
+public record MapView(int cols, int rows, List<PlotView> plots, List<BuildingView> buildings, AvatarView avatar) {
 
-    /** A map without buildings. */
+    /** A map without buildings and without avatar. */
     public MapView(int cols, int rows, List<PlotView> plots) {
         this(cols, rows, plots, List.of());
+    }
+
+    /** A map without avatar. */
+    public MapView(int cols, int rows, List<PlotView> plots, List<BuildingView> buildings) {
+        this(cols, rows, plots, buildings, null);
     }
 
     /** The building that covers the plot, or {@code null}. */

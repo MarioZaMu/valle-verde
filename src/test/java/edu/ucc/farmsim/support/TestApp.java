@@ -5,6 +5,7 @@ import edu.ucc.farmsim.application.event.EventBus;
 import edu.ucc.farmsim.application.event.GameEvent;
 import edu.ucc.farmsim.application.service.AchievementService;
 import edu.ucc.farmsim.application.service.AnimalService;
+import edu.ucc.farmsim.application.service.AvatarService;
 import edu.ucc.farmsim.application.service.BuildingService;
 import edu.ucc.farmsim.application.service.DayService;
 import edu.ucc.farmsim.application.service.FarmService;
@@ -94,6 +95,6 @@ public final class TestApp {
         AnimalService animals = new AnimalService(session, mapper, bus, achievements);
         return new TestApp(session, bus,
                 new GameController(session, mapper, progress, day, saves, farm, market, buildings, animals,
-                        achievements));
+                        achievements, new AvatarService(session, mapper, bus)));
     }
 }

@@ -1,6 +1,7 @@
 package edu.ucc.farmsim.application.controller;
 
 import edu.ucc.farmsim.application.dto.AchievementView;
+import edu.ucc.farmsim.application.dto.AvatarView;
 import edu.ucc.farmsim.application.dto.BuildingActionView;
 import edu.ucc.farmsim.application.dto.BuildingView;
 import edu.ucc.farmsim.application.dto.BuildingsView;
@@ -20,7 +21,7 @@ import java.util.List;
  *
  * <p>Every operation answers with a {@link Result}; none of them throws (R-03, RNF-07).
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-26, HU-28, HU-29, HU-30, HU-31, HU-32, HU-33, HU-35, HU-37, HU-38.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-26, HU-28, HU-29, HU-30, HU-31, HU-32, HU-33, HU-35, HU-37, HU-38, HU-45.
  */
 public interface GameCommands {
 
@@ -75,6 +76,15 @@ public interface GameCommands {
 
     /** The whole farm map, for drawing it. A pure query. */
     Result<MapView> map();
+
+    /**
+     * One step of the avatar (RN-36). It costs no energy and does not move the calendar; if the plot there
+     * cannot be walked on, it is rejected with {@code MOVIMIENTO_BLOQUEADO} and the avatar only turns.
+     *
+     * @param direction {@code NORTH}, {@code SOUTH}, {@code EAST} or {@code WEST}
+     * @return where the avatar stands now
+     */
+    Result<AvatarView> move(String direction);
 
     /** True if at least one of the save slots holds a game. */
     Result<Boolean> hasSavedGames();

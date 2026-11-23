@@ -36,7 +36,8 @@ class HU24WarehouseTest {
         GameFixtures.unlock(app.state(), Achievement.FIRST_HARVEST);
         GameFixtures.build(app.state(), BuildingType.WAREHOUSE, 2, 7);
 
-        Result<BuildingView> result = app.controller.build("WAREHOUSE", 6, 7);
+        // (9, 7): free grass away from the avatar, which stands on (7, 7) and is never built over (RN-36)
+        Result<BuildingView> result = app.controller.build("WAREHOUSE", 9, 7);
 
         assertEquals(ErrorCode.LIMITE_EDIFICIOS, result.code());
         assertEquals("Ya tienes el máximo de Almacenes.", result.message());

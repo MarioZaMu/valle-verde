@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
  * The construction use cases (RN-20, RN-21): build a building on free grass, and list what is built and what
  * can be built. The rules are checked in the order of RN-21 and a rejection never changes the game.
  *
- * <p>Stories: HU-18, HU-24, HU-26.
+ * <p>Stories: HU-18, HU-24, HU-26, HU-45.
  */
 @Service
 public final class BuildingService {
@@ -44,6 +44,7 @@ public final class BuildingService {
 
     /**
      * Builds a building with its top-left plot at the given place (RN-21): the area must be free grass inside
+     * (the avatar does not count as free: a building never lands on it, RN-36),
      * the map, the building unlocked, under its limit and affordable. Construction is instant and costs no energy.
      *
      * @param typeId building id, for example {@code COOP}
@@ -56,7 +57,8 @@ public final class BuildingService {
         }
         BuildingType type = BuildingType.valueOf(typeId);
         GameState state = session.current();
-        if (!state.farm().canPlace(type, col, row)) {
+        if (!state.farm().canPlace(type, col, row)
+                || state.avatar().isInside(col, row, type.width(), type.height())) {
             return Result.failWith(ErrorCode.UBICACION_INVALIDA);
         }
         Achievement required = type.requirement();

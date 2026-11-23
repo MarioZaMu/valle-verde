@@ -111,6 +111,14 @@ public final class GameRules {
         {0, 0}, {1, 0}, {0, 1}, {8, 0}, {0, 5}, {15, 5}, {0, 9}, {1, 9}, {7, 9}, {14, 9}, {15, 9}, {15, 8}
     };
 
+    // ---- RN-36: avatar ----
+
+    /** Column of the grass plot where the avatar of a new game stands, just south of the soil. */
+    public static final int AVATAR_START_COL = 7;
+
+    /** Row of the grass plot where the avatar of a new game stands. */
+    public static final int AVATAR_START_ROW = 7;
+
     // ---- RN-30: new game ----
 
     /** Money at the start of a game. */

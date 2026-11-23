@@ -49,6 +49,7 @@ public final class Messages {
         TEMPLATES.put(ErrorCode.SIN_HENO, "Heno insuficiente: necesitas %d.");
         TEMPLATES.put(ErrorCode.SIN_MEDICINA, "No tienes Medicina.");
         TEMPLATES.put(ErrorCode.ANIMAL_ENFERMO, "Hay animales enfermos: cúralos con Medicina.");
+        TEMPLATES.put(ErrorCode.MOVIMIENTO_BLOQUEADO, "No puedes pasar por ahí.");
         TEMPLATES.put(ErrorCode.ARCHIVO_INEXISTENTE, "No existe una partida en la ranura %d.");
         TEMPLATES.put(ErrorCode.ARCHIVO_CORRUPTO,
                 "La partida está dañada y no se puede cargar. Tu partida actual no cambió.");

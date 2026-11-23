@@ -496,8 +496,10 @@ Ajustes surgidos al implementar: (1) `Main` se declara como capa «Composition»
 | 5.7b | HU-43 | `pom.xml` con FlatLaf (descarga de Maven Central), `UiTheme`, tipografía, contraste |
 | 5.7c | HU-44, HU-48 | `tools/gen_sprites.py`, sprites de 32 × 32, escala entera nítida, iconos en barra, HUD e inventario |
 | 5.7d | HU-45 | `Avatar` en `GameState` y en el memento (esquema 2, el 1 se sigue aceptando), `GameCommands.move`, `POST /api/avatar/moves`, teclas, animación |
-| 5.7e | HU-46, HU-47 | `Npc`, `DialogueService`, `GET /api/npcs`, `POST /api/npcs/{id}/talk`, encargos, cuadro de diálogo |
-| 5.7f | — | cierre: arranque ≤ 5 s, cobertura, diagramas, README |
+| 5.7e | HU-46, HU-47 | `Npc`, `DialogueService`, `GET /api/npcs`, `POST /api/npcs/{id}/talk`, encargos, cuadro de diálogo, interacción con `E` o clic |
+| 5.7f | HU-49 (nueva) | tutorial de inicio: en una partida nueva el avatar guía al jugador paso a paso (caminar, sembrar, regar, hablar con un NPC, terminar el día); se puede saltar y su avance se guarda |
+| 5.7g | HU-29 a HU-32 (corrección) | persistencia en MongoDB: diagnosticar por qué la aplicación empaquetada no guarda nada, corregirlo y cubrirlo con una prueba contra MongoDB real (HU-29 · CA-2 pendiente) |
+| 5.7h | — | cierre: arranque ≤ 5 s, cobertura, diagramas, README |
 
 **Códigos de error nuevos (RN-35):** `MOVIMIENTO_BLOQUEADO`, `NPC_LEJOS`, `ENCARGO_INCOMPLETO` (los tres `409`).
 
@@ -515,4 +517,13 @@ Ajustes surgidos al implementar: (1) `Main` se declara como capa «Composition»
 - **Ventana:** abre maximizada y nunca más grande que la parte útil de la pantalla (antes 1100 × 860 no cabía en 1536 × 816 con la escala de 125 %).
 
 Decisiones: **D-64** la vista 3/4 se logra en la UI sin tocar el dominio (los árboles y tejados ocupan visualmente la parcela de arriba, pero las reglas siguen usando solo la huella); **D-65** la animación ambiental no cambia el estado y se apaga con la casilla «Efectos» (RN-08, RN-25).
+
+**Etapa 5.7d (hecha): avatar que camina (HU-45).** 526 pruebas en verde (2 omitidas); cobertura de dominio y aplicación sobre la barrera; verificadores sin errores.
+
+- **Dominio:** `Avatar` (posición, mirada, `step`), `Direction` y `AvatarSnapshot` en `domain.farm`; `FarmMap.isWalkable` (hierba o tierra, dentro del mapa y sin edificio) y `nearestWalkable`. `GameState` contiene al avatar y `stepAvatar`; el `GameMemento` lo guarda. `GameStateValidator` rechaza una partida con el avatar sobre agua, obstáculo o edificio.
+- **Guardado:** `SaveCodec.SCHEMA_VERSION = 2`; se siguen leyendo documentos de versión 1 (sin `avatar`), que dejan al avatar en (7, 7) o en la parcela transitable más cercana.
+- **Aplicación y red:** `AvatarService.move`, `GameCommands.move(direction)`, `AvatarView`, evento `AvatarMoved`, `MapView.avatar`, `POST /api/avatar/moves` y `MOVIMIENTO_BLOQUEADO` (409). La prueba de equivalencia cubre el paso por HTTP y en proceso.
+- **Interfaz:** flechas y `W` `A` `S` `D` caminan (un paso cada 180 ms al mantener la tecla); `Espacio` usa la herramienta en la parcela de enfrente; el clic sigue igual. `VisualEffects` anima el paso con 3 cuadros y lo interpola entre parcelas; en reposo muestra un cuadro. `MapRenderer` lo ordena por profundidad con su sombra (y un dibujo vectorial si no hay sprites).
+
+Decisiones: **D-66** un paso bloqueado se rechaza con `MOVIMIENTO_BLOQUEADO` pero **cambia la mirada**, por pedido de RN-36; es la única orden rechazada que cambia algo, por eso no publica eventos y la vista vuelve a pedir el mapa; **D-67** no se construye sobre la parcela del avatar (`UBICACION_INVALIDA`), para que nunca quede encerrado dentro de un edificio; **D-68** los NPC aún no bloquean el paso: se suman a `isWalkable` en la 5.7e.
 

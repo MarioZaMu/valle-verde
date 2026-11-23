@@ -1,6 +1,7 @@
 package edu.ucc.farmsim.ui.render;
 
 import edu.ucc.farmsim.application.dto.AnimalView;
+import edu.ucc.farmsim.application.dto.AvatarView;
 import edu.ucc.farmsim.application.dto.BuildingView;
 import edu.ucc.farmsim.application.dto.MapView;
 import edu.ucc.farmsim.application.dto.PlotView;
@@ -30,14 +31,15 @@ import java.util.Set;
  * its fence and woods, and trees, buildings, crops and animals that stand on their tile, rise above it and are
  * drawn from back to front, each with its shadow. Something that hides a crop or the plot under the cursor
  * turns see-through. With the ambient life on, the water ripples, the trees sway, the animals wander and
- * clouds, butterflies or leaves cross the fields.
+ * clouds, butterflies or leaves cross the fields. The avatar stands among them and walks from plot to plot
+ * with three frames (HU-45).
  *
  * <p>Without the pack each terrain and each crop stage is drawn with vector shapes, so the game needs no image
  * at all (HU-42); a single missing sprite also falls back to its vector shape. With a {@link VisualEffects}
  * it paints the palette of the season, the weather, the night tint and the animations (HU-40, HU-41). It works
  * on any {@link Graphics2D}, including one of an image, so it is tested without a display.
  *
- * <p>Stories: HU-18, HU-19, HU-25, HU-35, HU-40, HU-41, HU-42, HU-44, HU-48.
+ * <p>Stories: HU-18, HU-19, HU-25, HU-35, HU-40, HU-41, HU-42, HU-44, HU-45, HU-48.
  */
 public final class MapRenderer {
 
@@ -59,6 +61,10 @@ public final class MapRenderer {
     private static final Color CURSOR_EDGE = new Color(0x3B2412);
     private static final Color CURSOR_FILL = new Color(255, 255, 255, 48);
     private static final Color BUBBLE = new Color(0xFFF8E7);
+    private static final Color AVATAR_SHIRT = new Color(0x3F7FBF);
+    private static final Color AVATAR_SKIN = new Color(0xF2C79B);
+    private static final Color AVATAR_HAT = new Color(0xC8963E);
+    private static final Color AVATAR_EYE = new Color(0x2A1A10);
 
     private final AssetManager assets;
     private final PixelScaler scaler = new PixelScaler();
@@ -164,6 +170,9 @@ public final class MapRenderer {
         if (hover != null) {
             hidden.add(key(hover.col(), hover.row()));
         }
+        if (map.avatar() != null) {
+            hidden.add(key(map.avatar().col(), map.avatar().row()));
+        }
         List<Rectangle> shadows = new ArrayList<>();
         List<Item> items = new ArrayList<>();
         List<Runnable> above = new ArrayList<>();
@@ -180,6 +189,9 @@ public final class MapRenderer {
         }
         for (BuildingView building : map.buildings()) {
             building(g, building, geo, fx, ambient, time, hidden, shadows, items, above);
+        }
+        if (map.avatar() != null) {
+            avatar(g, map.avatar(), geo, fx, shadows, items);
         }
         Composite saved = g.getComposite();
         g.setColor(SHADOW);
@@ -439,6 +451,70 @@ public final class MapRenderer {
         for (PlotView plot : map.plots()) {
             if (plot.crop() != null && plot.sheltered()) {
                 drawCrop(g, plot, geometry.cellBounds(plot.col(), plot.row()), fx);
+            }
+        }
+        if (map.avatar() != null) {
+            drawAvatarVector(g, avatarCell(map.avatar(), geometry, fx), map.avatar().facing());
+        }
+    }
+
+    // ------------------------------------------------------------------ avatar
+
+    /** The sprite of the avatar looking to a direction, in one frame of its walk. */
+    static String avatarSprite(String facing, int frame) {
+        return "characters/AVATAR_" + facing.charAt(0) + "_" + frame + ".png";
+    }
+
+    /** Where the avatar is drawn: its plot, or on the way to it while it walks. */
+    private static Rectangle avatarCell(AvatarView avatar, MapGeometry geo, VisualEffects fx) {
+        Rectangle to = geo.cellBounds(avatar.col(), avatar.row());
+        int[] from = fx == null ? null : fx.avatarFrom();
+        if (from == null) {
+            return to;
+        }
+        Rectangle start = geo.cellBounds(from[0], from[1]);
+        double t = fx.avatarProgress();
+        return new Rectangle((int) Math.round(start.x + (to.x - start.x) * t),
+                (int) Math.round(start.y + (to.y - start.y) * t), to.width, to.height);
+    }
+
+    private void avatar(Graphics2D g, AvatarView avatar, MapGeometry geo, VisualEffects fx, List<Rectangle> shadows,
+                        List<Item> items) {
+        Rectangle cell = avatarCell(avatar, geo, fx);
+        int s = cell.width;
+        shadows.add(new Rectangle(cell.x + s / 5, cell.y + s - s / 6, s * 3 / 5, s / 5));
+        int frame = fx == null ? 0 : fx.avatarFrame();
+        Optional<BufferedImage> sprite = assets.sprite(avatarSprite(avatar.facing(), frame));
+        items.add(new Item(cell.y + cell.height - 0.1, items.size(), () -> {
+            if (sprite.isPresent()) {
+                scaler.draw(g, sprite.get(), cell.x, cell.y, s, s);
+            } else {
+                drawAvatarVector(g, cell, avatar.facing());
+            }
+        }));
+    }
+
+    /** The avatar without sprites: a farmer with a straw hat, looking to its direction. */
+    private static void drawAvatarVector(Graphics2D g, Rectangle c, String facing) {
+        int s = c.width;
+        int cx = c.x + s / 2;
+        g.setColor(AVATAR_SHIRT);
+        g.fillRoundRect(cx - s / 5, c.y + s * 9 / 20, s * 2 / 5, s * 2 / 5, s / 6, s / 6);
+        g.setColor(AVATAR_SKIN);
+        g.fillOval(cx - s / 6, c.y + s / 5, s / 3, s / 3);
+        g.setColor(AVATAR_HAT);
+        g.fillRect(cx - s / 4, c.y + s / 5, s / 2, Math.max(2, s / 14));
+        g.fillOval(cx - s / 8, c.y + s / 10, s / 4, s / 6);
+        if (!"NORTH".equals(facing)) {
+            int shift = "EAST".equals(facing) ? s / 12 : ("WEST".equals(facing) ? -s / 12 : 0);
+            int eye = Math.max(2, s / 16);
+            int ey = c.y + s / 3 + s / 20;
+            g.setColor(AVATAR_EYE);
+            if (shift == 0) {
+                g.fillRect(cx - s / 12 - eye / 2, ey, eye, eye);
+                g.fillRect(cx + s / 12 - eye / 2, ey, eye, eye);
+            } else {
+                g.fillRect(cx + shift - eye / 2, ey, eye, eye);
             }
         }
     }

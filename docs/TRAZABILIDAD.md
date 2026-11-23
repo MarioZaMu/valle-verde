@@ -87,7 +87,7 @@ RF-43, 48 | Contrast, Main, Palette, UiTheme, WoodStyle | HU-43: 5 |
 RF-42, 44 | AssetManager, GroundLayer, MapGeometry, MapRenderer, PixelScaler | HU-44: 7 |
 | RF-45 | Should | HU-45 | Avatar y personajes
 (NPC y encargos)
-RF-45 a RF-47 | pendiente | HU-45: 0 |
+RF-45 a RF-47 | Avatar, AvatarService, AvatarSnapshot, AvatarView, BuildingService, Direction, ErrorCode, FarmMap, GameCommands, GameController, GameEvent, GameMemento, GameRestController, GameScreen, GameScreenPresenter, GameState, GameStateValidator, MapPanel, MapRenderer, MapView, RemoteGameClient, SaveCodec, Texts, ViewMapper, VisualEffects | HU-45: 15 |
 | RF-46 | Should | HU-46 | Avatar y personajes
 (NPC y encargos)
 RF-45 a RF-47 | pendiente | HU-46: 0 |
@@ -97,7 +97,7 @@ RF-45 a RF-47 | pendiente | HU-47: 0 |
 | RF-48 | Should | HU-48 | Interfaz de usuario
 (Swing + FlatLaf)
 RF-33 a RF-41
-RF-43, 48 | AmbientPainter, AssetManager, EnergyBar, GameScreen, GroundLayer, HoverAnimator, HudModel, HudPanel, InventoryGrid, MapPanel, MapRenderer, PixelScaler, StartScreen, TitleScene, ToolBar, WoodBox, WoodButton, WoodSlot, WoodStyle | HU-48: 13 |
+RF-43, 48 | AmbientPainter, AssetManager, EnergyBar, GameScreen, GroundLayer, HoverAnimator, HudModel, HudPanel, InventoryGrid, MapPanel, MapRenderer, PixelScaler, StartScreen, TitleScene, ToolBar, VisualEffects, WoodBox, WoodButton, WoodSlot, WoodStyle | HU-48: 13 |
 
 ## 2. Por historia de usuario
 
@@ -147,9 +147,9 @@ RF-43, 48 | AmbientPainter, AssetManager, EnergyBar, GameScreen, GroundLayer, Ho
 | HU-42 · Carga de sprites con respaldo vectorial | 5.6 | Should | 4 | 8 | completa | AssetManager, MapRenderer |
 | HU-43 · Tema visual profesional con FlatLaf | 5.7 | Should | 4 | 5 | completa | Contrast, Main, Palette, UiTheme, WoodStyle |
 | HU-44 · Sprites pixel-art propios de 32 × 32 | 5.7 | Should | 5 | 7 | completa | AssetManager, GroundLayer, MapGeometry, MapRenderer, PixelScaler |
-| HU-45 · Mover el avatar por la granja | 5.7 | Should | 5 | 0 | sin pruebas | pendiente |
+| HU-45 · Mover el avatar por la granja | 5.7 | Should | 5 | 15 | completa | Avatar, AvatarService, AvatarSnapshot, AvatarView, BuildingService, Direction, ErrorCode, FarmMap, GameCommands, GameController, GameEvent, GameMemento, GameRestController, GameScreen, GameScreenPresenter, GameState, GameStateValidator, MapPanel, MapRenderer, MapView, RemoteGameClient, SaveCodec, Texts, ViewMapper, VisualEffects |
 | HU-46 · Hablar con los NPC | 5.7 | Should | 5 | 0 | sin pruebas | pendiente |
 | HU-47 · Encargos de los NPC | 5.7 | Could | 4 | 0 | sin pruebas | pendiente |
-| HU-48 · Interfaz con aspecto de granja | 5.7 | Should | 8 | 13 | completa | AmbientPainter, AssetManager, EnergyBar, GameScreen, GroundLayer, HoverAnimator, HudModel, HudPanel, InventoryGrid, MapPanel, MapRenderer, PixelScaler, StartScreen, TitleScene, ToolBar, WoodBox, WoodButton, WoodSlot, WoodStyle |
+| HU-48 · Interfaz con aspecto de granja | 5.7 | Should | 8 | 13 | completa | AmbientPainter, AssetManager, EnergyBar, GameScreen, GroundLayer, HoverAnimator, HudModel, HudPanel, InventoryGrid, MapPanel, MapRenderer, PixelScaler, StartScreen, TitleScene, ToolBar, VisualEffects, WoodBox, WoodButton, WoodSlot, WoodStyle |
 
-**Resumen:** 45 de 48 historias con todas sus pruebas; 396 pruebas `HUxx_` en total.
+**Resumen:** 46 de 48 historias con todas sus pruebas; 411 pruebas `HUxx_` en total.

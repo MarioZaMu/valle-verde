@@ -17,10 +17,10 @@ import java.util.List;
 
 /**
  * Checks the invariants of RN-33 (step 5) on a game that was read from a save, without any I/O: money, energy,
- * inventory, crops, buildings, animals, market and achievements must make sense together. A game that fails
+ * inventory, crops, buildings, animals, market, achievements and the avatar must make sense together. A game that fails
  * is never loaded.
  *
- * <p>Stories: HU-31.
+ * <p>Stories: HU-31, HU-45.
  */
 public final class GameStateValidator {
 
@@ -83,6 +83,7 @@ public final class GameStateValidator {
             warehouses += building.type() == BuildingType.WAREHOUSE ? 1 : 0;
             checkAnimals(building, found);
         }
+        checkAvatar(memento, map, found);
         var inventory = memento.inventory();
         int expected = GameRules.INVENTORY_BASE_SLOTS + warehouses * GameRules.WAREHOUSE_EXTRA_SLOTS;
         if (inventory.capacity() != expected || inventory.slots().size() != inventory.capacity()) {
@@ -94,6 +95,17 @@ public final class GameStateValidator {
                     || (stack.amount() > 0 && stack.type() == null)) {
                 found.add("invalid stack: " + stack);
             }
+        }
+    }
+
+    /** A save of version 1 has no avatar; otherwise it must stand on a plot it can walk on (RN-36). */
+    private static void checkAvatar(GameMemento memento, FarmMap map, List<String> found) {
+        var avatar = memento.avatar();
+        if (avatar == null) {
+            return;
+        }
+        if (avatar.facing() == null || !map.isWalkable(avatar.col(), avatar.row())) {
+            found.add("the avatar is not on a plot it can walk on: " + avatar);
         }
     }
 
