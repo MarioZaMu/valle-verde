@@ -1,6 +1,6 @@
 # Diagramas — Valle Verde
 
-> **Versión 0.1 · 2026-11-22 · Fase 3**
+> **Versión 0.2 · 2026-11-23 · revisados al cierre de la Fase 5.7** (contexto, despliegue y secuencia rehechos; lógica, funcional y desarrollo ajustados)
 > Las **5 vistas** que exige la plantilla del profesor (`docs/entrada/Modelo de presentación de diseño.pptx`, diapositivas 2 a 6) y **1 secuencia anexa**. Los archivos fuente son PlantUML (`.puml`) y se renderizan a PNG con `tools/render_diagrams.sh`. El verificador `tools/check_diagrams.py` comprueba la coherencia entre los diagramas (ver §8).
 
 | # | Diapositiva | Vista | Notación | Archivo | Responde |
@@ -21,7 +21,7 @@
 ![Vista de contexto](diagramas/01_vista_contexto.png)
 
 - **Cubre:** alcance y actores de [`VISION_ALCANCE.md`](VISION_ALCANCE.md) §4–5; CU-14, CU-15 y CU-18 (actores secundarios).
-- **Contenido:** un solo círculo (el sistema, sin nada dentro), 3 entidades externas (**Jugador**, **MongoDB**, **Paquete de assets gráficos**) y 5 flujos con sustantivo: *Órdenes de juego*, *Estado y notificaciones*, *Partida (documento + checksum)*, *Partida guardada* y *Sprites e iconos*.
+- **Contenido:** un solo círculo (el sistema, sin nada dentro), 2 entidades externas (**Jugador** y **MongoDB**) y 4 flujos con sustantivo: *Órdenes de juego* (caminar, herramienta, hablar con vecinos, compras y ventas, terminar día, guardar, cargar, pasos del tutorial), *Estado y notificaciones*, *Partida guardada* y *Partida cargada*. Los sprites ya no son una entidad externa: son propios (`tools/gen_sprites.py`) y van dentro del jar.
 - **Decisiones:** el reloj del juego no es entidad externa (avanza solo cuando el jugador termina el día); el almacén de datos no aparece (la guía lo reserva para niveles internos del DFD); no hay flechas entre entidades externas.
 - **Nota de notación:** el contexto no es UML formal sino un DFD nivel 0, como la plantilla («Online Community»). Se dibuja en un bloque `@startdot` dentro del `.puml` para obtener un círculo real.
 
@@ -30,8 +30,8 @@
 ![Vista funcional](diagramas/02_vista_funcional.png)
 
 - **Cubre:** los **50 RF** agrupados por componente (el verificador confirma que cada RF aparece **exactamente una vez**), HU-10, HU-29, HU-30, HU-35, HU-42 y las RN-01 a RN-40 (en el dominio).
-- **Componentes:** Interfaz de usuario (RF-33 a RF-41, RF-43 y RF-48), Gestor de assets (RF-42 y RF-44), Cliente HTTP (`RemoteGameClient`) con el bus de eventos del cliente, Controlador REST (`GameRestController` y `EventCollector`), Controlador del juego, Servicios de aplicación (6 bloques: cultivo RF-01–07, tiempo y clima RF-08–12 y RF-17, economía RF-13–16, construcción y animales RF-18–25, progreso RF-26–28, guardado RF-29–32, avatar, personajes, tutorial y valle RF-45–47, RF-49 y RF-50), Bus de eventos, Dominio del juego, Repositorio de partidas y dos externos (MongoDB y paquete de assets).
-- **Interfaces:** `IGameCommands` (la provee el cliente a la UI y el controlador del juego a la API), `IApiRest` (HTTP/JSON), `IServicios`, `IGameRules`, `IEventPublisher`, `IEventSubscription`, `IAssetProvider`, `ISaveRepository`, `IGameSnapshot`, `IMongoDB` e `IAssetFiles`; más 2 puertos en los componentes de entrada.
+- **Componentes:** Interfaz de usuario (RF-33 a RF-41, RF-43 y RF-48), Gestor de assets (RF-42 y RF-44), Cliente HTTP (`RemoteGameClient`) con el bus de eventos del cliente, Controlador REST (`GameRestController` y `EventCollector`), Controlador del juego, Servicios de aplicación (6 bloques: cultivo RF-01–07, tiempo y clima RF-08–12 y RF-17, economía RF-13–16, construcción y animales RF-18–25, progreso RF-26–28, guardado RF-29–32, avatar, personajes, tutorial y valle RF-45–47, RF-49 y RF-50), Bus de eventos, Dominio del juego, Repositorio de partidas, los sprites pixel-art propios (recursos del jar) y un externo (MongoDB).
+- **Interfaces:** `IGameCommands` (la provee el cliente a la UI y el controlador del juego a la API), `IApiRest` (HTTP/JSON), `IServicios`, `IGameRules`, `IEventPublisher`, `IEventSubscription`, `IAssetProvider`, `ISaveRepository`, `IGameSnapshot`, `IMongoDB` e `IAssetFiles` (lectura del classpath); más 2 puertos en los componentes de entrada.
 - **Decisiones:**
   - La interfaz `ISaveRepository` la define el **dominio** y la implementa la infraestructura (inversión de dependencias); el repositorio requiere `IGameSnapshot` del dominio.
   - RF-17 (resumen del día) está en *Tiempo y clima* porque lo produce `DayService` al terminar el día, aunque su épica sea Economía; RF-28 (nueva partida) está en *Progreso* porque crea el estado inicial y los logros.
@@ -43,9 +43,9 @@
 ![Vista lógica](diagramas/03_vista_logica.png)
 
 - **Cubre:** modelo de dominio y capa de aplicación para RF-01 a RF-32; HU-01 a HU-32.
-- **Contenido:** 53 clases en 4 paquetes (`ui`, `application`, `domain` con 9 subpaquetes e `infrastructure`). Cada clase de patrón lleva su **estereotipo** y su **color**; la leyenda enumera los 7 colores.
+- **Contenido:** 103 clases en 6 paquetes (`ui`, `client`, `api`, `application`, `domain` con 10 subpaquetes —incluido `npc`— e `infrastructure`), con el avatar, los vecinos, los encargos, el tutorial y las casas de la fase 5.7. Cada clase de patrón lleva su **estereotipo** y su **color**; la leyenda enumera los 7 colores.
 - **Relaciones (justificadas, sin rombos de adorno):**
-  - **Composición (◆)** donde la parte no existe sin el todo: `GameState` → `FarmMap`, `Inventory`, `Market`, `AchievementTracker`; `FarmMap` → 160 `Plot` y → `Building`; `Plot` → `Crop` (0..1); `Building` → `Animal` (0..4).
+  - **Composición (◆)** donde la parte no existe sin el todo: `GameState` → `FarmMap`, `Inventory`, `Market`, `AchievementTracker`; `FarmMap` → 1152 `Plot` (valle de 48 × 24) y → `Building`; `Plot` → `Crop` (0..1); `Building` → `Animal` (0..4).
   - **Agregación (◇)** donde la parte tiene ciclo de vida independiente: un estado o una estrategia es compartible y reemplazable (`Crop` → `CropState`, `Animal` → `AnimalState`, `GameClock` → `SeasonState`, `Market` → `PricingStrategy`), `EventBus` → `GameListener` y `BuildingDirector` → `BuildingBuilder`.
   - **Dependencia (- - ->)** para uso puntual sin referencia mantenida (`GameState` → `GameClock`, `SeasonState` → `WeatherStrategy`, `MapPanel` → `GameController`).
 - **Se muestra un subconjunto representativo:** de las 5 fábricas de cultivo solo `CarrotFactory` y `PumpkinFactory`; de las 4 construcciones solo `CoopBuilder` y `GreenhouseBuilder`; los servicios `FarmService`, `BuildingService`, `AnimalService` y `ProgressService` se indican en una nota. No se dibujan los enumerados (`Terrain`, `Weather`, `CropType`, `AnimalType`, `BuildingType`, `ItemType`), que aparecen como tipos de atributos.
@@ -80,7 +80,7 @@ Cada clase que implemente un patrón llevará el Javadoc `Pattern: <nombre> — 
 ![Vista de despliegue](diagramas/05_vista_despliegue.png)
 
 - **Cubre:** RNF-02, RNF-03, RNF-11, RNF-15, RNF-16, R-07, R-09, W-01 y W-03; HU-29, HU-30 y HU-33; RN-31 y RN-32.
-- **Contenido:** un nodo `«device»` (el equipo del jugador, Windows 10 o superior) con dos entornos de ejecución `«executionEnvironment»` al mismo nivel: la **JVM** (JRE 17+), que contiene a su vez el entorno del **Cliente** (Swing + Java2D) y el del **Servidor** (Spring Boot con Tomcat embebido en 127.0.0.1) además del artefacto `farmsim.jar`, y **MongoDB** (puerto 27017) con el artefacto *colección partidas*. Dos rutas de comunicación con protocolo: **HTTP / JSON** entre cliente y servidor, y **protocolo MongoDB (TCP)** entre servidor y MongoDB.
+- **Contenido:** un nodo `«device»` (el equipo del jugador, Windows 10 o superior) con dos entornos de ejecución `«executionEnvironment»` al mismo nivel: la **JVM** (JRE 17+), que contiene a su vez el entorno del **Cliente** (Swing + Java2D) y el del **Servidor** (Spring Boot con Tomcat embebido en 127.0.0.1) además del artefacto `farmsim.jar`, y **MongoDB Community 8.0** (servicio de Windows que arranca solo, puerto 27017) con el artefacto *colección partidas* de la base `valleverde`. La leyenda explica el arranque en paralelo (pantalla de inicio en unos 2 s, RNF-02), el contenido del jar (incluidos los 122 sprites propios) y el documento con `schemaVersion` 3. Dos rutas de comunicación con protocolo: **HTTP / JSON** entre cliente y servidor, y **protocolo MongoDB (TCP)** entre servidor y MongoDB.
 - **Decisiones (según el PDF de despliegue, p. 14 y p. 17):** no se dibujan las capas como servidores (son agrupaciones lógicas dentro del mismo proceso); no se confunde una clase con un artefacto; no se agrega internet, nube ni más nodos de los que el escenario tiene (servidor, cliente y MongoDB corren en el mismo equipo; W-01 y W-03).
 
 ## 6. Anexo A1 · Secuencia «Vender cosecha»
@@ -88,10 +88,10 @@ Cada clase que implemente un patrón llevará el Javadoc `Pattern: <nombre> — 
 ![Secuencia Vender cosecha](diagramas/A1_secuencia_vender_cosecha.png)
 
 - **Cubre:** HU-15 (CA-1 y CA-6), HU-26 (LG-04), HU-34, HU-38 y HU-39; RF-15, RF-26, RF-34, RF-38 y RF-39; RN-14, RN-15, RN-17, RN-18 y RN-28.
-- **Camino exitoso:** 3 Zanahorias en Primavera con demanda 100 → `sell` viaja por HTTP (`POST /api/market/sales`) → `sellUnit` ×3 (27 + 26 + 26) → `remove` → `earn(79)` → `evaluate` → `publish(SaleCompleted)` → el servidor devuelve `200 {data: 79, events}` → el cliente republica el evento → `onEvent` en `HudPanel` y, si la venta desbloquea un logro, en `ToastPresenter` → `Result.ok(79)`.
-- **Camino de error:** cantidad fuera de rango → `Result.fail(CANTIDAD_INVALIDA)` → respuesta HTTP de error y el mismo `Result` en el cliente, sin modificar inventario, saldo ni demanda.
+- **Camino exitoso:** 3 Zanahorias en Primavera con demanda 100 → `MarketPresenter.sellUnits` → `sell` viaja por HTTP (`POST /api/market/sales`) → `sellUnit` ×3 (27 + 26 + 26) → `remove` → `earn(79)` → `recordSale(3)` → `publish(MoneyChanged)` y `publish(InventoryChanged)` → `AchievementService.check` → `evaluateAchievements` (y `AchievementUnlocked` solo si hay logro) → el servidor devuelve `200 {data: 79, events}` → el cliente republica los eventos → `HudPanel` muestra «579 m» al instante y, si hubo logro, `ToastPresenter` avisa → el presentador recarga el mercado y muestra «Vendiste 3 × Zanahoria por 79 m.».
+- **Camino de error:** cantidad fuera de rango → `Result.fail(CANTIDAD_INVALIDA)` → respuesta HTTP `400` y el mismo `Result` en el cliente, sin modificar inventario, saldo ni demanda.
 - **Regla del taller:** cada mensaje sólido corresponde a una operación del diagrama de clases (verificado por script).
-- **Demuestra la regla de capas:** `MarketDialog` → `RemoteGameClient` → HTTP → `GameRestController` → `GameController` → `MarketService` → dominio; el controlador nunca llama a un repositorio y la UI recibe solo un `Result` (nunca una excepción).
+- **Demuestra la regla de capas:** `MarketDialog` → `MarketPresenter` → `RemoteGameClient` → HTTP → `GameRestController` → `GameController` → `MarketService` → dominio; el controlador nunca llama a un repositorio y la UI recibe solo un `Result` (nunca una excepción).
 
 ## 7. Notación: errores de la plantilla que NO se replicaron
 

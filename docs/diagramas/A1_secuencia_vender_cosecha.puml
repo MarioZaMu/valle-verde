@@ -5,6 +5,7 @@
   Con cliente y servidor: la orden cruza HTTP (los mensajes HTTP se rotulan con el verbo y la ruta, ver docs/API.md).
   Taller bloque 7: cada mensaje corresponde a una operación del diagrama de clases (03_vista_logica) y el flujo incluye
   el camino exitoso y el camino de error. Ejemplo numérico: 3 Zanahorias en Primavera con demanda 100 → 27 + 26 + 26 = 79 m.
+  Sigue el código de MarketPresenter.sellUnits, MarketService.sell y AchievementService.check (fase 5.7).
 '/
 skinparam dpi 150
 skinparam shadowing false
@@ -25,6 +26,7 @@ title Anexo A1 — Secuencia «Vender cosecha» (HU-15)\n
 actor Jugador
 box "ui" #E3F2FD
   participant MarketDialog
+  participant MarketPresenter
   participant HudPanel
   participant ToastPresenter
 end box
@@ -38,6 +40,7 @@ end box
 box "application" #E8F5E9
   participant GameController
   participant MarketService
+  participant AchievementService
   participant EventBus
 end box
 box "domain" #FFF3E0
@@ -47,9 +50,11 @@ box "domain" #FFF3E0
   participant AchievementTracker
 end box
 
-Jugador -> MarketDialog : elige Zanahoria, cantidad 3\ny pulsa «Vender»
+Jugador -> MarketDialog : pestaña «Vender», Zanahoria,\ncantidad 3 y pulsa «Vender»
 activate MarketDialog
-MarketDialog -> RemoteGameClient : sell("CARROT", 3)
+MarketDialog -> MarketPresenter : sellUnits("CARROT", 3)
+activate MarketPresenter
+MarketPresenter -> RemoteGameClient : sell("CARROT", 3)
 activate RemoteGameClient
 RemoteGameClient -> GameRestController : POST /api/market/sales {itemId, quantity}
 activate GameRestController
@@ -63,56 +68,67 @@ Inventory --> MarketService : 3
 deactivate Inventory
 
 alt cantidad fuera de rango (cantidad < 1 o mayor que la existencia)
-  MarketService --> GameController : Result.fail(CANTIDAD_INVALIDA, mensaje)
+  MarketService --> GameController : Result.fail(CANTIDAD_INVALIDA, 3)
   note right of MarketService
     HU-15 · CA-6: no cambian inventario,
     saldo ni demanda.
   end note
   GameController --> GameRestController : Result (error)
-  GameRestController --> RemoteGameClient : 409 {code: CANTIDAD_INVALIDA, message}
-  RemoteGameClient --> MarketDialog : Result (error)
-  MarketDialog --> Jugador : muestra «La cantidad debe estar\nentre 1 y 3.»
+  GameRestController --> RemoteGameClient : 400 {code: CANTIDAD_INVALIDA, message}
+  RemoteGameClient --> MarketPresenter : Result (error)
+  MarketPresenter --> MarketDialog : «La cantidad debe estar entre 1 y 3.»
+  MarketDialog --> Jugador : muestra el mensaje
 else cantidad válida (camino exitoso)
   loop 3 veces, una por unidad (la demanda baja 2 puntos cada vez)
-    MarketService -> Market : sellUnit("CARROT")
+    MarketService -> Market : sellUnit("CARROT", SPRING)
     activate Market
     Market --> MarketService : precio (27, luego 26, luego 26)
     deactivate Market
   end
   MarketService -> Inventory : remove("CARROT", 3)
-  activate Inventory
-  Inventory --> MarketService : true
-  deactivate Inventory
   MarketService -> GameState : earn(79)
-  MarketService -> AchievementTracker : evaluate(hechos)
-  activate AchievementTracker
-  AchievementTracker --> MarketService : logros nuevos (p. ej. LG-04 al llegar a 50 unidades)
-  deactivate AchievementTracker
-  MarketService -> EventBus : publish(SaleCompleted)
+  MarketService -> AchievementTracker : recordSale(3)
+  MarketService -> EventBus : publish(MoneyChanged(579))
   activate EventBus
-  EventBus -> EventCollector : onEvent(SaleCompleted)
+  EventBus -> EventCollector : onEvent(MoneyChanged)
   note right of EventCollector : el servidor no tiene pantalla: guarda\nel evento para la respuesta (DT-19)
   deactivate EventBus
+  MarketService -> EventBus : publish(InventoryChanged)
+  MarketService -> AchievementService : check(estado)
+  activate AchievementService
+  AchievementService -> GameState : evaluateAchievements()
+  activate GameState
+  GameState -> AchievementTracker : evaluate(hechos)
+  GameState --> AchievementService : logros nuevos (p. ej. LG-04 al llegar a 50 unidades, ya pagados)
+  deactivate GameState
+  opt si se desbloqueó algún logro (RN-28)
+    AchievementService -> EventBus : publish(AchievementUnlocked)
+  end
+  deactivate AchievementService
   MarketService --> GameController : Result.ok(79)
   deactivate MarketService
   GameController --> GameRestController : Result (ok, 79 m)
   deactivate GameController
-  GameRestController --> RemoteGameClient : 200 {data: 79, events: [SaleCompleted]}
+  GameRestController --> RemoteGameClient : 200 {data: 79, events: [MoneyChanged, InventoryChanged, …]}
   deactivate GameRestController
-  RemoteGameClient -> EventBus : publish(SaleCompleted)
+  RemoteGameClient -> EventBus : publish(evento) por cada uno
   note right of EventBus : el cliente republica los eventos en su\npropio bus, después de rehacer el Result
   activate EventBus
   par notificación a los observadores
-    EventBus -> HudPanel : onEvent(SaleCompleted)
-    note right of HudPanel : actualiza el dinero (HU-34)
+    EventBus -> HudPanel : onEvent(MoneyChanged)
+    note right of HudPanel : muestra «579 m» al instante (HU-34)
   else
     EventBus -> ToastPresenter : onEvent(AchievementUnlocked)
     note right of ToastPresenter : solo si la venta desbloquea un logro: aviso de 5 s (HU-39)
   end
   deactivate EventBus
-  RemoteGameClient --> MarketDialog : Result (ok, 79 m)
+  RemoteGameClient --> MarketPresenter : Result (ok, 79 m)
   deactivate RemoteGameClient
-  MarketDialog --> Jugador : muestra el total vendido
+  MarketPresenter -> MarketPresenter : refresh()
+  note right of MarketPresenter : vuelve a pedir mercado y saldo:\nlos precios bajaron (HU-38)
+  MarketPresenter --> MarketDialog : «Vendiste 3 × Zanahoria por 79 m.»
+  MarketDialog --> Jugador : muestra el total vendido y los precios nuevos
 end
+deactivate MarketPresenter
 deactivate MarketDialog
 @enduml

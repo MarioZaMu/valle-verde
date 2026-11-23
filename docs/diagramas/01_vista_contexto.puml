@@ -1,8 +1,10 @@
 @startdot
 /'
-  Vista 1 — Contexto (DFD nivel 0)  ·  Cubre: OBJ-01, alcance de VISION_ALCANCE §4-5
+  Vista 1 — Contexto (DFD nivel 0)  ·  Cubre: OBJ-01, alcance de VISION_ALCANCE §4-5; HU-29, HU-30, HU-45, HU-46, HU-49
   Reglas (guía del curso): un solo círculo, sin nada dentro; una caja por entidad externa;
   una flecha por dato y dirección rotulada con sustantivo; sin flechas entre entidades externas.
+  Fase 5.7: las partidas viven en MongoDB (no en archivos) y los sprites son propios y van dentro del jar,
+  así que ya no son una entidad externa.
   Posiciones fijadas a mano (layout=neato, pos="x,y!") para que ningún rótulo se superponga.
 '/
 digraph contexto {
@@ -11,19 +13,16 @@ digraph contexto {
   node  [fontname="Arial", fontsize=15];
   edge  [fontname="Arial", fontsize=13, arrowsize=1.1, penwidth=1.6];
 
-  jugador [label="Jugador", shape=box, width=2.34, height=0.9, pos="5.5,7.2!", style=filled, fillcolor="#FFF8E1"];
-  assets  [label="Paquete de assets\ngráficos\n(CC0 / CC-BY)", shape=box, width=2.6, height=1.1, pos="-0.5,2.2!", style=filled, fillcolor="#FFF8E1"];
-  archivos[label="Sistema de archivos\nlocal", shape=box, width=2.6, height=1.1, pos="12,2.2!", style=filled, fillcolor="#FFF8E1"];
+  jugador [label="Jugador", shape=box, width=2.34, height=0.9, pos="-1.5,2.2!", style=filled, fillcolor="#FFF8E1"];
+  mongo   [label="MongoDB\n(servidor local)", shape=box, width=2.6, height=1.1, pos="12.5,2.2!", style=filled, fillcolor="#FFF8E1"];
 
   sistema [label="Valle Verde\n\nSimulador de granja\npor turnos", shape=circle, width=3.3, fixedsize=true,
            pos="5.5,2.2!", style=filled, fillcolor="#E8F5E9", penwidth=2.6, fontsize=18];
 
-  jugador:sw -> sistema:nw [label="Órdenes de juego   \n(herramienta + clic,   \nterminar día, compras y ventas)   ", fontsize=13];
-  sistema:ne -> jugador:se [label="   Estado y notificaciones\n   (mapa, HUD, inventario,\n   logros y errores)"];
+  jugador:ne -> sistema:nw [label="Órdenes de juego\n(caminar, herramienta, hablar con vecinos,\ncompras y ventas, terminar día,\nguardar, cargar, pasos del tutorial)\n "];
+  sistema:sw -> jugador:se [label=" \nEstado y notificaciones\n(valle, HUD, inventario, diálogos,\nencargos, logros, tutorial y errores)"];
 
-  assets:e -> sistema:w [label="Sprites e iconos", labelfloat=false];
-
-  sistema:ne -> archivos:nw [label="  Partida (documento + checksum)  "];
-  archivos:sw -> sistema:se [xlabel="Partida guardada  "];
+  sistema:ne -> mongo:nw [label="Partida guardada\n(ranura, documento + checksum)\n "];
+  mongo:sw -> sistema:se [label=" \nPartida cargada\n(documento + checksum)"];
 }
 @enddot

@@ -6,7 +6,8 @@
   plataforma donde corre el software (cubo anidado: JVM con servidor y cliente, y MongoDB); «artifact» = unidad desplegable.
   Reglas (p.14 y p.17): no dibujar capas lógicas como servidores, no confundir clase con artefacto,
   toda ruta de comunicación lleva protocolo, no agregar infraestructura que el escenario no tiene.
-  Escenario: un solo equipo; un proceso Java con el servidor Spring Boot y el cliente Swing, y MongoDB local.
+  Escenario: un solo equipo; un proceso Java con el servidor Spring Boot y el cliente Swing, y MongoDB local
+  (MongoDB Community 8.0 instalado como servicio de Windows que arranca solo; fase 5.7h).
   Posiciones fijas (layout=neato).
 '/
 digraph despliegue {
@@ -33,15 +34,15 @@ digraph despliegue {
 
   mdb [shape=box3d, style=filled, fillcolor=white, fixedsize=true, width=4.4, height=4.6, pos="12.4,2.95!",
        labelloc=t, fontsize=15,
-       label="«executionEnvironment»\nMongoDB\n(servidor local · puerto 27017)"];
-  col [shape=note, style=filled, fillcolor="#FFF8E1", fixedsize=true, width=2.9, height=1.2, pos="12.4,2.2!",
-       label="«artifact»\ncolección partidas\n(documentos slot1, slot2, slot3)"];
+       label="«executionEnvironment»\nMongoDB Community 8.0\n(servicio de Windows «MongoDB»\nlocalhost · puerto 27017)"];
+  col [shape=note, style=filled, fillcolor="#FFF8E1", fixedsize=true, width=3.6, height=1.2, pos="12.4,1.9!",
+       label="«artifact»\nbase valleverde · colección partidas\n(documentos slot1, slot2, slot3)"];
 
   /* rutas de comunicación (con protocolo) */
   cli -> srv [dir=none, xlabel="HTTP / JSON\n(127.0.0.1)   ", penwidth=2.2];
   srv -> mdb [dir=none, xlabel="protocolo MongoDB\n(TCP · localhost:27017)   ", penwidth=2.2];
 
   leyenda [shape=box, style=filled, fillcolor="#FFFFF0", color="#999999", fixedsize=false, margin="0.25,0.15", fontsize=13, pos="7.35,-1.9!",
-           label="farmsim.jar: se genera con «mvn clean package» y se ejecuta con «java -jar farmsim.jar» (servidor y cliente) o con --server / --client por separado.\lContiene las clases de las capas, Spring Boot, Jackson, el driver de MongoDB y los assets gráficos (CC0 / CC-BY, opcionales).\lEl servidor solo escucha en 127.0.0.1. Jugar no requiere MongoDB: sin él, guardar y cargar responden ERROR_ES (RN-31).\lcolección partidas: cada documento guarda schemaVersion, savedAt, state y checksum SHA-256 (RN-31, RN-32); pesa ≤ 200 KB.\lSin internet ni nube: servidor, cliente y MongoDB están en el mismo equipo (W-01, W-03).\lui, client, api, application, domain e infrastructure son capas lógicas dentro del proceso Java, no nodos.\l"];
+           label="farmsim.jar: se genera con «mvnw clean package» y se ejecuta con «java -jar farmsim.jar» (servidor y cliente) o con --server / --client por separado.\lAl iniciar, el servidor arranca en su propio hilo mientras se abre la ventana: la pantalla de inicio aparece en unos 2 s y la del juego se arma cuando el servidor responde (RNF-02).\lContiene las clases de las capas, Spring Boot, Jackson, FlatLaf, el driver de MongoDB 5.5 y los 122 sprites pixel-art propios (assets/, generados con tools/gen_sprites.py).\lEl servidor solo escucha en 127.0.0.1. Sin MongoDB se puede jugar, pero guardar y cargar responden ERROR_ES en ≤ 2 s y la partida sigue (RN-31).\lcolección partidas: cada documento guarda schemaVersion 3, savedAt, state (valle de 48 × 24, avatar, encargos y tutorial) y checksum SHA-256 (RN-31, RN-32).\lSin internet ni nube: servidor, cliente y MongoDB están en el mismo equipo (W-01, W-03).\lui, client, api, application, domain e infrastructure son capas lógicas dentro del proceso Java, no nodos.\l"];
 }
 @enddot

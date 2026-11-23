@@ -36,6 +36,10 @@ package "ui  (presentación)" #F5FAFF {
   class MarketDialog {
     +onSellClicked(item: String, qty: int): void
   }
+  class MarketPresenter {
+    +sellUnits(item: String, qty: int): String
+    +refresh(): void
+  }
   class ToastPresenter <<ConcreteObserver>> #BBDEFB
   class ToastQueue {
     +post(kind: ToastKind, text: String): void
@@ -67,6 +71,7 @@ package "client  (cliente HTTP)" #F2FCFD {
     +newGame(seed: long): Result
     +hud(): Result
     +plant(col: int, row: int, crop: String): Result
+    +sell(item: String, qty: int): Result
   }
   class EventDecoder
 }
@@ -207,6 +212,7 @@ package "domain" #FFFCF5 {
       +restore(m: GameMemento): void
       +spend(amount: int): boolean
       +earn(amount: int): void
+      +evaluateAchievements(): List<Achievement>
     }
     class Energy {
       -current: int
@@ -422,7 +428,7 @@ package "domain" #FFFCF5 {
     class Market <<Context>> #FFF9C4 {
       -demand: Map<String, Integer>
       +unitPrice(item: String): int
-      +sellUnit(item: String): int
+      +sellUnit(item: String, s: Season): int
       +recoverDemand(): void
     }
     interface PricingStrategy <<Strategy>> #FFF9C4 {
@@ -436,6 +442,7 @@ package "domain" #FFFCF5 {
     class AchievementTracker {
       -harvests: int
       -unitsSold: int
+      +recordSale(units: int): void
       +evaluate(f: ProgressFacts): List<Achievement>
     }
     class Achievement <<enumeration>> {
@@ -484,7 +491,8 @@ MapPanel --> MapRenderer
 MapRenderer --> AssetManager : sprites o vectores
 MapRenderer ..> VisualEffects : lee
 MapPanel ..> GameCommands : usa
-MarketDialog ..> GameCommands : usa
+MarketDialog --> MarketPresenter
+MarketPresenter ..> GameCommands : usa
 
 ' ---------- Aplicación ----------
 GameController --> ProgressService
@@ -550,7 +558,7 @@ GameState *-- "1" Energy
 GameState *-- "1" WeatherCycle
 DayPipeline o-- "0..*" DayStep
 WeatherCycle ..> WeatherStrategy : usa
-FarmMap *-- "160" Plot
+FarmMap *-- "1152" Plot : 48 × 24
 FarmMap *-- "0..*" Building
 Plot *-- "0..1" Crop
 Building *-- "0..4" Animal

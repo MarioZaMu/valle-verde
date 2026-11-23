@@ -1,7 +1,7 @@
 @startuml 04_vista_desarrollo
 /'
   Vista 4 — Desarrollo (paquetes y dependencias del código fuente)
-  Cubre: RNF-06 (sentido de las dependencias), RNF-12, R-02; estructura de paquetes que seguirán las HU-01..HU-42.
+  Cubre: RNF-06 (sentido de las dependencias), RNF-12, R-02; estructura de paquetes que seguirán las HU-01..HU-50.
   Notación de la guía: paquete = carpeta con pestaña; flecha punteada A ..> B = "A importa clases de B" (apunta a quien se usa).
   Reglas: ui → application → domain · infrastructure → domain · el dominio no depende de nadie · sin ciclos ·
   la UI nunca importa domain ni infrastructure · el controlador nunca salta al repositorio.
@@ -40,9 +40,11 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
     package "screens" as UI_SCR #FFFFFF {
       class MainWindow
       class ScreenRouter
+      class ScreenNavigator
       class StartScreenPresenter
       class StartScreen
       class GameScreen
+      class GameScreenPresenter
     }
     package "components" as UI_CMP #FFFFFF {
       class HudPanel
@@ -67,6 +69,8 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
       class EnergyBar
       class TutorialBox
       class TutorialPresenter
+      class DialogueDialog
+      class DialoguePresenter
       class WalkKeys
     }
     package "render" as UI_REN #FFFFFF {
@@ -141,7 +145,7 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
     package "dto" as APP_DTO #FFFFFF {
       class HudView
       class MapView
-      class GameView
+      class MarketView
       class PlotView
       class AvatarView
       class NpcView
@@ -314,7 +318,7 @@ D_ECO .down.> D_TIM
 INF_PER .down.> D_SAVE
 
 note right of D_CFG
-  <b>domain.config</b> (GameRules): constantes de RN-01..RN-35.
+  <b>domain.config</b> (GameRules): constantes de RN-01..RN-40 (mapa de 48 × 24).
   Todos los paquetes de domain la usan;
   ella no depende de nadie.
 end note

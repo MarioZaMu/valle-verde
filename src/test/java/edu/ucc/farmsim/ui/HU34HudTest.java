@@ -69,6 +69,23 @@ class HU34HudTest {
     }
 
     @Test
+    void HU34_ca2_aSaleShowsTheNewMoneyAsSoonAsItsEventArrives() {
+        // Given a HUD with a game started and 3 carrots to sell
+        TestApp app = TestApp.create();
+        HudModel hud = new HudModel();
+        app.bus.subscribe(hud);
+        app.controller.newGame(TestApp.SEED);
+        app.state().inventory().add(edu.ucc.farmsim.domain.economy.ItemType.CARROT, 3);
+
+        // When the player sells them
+        int earned = app.controller.sell("CARROT", 3).value();
+
+        // Then the HUD shows the new balance without waiting for the end of the day
+        assertEquals((500 + earned) + " m", hud.moneyText());
+        assertEquals("100/100", hud.energyText(), "the rest of the HUD stays");
+    }
+
+    @Test
     void HU34_ca3_zeroEnergyShowsAnEmptyBarAndTheText0Of100NotJustAColor() {
         TestApp app = TestApp.create();
         HudModel hud = new HudModel();

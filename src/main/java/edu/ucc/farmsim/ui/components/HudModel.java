@@ -27,6 +27,9 @@ public class HudModel implements GameListener {
         } else if (event instanceof GameEvent.EnergyChanged changed && hud != null) {
             hud = new HudView(hud.money(), hud.year(), hud.season(), hud.day(), hud.weather(), hud.forecast(),
                     changed.energy(), changed.maxEnergy());
+        } else if (event instanceof GameEvent.MoneyChanged changed && hud != null) {
+            hud = new HudView(changed.money(), hud.year(), hud.season(), hud.day(), hud.weather(), hud.forecast(),
+                    hud.energy(), hud.maxEnergy());
         }
     }
 

@@ -46,7 +46,7 @@ RF-43, 48 | GameCommands, GameController, GameRestController, GameRules, GameScr
 | RF-34 | Must | HU-34 | Interfaz de usuario
 (Swing + FlatLaf)
 RF-33 a RF-41
-RF-43, 48 | EnergyBar, GameEvent, GameScreen, GameScreenPresenter, HudModel, HudPanel, HudView, Texts, ViewMapper | HU-34: 8 |
+RF-43, 48 | EnergyBar, GameEvent, GameScreen, GameScreenPresenter, HudModel, HudPanel, HudView, Texts, ViewMapper | HU-34: 9 |
 | RF-35 | Must | HU-35 | Interfaz de usuario
 (Swing + FlatLaf)
 RF-33 a RF-41
@@ -147,7 +147,7 @@ RF-49 a RF-50 | FarmMap, FarmMapSnapshot, GameMemento, GameScreen, GroundLayer, 
 | HU-31 · Rechazar partidas inválidas sin alterar la partida | 5.5 | Must | 5 | 12 | completa | Checksum, GameCommands, GameController, GameRestController, GameStateValidator, MongoSaveRepository, RemoteGameClient, SaveCodec, SaveGameService, SaveLoadException, SaveRepository |
 | HU-32 · Listar ranuras de guardado | 5.5 | Should | 3 | 5 | completa | GameCommands, GameController, GameRestController, MongoSaveRepository, RemoteGameClient, SaveGameService, SaveRepository, SaveSlotView, SlotInfo, SlotsDialog, SlotsPresenter |
 | HU-33 · Pantalla de inicio | 5.1 | Must | 4 | 11 | completa | GameCommands, GameController, GameRestController, GameRules, GameScreen, Main, MongoSaveRepository, RemoteGameClient, SaveDocument, SaveGameService, SaveRepository, SaveStorageException, ScreenNavigator, ScreenRouter, StartScreen, StartScreenPresenter, Texts, TitleScene, WoodButton |
-| HU-34 · HUD superior | 5.1 | Must | 4 | 8 | completa | EnergyBar, GameEvent, GameScreen, GameScreenPresenter, HudModel, HudPanel, HudView, Texts, ViewMapper |
+| HU-34 · HUD superior | 5.1 | Must | 4 | 9 | completa | EnergyBar, GameEvent, GameScreen, GameScreenPresenter, HudModel, HudPanel, HudView, Texts, ViewMapper |
 | HU-35 · Mapa de la granja | 5.2 | Must | 5 | 14 | completa | AnimalView, BuildingView, CellPos, FarmService, GameCommands, GameController, GameRestController, GameScreen, GroundLayer, MapGeometry, MapPanel, MapRenderer, MapView, Palette, PlotClickListener, PlotText, RemoteGameClient, ViewMapper |
 | HU-36 · Herramientas y clic sobre parcelas | 5.2 | Must | 5 | 20 | completa | GameScreen, GameScreenPresenter, Shortcut, Texts, Tool, ToolBar, ToolModel, WoodSlot |
 | HU-37 · Inventario en grilla | 5.3 | Must | 4 | 9 | completa | GameCommands, GameController, GameDialogs, GameRestController, GameScreen, InventoryDialog, InventoryGrid, InventoryModel, InventoryView, MarketService, RemoteGameClient, SlotView |
@@ -165,4 +165,4 @@ RF-49 a RF-50 | FarmMap, FarmMapSnapshot, GameMemento, GameScreen, GroundLayer, 
 | HU-49 · Tutorial de inicio guiado por el avatar | 5.7 | Should | 5 | 13 | completa | DialogueDialog, GameCommands, GameController, GameEvent, GameMemento, GameRestController, GameScreen, GameState, RemoteGameClient, Texts, ToastPresenter, Tutorial, TutorialBox, TutorialPresenter, TutorialService, TutorialStep, TutorialView |
 | HU-50 · Recorrer el valle: granja, aldea y cámara | 5.7 | Should | 6 | 11 | completa | FarmMap, FarmMapSnapshot, GameMemento, GameScreen, GroundLayer, House, HouseView, MapGeometry, MapPanel, MapRenderer, MapView, SaveCodec, Terrain, ViewMapper, VisualEffects, WalkKeys |
 
-**Resumen:** 50 de 50 historias con todas sus pruebas; 459 pruebas `HUxx_` en total.
+**Resumen:** 50 de 50 historias con todas sus pruebas; 460 pruebas `HUxx_` en total.
