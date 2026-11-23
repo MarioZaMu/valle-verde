@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 class HU33StartScreenTest {
 
     /** Records what the presenter asks the navigation to do. */
-    private static final class FakeNavigator implements ScreenNavigator {
+    private static class FakeNavigator implements ScreenNavigator {
         final List<String> calls = new ArrayList<>();
         boolean answerToConfirmation = true;
         int chosenSlot;
@@ -61,6 +61,41 @@ class HU33StartScreenTest {
         assertEquals("Nueva partida", Texts.START_NEW_GAME);
         assertEquals("Cargar", Texts.START_LOAD);
         assertEquals("Salir", Texts.START_EXIT);
+    }
+
+    /** The controller, writing the name of every order into {@code calls}. */
+    private static edu.ucc.farmsim.application.controller.GameCommands recording(TestApp app, List<String> calls) {
+        return (edu.ucc.farmsim.application.controller.GameCommands) java.lang.reflect.Proxy.newProxyInstance(
+                HU33StartScreenTest.class.getClassLoader(),
+                new Class<?>[] {edu.ucc.farmsim.application.controller.GameCommands.class},
+                (proxy, method, args) -> {
+                    calls.add(method.getName());
+                    try {
+                        return method.invoke(app.controller, args);
+                    } catch (java.lang.reflect.InvocationTargetException e) {
+                        throw e.getCause();
+                    }
+                });
+    }
+
+    @Test
+    void RNF02_newGameAndLoadPrepareTheGameScreenBeforeTheirFirstOrder() {
+        TestApp app = TestApp.create();
+        List<String> order = new ArrayList<>();
+        FakeNavigator navigator = new FakeNavigator() {
+            @Override
+            public void prepareGame() {
+                order.add("prepare");
+            }
+        };
+        StartScreenPresenter presenter = new StartScreenPresenter(recording(app, order), navigator, () -> TestApp.SEED);
+
+        presenter.onNewGame();
+        assertEquals("prepare", order.get(0), String.valueOf(order));
+        assertTrue(order.contains("newGame"));
+        order.clear();
+        presenter.onLoad();
+        assertEquals("prepare", order.get(0), String.valueOf(order));
     }
 
     @Test

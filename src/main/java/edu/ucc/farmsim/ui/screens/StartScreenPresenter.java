@@ -33,6 +33,7 @@ public final class StartScreenPresenter {
 
     /** "New game": asks for confirmation if a game is in progress, then starts one and shows the game. */
     public void onNewGame() {
+        navigator.prepareGame();
         if (controller.hasGameInProgress() && !navigator.confirm(Texts.CONFIRM_DISCARD_GAME)) {
             return;
         }
@@ -46,6 +47,7 @@ public final class StartScreenPresenter {
 
     /** "Load": tells the player when there is nothing to load, or lets them choose a slot and loads it. */
     public void onLoad() {
+        navigator.prepareGame();
         Result<Boolean> saved = controller.hasSavedGames();
         if (!saved.isOk()) {
             navigator.showMessage(saved.message());

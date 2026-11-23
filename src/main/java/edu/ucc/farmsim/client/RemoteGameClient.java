@@ -31,6 +31,10 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -45,6 +49,10 @@ import java.util.logging.Logger;
  * <p>Orders are sent synchronously from the calling thread with a time limit (DT-20). It never throws: an
  * unreachable server, a timeout or an unreadable answer becomes {@code ERROR_INTERNO}.
  *
+ * <p>The address of the server may still be on its way: the window opens while the server starts, and an order
+ * sent before it is up waits for it, up to a limit (RNF-02). A server that fails to start is also
+ * {@code ERROR_INTERNO}.
+ *
  * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-26, HU-28, HU-29, HU-30, HU-31, HU-32, HU-33, HU-35, HU-37, HU-38, HU-45, HU-46, HU-47, HU-49.
  */
 public final class RemoteGameClient implements GameCommands {
@@ -53,7 +61,8 @@ public final class RemoteGameClient implements GameCommands {
     private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(2);
     private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(5);
 
-    private final URI baseUri;
+    private final CompletableFuture<URI> server;
+    private final Duration startWait;
     private final EventBus bus;
     private final HttpClient http = HttpClient.newBuilder().connectTimeout(CONNECT_TIMEOUT).build();
     private final ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -66,8 +75,28 @@ public final class RemoteGameClient implements GameCommands {
      * @param bus     the local bus where the events of every response are republished
      */
     public RemoteGameClient(URI baseUri, EventBus bus) {
-        this.baseUri = baseUri;
+        this(CompletableFuture.completedFuture(baseUri), bus, Duration.ZERO);
+    }
+
+    /**
+     * Creates a client for a server that may still be starting.
+     *
+     * @param server    completes with the address of the server once it listens, or fails if it cannot start
+     * @param bus       the local bus where the events of every response are republished
+     * @param startWait how long an order waits for the server to be up before it gives up
+     */
+    public RemoteGameClient(CompletableFuture<URI> server, EventBus bus, Duration startWait) {
+        this.server = server;
+        this.startWait = startWait;
         this.bus = bus;
+    }
+
+    /** The address of the server, waiting for it while it starts. */
+    private URI baseUri() throws InterruptedException, ExecutionException, TimeoutException {
+        if (server.isDone()) {
+            return server.get();
+        }
+        return server.get(startWait.toMillis(), TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -244,7 +273,7 @@ public final class RemoteGameClient implements GameCommands {
             HttpRequest.BodyPublisher publisher = body == null
                     ? HttpRequest.BodyPublishers.noBody()
                     : HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body), StandardCharsets.UTF_8);
-            HttpRequest.Builder request = HttpRequest.newBuilder(baseUri.resolve(path))
+            HttpRequest.Builder request = HttpRequest.newBuilder(baseUri().resolve(path))
                     .timeout(REQUEST_TIMEOUT)
                     .header("Accept", "application/json")
                     .method(method, publisher);
@@ -256,6 +285,9 @@ public final class RemoteGameClient implements GameCommands {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             LOG.log(Level.WARNING, "Interrupted while waiting for the server", e);
+            return Result.failWith(ErrorCode.ERROR_INTERNO);
+        } catch (ExecutionException | TimeoutException e) {
+            LOG.log(Level.WARNING, "The server is not up for " + method + " " + path, e);
             return Result.failWith(ErrorCode.ERROR_INTERNO);
         } catch (IOException | RuntimeException e) {
             LOG.log(Level.WARNING, "The server did not answer " + method + " " + path, e);

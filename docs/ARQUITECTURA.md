@@ -481,11 +481,11 @@ Ajustes surgidos al implementar: (1) `Main` se declara como capa «Composition»
 | Criterio | Qué falta | Cuándo |
 |---|---|---|
 | HU-29 · CA-2 | ~~la prueba contra un MongoDB real que rechaza o no responde~~ — **cubierta en la etapa 5.7h** (`HU29RealMongoTest`) | hecha |
-| RNF-02 · RT-09 | el arranque medido del `.jar` (servidor listo) fue de **4,96 s** en esta máquina, justo bajo el límite de 5 s; repetir en una máquina limpia | demostración final |
+| ~~RNF-02 · RT-09~~ | **resuelto en la 5.7i:** la pantalla de inicio aparece en 2,0 a 2,4 s porque servidor y ventana arrancan en paralelo | hecha |
 
 **Diagramas:** `03_vista_logica` y `04_vista_desarrollo` incluyen `ToastPresenter`, `ToastQueue`, `ToastLayer`, `VisualEffects`, `Particle`, `SeasonPalette` y `AssetManager`; la secuencia anexa cambió `ToastLayer` por `ToastPresenter`. Las vistas se volvieron a renderizar.
 
-## 18. Fase 5.7 (en curso): interfaz profesional, avatar y NPC
+## 18. Fase 5.7 (hecha): interfaz profesional, avatar y NPC
 
 **Origen:** el estudiante pidió, tras cerrar la 5.6, FlatLaf, sprites en estilo granja, NPC y un avatar que camina. Esto **revierte** las decisiones de Fase 0 «sin NPC» (W-04) y «sin avatar» (W-05). Los sprites de Stardew Valley son de ConcernedApe y tienen copyright: no se usan; se dibujan sprites **propios** de 32 × 32 px.
 
@@ -561,3 +561,15 @@ Decisiones: **D-75** las casas del valle son terreno (`HOUSE`) y no edificios de
 - **Verificación manual:** con el `.jar`, se guardó una partida en la ranura 1, se cerró la aplicación, se volvió a abrir y «Cargar» devolvió el mismo día, clima y dinero.
 
 Decisiones: **D-79** no se agrega un respaldo en archivos: el estudiante eligió instalar MongoDB, que es el almacenamiento que pide RN-31; sin MongoDB el comportamiento sigue siendo el de RN-31 (`ERROR_ES`, la partida sigue); **D-80** la prueba real se omite, en vez de fallar, en un equipo sin MongoDB, igual que las pruebas que necesitan pantalla.
+
+**Etapa 5.7i (hecha): cierre de la Fase 5.7.** 581 pruebas en verde; cobertura de dominio 97 % y de aplicación 96 % (barrera 70 %); `check_hu`, `check_diagrams`, `check_imports`, `traceability --upto 5.7` y `gen_sprites --check` sin errores; README al día (estado, cómo se juega, MongoDB, totales de la documentación).
+
+- **Arranque (RNF-02, RT-09):** medido con 5 arranques del `.jar`, la pantalla de inicio tardaba **5,5 a 6,7 s**. Con marcas de tiempo se vio que el marco estaba listo a los 1,5 s, pero `ScreenRouter` construía la pantalla de juego desde el principio y sus paneles (`MapPanel`, `TutorialPresenter`) le piden el mapa y el tutorial al servidor, así que la ventana esperaba a Spring (3,3 a 4,9 s). Cambios:
+  - `Main` arranca el servidor en un hilo propio (`server-start`) y abre la ventana a la vez; si el servidor no puede arrancar, avisa y termina con código 3.
+  - `RemoteGameClient` acepta la dirección del servidor como `CompletableFuture<URI>`: una orden enviada antes de que el servidor esté listo espera hasta 30 s, y un servidor que falla es `ERROR_INTERNO`, nunca una espera infinita.
+  - `ScreenRouter` muestra la pantalla de inicio sin consultar al servidor y construye la pantalla de juego cuando el servidor responde, o antes si el jugador pulsa «Nueva partida» o «Cargar» (`ScreenNavigator.prepareGame()`, que `StartScreenPresenter` llama antes de su primera orden), para que el HUD reciba el `GameStarted`.
+  - Resultado: la pantalla de inicio aparece en **2,0 a 2,4 s** (5 arranques) y el servidor está listo a los 3,8 a 4,9 s, en paralelo. Un clic en «Nueva partida» apenas aparece la ventana funciona: espera al servidor y abre la partida con el HUD completo.
+
+Decisiones: **D-81** RNF-02 se mide hasta la pantalla de inicio, como dice su texto, y no hasta «servidor listo»: la pantalla de inicio no necesita al servidor hasta el primer clic; **D-82** la pantalla de juego se construye cuando hay servidor en vez de hacer asíncronas las lecturas iniciales de cada panel: un solo punto de cambio (`ScreenRouter`) y los paneles no cambian.
+
+**Pendiente pedido por el estudiante:** el avatar todavía se siente trabado al caminar en algunos casos, aun con la corrección de `WalkKeys` (1b0cde0); se revisa después de la Fase 5.7.

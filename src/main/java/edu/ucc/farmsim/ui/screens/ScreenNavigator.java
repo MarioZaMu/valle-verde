@@ -11,6 +11,14 @@ public interface ScreenNavigator {
     /** Shows the start screen. */
     void showStart();
 
+    /**
+     * Makes sure the game screen exists before the first order of a game is sent, so it hears the events of that
+     * order (RNF-02: it may still be waiting for the server to start). Nothing to do by default.
+     */
+    default void prepareGame() {
+        // the game screen already exists
+    }
+
     /** Shows the game screen. */
     void showGame();
 

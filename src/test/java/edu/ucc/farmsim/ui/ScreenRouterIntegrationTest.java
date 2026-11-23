@@ -1,5 +1,6 @@
 package edu.ucc.farmsim.ui;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
@@ -43,6 +44,52 @@ class ScreenRouterIntegrationTest {
 
         // Then the top bar shows day 2
         assertTrue(labels(router).contains("Año 1 · Primavera · Día 2"), labels(router).toString());
+    }
+
+    private static edu.ucc.farmsim.application.controller.GameCommands recording(TestApp app, List<String> calls) {
+        return (edu.ucc.farmsim.application.controller.GameCommands) java.lang.reflect.Proxy.newProxyInstance(
+                ScreenRouterIntegrationTest.class.getClassLoader(),
+                new Class<?>[] {edu.ucc.farmsim.application.controller.GameCommands.class},
+                (proxy, method, args) -> {
+                    calls.add(method.getName());
+                    try {
+                        return method.invoke(app.controller, args);
+                    } catch (java.lang.reflect.InvocationTargetException e) {
+                        throw e.getCause();
+                    }
+                });
+    }
+
+    @Test
+    void RNF02_theStartScreenAsksTheServerNothingAndTheGameScreenIsBuiltOnceTheServerIsUp() throws Exception {
+        assumeFalse(GraphicsEnvironment.isHeadless(), "needs a display");
+        TestApp app = TestApp.create();
+        List<String> calls = new ArrayList<>();
+        java.util.concurrent.CompletableFuture<Void> ready = new java.util.concurrent.CompletableFuture<>();
+
+        ScreenRouter router = new ScreenRouter(recording(app, calls), app.bus, () -> TestApp.SEED, ready);
+
+        assertTrue(calls.isEmpty(), "the start screen opened without waiting for the server: " + calls);
+        ready.complete(null);
+        flush();
+        assertFalse(calls.isEmpty(), "the game screen was built once the server was up");
+        button(router, "Nueva partida").doClick();
+        flush();
+        assertTrue(labels(router).contains("500 m"), labels(router).toString());
+    }
+
+    @Test
+    void RNF02_aClickBeforeTheServerIsUpBuildsTheGameScreenFirstSoTheTopBarSeesTheNewGame() throws Exception {
+        assumeFalse(GraphicsEnvironment.isHeadless(), "needs a display");
+        TestApp app = TestApp.create();
+        ScreenRouter router = new ScreenRouter(app.controller, app.bus, () -> TestApp.SEED,
+                new java.util.concurrent.CompletableFuture<Void>());
+
+        button(router, "Nueva partida").doClick();
+        flush();
+
+        assertTrue(labels(router).contains("500 m"), labels(router).toString());
+        assertTrue(labels(router).contains("Año 1 · Primavera · Día 1"), labels(router).toString());
     }
 
     @Test

@@ -8,6 +8,8 @@ import edu.ucc.farmsim.ui.screens.ScreenRouter;
 import edu.ucc.farmsim.ui.theme.UiTheme;
 import java.awt.GraphicsEnvironment;
 import java.net.URI;
+import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
 import javax.swing.SwingUtilities;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.context.WebServerApplicationContext;
@@ -16,7 +18,9 @@ import org.springframework.context.ConfigurableApplicationContext;
 /**
  * Composition root: the only place that starts the server and the window and joins them (DT-22). With no
  * arguments it starts the Spring Boot server on this machine and a window that talks to it over HTTP;
- * {@code --server} starts only the server and {@code --client --url=...} only the window.
+ * {@code --server} starts only the server and {@code --client --url=...} only the window. With both, the server
+ * starts on a thread of its own while the window opens, so the start screen appears without waiting for Spring
+ * (RNF-02); an order sent before the server is up waits for it.
  *
  * <p>Stories: HU-33, HU-43.
  */
@@ -24,6 +28,8 @@ public final class Main {
 
     private static final int EXIT_NO_DISPLAY = 1;
     private static final int EXIT_BAD_ARGUMENTS = 2;
+    private static final int EXIT_SERVER_FAILED = 3;
+    private static final Duration SERVER_START_WAIT = Duration.ofSeconds(30);
 
     private Main() {
         // entry point only
@@ -48,13 +54,27 @@ public final class Main {
             System.exit(EXIT_NO_DISPLAY);
             return;
         }
-        String serverUrl = options.url() != null ? options.url() : LaunchOptions.DEFAULT_URL;
-        if (options.needsServer()) {
-            serverUrl = "http://127.0.0.1:" + startServer(options);
+        if (!options.needsWindow()) {
+            startServer(options);
+            return;
         }
-        if (options.needsWindow()) {
-            openWindow(URI.create(serverUrl));
+        if (!options.needsServer()) {
+            String url = options.url() != null ? options.url() : LaunchOptions.DEFAULT_URL;
+            openWindow(CompletableFuture.completedFuture(URI.create(url)));
+            return;
         }
+        CompletableFuture<URI> server = new CompletableFuture<>();
+        Thread starter = new Thread(() -> {
+            try {
+                server.complete(URI.create("http://127.0.0.1:" + startServer(options)));
+            } catch (RuntimeException e) {
+                server.completeExceptionally(e);
+                System.err.println(GameInfo.NAME + ": el servidor no pudo arrancar: " + e.getMessage());
+                System.exit(EXIT_SERVER_FAILED);
+            }
+        }, "server-start");
+        starter.start();
+        openWindow(server);
     }
 
     /** Starts the Spring Boot server and returns the port it listens on. */
@@ -65,13 +85,13 @@ public final class Main {
         return ((WebServerApplicationContext) context).getWebServer().getPort();
     }
 
-    private static void openWindow(URI server) {
+    private static void openWindow(CompletableFuture<URI> server) {
         EventBus bus = new EventBus();
-        RemoteGameClient client = new RemoteGameClient(server, bus);
+        RemoteGameClient client = new RemoteGameClient(server, bus, SERVER_START_WAIT);
         SwingUtilities.invokeLater(() -> {
             UiTheme.install();
             MainWindow window = new MainWindow(GameInfo.NAME);
-            window.setContentPane(new ScreenRouter(client, bus, System::currentTimeMillis));
+            window.setContentPane(new ScreenRouter(client, bus, System::currentTimeMillis, server));
             window.setVisible(true);
         });
     }

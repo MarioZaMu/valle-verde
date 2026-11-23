@@ -79,6 +79,41 @@ class RemoteGameClientTest {
     }
 
     @Test
+    void RNF02_theWindowCanOpenBeforeTheServerIsUpAndAnOrderWaitsForIt() throws Exception {
+        java.util.concurrent.CompletableFuture<URI> server = new java.util.concurrent.CompletableFuture<>();
+        RemoteGameClient early = new RemoteGameClient(server, bus, java.time.Duration.ofSeconds(5));
+        new Thread(() -> {
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            server.complete(URI.create("http://127.0.0.1:" + port));
+        }).start();
+
+        long start = System.nanoTime();
+        Result<HudView> result = early.newGame(TestApp.SEED);
+
+        assertTrue(result.isOk(), String.valueOf(result.message()));
+        assertTrue((System.nanoTime() - start) / 1_000_000 >= 250, "it waited for the server");
+        assertEquals(500, result.value().money());
+    }
+
+    @Test
+    void RNF02_aServerThatFailsToStartOrNeverComesUpIsAnInternalErrorNotAHang() {
+        java.util.concurrent.CompletableFuture<URI> failed = new java.util.concurrent.CompletableFuture<>();
+        failed.completeExceptionally(new IllegalStateException("port in use"));
+        RemoteGameClient broken = new RemoteGameClient(failed, bus, java.time.Duration.ofSeconds(5));
+        RemoteGameClient never = new RemoteGameClient(new java.util.concurrent.CompletableFuture<>(), bus,
+                java.time.Duration.ofMillis(200));
+
+        assertEquals(ErrorCode.ERROR_INTERNO, broken.hud().code());
+        assertEquals(ErrorCode.ERROR_INTERNO, never.newGame(TestApp.SEED).code());
+        assertFalse(never.hasGameInProgress());
+        assertTrue(events.isEmpty());
+    }
+
+    @Test
     void hasGameInProgressFollowsTheServer() {
         assertFalse(client.hasGameInProgress());
         client.newGame(TestApp.SEED);
