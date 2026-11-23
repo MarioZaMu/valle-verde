@@ -226,7 +226,7 @@ public final class GameScreen extends JPanel {
     /**
      * One step. When it is blocked and another held key points at a right angle (walking in a diagonal along a
      * fence of trees), that way is tried instead; a step that stays blocked only turns the avatar, which no event
-     * announces, so the map is asked again.
+     * announces, so the map shown turns it without asking the server for the whole valley.
      */
     private static void step(GameScreenPresenter presenter, MapPanel map, WalkKeys walking, String direction) {
         if (presenter.onMove(direction)) {
@@ -237,7 +237,7 @@ public final class GameScreen extends JPanel {
             walking.steppedInstead(instead);
             return;
         }
-        map.reload();
+        map.face(direction);
     }
 
     private static JPanel clear(JPanel panel) {

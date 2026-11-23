@@ -1,6 +1,7 @@
 package edu.ucc.farmsim.ui.render;
 
 import edu.ucc.farmsim.application.controller.GameCommands;
+import edu.ucc.farmsim.application.dto.AvatarView;
 import edu.ucc.farmsim.application.dto.BuildingView;
 import edu.ucc.farmsim.application.dto.HudView;
 import edu.ucc.farmsim.application.dto.MapView;
@@ -230,8 +231,31 @@ public final class MapPanel extends JPanel implements GameListener {
         } else if (event instanceof GameEvent.DayEnded ended) {
             effects.onWorld(ended.hud().season(), ended.hud().weather());
             effects.onDayEnded();
+        } else if (event instanceof GameEvent.AvatarMoved moved && view != null) {
+            show(view.withAvatar(moved.avatar()));
+            return;
         }
         refresh();
+    }
+
+    /**
+     * A blocked step only turned the avatar: the map shown turns it too, with no call to the server (asking for
+     * the whole valley on every step made the walk jerk).
+     *
+     * @param direction where the avatar now looks
+     */
+    public void face(String direction) {
+        if (view != null && view.avatar() != null) {
+            AvatarView avatar = view.avatar();
+            show(view.withAvatar(new AvatarView(avatar.col(), avatar.row(), direction)));
+        }
+    }
+
+    private void show(MapView next) {
+        view = next;
+        effects.onMap(view);
+        startOrStopFrames();
+        repaint();
     }
 
     @Override
@@ -263,10 +287,7 @@ public final class MapPanel extends JPanel implements GameListener {
     private void refresh() {
         Result<MapView> result = controller.map();
         if (result.isOk()) {
-            view = result.value();
-            effects.onMap(view);
-            startOrStopFrames();
-            repaint();
+            show(result.value());
         }
     }
 

@@ -40,6 +40,11 @@ public record MapView(int cols, int rows, List<PlotView> plots, List<BuildingVie
         this(cols, rows, plots, buildings, null);
     }
 
+    /** The same map with the avatar somewhere else or looking elsewhere (a step changes nothing more). */
+    public MapView withAvatar(AvatarView moved) {
+        return new MapView(cols, rows, plots, buildings, moved, npcs, houses);
+    }
+
     /** The building that covers the plot, or {@code null}. */
     public BuildingView buildingAt(int col, int row) {
         for (BuildingView building : buildings) {

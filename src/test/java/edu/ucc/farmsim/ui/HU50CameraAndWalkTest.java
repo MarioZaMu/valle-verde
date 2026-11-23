@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import edu.ucc.farmsim.application.controller.GameCommands;
 import edu.ucc.farmsim.application.dto.AvatarView;
 import edu.ucc.farmsim.application.dto.MapView;
 import edu.ucc.farmsim.application.dto.PlotView;
@@ -22,6 +23,8 @@ import edu.ucc.farmsim.ui.render.VisualEffects;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -171,6 +174,47 @@ class HU50CameraAndWalkTest {
         keys.press("WEST", 2_300);
         assertEquals("WEST", keys.tick(2_440), "opposite keys do not zigzag: the last one leads");
         assertEquals("WEST", keys.tick(2_620));
+    }
+
+    @Test
+    void HU50_ca5_aStepMovesTheAvatarOnTheShownMapWithoutDownloadingTheWholeValleyAgain() throws Exception {
+        TestApp app = TestApp.startedGame();
+        AtomicLong mapCalls = new AtomicLong();
+        GameCommands counted = (GameCommands) Proxy.newProxyInstance(GameCommands.class.getClassLoader(),
+                new Class<?>[] {GameCommands.class}, (proxy, method, args) -> {
+                    if ("map".equals(method.getName())) {
+                        mapCalls.incrementAndGet();
+                    }
+                    try {
+                        return method.invoke(app.controller, args);
+                    } catch (InvocationTargetException e) {
+                        throw e.getCause();
+                    }
+                });
+        MapPanel panel = new MapPanel(counted, app.bus, (col, row) -> { });
+        panel.setSize(1920, 1080);
+        MapView before = panel.currentView();
+        long calls = mapCalls.get();
+
+        String way = null;
+        for (String direction : List.of("EAST", "SOUTH", "WEST", "NORTH")) {
+            if (app.controller.move(direction).isOk()) {
+                way = direction;
+                break;
+            }
+        }
+        javax.swing.SwingUtilities.invokeAndWait(() -> { });
+
+        assertEquals(calls, mapCalls.get(), "a step does not ask for the 1152 plots again (it made the walk jerk)");
+        assertEquals(app.controller.map().value().avatar(), panel.currentView().avatar(), "the avatar is where it went");
+        assertEquals(way, panel.currentView().avatar().facing());
+        assertEquals(before.plots(), panel.currentView().plots(), "the rest of the valley is the same");
+
+        AvatarView at = panel.currentView().avatar();
+        panel.face("NORTH");
+        assertEquals(new AvatarView(at.col(), at.row(), "NORTH"), panel.currentView().avatar(),
+                "a blocked step only turns the avatar, also without asking for the map");
+        assertEquals(calls, mapCalls.get());
     }
 
     @Test
