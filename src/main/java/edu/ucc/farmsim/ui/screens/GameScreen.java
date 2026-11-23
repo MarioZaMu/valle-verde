@@ -29,6 +29,8 @@ import edu.ucc.farmsim.ui.components.ToastQueue;
 import edu.ucc.farmsim.ui.components.Tool;
 import edu.ucc.farmsim.ui.components.ToolBar;
 import edu.ucc.farmsim.ui.components.ToolModel;
+import edu.ucc.farmsim.ui.components.TutorialBox;
+import edu.ucc.farmsim.ui.components.TutorialPresenter;
 import edu.ucc.farmsim.ui.components.WoodBox;
 import edu.ucc.farmsim.ui.components.WoodButton;
 import edu.ucc.farmsim.ui.render.MapPanel;
@@ -57,9 +59,10 @@ import javax.swing.SwingUtilities;
  * The main game screen: the farm fills the window and the bars float over it in wooden boxes, the date,
  * weather, money and energy in the top right corner (HUD), and at the bottom the tool bar, a status line for
  * messages and the buttons "End day" and "Menu". Keys 1 to 5 pick a tool, Escape deselects it, and the
- * shortcuts of RN-34 work anywhere on the screen.
+ * shortcuts of RN-34 work anywhere on the screen. While the start tutorial runs, the avatar's box floats in the
+ * top left corner (HU-49).
  *
- * <p>Stories: HU-17, HU-18, HU-20, HU-22, HU-23, HU-26, HU-29, HU-30, HU-33, HU-34, HU-35, HU-36, HU-37, HU-38, HU-39, HU-40, HU-41, HU-45, HU-46, HU-48.
+ * <p>Stories: HU-17, HU-18, HU-20, HU-22, HU-23, HU-26, HU-29, HU-30, HU-33, HU-34, HU-35, HU-36, HU-37, HU-38, HU-39, HU-40, HU-41, HU-45, HU-46, HU-48, HU-49.
  */
 public final class GameScreen extends JPanel {
 
@@ -148,6 +151,14 @@ public final class GameScreen extends JPanel {
 
         MapPanel map = new MapPanel(controller, bus, presenter::onPlotClicked);
         HudPanel hud = new HudPanel(bus);
+        TutorialBox tutorial = new TutorialBox(new TutorialPresenter(controller));
+        bus.subscribe(tutorial);
+        tutorial.refresh();
+        JPanel tutorialRow = clear(new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0)));
+        tutorialRow.add(tutorial);
+        JPanel top = clear(new JPanel(new BorderLayout(GAP, 0)));
+        top.add(tutorialRow, BorderLayout.WEST);
+        top.add(hud, BorderLayout.CENTER);
 
         WoodBox toolBox = new WoodBox(new BorderLayout());
         toolBox.add(new ToolBar(tools), BorderLayout.CENTER);
@@ -185,9 +196,10 @@ public final class GameScreen extends JPanel {
 
         JPanel bars = clear(new JPanel(new BorderLayout()));
         bars.setBorder(BorderFactory.createEmptyBorder(MARGIN, MARGIN, MARGIN, MARGIN));
-        bars.add(hud, BorderLayout.NORTH);
+        bars.add(top, BorderLayout.NORTH);
         bars.add(bottom, BorderLayout.SOUTH);
         map.addFloating(hud.box());
+        map.addFloating(tutorial);
         map.addFloating(bottom);
 
         OverlayPanel stage = new OverlayPanel(map);

@@ -65,6 +65,8 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
       class WoodButton
       class WoodSlot
       class EnergyBar
+      class TutorialBox
+      class TutorialPresenter
     }
     package "render" as UI_REN #FFFFFF {
       class MapPanel
@@ -126,6 +128,7 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
       class AvatarService
       class NpcService
       class DialogueService
+      class TutorialService
       class ViewMapper
       class GameSession
     }
@@ -142,6 +145,7 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
       class AvatarView
       class NpcView
       class DialogueView
+      class TutorialView
     }
     package "result" as APP_RES #FFFFFF {
       class Result
@@ -215,6 +219,8 @@ package "edu.ucc.farmsim" as ROOT #FFFFFF {
     package "progress" as D_PRO #FFFFFF {
       class AchievementTracker
       class Achievement
+      class Tutorial
+      class TutorialStep
       class ProgressFacts
     }
     package "config" as D_CFG #FFFFFF {

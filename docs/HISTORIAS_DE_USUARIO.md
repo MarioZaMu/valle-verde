@@ -7,7 +7,7 @@
 
 | Elemento | Convención |
 |---|---|
-| ID | `HU-01` … `HU-48`. El orden numérico sigue las épicas; el **orden de implementación** está en §6 |
+| ID | `HU-01` … `HU-49`. El orden numérico sigue las épicas; el **orden de implementación** está en §6 |
 | Prioridad | MoSCoW heredada de los RF: **Must** (MVP), **Should**, **Could** |
 | Puntos | Fibonacci (1, 2, 3, 5). **Ninguna historia supera 5**: si una pasaba de 5, se dividió |
 | Rol | Todas las historias son del único actor humano, el **Jugador** |
@@ -626,6 +626,18 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 - **CA-3 · Una sola vez (borde).** **Dado** un encargo cumplido, **Cuando** vuelvo a hablar con el NPC, **Entonces** me lo agradece y no paga de nuevo; y el estado se conserva al guardar y cargar.
 - **CA-4 · Resumen del día.** **Dado** un encargo cumplido hoy, **Entonces** su recompensa aparece como ingreso en el resumen del día.
 
+### HU-49 · Tutorial de inicio guiado por el avatar
+**Épica:** Mundo y personajes · **Prioridad:** Should · **Puntos:** 3 · **RF:** RF-49 · **RN:** RN-39 · **Depende de:** HU-45, HU-46
+
+**Como** jugador nuevo **quiero** que mi avatar me explique paso a paso lo básico **para** empezar a jugar sin leer un manual.
+
+**Criterios de aceptación**
+- **CA-1 · Inicio.** **Dado** una partida nueva, **Entonces** se muestra el cuadro del avatar con «Paso 1 de 5», la indicación de caminar con las flechas o `W` `A` `S` `D` y el botón «Saltar tutorial».
+- **CA-2 · Avance en orden.** **Dado** el tutorial en curso, **Cuando** camino, siembro, riego, hablo con un NPC y termino el día, en ese orden, **Entonces** cada acción pasa al paso siguiente; y al terminar el paso 5 aparece el aviso «¡Listo! Ya sabes lo básico.» y el cuadro desaparece.
+- **CA-3 · Fuera de orden (negativo).** **Dado** el paso 1, **Cuando** termino el día, siembro o intento pasar contra un obstáculo, **Entonces** el paso no cambia; y una acción rechazada nunca hace avanzar el tutorial.
+- **CA-4 · Saltar.** **Dado** cualquier paso, **Cuando** pulso «Saltar tutorial», **Entonces** el cuadro desaparece y el tutorial no vuelve; y el tutorial nunca cambia la energía, el dinero, el inventario ni el día.
+- **CA-5 · Persistencia (borde).** **Dado** el tutorial en el paso 3, **Cuando** guardo y cargo, **Entonces** sigue en el paso 3; y una partida guardada antes del tutorial se carga con el tutorial terminado.
+
 ---
 
 ## 6. Pruebas críticas obligatorias → historias
@@ -716,7 +728,7 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 | 4 | HU-40 · Efectos visuales de estación y clima | Interfaz | Could | 5 | HU-11, HU-35 |
 | 5 | HU-41 · Animaciones suaves | Interfaz | Could | 3 | HU-35, HU-42 |
 
-### Fase 5.7 · Interfaz profesional, avatar y NPC (pedido del estudiante) — 24 puntos (6 historias)
+### Fase 5.7 · Interfaz profesional, avatar y NPC (pedido del estudiante) — 27 puntos (7 historias)
 
 | Orden | Historia | Épica | Prioridad | Puntos | Depende de |
 |---|---|---|---|---|---|
@@ -726,6 +738,7 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 | 4 | HU-45 · Mover el avatar por la granja | Mundo y personajes | Should | 5 | HU-30, HU-35, HU-36, HU-44 |
 | 5 | HU-46 · Hablar con los NPC | Mundo y personajes | Should | 5 | HU-44, HU-45 |
 | 6 | HU-47 · Encargos de los NPC | Mundo y personajes | Could | 3 | HU-26, HU-46 |
+| 7 | HU-49 · Tutorial de inicio guiado por el avatar | Mundo y personajes | Should | 3 | HU-45, HU-46 |
 
 ### Resumen de puntos
 
@@ -737,10 +750,10 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 | 5.4 · Construcción y animales | 21 | 98 | 17 | 2 | 2 |
 | 5.5 · Progresión y persistencia | 24 | 122 | 18 | 6 | 0 |
 | 5.6 · Interfaz visual y extras (recortable) | 19 | 141 | 0 | 6 | 13 |
-| 5.7 · Interfaz profesional, avatar y NPC | 24 | 165 | 0 | 21 | 3 |
-| **Total** | **165** | **165** | **109** | **38** | **18** |
+| 5.7 · Interfaz profesional, avatar y NPC | 27 | 168 | 0 | 24 | 3 |
+| **Total** | **168** | **168** | **109** | **41** | **18** |
 
-> **MVP (todas las *Must*): 109 puntos** en 30 historias. Lo *Should* y *Could* (56 puntos) se puede recortar sin afectar el diseño base.
+> **MVP (todas las *Must*): 109 puntos** en 30 historias. Lo *Should* y *Could* (59 puntos) se puede recortar sin afectar el diseño base.
 
 ## 8. Mapa de historias (épica → historias)
 
@@ -752,7 +765,7 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 | Construcción y animales | HU-18 Construir edificios, HU-19 Comprar animales, HU-20 Alimentar animales, HU-21 Estados del animal, HU-22 Producción y recolección, HU-23 Curar animales enfermos, HU-24 Construir y usar el almacén, HU-25 Construir y usar el invernadero | 26 |
 | Progresión y persistencia | HU-26 Registrar logros, HU-27 Desbloquear edificios por logros, HU-28 Iniciar nueva partida, HU-29 Guardar partida, HU-30 Cargar partida, HU-31 Rechazar partidas inválidas sin alterar la partida, HU-32 Listar ranuras de guardado | 25 |
 | Interfaz | HU-33 Pantalla de inicio, HU-34 HUD superior, HU-35 Mapa de la granja, HU-36 Herramientas y clic sobre parcelas, HU-37 Inventario en grilla, HU-38 Mercado modal, HU-39 Notificaciones (toasts), HU-40 Efectos visuales de estación y clima, HU-41 Animaciones suaves, HU-42 Carga de sprites con respaldo vectorial, HU-43 Tema visual profesional con FlatLaf, HU-44 Sprites pixel-art propios de 32 × 32, HU-48 Interfaz con aspecto de granja | 49 |
-| Mundo y personajes | HU-45 Mover el avatar por la granja, HU-46 Hablar con los NPC, HU-47 Encargos de los NPC | 13 |
+| Mundo y personajes | HU-45 Mover el avatar por la granja, HU-46 Hablar con los NPC, HU-47 Encargos de los NPC, HU-49 Tutorial de inicio guiado por el avatar | 16 |
 
 ## 9. Trazabilidad RF → HU → caso de uso
 
@@ -806,3 +819,4 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 | RF-46 | Should | HU-46 | CU-20 |
 | RF-47 | Could | HU-47 | CU-20 |
 | RF-48 | Should | HU-48 | CU-18 |
+| RF-49 | Should | HU-49 | CU-21 |

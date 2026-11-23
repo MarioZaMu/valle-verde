@@ -105,14 +105,29 @@ class HU48FarmInterfaceTest {
     @Test
     void HU48_ca4_atTheMinimumWindowSizeNoComponentOfTheGameScreenIsCutOff() {
         UiTheme.install();
-        TestApp app = TestApp.startedGame();
-        GameScreen screen = new GameScreen(app.controller, app.bus, new SilentNavigator());
-        screen.setSize(1024, 768);
-        layoutEverything(screen);
+        TestApp withTutorial = TestApp.create();
+        withTutorial.controller.newGame(TestApp.SEED);
+        for (TestApp app : List.of(TestApp.startedGame(), withTutorial)) {
+            GameScreen screen = new GameScreen(app.controller, app.bus, new SilentNavigator());
+            screen.setSize(1024, 768);
+            layoutEverything(screen);
+            assertNothingCut(screen);
+        }
+    }
 
+    private static boolean shown(Component component) {
+        for (Component c = component; c != null; c = c.getParent()) {
+            if (!c.isVisible()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static void assertNothingCut(GameScreen screen) {
         for (Component child : allComponents(screen)) {
             Container parent = child.getParent();
-            if (parent == null || !child.isVisible() || child.getWidth() == 0) {
+            if (parent == null || !shown(child) || child.getWidth() == 0) {
                 continue;
             }
             Rectangle inside = new Rectangle(0, 0, parent.getWidth(), parent.getHeight());

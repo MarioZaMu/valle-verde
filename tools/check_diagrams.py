@@ -75,16 +75,16 @@ for a in parts-{'Jugador'}:
 print(f'mensajes de secuencia verificados: {len(msgs)}')
 
 
-# --- functional view: the 48 RF must be covered exactly once by the component labels ---
+# --- functional view: the 49 RF must be covered exactly once by the component labels ---
 func=rd('02_vista_funcional.puml')
 cov={}
 for m in re.finditer(r'RF-(\d\d)(?: a (?:RF-)?(\d\d))?(?:, (?:RF-)?(\d\d))?',func.split("'/")[1]):
     a=int(m.group(1)); b=int(m.group(2) or a)
     for n in range(a,b+1): cov[n]=cov.get(n,0)+1
     if m.group(3): cov[int(m.group(3))]=cov.get(int(m.group(3)),0)+1
-for n in range(1,49):
+for n in range(1,50):
     if cov.get(n,0)!=1: errs.append(f'vista funcional: RF-{n:02d} cubierto {cov.get(n,0)} veces (debe ser 1)')
-print(f'RF cubiertos en vista funcional: {sum(1 for n in range(1,49) if cov.get(n)==1)}/48')
+print(f'RF cubiertos en vista funcional: {sum(1 for n in range(1,50) if cov.get(n)==1)}/49')
 
 
 # --- development view: no cycles and layer rules (arrows A ..> B between package aliases) ---

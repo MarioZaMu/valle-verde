@@ -29,6 +29,7 @@
 | CU-18 | Observar la granja | Interfaz | RF-10, RF-34, RF-35, RF-36, RF-39, RF-40, RF-41, RF-42, RF-43, RF-44, RF-48 |
 | CU-19 | Caminar por la granja | Mundo | RF-45 |
 | CU-20 | Hablar con un NPC | Mundo | RF-46, RF-47 |
+| CU-21 | Seguir el tutorial de inicio | Mundo | RF-49 |
 
 ---
 
@@ -258,6 +259,17 @@
 - **Alternativas:** **A1.** El avatar no está junto al NPC: `NPC_LEJOS`. **A3.** Faltan artículos: `ENCARGO_INCOMPLETO` y no cambia nada. **A3b.** El encargo ya fue cumplido: el NPC lo agradece y no paga de nuevo.
 - **Postcondición:** el encargo cumplido y el dinero quedan guardados con la partida.
 
+## CU-21 · Seguir el tutorial de inicio
+- **Actor:** Jugador · **RF:** RF-49 · **RN:** RN-39, RN-36, RN-37
+- **Precondición:** el Jugador acaba de empezar una partida nueva (CU-01).
+- **Flujo principal:**
+  1. El sistema muestra el cuadro del avatar con «Paso 1 de 5» y la indicación de caminar.
+  2. El Jugador hace lo que pide el paso (caminar, sembrar, regar, hablar con un NPC o terminar el día; CU-19, CU-02, CU-03, CU-20, CU-06).
+  3. El sistema pasa al paso siguiente y cambia la indicación. Se repiten 2 y 3 hasta el paso 5.
+  4. Al terminar el paso 5, el sistema muestra «¡Listo! Ya sabes lo básico.» y oculta el cuadro.
+- **Alternativas:** **A2a.** La acción es de otro paso o fue rechazada: el paso no cambia. **A2b.** El Jugador pulsa «Saltar tutorial»: el sistema da el tutorial por terminado y oculta el cuadro.
+- **Postcondición:** el paso actual (o el tutorial terminado) queda en el estado y se guarda con la partida.
+
 ---
 
 ## Trazabilidad RF → CU
@@ -312,5 +324,6 @@
 | RF-46 | El jugador podrá hablar con los NPC que estén junto a su avatar y leer diálogos en español … | Should | CU-20 | HU-46 |
 | RF-47 | Los NPC ofrecerán encargos de un solo uso con recompensa en m | Could | CU-20 | HU-47 |
 | RF-48 | La interfaz tendrá aspecto de granja: barra de herramientas con iconos, HUD con iconos e inventario … | Should | CU-18 | HU-48 |
+| RF-49 | Una partida nueva empezará con un tutorial de 5 pasos guiado por el avatar, que se puede saltar … | Should | CU-21 | HU-49 |
 
 > Las historias de usuario están en [`HISTORIAS_DE_USUARIO.md`](HISTORIAS_DE_USUARIO.md).

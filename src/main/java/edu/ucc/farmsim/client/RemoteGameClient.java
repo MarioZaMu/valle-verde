@@ -17,6 +17,7 @@ import edu.ucc.farmsim.application.dto.InventoryView;
 import edu.ucc.farmsim.application.dto.MapView;
 import edu.ucc.farmsim.application.dto.MarketView;
 import edu.ucc.farmsim.application.dto.NpcView;
+import edu.ucc.farmsim.application.dto.TutorialView;
 import edu.ucc.farmsim.application.dto.PlotView;
 import edu.ucc.farmsim.application.dto.SaveSlotView;
 import edu.ucc.farmsim.application.event.EventBus;
@@ -44,7 +45,7 @@ import java.util.logging.Logger;
  * <p>Orders are sent synchronously from the calling thread with a time limit (DT-20). It never throws: an
  * unreachable server, a timeout or an unreadable answer becomes {@code ERROR_INTERNO}.
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-26, HU-28, HU-29, HU-30, HU-31, HU-32, HU-33, HU-35, HU-37, HU-38, HU-45, HU-46, HU-47.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-26, HU-28, HU-29, HU-30, HU-31, HU-32, HU-33, HU-35, HU-37, HU-38, HU-45, HU-46, HU-47, HU-49.
  */
 public final class RemoteGameClient implements GameCommands {
 
@@ -132,6 +133,16 @@ public final class RemoteGameClient implements GameCommands {
     @Override
     public Result<DialogueView> deliver(String npcId) {
         return send("POST", "/api/npcs/" + npcId + "/errand", null, DialogueView.class);
+    }
+
+    @Override
+    public Result<TutorialView> tutorial() {
+        return send("GET", "/api/tutorial", null, TutorialView.class);
+    }
+
+    @Override
+    public Result<TutorialView> skipTutorial() {
+        return send("POST", "/api/tutorial/skip", null, TutorialView.class);
     }
 
     @Override

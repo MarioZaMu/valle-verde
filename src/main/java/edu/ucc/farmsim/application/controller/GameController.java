@@ -13,6 +13,7 @@ import edu.ucc.farmsim.application.dto.MarketView;
 import edu.ucc.farmsim.application.dto.NpcView;
 import edu.ucc.farmsim.application.dto.PlotView;
 import edu.ucc.farmsim.application.dto.SaveSlotView;
+import edu.ucc.farmsim.application.dto.TutorialView;
 import edu.ucc.farmsim.application.result.ErrorCode;
 import edu.ucc.farmsim.application.result.Result;
 import edu.ucc.farmsim.application.service.AchievementService;
@@ -26,7 +27,9 @@ import edu.ucc.farmsim.application.service.MarketService;
 import edu.ucc.farmsim.application.service.NpcService;
 import edu.ucc.farmsim.application.service.ProgressService;
 import edu.ucc.farmsim.application.service.SaveGameService;
+import edu.ucc.farmsim.application.service.TutorialService;
 import edu.ucc.farmsim.application.service.ViewMapper;
+import edu.ucc.farmsim.domain.progress.TutorialStep;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.logging.Level;
@@ -39,9 +42,10 @@ import org.springframework.stereotype.Component;
  * <p>It only orchestrates: it asks the services to do the work and always answers with a {@link Result}.
  * No exception ever reaches the UI or the API: anything unexpected becomes {@code ERROR_INTERNO} (R-03,
  * RNF-07), and it never touches repositories (AR-4). It is not the REST controller: the {@code api} package
- * translates HTTP into calls to this class.
+ * translates HTTP into calls to this class. After an accepted walk, sowing, watering, talk or end of the day it
+ * tells the start tutorial, which moves on if that was the action of its step (RN-39).
  *
- * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-26, HU-28, HU-29, HU-30, HU-31, HU-32, HU-33, HU-35, HU-37, HU-38, HU-45, HU-46, HU-47.
+ * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-26, HU-28, HU-29, HU-30, HU-31, HU-32, HU-33, HU-35, HU-37, HU-38, HU-45, HU-46, HU-47, HU-49.
  */
 @Component
 public final class GameController implements GameCommands {
@@ -60,6 +64,7 @@ public final class GameController implements GameCommands {
     private final AchievementService achievements;
     private final AvatarService avatar;
     private final NpcService npcs;
+    private final TutorialService tutorial;
 
     /**
      * Creates the controller.
@@ -76,12 +81,13 @@ public final class GameController implements GameCommands {
      * @param achievements the achievements and their progress
      * @param avatar   walking with the avatar
      * @param npcs     the people of the valley and their errands
+     * @param tutorial the start tutorial
      */
     public GameController(GameSession session, ViewMapper mapper, ProgressService progress, DayService day,
                           SaveGameService saves, FarmService farm, MarketService market,
                           BuildingService buildings, AnimalService animals,
                           AchievementService achievements, AvatarService avatar,
-                          NpcService npcs) {
+                          NpcService npcs, TutorialService tutorial) {
         this.session = session;
         this.mapper = mapper;
         this.progress = progress;
@@ -94,6 +100,7 @@ public final class GameController implements GameCommands {
         this.achievements = achievements;
         this.avatar = avatar;
         this.npcs = npcs;
+        this.tutorial = tutorial;
     }
 
     /** True if a game is in progress (the UI asks for confirmation before discarding it). */
@@ -120,7 +127,7 @@ public final class GameController implements GameCommands {
     /** Ends the day: effects are resolved in the order of RN-03 and the new top bar is returned. */
     @Override
     public Result<HudView> endDay() {
-        return guard(day::endDay);
+        return guard(() -> tracked(TutorialStep.END_DAY, day.endDay()));
     }
 
     /**
@@ -132,7 +139,7 @@ public final class GameController implements GameCommands {
      */
     @Override
     public Result<PlotView> plant(int col, int row, String seedId) {
-        return guard(() -> farm.plant(col, row, seedId));
+        return guard(() -> tracked(TutorialStep.SOW, farm.plant(col, row, seedId)));
     }
 
     /**
@@ -143,7 +150,7 @@ public final class GameController implements GameCommands {
      */
     @Override
     public Result<PlotView> water(int col, int row) {
-        return guard(() -> farm.water(col, row));
+        return guard(() -> tracked(TutorialStep.WATER, farm.water(col, row)));
     }
 
     /**
@@ -176,7 +183,7 @@ public final class GameController implements GameCommands {
 
     @Override
     public Result<AvatarView> move(String direction) {
-        return guard(() -> avatar.move(direction));
+        return guard(() -> tracked(TutorialStep.WALK, avatar.move(direction)));
     }
 
     @Override
@@ -186,12 +193,22 @@ public final class GameController implements GameCommands {
 
     @Override
     public Result<DialogueView> talk(String npcId) {
-        return guard(() -> npcs.talk(npcId));
+        return guard(() -> tracked(TutorialStep.TALK, npcs.talk(npcId)));
     }
 
     @Override
     public Result<DialogueView> deliver(String npcId) {
         return guard(() -> npcs.deliver(npcId));
+    }
+
+    @Override
+    public Result<TutorialView> tutorial() {
+        return guard(tutorial::tutorial);
+    }
+
+    @Override
+    public Result<TutorialView> skipTutorial() {
+        return guard(tutorial::skip);
     }
 
     /** True if at least one of the save slots holds a game. */
@@ -284,6 +301,14 @@ public final class GameController implements GameCommands {
     @Override
     public Result<HudView> load(int slot) {
         return guard(() -> saves.load(slot));
+    }
+
+    /** An accepted action of a step tells the tutorial, after the events of the action itself. */
+    private <T> Result<T> tracked(TutorialStep step, Result<T> result) {
+        if (result.isOk()) {
+            tutorial.done(step);
+        }
+        return result;
     }
 
     private <T> Result<T> guard(Supplier<Result<T>> operation) {

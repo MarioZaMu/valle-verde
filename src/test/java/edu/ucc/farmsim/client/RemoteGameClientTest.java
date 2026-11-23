@@ -88,6 +88,7 @@ class RemoteGameClientTest {
     @Test
     void HU45_aStepThroughTheServerGivesTheSameAnswerAndEventAsTheLocalController() {
         client.newGame(TestApp.SEED);
+        client.skipTutorial();
         TestApp local = TestApp.startedGame();
         events.clear();
 
@@ -103,6 +104,24 @@ class RemoteGameClientTest {
         Result<AvatarView> blocked = client.move("SOUTH");
         assertEquals(ErrorCode.MOVIMIENTO_BLOQUEADO, blocked.code());
         assertEquals("No puedes pasar por ahí.", blocked.message());
+    }
+
+    @Test
+    void HU49_theTutorialThroughTheServerMatchesTheLocalControllerStepByStep() {
+        client.newGame(TestApp.SEED);
+        TestApp local = TestApp.create();
+        local.controller.newGame(TestApp.SEED);
+        local.events.clear();
+        events.clear();
+
+        assertEquals(local.controller.tutorial().value(), client.tutorial().value());
+        assertEquals(local.controller.move("EAST").value(), client.move("EAST").value());
+        assertEquals(local.controller.plant(8, 6, "CARROT_SEED").value(), client.plant(8, 6, "CARROT_SEED").value());
+        assertEquals(local.controller.skipTutorial().value(), client.skipTutorial().value());
+        assertEquals(local.events, events, "the same TutorialAdvanced events, in the same places");
+        assertTrue(client.tutorial().value().finished());
+        session.replace(null);
+        assertEquals(ErrorCode.SIN_PARTIDA, client.tutorial().code());
     }
 
     @Test

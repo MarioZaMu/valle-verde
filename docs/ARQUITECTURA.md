@@ -535,3 +535,11 @@ Decisiones: **D-66** un paso bloqueado se rechaza con `MOVIMIENTO_BLOQUEADO` per
 
 Decisiones: **D-69** entregar un encargo ya cumplido no es un rechazo: responde con el agradecimiento y no paga (RN-38 «no se repite»); **D-70** no se construye sobre un NPC, pero esa regla vive en `BuildingService` y no en `FarmMap.canPlace`, para que una partida antigua con un edificio en esa parcela siga cargando; **D-71** el esquema sigue en la versión 2: un documento sin `errandsDone` se lee como «ningún encargo cumplido».
 
+**Etapa 5.7f (hecha): tutorial de inicio guiado por el avatar (HU-49).** 557 pruebas en verde (2 omitidas); cobertura de dominio y aplicación sobre la barrera; verificadores sin errores. Antes del código se documentaron RF-49, RN-39, CU-21 y HU-49 (49 historias, 168 puntos).
+
+- **Dominio:** `Tutorial` y `TutorialStep` en `domain.progress` (caminar, sembrar, regar, hablar, terminar el día, y `DONE` o `SKIPPED`). Una acción solo cuenta si es la del paso actual; terminado o saltado no vuelve. `GameState` lo contiene y el `GameMemento` guarda el paso (`tutorial`).
+- **Aplicación y red:** `TutorialService` (texto de cada paso, `tutorial`, `skip`, `done`), `TutorialView`, evento `TutorialAdvanced`, `GameCommands.tutorial()` y `skipTutorial()`, rutas `GET /api/tutorial` y `POST /api/tutorial/skip`. La prueba de equivalencia cubre el tutorial por HTTP y en proceso.
+- **Interfaz:** `TutorialBox` (lógica en `TutorialPresenter`) flota arriba a la izquierda con el retrato del granjero, «Paso n de 5», la indicación y «Saltar tutorial»; se oculta al terminar y `ToastPresenter` muestra «¡Listo! Ya sabes lo básico.». `MapPanel.addFloating` evita que tape parcelas; la prueba de 1024 × 768 sin texto cortado se repite con el cuadro visible.
+
+Decisiones: **D-72** el tutorial avanza desde `GameController`, después de que la orden fue aceptada y publicó sus eventos, y no desde cada servicio: así ningún servicio depende del tutorial y una orden rechazada nunca lo mueve; **D-73** el esquema sigue en la versión 2: un documento sin `tutorial` se carga con el tutorial **terminado**, porque es una partida que ya se estaba jugando; **D-74** `TestApp.startedGame()` salta el tutorial, para que las pruebas de las demás historias vean solo los eventos de su propia orden; las pruebas de HU-49 crean la partida con el tutorial en curso.
+

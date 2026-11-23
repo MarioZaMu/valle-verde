@@ -147,6 +147,29 @@ class GameRestControllerTest {
     }
 
     @Test
+    void HU49_GET_tutorial_followsTheStepsAndPOST_skip_endsIt() throws Exception {
+        newGame();
+        mvc.perform(get("/api/tutorial")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.step").value("WALK"))
+                .andExpect(jsonPath("$.data.number").value(1))
+                .andExpect(jsonPath("$.data.total").value(5))
+                .andExpect(jsonPath("$.data.finished").value(false));
+        mvc.perform(post("/api/avatar/moves").contentType(MediaType.APPLICATION_JSON).content("{\"direction\": \"EAST\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.events[1].type").value("TutorialAdvanced"))
+                .andExpect(jsonPath("$.events[1].data.tutorial.step").value("SOW"));
+        mvc.perform(post("/api/tutorial/skip")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.step").value("SKIPPED"))
+                .andExpect(jsonPath("$.data.finished").value(true))
+                .andExpect(jsonPath("$.events", hasSize(1)));
+        mvc.perform(post("/api/tutorial/skip")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.events", hasSize(0)));
+        session.replace(null);
+        mvc.perform(get("/api/tutorial")).andExpect(status().isNotFound());
+        mvc.perform(post("/api/tutorial/skip")).andExpect(status().isNotFound());
+    }
+
+    @Test
     void HU46_GET_npcs_and_POST_talk_answerByDistanceAndHU47_POST_errand_rejectsAnIncompleteErrand() throws Exception {
         newGame();
         mvc.perform(get("/api/npcs")).andExpect(status().isOk())

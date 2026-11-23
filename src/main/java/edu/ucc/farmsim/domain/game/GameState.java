@@ -11,6 +11,7 @@ import edu.ucc.farmsim.domain.npc.ErrandBook;
 import edu.ucc.farmsim.domain.progress.Achievement;
 import edu.ucc.farmsim.domain.progress.AchievementTracker;
 import edu.ucc.farmsim.domain.progress.ProgressFacts;
+import edu.ucc.farmsim.domain.progress.Tutorial;
 import edu.ucc.farmsim.domain.time.GameClock;
 import edu.ucc.farmsim.domain.time.GameDate;
 import edu.ucc.farmsim.domain.time.StateRandom;
@@ -26,7 +27,7 @@ import java.util.List;
  * {@link #createMemento()} and {@link #restore(GameMemento)} undo a failed end of the day (HU-10) and
  * will back saving and loading (HU-29, HU-30).
  *
- * <p>Stories: HU-01, HU-10, HU-14, HU-15, HU-17, HU-18, HU-26, HU-28, HU-45, HU-47.
+ * <p>Stories: HU-01, HU-10, HU-14, HU-15, HU-17, HU-18, HU-26, HU-28, HU-45, HU-47, HU-49.
  */
 public final class GameState {
 
@@ -41,6 +42,7 @@ public final class GameState {
     private final AchievementTracker progress = new AchievementTracker();
     private final Avatar avatar = Avatar.start();
     private final ErrandBook errands = new ErrandBook();
+    private final Tutorial tutorial = new Tutorial();
 
     private GameState(int money, Energy energy, Inventory inventory, FarmMap farm,
                       WeatherCycle weather, StateRandom random, Market market) {
@@ -192,6 +194,11 @@ public final class GameState {
         return errands;
     }
 
+    /** Where the player is in the start tutorial (RN-39). */
+    public Tutorial tutorial() {
+        return tutorial;
+    }
+
     /** The random generator of this game. */
     public StateRandom random() {
         return random;
@@ -201,7 +208,7 @@ public final class GameState {
     public GameMemento createMemento() {
         return new GameMemento(date(), money, energy.current(), inventory.snapshot(),
                 farm.snapshot(), weather.today(), weather.forecast(), random.state(), market.snapshot(),
-                ledger.snapshot(), progress.snapshot(), avatar.snapshot(), errands.snapshot());
+                ledger.snapshot(), progress.snapshot(), avatar.snapshot(), errands.snapshot(), tutorial.snapshot());
     }
 
     /** Puts the state back exactly as it was when the snapshot was taken. */
@@ -222,6 +229,7 @@ public final class GameState {
             avatar.restoreFrom(memento.avatar());
         }
         errands.restoreFrom(memento.errandsDone());
+        tutorial.restoreFrom(memento.tutorial());
     }
 
     /** Current calendar date. */

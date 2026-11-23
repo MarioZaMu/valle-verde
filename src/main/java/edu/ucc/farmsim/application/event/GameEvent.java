@@ -3,12 +3,13 @@ package edu.ucc.farmsim.application.event;
 import edu.ucc.farmsim.application.dto.AvatarView;
 import edu.ucc.farmsim.application.dto.DaySummaryView;
 import edu.ucc.farmsim.application.dto.HudView;
+import edu.ucc.farmsim.application.dto.TutorialView;
 
 /**
  * Something that happened in the game and the screen may want to show. Events carry immutable views, never
  * domain objects, so the UI can react without importing the domain.
  *
- * <p>Stories: HU-01, HU-10, HU-14, HU-15, HU-17, HU-26, HU-34, HU-45, HU-47.
+ * <p>Stories: HU-01, HU-10, HU-14, HU-15, HU-17, HU-26, HU-34, HU-45, HU-47, HU-49.
  */
 public sealed interface GameEvent {
 
@@ -38,6 +39,9 @@ public sealed interface GameEvent {
 
     /** An errand of a person of the valley was delivered and paid (RN-38). */
     record ErrandCompleted(String npcId, String name, int reward) implements GameEvent { }
+
+    /** The start tutorial moved to its next step, or ended (RN-39). */
+    record TutorialAdvanced(TutorialView tutorial) implements GameEvent { }
 
     /** Energy changed after an action. */
     record EnergyChanged(int energy, int maxEnergy) implements GameEvent { }

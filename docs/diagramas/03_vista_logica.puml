@@ -150,6 +150,11 @@ package "application" #F6FBF6 {
   class DialogueService {
     +dialogue(n: Npc, s: GameState): DialogueView
   }
+  class TutorialService {
+    +tutorial(): Result
+    +skip(): Result
+    +done(action: TutorialStep): void
+  }
   class DayService {
     +endDay(): Result
   }
@@ -424,6 +429,14 @@ package "domain" #FFFCF5 {
     class Achievement <<enumeration>> {
       LG-01..LG-09
     }
+    class Tutorial {
+      -step: TutorialStep
+      +complete(action: TutorialStep): boolean
+      +skip(): boolean
+    }
+    class TutorialStep <<enumeration>> {
+      WALK, SOW, WATER, TALK, END_DAY, DONE, SKIPPED
+    }
     class ProgressFacts <<ValueObject>> {
       -money: int
       -harvests: int
@@ -471,6 +484,9 @@ GameController --> AnimalService
 GameController --> SaveGameService
 GameController --> AvatarService
 GameController --> NpcService
+GameController --> TutorialService
+TutorialService --> GameSession
+TutorialService --> EventBus
 NpcService --> GameSession
 NpcService --> EventBus
 NpcService --> DialogueService
@@ -510,6 +526,8 @@ FarmMap ..> Npc : bloquean el paso
 GameState *-- "1" Inventory
 GameState *-- "1" Market
 GameState *-- "1" AchievementTracker
+GameState *-- "1" Tutorial
+Tutorial --> TutorialStep
 GameState ..> ProgressFacts : «create»
 AchievementTracker ..> ProgressFacts : lee
 GameSession --> "1" GameState : actual

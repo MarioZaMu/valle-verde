@@ -30,7 +30,7 @@ import javax.swing.KeyStroke;
  * portrait, name and role, what it says, its errand and the buttons Entregar and Cerrar. It is modal; {@code Esc}
  * or {@code E} closes it. All the logic is in {@link DialoguePresenter}.
  *
- * <p>Stories: HU-46, HU-47.
+ * <p>Stories: HU-46, HU-47, HU-49.
  */
 public final class DialogueDialog extends JDialog {
 
@@ -59,7 +59,7 @@ public final class DialogueDialog extends JDialog {
         this.presenter = presenter;
         setUndecorated(true);
         WoodBox box = new WoodBox(new BorderLayout(12, 6));
-        box.add(portrait(presenter.view().npcId()), BorderLayout.WEST);
+        box.add(portrait("characters/" + presenter.view().npcId() + ".png", PORTRAIT), BorderLayout.WEST);
 
         JPanel words = new JPanel();
         words.setOpaque(false);
@@ -132,14 +132,15 @@ public final class DialogueDialog extends JDialog {
         setLocation(area.x + (area.width - width) / 2, area.y + area.height - HEIGHT - MARGIN * 3);
     }
 
-    private static JLabel portrait(String npcId) {
+    /** A sprite enlarged without blur to a square of the given side; empty (but of that size) without the sprite. */
+    static JLabel portrait(String sprite, int side) {
         JLabel label = new JLabel();
-        label.setPreferredSize(new Dimension(PORTRAIT, PORTRAIT));
-        AssetManager.shared().sprite("characters/" + npcId + ".png").ifPresent(img -> {
-            BufferedImage big = new BufferedImage(PORTRAIT, PORTRAIT, BufferedImage.TYPE_INT_ARGB);
+        label.setPreferredSize(new Dimension(side, side));
+        AssetManager.shared().sprite(sprite).ifPresent(img -> {
+            BufferedImage big = new BufferedImage(side, side, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = big.createGraphics();
             g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-            g.drawImage(img, 0, 0, PORTRAIT, PORTRAIT, null);
+            g.drawImage(img, 0, 0, side, side, null);
             g.dispose();
             label.setIcon(new ImageIcon(big));
         });

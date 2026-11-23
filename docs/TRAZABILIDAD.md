@@ -86,18 +86,21 @@ RF-43, 48 | Contrast, Main, Palette, UiTheme, WoodStyle | HU-43: 5 |
 (AssetManager)
 RF-42, 44 | AssetManager, GroundLayer, MapGeometry, MapRenderer, PixelScaler | HU-44: 7 |
 | RF-45 | Should | HU-45 | Avatar y personajes
-(NPC y encargos)
-RF-45 a RF-47 | Avatar, AvatarService, AvatarSnapshot, AvatarView, BuildingService, Direction, ErrorCode, FarmMap, GameCommands, GameController, GameEvent, GameMemento, GameRestController, GameScreen, GameScreenPresenter, GameState, GameStateValidator, MapPanel, MapRenderer, MapView, RemoteGameClient, SaveCodec, Texts, ViewMapper, VisualEffects | HU-45: 15 |
+(NPC, encargos, tutorial)
+RF-45 a RF-47, 49 | Avatar, AvatarService, AvatarSnapshot, AvatarView, BuildingService, Direction, ErrorCode, FarmMap, GameCommands, GameController, GameEvent, GameMemento, GameRestController, GameScreen, GameScreenPresenter, GameState, GameStateValidator, MapPanel, MapRenderer, MapView, RemoteGameClient, SaveCodec, Texts, ViewMapper, VisualEffects | HU-45: 15 |
 | RF-46 | Should | HU-46 | Avatar y personajes
-(NPC y encargos)
-RF-45 a RF-47 | BuildingService, DialogueDialog, DialoguePresenter, DialogueService, DialogueView, ErrorCode, FarmMap, GameCommands, GameController, GameDialogs, GameRestController, GameScreen, GameScreenPresenter, MapPanel, MapRenderer, MapView, Names, Npc, NpcService, NpcView, RemoteGameClient, Texts, ViewMapper | HU-46: 10 |
+(NPC, encargos, tutorial)
+RF-45 a RF-47, 49 | BuildingService, DialogueDialog, DialoguePresenter, DialogueService, DialogueView, ErrorCode, FarmMap, GameCommands, GameController, GameDialogs, GameRestController, GameScreen, GameScreenPresenter, MapPanel, MapRenderer, MapView, Names, Npc, NpcService, NpcView, RemoteGameClient, Texts, ViewMapper | HU-46: 10 |
 | RF-47 | Could | HU-47 | Avatar y personajes
-(NPC y encargos)
-RF-45 a RF-47 | DialogueDialog, DialoguePresenter, DialogueService, DialogueView, ErrandBook, ErrorCode, GameCommands, GameController, GameEvent, GameMemento, GameRestController, GameState, GameStateValidator, MapRenderer, Names, Npc, NpcService, NpcView, RemoteGameClient, Texts, ToastPresenter | HU-47: 8 |
+(NPC, encargos, tutorial)
+RF-45 a RF-47, 49 | DialogueDialog, DialoguePresenter, DialogueService, DialogueView, ErrandBook, ErrorCode, GameCommands, GameController, GameEvent, GameMemento, GameRestController, GameState, GameStateValidator, MapRenderer, Names, Npc, NpcService, NpcView, RemoteGameClient, Texts, ToastPresenter | HU-47: 8 |
 | RF-48 | Should | HU-48 | Interfaz de usuario
 (Swing + FlatLaf)
 RF-33 a RF-41
 RF-43, 48 | AmbientPainter, AssetManager, EnergyBar, GameScreen, GroundLayer, HoverAnimator, HudModel, HudPanel, InventoryGrid, MapPanel, MapRenderer, PixelScaler, StartScreen, TitleScene, ToolBar, VisualEffects, WoodBox, WoodButton, WoodSlot, WoodStyle | HU-48: 13 |
+| RF-49 | Should | HU-49 | Avatar y personajes
+(NPC, encargos, tutorial)
+RF-45 a RF-47, 49 | DialogueDialog, GameCommands, GameController, GameEvent, GameMemento, GameRestController, GameScreen, GameState, RemoteGameClient, Texts, ToastPresenter, Tutorial, TutorialBox, TutorialPresenter, TutorialService, TutorialStep, TutorialView | HU-49: 13 |
 
 ## 2. Por historia de usuario
 
@@ -151,5 +154,6 @@ RF-43, 48 | AmbientPainter, AssetManager, EnergyBar, GameScreen, GroundLayer, Ho
 | HU-46 · Hablar con los NPC | 5.7 | Should | 5 | 10 | completa | BuildingService, DialogueDialog, DialoguePresenter, DialogueService, DialogueView, ErrorCode, FarmMap, GameCommands, GameController, GameDialogs, GameRestController, GameScreen, GameScreenPresenter, MapPanel, MapRenderer, MapView, Names, Npc, NpcService, NpcView, RemoteGameClient, Texts, ViewMapper |
 | HU-47 · Encargos de los NPC | 5.7 | Could | 4 | 8 | completa | DialogueDialog, DialoguePresenter, DialogueService, DialogueView, ErrandBook, ErrorCode, GameCommands, GameController, GameEvent, GameMemento, GameRestController, GameState, GameStateValidator, MapRenderer, Names, Npc, NpcService, NpcView, RemoteGameClient, Texts, ToastPresenter |
 | HU-48 · Interfaz con aspecto de granja | 5.7 | Should | 8 | 13 | completa | AmbientPainter, AssetManager, EnergyBar, GameScreen, GroundLayer, HoverAnimator, HudModel, HudPanel, InventoryGrid, MapPanel, MapRenderer, PixelScaler, StartScreen, TitleScene, ToolBar, VisualEffects, WoodBox, WoodButton, WoodSlot, WoodStyle |
+| HU-49 · Tutorial de inicio guiado por el avatar | 5.7 | Should | 5 | 13 | completa | DialogueDialog, GameCommands, GameController, GameEvent, GameMemento, GameRestController, GameScreen, GameState, RemoteGameClient, Texts, ToastPresenter, Tutorial, TutorialBox, TutorialPresenter, TutorialService, TutorialStep, TutorialView |
 
-**Resumen:** 48 de 48 historias con todas sus pruebas; 429 pruebas `HUxx_` en total.
+**Resumen:** 49 de 49 historias con todas sus pruebas; 442 pruebas `HUxx_` en total.

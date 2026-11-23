@@ -14,7 +14,7 @@ PH=[('5.1','Núcleo del turno',[13,9,8,11,28,10,33,34]),
     ('5.4','Construcción y animales',[18,19,20,21,22,23,17]),
     ('5.5','Progresión y persistencia',[26,27,24,29,30,31,32]),
     ('5.6','Interfaz visual y extras (recortable)',[39,42,25,40,41]),
-    ('5.7','Interfaz profesional, avatar y NPC (pedido del estudiante)',[43,44,48,45,46,47])]
+    ('5.7','Interfaz profesional, avatar y NPC (pedido del estudiante)',[43,44,48,45,46,47,49])]
 pos={}; phase={}
 for i,(pid,_,l) in enumerate(PH):
     for j,h in enumerate(l): pos[f'HU-{h:02d}']=(i,j); phase[f'HU-{h:02d}']=pid

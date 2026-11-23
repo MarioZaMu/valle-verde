@@ -94,8 +94,9 @@ Los requerimientos se agrupan en las **6 épicas** que también organizarán las
 | RF-46 | El jugador podrá **hablar con los NPC** que estén junto a su avatar y leer diálogos en español que dependen del estado del juego | Should | RN-37 |
 | RF-47 | Los NPC ofrecerán **encargos** de un solo uso que el jugador cumple entregando artículos a cambio de una recompensa en m | Could | RN-38 |
 | RF-48 | La interfaz tendrá aspecto de granja: barra de herramientas con iconos, HUD con iconos e inventario con los sprites de los ítems | Should | RN-34 |
+| RF-49 | Una partida nueva empezará con un **tutorial** de 5 pasos guiado por el avatar (caminar, sembrar, regar, hablar con un NPC y terminar el día), que se puede saltar y se guarda con la partida | Should | RN-39 |
 
-**Totales:** 48 RF → 30 *Must* · 13 *Should* · 5 *Could* (los RF-43 a RF-48 se agregaron en la Fase 5.7 por pedido expreso del estudiante).
+**Totales:** 49 RF → 30 *Must* · 14 *Should* · 5 *Could* (los RF-43 a RF-49 se agregaron en la Fase 5.7 por pedido expreso del estudiante).
 
 ## 3. Requerimientos no funcionales (medibles)
 
@@ -164,6 +165,7 @@ Referencia de hardware: equipo de desarrollo con Windows 11, ≥ 8 GB de RAM y J
 | RN-36 | Avatar y movimiento | RF-45 |
 | RN-37 | Personajes (NPC) y diálogos | RF-46 |
 | RN-38 | Encargos de los NPC | RF-47 |
+| RN-39 | Tutorial de inicio | RF-49 |
 
 ## 5. Fuera de alcance (*Won't*)
 

@@ -18,7 +18,7 @@
 | Progresión | RN-28 a RN-29 |
 | Partida y persistencia | RN-30 a RN-33 |
 | Interfaz | RN-34 a RN-35 |
-| Avatar y personajes | RN-36 a RN-38 |
+| Avatar y personajes | RN-36 a RN-39 |
 
 ---
 
@@ -460,3 +460,20 @@ Cada RN se usa por al menos un requerimiento funcional; la tabla completa RF ↔
 
 - Al hablar con el NPC se puede **entregar** el encargo: si el inventario tiene la cantidad, se retira y se paga la recompensa (ingreso del día, RN-14); si no, se rechaza (`ENCARGO_INCOMPLETO`, «Te faltan {n} {artículo} para el encargo.») sin cambiar nada.
 - Un encargo cumplido **no se repite**; su estado se guarda en la partida (RN-32).
+
+### RN-39 · Tutorial de inicio
+- Una **partida nueva** empieza con un tutorial de **5 pasos** en el que el avatar le habla al jugador desde un cuadro con su retrato, que muestra «Paso n de 5», qué hacer y el botón «Saltar tutorial».
+
+| Paso | Lo que pide el avatar | Avanza cuando |
+|---|---|---|
+| 1 · Caminar | «¡Hola! Soy tu granjero. Camina por la granja con las flechas o con W A S D.» | el avatar da un paso (no basta con girar contra un obstáculo) |
+| 2 · Sembrar | «Elige Sembrar con la tecla 1, ponte frente a la tierra y pulsa Espacio (o haz clic en una parcela de tierra).» | se siembra una semilla |
+| 3 · Regar | «Ahora elige Regar con la tecla 2 y riega lo que sembraste.» | se riega un cultivo |
+| 4 · Hablar | «Los vecinos dan consejos y encargos. Acércate a uno y pulsa E.» | se habla con un NPC |
+| 5 · Terminar el día | «Cuando acabes, pulsa Enter o «Terminar día» para que crezcan tus cultivos.» | se termina el día |
+
+- Los pasos van **en orden**: una acción solo cuenta si es la del paso actual, y una acción **rechazada** no cuenta.
+- Al terminar el paso 5 se muestra el aviso «¡Listo! Ya sabes lo básico. ¡Buena suerte en el valle!» y el cuadro desaparece.
+- «Saltar tutorial» lo da por terminado en cualquier paso; un tutorial terminado o saltado **no vuelve**.
+- El tutorial **no cambia** la energía, el dinero, el inventario ni el día: solo guía.
+- El paso actual se guarda con la partida (RN-32) sin subir la `schemaVersion`; un documento escrito antes del tutorial se carga con el tutorial **terminado** (una partida que ya se jugaba no lo repite).

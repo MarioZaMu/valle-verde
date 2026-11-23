@@ -15,6 +15,7 @@ import edu.ucc.farmsim.application.service.NpcService;
 import edu.ucc.farmsim.application.service.DialogueService;
 import edu.ucc.farmsim.application.service.ProgressService;
 import edu.ucc.farmsim.application.service.SaveGameService;
+import edu.ucc.farmsim.application.service.TutorialService;
 import edu.ucc.farmsim.application.service.ViewMapper;
 import edu.ucc.farmsim.domain.game.DayPipeline;
 import edu.ucc.farmsim.domain.game.GameState;
@@ -47,10 +48,14 @@ public final class TestApp {
         bus.subscribe(events::add);
     }
 
-    /** Creates the graph and starts a new game (Year 1, Spring, day 1, 500 m, 10 carrot and 5 potato seeds). */
+    /**
+     * Creates the graph and starts a new game (Year 1, Spring, day 1, 500 m, 10 carrot and 5 potato seeds) with
+     * its start tutorial already skipped, so the events of the tests are only those of the game itself.
+     */
     public static TestApp startedGame() {
         TestApp app = create();
         app.controller.newGame(SEED);
+        app.controller.skipTutorial();
         app.events.clear();
         return app;
     }
@@ -98,6 +103,7 @@ public final class TestApp {
         return new TestApp(session, bus,
                 new GameController(session, mapper, progress, day, saves, farm, market, buildings, animals,
                         achievements, new AvatarService(session, mapper, bus),
-                        new NpcService(session, mapper, new DialogueService(), bus, achievements)));
+                        new NpcService(session, mapper, new DialogueService(), bus, achievements),
+                        new TutorialService(session, bus)));
     }
 }

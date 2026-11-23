@@ -8,7 +8,7 @@ import java.util.Locale;
  * Every text the player reads on screen, in Spanish. Keeping them here means the screens contain no
  * literals and the language is easy to review (RNF-10).
  *
- * <p>Stories: HU-33, HU-34, HU-36, HU-45, HU-46, HU-47.
+ * <p>Stories: HU-33, HU-34, HU-36, HU-45, HU-46, HU-47, HU-49.
  */
 public final class Texts {
 
@@ -94,6 +94,14 @@ public final class Texts {
     /** Notice of a delivered errand. */
     public static String errandCompleted(String name, int reward) {
         return "Encargo de " + name + " cumplido: +" + money(reward);
+    }
+
+    /** Button of the avatar's box that ends the start tutorial. */
+    public static final String SKIP_TUTORIAL = "Saltar tutorial";
+
+    /** Where the player is in the start tutorial, for example "Paso 2 de 5". */
+    public static String tutorialStep(int number, int total) {
+        return "Paso " + number + " de " + total;
     }
 
     /** Shown when Space is pressed and the avatar looks out of the farm. */
