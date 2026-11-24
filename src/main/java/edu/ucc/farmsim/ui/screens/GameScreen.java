@@ -59,11 +59,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 /**
- * The main game screen: the farm fills the window and the bars float over it in wooden boxes, the date,
- * weather, money and energy in the top right corner (HUD), and at the bottom the tool bar, a status line for
- * messages and the buttons "End day" and "Menu". Keys 1 to 5 pick a tool, Escape deselects it, and the
- * shortcuts of RN-34 work anywhere on the screen. While the start tutorial runs, the avatar's box floats in the
- * top left corner (HU-49).
+ * La pantalla principal del juego: la granja llena la ventana y las barras flotan sobre ella en cajas de madera, la
+ * fecha, el clima, el dinero y la energía en la esquina superior derecha (HUD), y abajo la barra de herramientas, una
+ * línea de estado para mensajes y los botones «Terminar día» y «Menú». Las teclas 1 a 5 eligen una herramienta, Escape
+ * la deselecciona, y los atajos de RN-34 funcionan en cualquier parte de la pantalla. Mientras corre el tutorial de
+ * inicio, el cuadro del avatar flota en la esquina superior izquierda (HU-49).
  *
  * <p>Stories: HU-17, HU-18, HU-20, HU-22, HU-23, HU-26, HU-29, HU-30, HU-33, HU-34, HU-35, HU-36, HU-37, HU-38, HU-39, HU-40, HU-41, HU-45, HU-46, HU-48, HU-49, HU-50.
  */
@@ -78,11 +78,11 @@ public final class GameScreen extends JPanel {
     private static final int WALK_TICK_MS = 15;
 
     /**
-     * Builds the screen.
+     * Construye la pantalla.
      *
-     * @param controller entry point to the game
-     * @param bus        where game events are published (the top bar and the map listen to it)
-     * @param navigator  switches screens
+     * @param controller punto de entrada al juego
+     * @param bus        donde se publican los eventos del juego (la barra superior y el mapa lo escuchan)
+     * @param navigator  cambia las pantallas
      */
     public GameScreen(GameCommands controller, EventBus bus, ScreenNavigator navigator) {
         super(new BorderLayout());
@@ -224,9 +224,9 @@ public final class GameScreen extends JPanel {
     }
 
     /**
-     * One step. When it is blocked and another held key points at a right angle (walking in a diagonal along a
-     * fence of trees), that way is tried instead; a step that stays blocked only turns the avatar, which no event
-     * announces, so the map shown turns it without asking the server for the whole valley.
+     * Un paso. Cuando está bloqueado y otra tecla pulsada apunta en ángulo recto (caminando en diagonal a lo largo de
+     * una cerca de árboles), se prueba ese camino en su lugar; un paso que sigue bloqueado solo gira al avatar, lo que
+     * ningún evento anuncia, así que el mapa que se muestra lo gira sin pedirle al servidor todo el valle.
      */
     private static void step(GameScreenPresenter presenter, MapPanel map, WalkKeys walking, String direction) {
         if (presenter.onMove(direction)) {
@@ -246,10 +246,10 @@ public final class GameScreen extends JPanel {
     }
 
     /**
-     * Arrows and W A S D walk with the avatar: a press steps at once and held keys keep walking, one plot
-     * every {@link VisualEffects#STEP_MS}, with no pause after the first step; two perpendicular keys (W and D)
-     * walk in a diagonal (RN-40). Space uses the selected
-     * tool on the plot in front (HU-45) and E talks to the person next to the avatar (HU-46).
+     * Las flechas y W A S D hacen caminar al avatar: una pulsación da un paso de inmediato y las teclas mantenidas
+     * siguen caminando, una parcela cada {@link VisualEffects#STEP_MS}, sin pausa después del primer paso; dos teclas
+     * perpendiculares (W y D) caminan en diagonal (RN-40). Espacio usa la herramienta seleccionada en la parcela de
+     * enfrente (HU-45) y E habla con la persona junto al avatar (HU-46).
      */
     private void bindWalking(GameScreenPresenter presenter, MapPanel map) {
         InputMap keys = getInputMap(WHEN_IN_FOCUSED_WINDOW);

@@ -16,11 +16,11 @@ import org.springframework.boot.web.context.WebServerApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * Composition root: the only place that starts the server and the window and joins them (DT-22). With no
- * arguments it starts the Spring Boot server on this machine and a window that talks to it over HTTP;
- * {@code --server} starts only the server and {@code --client --url=...} only the window. With both, the server
- * starts on a thread of its own while the window opens, so the start screen appears without waiting for Spring
- * (RNF-02); an order sent before the server is up waits for it.
+ * Raíz de composición: el único lugar que arranca el servidor y la ventana y los une (DT-22). Sin argumentos arranca el
+ * servidor Spring Boot en esta máquina y una ventana que le habla por HTTP; {@code --server} arranca solo el servidor y
+ * {@code --client --url=...} solo la ventana. Con ambos, el servidor arranca en un hilo propio mientras se abre la
+ * ventana, de modo que la pantalla de inicio aparece sin esperar a Spring (RNF-02); una orden enviada antes de que el
+ * servidor esté listo lo espera.
  *
  * <p>Stories: HU-33, HU-43.
  */
@@ -32,13 +32,13 @@ public final class Main {
     private static final Duration SERVER_START_WAIT = Duration.ofSeconds(30);
 
     private Main() {
-        // entry point only
+                // solo punto de entrada
     }
 
     /**
-     * Starts the application.
+     * Arranca la aplicación.
      *
-     * @param args see {@link LaunchOptions}
+     * @param args véase {@link LaunchOptions}
      */
     public static void main(String[] args) {
         LaunchOptions options;
@@ -77,7 +77,7 @@ public final class Main {
         openWindow(server);
     }
 
-    /** Starts the Spring Boot server and returns the port it listens on. */
+    /** Arranca el servidor Spring Boot y devuelve el puerto en el que escucha. */
     private static int startServer(LaunchOptions options) {
         ConfigurableApplicationContext context = new SpringApplicationBuilder(ServerApplication.class)
                 .headless(false)

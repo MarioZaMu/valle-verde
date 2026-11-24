@@ -9,21 +9,21 @@ import java.util.logging.Logger;
 import javax.swing.UIManager;
 
 /**
- * Installs the look and feel of the whole window: FlatLaf with a single font family of at least
- * {@link #FONT_SIZE} points (HU-43). If the theme cannot be installed the game keeps the default Swing look,
- * logs a warning and goes on; it never throws.
+ * Instala el aspecto de toda la ventana: FlatLaf con una sola familia de fuente de al menos {@link #FONT_SIZE} puntos
+ * (HU-43). Si el tema no se puede instalar, el juego conserva el aspecto predeterminado de Swing, registra una
+ * advertencia y sigue; nunca lanza excepciones.
  *
  * <p>Stories: HU-43.
  */
 public final class UiTheme {
 
-    /** Size in points of the font used everywhere. */
+    /** Tamaño en puntos de la fuente que se usa en todas partes. */
     public static final int FONT_SIZE = 14;
 
     private static final Logger LOG = Logger.getLogger(UiTheme.class.getName());
     private static final int ARC = 12;
 
-    /** Warm parchment and wood for every window and dialog, the same palette as the wooden boxes of the map. */
+    /** Pergamino cálido y madera para cada ventana y diálogo, la misma paleta que las cajas de madera del mapa. */
     private static final Map<String, String> VALLEY_COLOURS = Map.ofEntries(
             Map.entry("@background", "#F4E4BC"),
             Map.entry("@foreground", "#3B2412"),
@@ -52,18 +52,18 @@ public final class UiTheme {
             Map.entry("ToolTip.background", "#FFF8E7"),
             Map.entry("ToolTip.foreground", "#3B2412"));
 
-    /** What actually installs a theme; it can fail with any exception. */
+    /** Lo que realmente instala un tema; puede fallar con cualquier excepción. */
     @FunctionalInterface
     public interface Installer {
-        /** Installs the theme. */
+        /** Instala el tema. */
         void setup();
     }
 
     private UiTheme() {
-        // static helpers only
+                // solo métodos de utilidad estáticos
     }
 
-    /** Installs FlatLaf; returns {@code false} (and leaves the look unchanged) if it could not. */
+    /** Instala FlatLaf; devuelve {@code false} (y deja el aspecto sin cambios) si no pudo. */
     public static boolean install() {
         return install(() -> {
             UIManager.put("defaultFont", new Font(Font.SANS_SERIF, Font.PLAIN, FONT_SIZE));
@@ -78,9 +78,9 @@ public final class UiTheme {
     }
 
     /**
-     * Installs a theme with the given installer.
+     * Instala un tema con el instalador dado.
      *
-     * @return {@code true} if it was installed; {@code false} if it failed (a warning is logged)
+     * @return {@code true} si se instaló; {@code false} si falló (se registra una advertencia)
      */
     public static boolean install(Installer installer) {
         try {

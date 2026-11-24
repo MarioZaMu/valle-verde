@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Keeps the achievements the player has unlocked and the counters they need (RN-28). An achievement is granted
- * once and never revoked; evaluating it only needs a {@link ProgressFacts}, never the game.
+ * Guarda los logros que el jugador ha desbloqueado y los contadores que necesitan (RN-28). Un logro se concede una vez
+ * y nunca se revoca; evaluarlo solo necesita un {@link ProgressFacts}, nunca la partida.
  *
  * <p>Stories: HU-18, HU-26.
  */
@@ -19,64 +19,64 @@ public final class AchievementTracker {
     private int buildingsBuilt;
     private int animalsCured;
 
-    /** True if the player has the achievement. */
+    /** Verdadero si el jugador tiene el logro. */
     public boolean has(Achievement achievement) {
         return unlocked.contains(achievement);
     }
 
     /**
-     * Grants an achievement.
+     * Concede un logro.
      *
-     * @return {@code true} if it was new; {@code false} if the player already had it
+     * @return {@code true} si era nuevo; {@code false} si el jugador ya lo tenía
      */
     public boolean unlock(Achievement achievement) {
         return unlocked.add(achievement);
     }
 
-    /** Counts a harvested crop. */
+    /** Cuenta un cultivo cosechado. */
     public void recordHarvest() {
         harvests++;
     }
 
-    /** Counts units sold. */
+    /** Cuenta unidades vendidas. */
     public void recordSale(int units) {
         unitsSold += units;
     }
 
-    /** Counts a building built. */
+    /** Cuenta un edificio construido. */
     public void recordBuild() {
         buildingsBuilt++;
     }
 
-    /** Counts an animal cured. */
+    /** Cuenta un animal curado. */
     public void recordCure() {
         animalsCured++;
     }
 
-    /** Crops harvested so far. */
+    /** Cultivos cosechados hasta ahora. */
     public int harvests() {
         return harvests;
     }
 
-    /** Units sold so far. */
+    /** Unidades vendidas hasta ahora. */
     public int unitsSold() {
         return unitsSold;
     }
 
-    /** Buildings built so far. */
+    /** Edificios construidos hasta ahora. */
     public int buildingsBuilt() {
         return buildingsBuilt;
     }
 
-    /** Animals cured so far. */
+    /** Animales curados hasta ahora. */
     public int animalsCured() {
         return animalsCured;
     }
 
     /**
-     * Unlocks every achievement whose condition the facts meet and that the player does not have yet.
+     * Desbloquea todos los logros cuya condición cumplen los hechos y que el jugador aún no tiene.
      *
-     * @return the ones unlocked now, in the order of RN-28
+     * @return los desbloqueados ahora, en el orden de RN-28
      */
     public List<Achievement> evaluate(ProgressFacts facts) {
         List<Achievement> fresh = new ArrayList<>();
@@ -89,12 +89,12 @@ public final class AchievementTracker {
         return fresh;
     }
 
-    /** An immutable copy of the achievements and the counters, for the memento. */
+    /** Una copia inmutable de los logros y los contadores, para el memento. */
     public ProgressSnapshot snapshot() {
         return new ProgressSnapshot(unlocked, harvests, unitsSold, buildingsBuilt, animalsCured);
     }
 
-    /** Replaces everything with a copy taken earlier. */
+    /** Reemplaza todo con una copia tomada antes. */
     public void restoreFrom(ProgressSnapshot saved) {
         unlocked.clear();
         unlocked.addAll(saved.unlocked());

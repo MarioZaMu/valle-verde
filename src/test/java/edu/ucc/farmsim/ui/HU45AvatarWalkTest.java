@@ -33,7 +33,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.Test;
 
-/** HU-45 · CA-3 and CA-5: the tool in front of the avatar and the walk animation, without a display. */
+/** HU-45 · CA-3 y CA-5: la herramienta frente al avatar y la animación de caminata, sin pantalla. */
 class HU45AvatarWalkTest {
 
     private static final int W = 1024;

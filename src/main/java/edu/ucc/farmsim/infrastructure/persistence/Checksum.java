@@ -6,17 +6,17 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 
 /**
- * The SHA-256 of the text of a saved game, in hexadecimal (RN-32), to notice any change made to it.
+ * El SHA-256 del texto de una partida guardada, en hexadecimal (RN-32), para notar cualquier cambio hecho en ella.
  *
  * <p>Stories: HU-29, HU-31.
  */
 public final class Checksum {
 
     private Checksum() {
-        // static helpers only
+                // solo métodos de utilidad estáticos
     }
 
-    /** SHA-256 of the UTF-8 bytes of the text, in lower-case hexadecimal. */
+    /** SHA-256 de los bytes UTF-8 del texto, en hexadecimal minúscula. */
     public static String of(String text) {
         try {
             byte[] hash = MessageDigest.getInstance("SHA-256").digest(text.getBytes(StandardCharsets.UTF_8));

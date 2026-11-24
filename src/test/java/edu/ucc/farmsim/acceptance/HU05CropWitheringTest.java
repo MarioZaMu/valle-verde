@@ -14,13 +14,15 @@ import edu.ucc.farmsim.support.GameFixtures;
 import edu.ucc.farmsim.support.TestApp;
 import org.junit.jupiter.api.Test;
 
-/** HU-05: crops wither from lack of water and out of season (RN-01, RN-03, RN-09). */
+/** HU-05: los cultivos se marchitan por falta de agua y fuera de estación (RN-01, RN-03, RN-09). */
 class HU05CropWitheringTest {
 
     private static final int COL = GameFixtures.SOIL_COL;
     private static final int ROW = GameFixtures.SOIL_ROW;
 
-    /** Ends the day with a Cloudy day, so the random weather (rain would water the crops) does not interfere. */
+    /**
+     * Termina el día con un día Cloudy, de modo que el clima aleatorio (la lluvia regaría los cultivos) no interfiera.
+     */
     private static void endCloudyDay(TestApp app) {
         app.state().weather().restore(Weather.CLOUDY, Weather.CLOUDY);
         app.controller.endDay();
@@ -32,45 +34,45 @@ class HU05CropWitheringTest {
 
     @Test
     void HU05_ca1_aCropWithersAfterThreeDaysWithoutWater() {
-        // Given a crop in the Growing stage
+                // Dado un cultivo en la etapa Growing
         TestApp app = TestApp.startedGame();
         GameFixtures.plant(app.state(), COL, ROW, CropType.CARROT, 2);
         assertEquals(CropStage.GROWING, cropOf(app).stage());
 
-        // When 2 days pass without watering it, it is still alive with 2 dry days
+                // Cuando pasan 2 días sin regarlo, sigue vivo con 2 días secos
         endCloudyDay(app);
         endCloudyDay(app);
         assertTrue(cropOf(app).isAlive());
         assertEquals(2, cropOf(app).daysWithoutWater());
 
-        // And when the third day passes, it withers
+                // Y cuando pasa el tercer día, se marchita
         endCloudyDay(app);
         assertEquals(CropStage.WITHERED, cropOf(app).stage());
     }
 
     @Test
     void HU05_ca2_inADroughtACropWithersAfterJustTwoDryDays() {
-        // Given a crop with 1 day without water and a Drought day ending
+                // Dado un cultivo con 1 día sin agua y que termina un día de Drought
         TestApp app = TestApp.startedGame();
         GameFixtures.plant(app.state(), COL, ROW, CropType.CARROT, 2, 1, false, false);
         app.state().weather().restore(Weather.DROUGHT, Weather.SUNNY);
 
-        // When the day ends
+                // Cuando termina el día
         app.controller.endDay();
 
-        // Then it has 2 dry days and it has withered (tolerance is 2 in a drought)
+                // Entonces tiene 2 días secos y se ha marchitado (la tolerancia es 2 en una sequía)
         assertEquals(2, cropOf(app).daysWithoutWater());
         assertEquals(CropStage.WITHERED, cropOf(app).stage());
     }
 
     @Test
     void HU05_ca3_cropsOutOfTheNewSeasonWitherEvenIfMature() {
-        // Given a mature carrot (valid only in Spring) alive on day 28 of Spring
+                // Dada una zanahoria madura (válida solo en Primavera) viva el día 28 de Primavera
         TestApp app = TestApp.startedGame();
         GameFixtures.setDate(1, Season.SPRING, 28);
         GameFixtures.plant(app.state(), COL, ROW, CropType.CARROT, 4);
 
-        // When the day ends and Summer begins, it withers
+                // Cuando termina el día y empieza el Verano, se marchita
         app.controller.endDay();
         assertEquals(Season.SUMMER, app.state().date().season());
         assertEquals(CropStage.WITHERED, cropOf(app).stage());
@@ -106,15 +108,15 @@ class HU05CropWitheringTest {
 
     @Test
     void HU05_ca4_wateringResetsTheDryDayCounter() {
-        // Given a crop with 2 dry days
+                // Dado un cultivo con 2 días secos
         TestApp app = TestApp.startedGame();
         GameFixtures.plant(app.state(), COL, ROW, CropType.CARROT, 2, 2, false, false);
 
-        // When it is watered and the day ends
+                // Cuando se riega y termina el día
         assertTrue(app.controller.water(COL, ROW).isOk());
         app.controller.endDay();
 
-        // Then the counter is 0 and the crop did not wither
+                // Entonces el contador es 0 y el cultivo no se marchitó
         assertEquals(0, cropOf(app).daysWithoutWater());
         assertTrue(cropOf(app).isAlive());
         assertEquals(3, cropOf(app).daysGrown());
@@ -126,14 +128,14 @@ class HU05CropWitheringTest {
         TestApp app = TestApp.startedGame();
         GameFixtures.plant(app.state(), COL, ROW, CropType.CARROT, 2, 3, false, true);
 
-        // When the player tries to sow on its plot
+                // Cuando el jugador intenta sembrar en su parcela
         var result = app.controller.plant(COL, ROW, "CARROT_SEED");
 
-        // Then the plot is occupied
+                // Entonces la parcela está ocupada
         assertEquals(ErrorCode.PARCELA_OCUPADA, result.code());
         assertEquals(10, app.state().inventory().count(ItemType.CARROT_SEED));
 
-        // And a day later it has not grown
+                // Y un día después no ha crecido
         app.controller.endDay();
         assertEquals(2, cropOf(app).daysGrown());
         assertEquals(CropStage.WITHERED, cropOf(app).stage());

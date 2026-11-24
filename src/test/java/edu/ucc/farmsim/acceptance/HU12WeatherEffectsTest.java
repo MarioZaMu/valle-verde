@@ -12,7 +12,9 @@ import edu.ucc.farmsim.support.GameFixtures;
 import edu.ucc.farmsim.support.TestApp;
 import org.junit.jupiter.api.Test;
 
-/** HU-12: rain waters, drought punishes and frost withers the crops in the open (RN-03, RN-09, RN-12). */
+/**
+ * HU-12: la lluvia riega, la sequía castiga y la helada marchita los cultivos a la intemperie (RN-03, RN-09, RN-12).
+ */
 class HU12WeatherEffectsTest {
 
     private static final int ROW = GameFixtures.SOIL_ROW;
@@ -24,17 +26,17 @@ class HU12WeatherEffectsTest {
 
     @Test
     void HU12_ca1_rainWatersEveryCropInTheOpenSoTheyGrowOneDay() {
-        // Given 5 unwatered crops that are two days from withering, and a Rainy day ending
+                // Dados 5 cultivos sin regar a dos días de marchitarse, y que termina un día Rainy
         TestApp app = TestApp.startedGame();
         for (int i = 0; i < 5; i++) {
             GameFixtures.plant(app.state(), FIRST_COL + i, ROW, CropType.CARROT, 1, 2, false, false);
         }
         app.state().weather().restore(Weather.RAINY, Weather.SUNNY);
 
-        // When the day ends
+                // Cuando termina el día
         app.controller.endDay();
 
-        // Then all 5 were watered by the rain: they grew one day, have no dry days and are alive
+                // Entonces la lluvia regó los 5: crecieron un día, no tienen días secos y están vivos
         for (int i = 0; i < 5; i++) {
             Crop crop = cropAt(app, i);
             assertEquals(2, crop.daysGrown(), "crop " + i);
@@ -45,7 +47,7 @@ class HU12WeatherEffectsTest {
 
     @Test
     void HU12_ca2_frostWithersEveryCropInTheOpenEvenAMatureOne() {
-        // Given 3 crops in the open, one of them mature and not harvested, and a Frost day ending
+                // Dados 3 cultivos al aire libre, uno de ellos maduro y sin cosechar, y que termina un día de Frost
         TestApp app = TestApp.startedGame();
         GameFixtures.plant(app.state(), FIRST_COL, ROW, CropType.CARROT, 1);
         GameFixtures.plant(app.state(), FIRST_COL + 1, ROW, CropType.POTATO, 3);
@@ -53,10 +55,10 @@ class HU12WeatherEffectsTest {
         assertEquals(CropStage.MATURE, cropAt(app, 2).stage());
         app.state().weather().restore(Weather.FROST, Weather.SUNNY);
 
-        // When the day ends
+                // Cuando termina el día
         app.controller.endDay();
 
-        // Then the 3 crops are withered
+                // Entonces los 3 cultivos están marchitos
         for (int i = 0; i < 3; i++) {
             assertEquals(CropStage.WITHERED, cropAt(app, i).stage(), "crop " + i);
         }
@@ -82,11 +84,11 @@ class HU12WeatherEffectsTest {
         GameFixtures.plant(app.state(), FIRST_COL + 1, ROW, CropType.CARROT, 2, 0, false, false);
         app.state().weather().restore(Weather.DROUGHT, Weather.SUNNY);
 
-        // When the player waters one crop it costs 2 energy
+                // Cuando el jugador riega un cultivo cuesta 2 de energía
         assertTrue(app.controller.water(FIRST_COL + 1, ROW).isOk());
         assertEquals(98, app.state().energy().current());
 
-        // And when the day ends, the crop with 1 dry day (now 2) withers and the watered one survives
+                // Y cuando termina el día, el cultivo con 1 día seco (ahora 2) se marchita y el regado sobrevive
         app.controller.endDay();
         assertEquals(CropStage.WITHERED, cropAt(app, 0).stage());
         assertTrue(cropAt(app, 1).isAlive());
@@ -95,15 +97,15 @@ class HU12WeatherEffectsTest {
     @Test
     void HU12_ca4_sunnyCloudyAndSnowyDaysOnlyAddADryDay() {
         for (Weather weather : new Weather[] {Weather.SUNNY, Weather.CLOUDY, Weather.SNOWY}) {
-            // Given an unwatered crop and a day of this weather ending
+                        // Dado un cultivo sin regar y que termina un día de este clima
             TestApp app = TestApp.startedGame();
             GameFixtures.plant(app.state(), FIRST_COL, ROW, CropType.CARROT, 1);
             app.state().weather().restore(weather, Weather.SUNNY);
 
-            // When the day ends
+                        // Cuando termina el día
             app.controller.endDay();
 
-            // Then it only gained a dry day: not watered by the weather, not withered by it
+                        // Entonces solo ganó un día seco: no lo regó el clima, no lo marchitó el clima
             Crop crop = cropAt(app, 0);
             assertEquals(1, crop.daysWithoutWater(), weather.name());
             assertEquals(1, crop.daysGrown(), weather.name());

@@ -15,7 +15,7 @@ import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import org.junit.jupiter.api.Test;
 
-/** HU-43: the FlatLaf theme, its fallback and the contrast of the palette (RNF-14). */
+/** HU-43: el tema FlatLaf, su respaldo y el contraste de la paleta (RNF-14). */
 class HU43FlatLafThemeTest {
 
     @Test

@@ -15,8 +15,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * The farm grid: {@link GameRules#MAP_COLS} x {@link GameRules#MAP_ROWS} plots with coordinates
- * {@code (column, row)}, where {@code (0, 0)} is the top-left corner (RN-04).
+ * La grilla de la granja: {@link GameRules#MAP_COLS} x {@link GameRules#MAP_ROWS} parcelas con coordenadas {@code
+ * (columna, fila)}, donde {@code (0, 0)} es la esquina superior izquierda (RN-04).
  *
  * <p>Stories: HU-01, HU-03, HU-05, HU-12, HU-18, HU-25, HU-28, HU-45, HU-46, HU-50.
  */
@@ -30,8 +30,8 @@ public final class FarmMap {
     }
 
     /**
-     * Builds the fixed initial map of a new game: the soil block, the pond, the obstacles, the path and the
-     * houses of the valley, and grass elsewhere (RN-04).
+     * Construye el mapa inicial fijo de una partida nueva: el bloque de tierra, el estanque, los obstáculos, el camino
+     * y las casas del valle, y pasto en el resto (RN-04).
      */
     public static FarmMap initial() {
         Plot[][] grid = new Plot[GameRules.MAP_ROWS][GameRules.MAP_COLS];
@@ -72,25 +72,25 @@ public final class FarmMap {
         return col >= left && col < left + width && row >= top && row < top + height;
     }
 
-    /** Number of columns. */
+    /** Número de columnas. */
     public int cols() {
         return GameRules.MAP_COLS;
     }
 
-    /** Number of rows. */
+    /** Número de filas. */
     public int rows() {
         return GameRules.MAP_ROWS;
     }
 
-    /** True if the coordinates are inside the map. */
+    /** Verdadero si las coordenadas están dentro del mapa. */
     public boolean contains(int col, int row) {
         return col >= 0 && col < cols() && row >= 0 && row < rows();
     }
 
     /**
-     * The plot at the given coordinates.
+     * La parcela en las coordenadas dadas.
      *
-     * @throws IllegalArgumentException if the coordinates are outside the map
+     * @throws IllegalArgumentException si las coordenadas están fuera del mapa
      */
     public Plot plotAt(int col, int row) {
         if (!contains(col, row)) {
@@ -100,9 +100,9 @@ public final class FarmMap {
     }
 
     /**
-     * True if the avatar can stand on the plot (RN-36): it is inside the map, it is grass, soil (with or without
-     * a crop) or the path, no building covers it and no person of the valley stands on it (RN-37). Water,
-     * obstacles and houses block the way.
+     * Verdadero si el avatar puede pararse en la parcela (RN-36): está dentro del mapa, es pasto, tierra (con o sin
+     * cultivo) o camino, ningún edificio la cubre y ninguna persona del valle está sobre ella (RN-37). El agua, los
+     * obstáculos y las casas bloquean el paso.
      */
     public boolean isWalkable(int col, int row) {
         if (!contains(col, row)) {
@@ -115,11 +115,11 @@ public final class FarmMap {
     }
 
     /**
-     * The walkable plot nearest to the given one, counting steps along columns and rows; ties go to the upper
-     * row, then to the left column. The given plot itself if it is walkable.
+     * La parcela transitable más cercana a la dada, contando pasos por columnas y filas; los empates van a la fila de
+     * arriba y luego a la columna de la izquierda. La propia parcela dada si es transitable.
      *
-     * @return {column, row}
-     * @throws IllegalStateException if no plot of the map can be walked on
+     * @return {columna, fila}
+     * @throws IllegalStateException si ninguna parcela del mapa es transitable
      */
     public int[] nearestWalkable(int col, int row) {
         for (int distance = 0; distance <= cols() + rows(); distance++) {
@@ -135,24 +135,24 @@ public final class FarmMap {
         throw new IllegalStateException("no plot of the map can be walked on");
     }
 
-    /** The buildings in the order they were built; the index of a building is its id. */
+    /** Los edificios en el orden en que se construyeron; el índice de un edificio es su id. */
     public List<Building> buildings() {
         return Collections.unmodifiableList(buildings);
     }
 
-    /** How many buildings of the type have been built. */
+    /** Cuántos edificios del tipo se han construido. */
     public int countBuildings(BuildingType type) {
         return (int) buildings.stream().filter(b -> b.type() == type).count();
     }
 
-    /** The building that covers a plot, or {@code null}. */
+    /** El edificio que cubre una parcela, o {@code null}. */
     public Building buildingAt(int col, int row) {
         return contains(col, row) ? plots[row][col].building() : null;
     }
 
     /**
-     * True if a building of the type fits with its top-left plot at the given place: every plot of the area is
-     * inside the map, is grass and is free (RN-21 point 1).
+     * Verdadero si cabe un edificio del tipo con su parcela superior izquierda en el lugar dado: todas las parcelas del
+     * área están dentro del mapa, son pasto y están libres (RN-21 punto 1).
      */
     public boolean canPlace(BuildingType type, int col, int row) {
         for (int r = row; r < row + type.height(); r++) {
@@ -166,9 +166,9 @@ public final class FarmMap {
     }
 
     /**
-     * Builds a building and marks its plots as occupied.
+     * Construye un edificio y marca sus parcelas como ocupadas.
      *
-     * @throws IllegalStateException if the area is not free grass inside the map
+     * @throws IllegalStateException si el área no es pasto libre dentro del mapa
      */
     public Building place(BuildingType type, int col, int row) {
         if (!canPlace(type, col, row)) {
@@ -187,7 +187,7 @@ public final class FarmMap {
         return building;
     }
 
-    /** Number of plots with the given terrain. */
+    /** Número de parcelas con el terreno dado. */
     public int count(Terrain terrain) {
         int total = 0;
         for (Plot[] line : plots) {
@@ -201,11 +201,11 @@ public final class FarmMap {
     }
 
     /**
-     * Resolves the end of the day for every crop on the map (step 2 of RN-03): growth, or a dry day, or
-     * withering. A drought lowers the tolerance to dry days (RN-09).
+     * Resuelve el final del día de cada cultivo del mapa (paso 2 de RN-03): crecimiento, día seco o marchitamiento. Una
+     * sequía reduce la tolerancia a los días secos (RN-09).
      *
-     * @param todayWeather weather of the day that ends
-     * @return number of crops that withered now
+     * @param todayWeather clima del día que termina
+     * @return número de cultivos que se marchitaron ahora
      */
     public int growCrops(Weather todayWeather) {
         int openTolerance = todayWeather == Weather.DROUGHT
@@ -228,8 +228,8 @@ public final class FarmMap {
     }
 
     /**
-     * Rain waters every living crop in the open (step 1 of RN-03); the ones inside a greenhouse get no rain
-     * (RN-22).
+     * La lluvia riega todos los cultivos vivos a la intemperie (paso 1 de RN-03); los que están dentro de un
+     * invernadero no reciben lluvia (RN-22).
      */
     public void rainOnCrops() {
         for (Plot[] line : plots) {
@@ -242,9 +242,9 @@ public final class FarmMap {
     }
 
     /**
-     * A frost withers every living crop in the open, whatever its stage (RN-09-b).
+     * Una helada marchita todos los cultivos vivos a la intemperie, sea cual sea su etapa (RN-09-b).
      *
-     * @return how many crops withered now
+     * @return cuántos cultivos se marchitaron ahora
      */
     public int frostCrops() {
         int withered = 0;
@@ -259,9 +259,9 @@ public final class FarmMap {
     }
 
     /**
-     * Withers every living crop that is not valid in the given season (RN-09-c, step 5 of RN-03).
+     * Marchita todos los cultivos vivos que no son válidos en la estación dada (RN-09-c, paso 5 de RN-03).
      *
-     * @return number of crops that withered now
+     * @return número de cultivos que se marchitaron ahora
      */
     public int witherOutOfSeason(Season season) {
         int withered = 0;
@@ -275,7 +275,7 @@ public final class FarmMap {
         return withered;
     }
 
-    /** Copy of the crops of every plot in row-major order ({@code null} where there is none), for the memento. */
+    /** Copia de los cultivos de cada parcela en orden de fila ({@code null} donde no hay), para el memento. */
     public FarmMapSnapshot snapshot() {
         List<CropSnapshot> crops = new ArrayList<>();
         for (Plot[] line : plots) {
@@ -287,7 +287,7 @@ public final class FarmMap {
                 buildings.stream().map(Building::snapshot).toList());
     }
 
-    /** Puts every crop and every building back as it was when the snapshot was taken. */
+    /** Devuelve cada cultivo y cada edificio a como estaban cuando se tomó la instantánea. */
     public void restoreFrom(FarmMapSnapshot snapshot) {
         int index = 0;
         for (Plot[] line : plots) {

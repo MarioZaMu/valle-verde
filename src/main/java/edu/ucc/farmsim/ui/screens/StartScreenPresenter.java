@@ -8,7 +8,7 @@ import edu.ucc.farmsim.ui.theme.Texts;
 import java.util.function.LongSupplier;
 
 /**
- * Logic of the start screen, with no Swing: what happens when each button is pressed.
+ * Lógica de la pantalla de inicio, sin Swing: qué pasa cuando se pulsa cada botón.
  *
  * <p>Stories: HU-28, HU-30, HU-33.
  */
@@ -19,11 +19,11 @@ public final class StartScreenPresenter {
     private final LongSupplier seeds;
 
     /**
-     * Creates the presenter.
+     * Crea el presentador.
      *
-     * @param controller entry point to the game
-     * @param navigator  switches screens and talks to the player
-     * @param seeds      supplies the seed of each new game (the clock in production, a constant in tests)
+     * @param controller punto de entrada al juego
+     * @param navigator  cambia las pantallas y habla con el jugador
+     * @param seeds      provee la semilla de cada partida nueva (el reloj en producción, una constante en las pruebas)
      */
     public StartScreenPresenter(GameCommands controller, ScreenNavigator navigator, LongSupplier seeds) {
         this.controller = controller;
@@ -31,7 +31,7 @@ public final class StartScreenPresenter {
         this.seeds = seeds;
     }
 
-    /** "New game": asks for confirmation if a game is in progress, then starts one and shows the game. */
+    /** «Nueva partida»: pide confirmación si hay una partida en curso, luego inicia una y muestra el juego. */
     public void onNewGame() {
         navigator.prepareGame();
         if (controller.hasGameInProgress() && !navigator.confirm(Texts.CONFIRM_DISCARD_GAME)) {
@@ -45,7 +45,7 @@ public final class StartScreenPresenter {
         }
     }
 
-    /** "Load": tells the player when there is nothing to load, or lets them choose a slot and loads it. */
+    /** «Cargar»: avisa al jugador cuando no hay nada que cargar, o le deja elegir una ranura y la carga. */
     public void onLoad() {
         navigator.prepareGame();
         Result<Boolean> saved = controller.hasSavedGames();
@@ -76,7 +76,7 @@ public final class StartScreenPresenter {
         }
     }
 
-    /** "Exit": closes the application. */
+    /** «Salir»: cierra la aplicación. */
     public void onExit() {
         navigator.exit();
     }

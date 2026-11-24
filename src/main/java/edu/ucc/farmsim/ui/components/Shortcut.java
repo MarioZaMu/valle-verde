@@ -3,22 +3,22 @@ package edu.ucc.farmsim.ui.components;
 import java.awt.event.KeyEvent;
 
 /**
- * The keyboard shortcuts of the game screen besides the tool keys (RN-34).
+ * Los atajos de teclado de la pantalla de juego además de las teclas de herramientas (RN-34).
  *
  * <p>Stories: HU-36.
  */
 public enum Shortcut {
-    /** End the day. */
+    /** Terminar el día. */
     END_DAY(KeyEvent.VK_ENTER),
-    /** Open the market. */
+    /** Abrir el mercado. */
     MARKET(KeyEvent.VK_M),
-    /** Open the inventory. */
+    /** Abrir el inventario. */
     INVENTORY(KeyEvent.VK_I),
-    /** Open the achievements. */
+    /** Abrir los logros. */
     ACHIEVEMENTS(KeyEvent.VK_L),
-    /** Save quickly in the last used slot. */
+    /** Guardar rápido en la última ranura usada. */
     QUICK_SAVE(KeyEvent.VK_F5),
-    /** Load quickly from the last used slot. */
+    /** Cargar rápido desde la última ranura usada. */
     QUICK_LOAD(KeyEvent.VK_F9);
 
     private final int keyCode;
@@ -27,7 +27,7 @@ public enum Shortcut {
         this.keyCode = keyCode;
     }
 
-    /** The AWT key code of this shortcut. */
+    /** El código de tecla AWT de este atajo. */
     public int keyCode() {
         return keyCode;
     }

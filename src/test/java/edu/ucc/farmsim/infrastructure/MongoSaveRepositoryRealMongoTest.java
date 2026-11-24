@@ -23,9 +23,9 @@ import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import org.junit.jupiter.api.Assumptions;
 
 /**
- * The same repository against a real MongoDB. It runs only when one answers on {@code localhost:27017} (or
- * at the address in {@code VALLEVERDE_TEST_MONGO_URI}); otherwise it is skipped with a notice, and the
- * rest of the build does not depend on it (RT-11). Each run uses its own throw-away database.
+ * El mismo repositorio contra un MongoDB real. Solo corre cuando uno responde en {@code localhost:27017} (o en la
+ * dirección de {@code VALLEVERDE_TEST_MONGO_URI}); si no, se omite con un aviso, y el resto del build no depende de él
+ * (RT-11). Cada ejecución usa su propia base de datos desechable.
  */
 class MongoSaveRepositoryRealMongoTest {
 

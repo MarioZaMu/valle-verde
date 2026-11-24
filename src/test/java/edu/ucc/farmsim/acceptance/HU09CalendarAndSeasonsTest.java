@@ -12,7 +12,7 @@ import edu.ucc.farmsim.domain.time.SeasonState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/** HU-09: calendar with 4 seasons of 28 days and years of 112 days (RN-01). */
+/** HU-09: calendario con 4 estaciones de 28 días y años de 112 días (RN-01). */
 class HU09CalendarAndSeasonsTest {
 
     private GameClock clock;
@@ -28,23 +28,23 @@ class HU09CalendarAndSeasonsTest {
         // Given Year 1, Spring, day 1
         assertEquals(new GameDate(1, Season.SPRING, 1), clock.date());
 
-        // When the day ends
+                // Cuando termina el día
         clock.advanceDay();
 
-        // Then it is Year 1, Spring, day 2
+                // Entonces es Año 1, Primavera, día 2
         assertEquals(new GameDate(1, Season.SPRING, 2), clock.date());
     }
 
     @Test
     void HU09_ca2_changesSeasonAfterDay28InOrderSpringSummerAutumnWinter() {
-        // Given day 28 of Spring
+                // Dado el día 28 de Primavera
         clock.restore(new GameDate(1, Season.SPRING, GameRules.DAYS_PER_SEASON));
 
-        // When the day ends, then it is Summer day 1 of the same year
+                // Cuando termina el día, entonces es el día 1 de Verano del mismo año
         clock.advanceDay();
         assertEquals(new GameDate(1, Season.SUMMER, 1), clock.date());
 
-        // And the order continues Summer -> Autumn -> Winter
+                // Y el orden continúa Verano -> Otoño -> Invierno
         advanceDays(GameRules.DAYS_PER_SEASON);
         assertEquals(new GameDate(1, Season.AUTUMN, 1), clock.date());
         advanceDays(GameRules.DAYS_PER_SEASON);
@@ -53,10 +53,10 @@ class HU09CalendarAndSeasonsTest {
 
     @Test
     void HU09_ca3_changesYearAfterDay28OfWinter() {
-        // Given day 28 of Winter of Year 1
+                // Dado el día 28 de Invierno del Año 1
         clock.restore(new GameDate(1, Season.WINTER, GameRules.DAYS_PER_SEASON));
 
-        // When the day ends, then it is Year 2, Spring, day 1
+                // Cuando termina el día, entonces es Año 2, Primavera, día 1
         clock.advanceDay();
 
         assertEquals(new GameDate(2, Season.SPRING, 1), clock.date());
@@ -68,11 +68,11 @@ class HU09CalendarAndSeasonsTest {
         int daysPerYear = GameRules.DAYS_PER_SEASON * Season.values().length;
         assertEquals(112, daysPerYear);
 
-        // When 112 days pass, then it is Year 2, Spring, day 1
+                // Cuando pasan 112 días, entonces es Año 2, Primavera, día 1
         advanceDays(daysPerYear);
         assertEquals(new GameDate(2, Season.SPRING, 1), clock.date());
 
-        // And the game simply keeps going
+                // Y el juego simplemente sigue
         advanceDays(1);
         assertEquals(new GameDate(2, Season.SPRING, 2), clock.date());
     }

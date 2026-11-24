@@ -28,10 +28,10 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-/** HU-10: end the day, resolving its effects in the fixed order of RN-03. */
+/** HU-10: terminar el día, resolviendo sus efectos en el orden fijo de RN-03. */
 class HU10EndDayTest {
 
-    /** A pipeline step that only records that it ran. */
+    /** Un paso del pipeline que solo registra que corrió. */
     private record RecordingStep(DayPhase phase, List<String> log) implements DayStep {
         @Override
         public void apply(GameState state, DayReport report) {
@@ -41,7 +41,7 @@ class HU10EndDayTest {
 
     @Test
     void HU10_ca1_stepsRunInTheOrderOfRn03EvenIfRegisteredInAnyOrderAndEventsArePublishedLast() {
-        // Given one step per phase, registered in a shuffled order
+                // Dado un paso por fase, registrados en orden mezclado
         List<String> log = new ArrayList<>();
         List<DayPhase> shuffled = new ArrayList<>(Arrays.asList(DayPhase.values()));
         Collections.shuffle(shuffled, new Random(7));
@@ -53,11 +53,11 @@ class HU10EndDayTest {
         app.controller.newGame(TestApp.SEED);
         app.bus.subscribe(event -> log.add("event"));
 
-        // When the day ends
+                // Cuando termina el día
         Result<HudView> result = app.controller.endDay();
 
-        // Then the steps ran as RN-03 says: weather effects, growth, animals, market, calendar, forecast,
-        // energy, achievements; and the events were published after all of them (step 9)
+                // Entonces los pasos corrieron como dice RN-03: efectos del clima, crecimiento, animales, mercado, calendario,
+        // pronóstico, energía, logros; y los eventos se publicaron después de todos ellos (paso 9)
         assertTrue(result.isOk());
         List<String> expected = new ArrayList<>();
         for (DayPhase phase : DayPhase.values()) {
@@ -91,34 +91,34 @@ class HU10EndDayTest {
 
     @Test
     void HU10_ca2_endingTheDayRestoresEnergyTo100() {
-        // Given a game where 60 energy was spent (40 left)
+                // Dada una partida donde se gastaron 60 de energía (quedan 40)
         TestApp app = TestApp.create();
         app.controller.newGame(TestApp.SEED);
         assertTrue(app.session.current().energy().trySpend(60));
         assertEquals(40, app.session.current().energy().current());
 
-        // When the day ends
+                // Cuando termina el día
         Result<HudView> result = app.controller.endDay();
 
-        // Then energy is 100 and the view shows day 2
+                // Entonces la energía es 100 y la vista muestra el día 2
         assertTrue(result.isOk());
         assertEquals(100, app.session.current().energy().current());
         assertEquals(100, result.value().energy());
         assertEquals(2, result.value().day());
-        // (the "watered" marks of the plots are cleared by HU-03 in phase 5.2)
+                // (las marcas de «regado» de las parcelas las borra HU-03 en la fase 5.2)
     }
 
     @Test
     @Tag("perf")
     @Disabled("needs full-load fixture, see PLAN_DE_PRUEBAS section 9")
     void HU10_ca3_endOfDayTakesAtMost200msAtFullLoad() {
-        // Given a farm at full load (40 outdoor crops, 9 in the greenhouse, 6 buildings, 16 animals)
-        // When the day ends 100 times, then the 95th percentile is at most 200 ms (RNF-01). Phase 5.5.
+                // Dada una granja a plena carga (40 cultivos al aire libre, 9 en el invernadero, 6 edificios, 16 animales)
+        // Cuando el día termina 100 veces, entonces el percentil 95 es como máximo 200 ms (RNF-01). Fase 5.5.
     }
 
     @Test
     void HU10_ca4_anInternalFailureLeavesTheWholeStateIdenticalAndPublishesNothing() {
-        // Given a step that changes things and then fails
+                // Dado un paso que cambia cosas y luego falla
         DayStep failing = new DayStep() {
             @Override
             public DayPhase phase() {
@@ -137,10 +137,10 @@ class HU10EndDayTest {
         GameMemento before = app.session.current().createMemento();
         app.events.clear();
 
-        // When the day ends
+                // Cuando termina el día
         Result<HudView> result = app.controller.endDay();
 
-        // Then the result is an error, the state is exactly as before, and no event was published
+                // Entonces el resultado es un error, el estado es exactamente el de antes y no se publicó ningún evento
         assertFalse(result.isOk());
         assertEquals(ErrorCode.ERROR_INTERNO, result.code());
         assertEquals("Ocurrió un error inesperado. Tu partida no cambió.", result.message());
@@ -196,7 +196,7 @@ class HU10EndDayTest {
 
     @Test
     void AR4_controllerNeverThrowsEvenWhenTheSessionFails() {
-        // Given a session that blows up as soon as the state is read
+                // Dada una sesión que explota apenas se lee el estado
         GameSession faulty = new GameSession() {
             @Override
             public boolean hasGame() {
@@ -210,7 +210,7 @@ class HU10EndDayTest {
         };
         TestApp app = TestApp.create(faulty, DayPipeline.standard());
 
-        // Then every controller call answers with ERROR_INTERNO instead of throwing
+                // Entonces toda llamada del controlador responde con ERROR_INTERNO en lugar de lanzar una excepción
         assertEquals(ErrorCode.ERROR_INTERNO, app.controller.endDay().code());
         assertEquals(ErrorCode.ERROR_INTERNO, app.controller.hud().code());
     }

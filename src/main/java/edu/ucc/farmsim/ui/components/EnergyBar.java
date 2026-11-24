@@ -12,8 +12,8 @@ import java.awt.RenderingHints;
 import javax.swing.JProgressBar;
 
 /**
- * The energy of the farmer as a bar in a wooden frame: green when there is plenty, yellow when it runs low and
- * red when little is left, with the amount written on it.
+ * La energía del granjero como una barra en un marco de madera: verde cuando hay de sobra, amarilla cuando escasea y
+ * roja cuando queda poca, con la cantidad escrita encima.
  *
  * <p>Stories: HU-34, HU-48.
  */
@@ -29,9 +29,9 @@ public class EnergyBar extends JProgressBar {
     private static final double QUARTER = 0.25;
 
     /**
-     * Creates the bar.
+     * Crea la barra.
      *
-     * @param max the largest value
+     * @param max el valor más grande
      */
     public EnergyBar(int max) {
         super(0, max);

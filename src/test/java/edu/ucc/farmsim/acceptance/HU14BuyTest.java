@@ -11,7 +11,7 @@ import edu.ucc.farmsim.support.GameFixtures;
 import edu.ucc.farmsim.support.TestApp;
 import org.junit.jupiter.api.Test;
 
-/** HU-14: buying seeds, hay and medicine at fixed prices (RN-14, RN-15, RN-16). */
+/** HU-14: comprar semillas, heno y medicina a precios fijos (RN-14, RN-15, RN-16). */
 class HU14BuyTest {
 
     @Test
@@ -19,10 +19,10 @@ class HU14BuyTest {
         // Given 500 m
         TestApp app = TestApp.startedGame();
 
-        // When the player buys 5 corn seeds (30 m each)
+                // Cuando el jugador compra 5 semillas de maíz (30 m cada una)
         Result<Integer> result = app.controller.buy("CORN_SEED", 5);
 
-        // Then the balance is 350 m and there are 5 more seeds
+                // Entonces el saldo es 350 m y hay 5 semillas más
         assertTrue(result.isOk(), String.valueOf(result.message()));
         assertEquals(150, result.value());
         assertEquals(350, app.state().money());
@@ -35,10 +35,10 @@ class HU14BuyTest {
         TestApp app = TestApp.startedGame();
         GameFixtures.setMoney(app.state(), 100);
 
-        // When the player tries to buy 3 medicines (120 m)
+                // Cuando el jugador intenta comprar 3 medicinas (120 m)
         Result<Integer> result = app.controller.buy("MEDICINE", 3);
 
-        // Then it is rejected: 20 m are missing
+                // Entonces se rechaza: faltan 20 m
         assertFalse(result.isOk());
         assertEquals(ErrorCode.SIN_FONDOS, result.code());
         assertEquals("Fondos insuficientes: faltan 20 m.", result.message());
@@ -49,14 +49,14 @@ class HU14BuyTest {
 
     @Test
     void HU14_ca3_withoutRoomInTheInventoryTheMoneyIsNotTaken() {
-        // Given an inventory with no room for 10 hay
+                // Dado un inventario sin lugar para 10 de heno
         TestApp app = TestApp.startedGame();
         GameFixtures.fillInventoryExcept(app.state(), ItemType.CARROT, 5);
 
-        // When the player tries to buy them
+                // Cuando el jugador intenta comprarlos
         Result<Integer> result = app.controller.buy("MEDICINE", 10);
 
-        // Then it is rejected and the balance is the same
+                // Entonces se rechaza y el saldo es el mismo
         assertEquals(ErrorCode.INVENTARIO_LLENO, result.code());
         assertEquals(500, app.state().money());
     }

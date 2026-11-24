@@ -12,7 +12,7 @@ final class SummerState implements SeasonState {
     static final SummerState INSTANCE = new SummerState();
 
     private SummerState() {
-        // shared instance
+                // instancia compartida
     }
 
     @Override

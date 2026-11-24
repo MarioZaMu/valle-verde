@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Facts about one end of the day, filled in by the steps and read by the application layer.
+ * Hechos de un final de día, llenados por los pasos y leídos por la capa de aplicación.
  *
  * <p>Stories: HU-05, HU-10, HU-17, HU-21, HU-22, HU-26.
  */
@@ -28,37 +28,37 @@ public final class DayReport {
     private int income;
     private int expenses;
 
-    /** The phases that ran, in execution order. */
+    /** Las fases que corrieron, en orden de ejecución. */
     public List<DayPhase> phasesRun() {
         return Collections.unmodifiableList(phasesRun);
     }
 
-    /** Date before the calendar advanced, or {@code null} if no calendar step ran. */
+    /** Fecha antes de que avanzara el calendario, o {@code null} si no corrió el paso del calendario. */
     public GameDate previousDate() {
         return previousDate;
     }
 
-    /** Date after the calendar advanced, or {@code null} if no calendar step ran. */
+    /** Fecha después de que avanzó el calendario, o {@code null} si no corrió el paso del calendario. */
     public GameDate newDate() {
         return newDate;
     }
 
-    /** Weather of the new day, or {@code null} if no forecast step ran. */
+    /** Clima del día nuevo, o {@code null} si no corrió el paso del pronóstico. */
     public Weather todayWeather() {
         return todayWeather;
     }
 
-    /** Forecast drawn for the following day, or {@code null} if no forecast step ran. */
+    /** Pronóstico sorteado para el día siguiente, o {@code null} si no corrió el paso del pronóstico. */
     public Weather forecast() {
         return forecast;
     }
 
-    /** Number of crops that withered during this end of the day. */
+    /** Número de cultivos que se marchitaron durante este final de día. */
     public int witheredCrops() {
         return witheredCrops;
     }
 
-    /** Achievements unlocked during this end of the day (step 8). */
+    /** Logros desbloqueados durante este final de día (paso 8). */
     public List<Achievement> unlocked() {
         return Collections.unmodifiableList(unlocked);
     }
@@ -67,32 +67,32 @@ public final class DayReport {
         unlocked.addAll(achievements);
     }
 
-    /** Animals that fell sick during this end of the day. */
+    /** Animales que se enfermaron durante este final de día. */
     public int sickAnimals() {
         return sickAnimals;
     }
 
-    /** Units of product the animals made during this end of the day. */
+    /** Unidades de producto que hicieron los animales durante este final de día. */
     public int products() {
         return products;
     }
 
-    /** Money at the start of the day that ended. */
+    /** Dinero al inicio del día que terminó. */
     public int balanceBefore() {
         return balanceBefore;
     }
 
-    /** Money at the end of the day that ended. */
+    /** Dinero al final del día que terminó. */
     public int balanceAfter() {
         return balanceAfter;
     }
 
-    /** m earned during the day that ended. */
+    /** m ganados durante el día que terminó. */
     public int income() {
         return income;
     }
 
-    /** m spent during the day that ended. */
+    /** m gastados durante el día que terminó. */
     public int expenses() {
         return expenses;
     }

@@ -8,9 +8,9 @@ import edu.ucc.farmsim.ui.theme.Texts;
 /**
  * Pattern: Observer — Role: ConcreteObserver (keeps the top-bar data up to date from game events).
  *
- * <p>It has no Swing: it listens to the event bus, remembers the last {@link HudView} and exposes the
- * Spanish texts to show. The Swing {@link HudPanel} only paints these texts, so the HUD logic is tested
- * without a display and the screen is updated by events, never by polling.
+ * <p>No tiene Swing: escucha el bus de eventos, recuerda el último {@link HudView} y expone los textos en español que
+ * se muestran. El {@link HudPanel} de Swing solo pinta esos textos, de modo que la lógica del HUD se prueba sin
+ * pantalla y la pantalla se actualiza por eventos, nunca por sondeo.
  *
  * <p>Stories: HU-34, HU-48.
  */
@@ -33,47 +33,47 @@ public class HudModel implements GameListener {
         }
     }
 
-    /** Money, for example {@code 500 m}. */
+    /** Dinero, por ejemplo {@code 500 m}. */
     public String moneyText() {
         return hud == null ? Texts.NO_VALUE : Texts.money(hud.money());
     }
 
-    /** Date, for example {@code Año 1 · Primavera · Día 1}. */
+    /** Fecha, por ejemplo {@code Año 1 · Primavera · Día 1}. */
     public String dateText() {
         return hud == null ? Texts.NO_VALUE : Texts.date(hud.year(), hud.season(), hud.day());
     }
 
-    /** Weather of today, for example {@code Soleado}. */
+    /** Clima de hoy, por ejemplo {@code Soleado}. */
     public String weatherText() {
         return hud == null ? Texts.NO_VALUE : Texts.weather(hud.weather());
     }
 
-    /** Forecast for tomorrow, for example {@code Mañana: Lluvioso}. */
+    /** Pronóstico de mañana, por ejemplo {@code Mañana: Lluvioso}. */
     public String forecastText() {
         return hud == null ? Texts.NO_VALUE : Texts.forecast(hud.forecast());
     }
 
-    /** Id of the season, for example {@code SPRING}, or {@code null} before a game starts. */
+    /** Id de la estación, por ejemplo {@code SPRING}, o {@code null} antes de que empiece una partida. */
     public String seasonId() {
         return hud == null ? null : hud.season();
     }
 
-    /** Id of today's weather, for example {@code RAINY}, or {@code null} before a game starts. */
+    /** Id del clima de hoy, por ejemplo {@code RAINY}, o {@code null} antes de que empiece una partida. */
     public String weatherId() {
         return hud == null ? null : hud.weather();
     }
 
-    /** Id of tomorrow's weather, or {@code null} before a game starts. */
+    /** Id del clima de mañana, o {@code null} antes de que empiece una partida. */
     public String forecastId() {
         return hud == null ? null : hud.forecast();
     }
 
-    /** Energy as text, for example {@code 98/100}: the information never depends on a color alone. */
+    /** Energía como texto, por ejemplo {@code 98/100}: la información nunca depende solo de un color. */
     public String energyText() {
         return hud == null ? Texts.NO_VALUE + "/" + Texts.NO_VALUE : Texts.energy(hud.energy(), hud.maxEnergy());
     }
 
-    /** Energy as a fraction from 0 to 1, for the bar. */
+    /** Energía como una fracción de 0 a 1, para la barra. */
     public double energyFraction() {
         return hud == null || hud.maxEnergy() == 0 ? 0.0 : (double) hud.energy() / hud.maxEnergy();
     }

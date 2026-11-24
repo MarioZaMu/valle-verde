@@ -1,8 +1,8 @@
 package edu.ucc.farmsim.domain.farm;
 
 /**
- * The four directions the avatar can face and walk to (RN-36). The map grows to the east (columns) and to
- * the south (rows), so north is one row up.
+ * Las cuatro direcciones hacia las que puede mirar y caminar el avatar (RN-36). El mapa crece hacia el este (columnas)
+ * y hacia el sur (filas), así que el norte es una fila hacia arriba.
  *
  * <p>Stories: HU-45.
  */
@@ -20,12 +20,12 @@ public enum Direction {
         this.dRow = dRow;
     }
 
-    /** How many columns one step in this direction moves: -1, 0 or 1. */
+    /** Cuántas columnas mueve un paso en esta dirección: -1, 0 o 1. */
     public int dCol() {
         return dCol;
     }
 
-    /** How many rows one step in this direction moves: -1, 0 or 1. */
+    /** Cuántas filas mueve un paso en esta dirección: -1, 0 o 1. */
     public int dRow() {
         return dRow;
     }

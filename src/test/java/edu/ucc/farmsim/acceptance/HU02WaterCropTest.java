@@ -14,7 +14,7 @@ import edu.ucc.farmsim.support.GameFixtures;
 import edu.ucc.farmsim.support.TestApp;
 import org.junit.jupiter.api.Test;
 
-/** HU-02: water a living crop so it grows that day (RN-02, RN-07, RN-12). */
+/** HU-02: regar un cultivo vivo para que crezca ese día (RN-02, RN-07, RN-12). */
 class HU02WaterCropTest {
 
     private static final int COL = GameFixtures.SOIL_COL;
@@ -28,14 +28,14 @@ class HU02WaterCropTest {
 
     @Test
     void HU02_ca1_wateringMarksTheCropAsWateredAndCostsOneEnergy() {
-        // Given a living, unwatered crop, Sunny weather and 100 energy
+                // Dado un cultivo vivo sin regar, clima Sunny y 100 de energía
         TestApp app = gameWithACrop();
         assertEquals(Weather.SUNNY, app.state().weather().today());
 
-        // When the player waters it
+                // Cuando el jugador lo riega
         Result<PlotView> result = app.controller.water(COL, ROW);
 
-        // Then it is watered until the end of the day and energy is 99
+                // Entonces queda regado hasta el final del día y la energía es 99
         assertTrue(result.isOk(), String.valueOf(result.message()));
         assertTrue(app.state().farm().plotAt(COL, ROW).crop().isWatered());
         assertTrue(result.value().watered());
@@ -44,14 +44,14 @@ class HU02WaterCropTest {
 
     @Test
     void HU02_ca2_wateringInDroughtCostsTwoEnergy() {
-        // Given the weather of the day is Drought
+                // Dado que el clima del día es Drought
         TestApp app = gameWithACrop();
         app.state().weather().restore(Weather.DROUGHT, Weather.SUNNY);
 
-        // When the player waters
+                // Cuando el jugador riega
         Result<PlotView> result = app.controller.water(COL, ROW);
 
-        // Then energy is 98
+                // Entonces la energía es 98
         assertTrue(result.isOk());
         assertEquals(98, app.state().energy().current());
     }

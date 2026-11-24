@@ -7,27 +7,27 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Declares the beans that are not components of their own: the server's event bus and the end-of-day
- * pipeline (DT-16). The domain stays free of Spring, so its objects are created here.
+ * Declara los beans que no son componentes por sí mismos: el bus de eventos del servidor y el pipeline de fin de día
+ * (DT-16). El dominio queda libre de Spring, por eso sus objetos se crean aquí.
  *
  * <p>Stories: none.
  */
 @Configuration(proxyBeanMethods = false)
 public class ServerConfig {
 
-    /** The bus the services publish to; the {@code EventCollector} listens to it. */
+    /** El bus donde publican los servicios; el {@code EventCollector} lo escucha. */
     @Bean
     public EventBus eventBus() {
         return new EventBus();
     }
 
-    /** The clock the saves are stamped with. */
+    /** El reloj con el que se sellan los guardados. */
     @Bean
     public Clock clock() {
         return Clock.systemDefaultZone();
     }
 
-    /** The ordered steps that run when a day ends (RN-03). */
+    /** Los pasos ordenados que corren cuando termina un día (RN-03). */
     @Bean
     public DayPipeline dayPipeline() {
         return DayPipeline.standard();

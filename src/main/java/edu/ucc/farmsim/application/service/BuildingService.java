@@ -15,8 +15,8 @@ import edu.ucc.farmsim.domain.progress.Achievement;
 import org.springframework.stereotype.Service;
 
 /**
- * The construction use cases (RN-20, RN-21): build a building on free grass, and list what is built and what
- * can be built. The rules are checked in the order of RN-21 and a rejection never changes the game.
+ * Los casos de uso de construcción (RN-20, RN-21): construir un edificio sobre pasto libre, y listar lo construido y lo
+ * que se puede construir. Las reglas se comprueban en el orden de RN-21 y un rechazo nunca cambia la partida.
  *
  * <p>Stories: HU-18, HU-24, HU-26, HU-45, HU-46.
  */
@@ -29,12 +29,12 @@ public final class BuildingService {
     private final AchievementService achievements;
 
     /**
-     * Creates the service.
+     * Crea el servicio.
      *
-     * @param session the game in progress
-     * @param mapper  builds the views the UI draws
-     * @param events  where events are published
-     * @param achievements evaluates the achievements after each construction
+     * @param session la partida en curso
+     * @param mapper  construye las vistas que dibuja la UI
+     * @param events  donde se publican los eventos
+     * @param achievements evalúa los logros después de cada construcción
      */
     public BuildingService(GameSession session, ViewMapper mapper, EventBus events, AchievementService achievements) {
         this.session = session;
@@ -44,13 +44,14 @@ public final class BuildingService {
     }
 
     /**
-     * Builds a building with its top-left plot at the given place (RN-21): the area must be free grass inside
-     * (the avatar and the people of the valley do not count as free: a building never lands on them, RN-36, RN-37),
-     * the map, the building unlocked, under its limit and affordable. Construction is instant and costs no energy.
+     * Construye un edificio con su parcela superior izquierda en el lugar dado (RN-21): el área debe ser pasto libre
+     * dentro del mapa (el avatar y las personas del valle no cuentan como libres: un edificio nunca cae sobre ellos,
+     * RN-36, RN-37), el edificio debe estar desbloqueado, bajo su límite y al alcance del dinero. La construcción es
+     * instantánea y no cuesta energía.
      *
-     * @param typeId building id, for example {@code COOP}
-     * @param col    column of the top-left plot
-     * @param row    row of the top-left plot
+     * @param typeId id del edificio, por ejemplo {@code COOP}
+     * @param col    columna de la parcela superior izquierda
+     * @param row    fila de la parcela superior izquierda
      */
     public Result<BuildingView> build(String typeId, int col, int row) {
         if (!session.hasGame()) {
@@ -86,7 +87,7 @@ public final class BuildingService {
         return Result.ok(mapper.building(building));
     }
 
-    /** The buildings of the farm and the catalogue of what can be built. A pure query. */
+    /** Los edificios de la granja y el catálogo de lo que se puede construir. Una consulta pura. */
     public Result<BuildingsView> buildings() {
         if (!session.hasGame()) {
             return Result.failWith(ErrorCode.SIN_PARTIDA);

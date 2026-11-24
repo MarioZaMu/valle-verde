@@ -3,35 +3,35 @@ package edu.ucc.farmsim.domain.crop;
 /**
  * Pattern: State — Role: State interface (what a crop can do at each growth stage).
  *
- * <p>The states are stateless and shared; a {@link Crop} holds the current one and changes it as it grows,
- * so no code needs a chain of {@code if}s on the stage.
+ * <p>Los estados no guardan datos y se comparten; un {@link Crop} guarda el actual y lo cambia a medida que crece, de
+ * modo que ningún código necesita una cadena de {@code if} sobre la etapa.
  *
  * <p>Stories: HU-01, HU-03, HU-05.
  */
 public interface CropState {
 
-    /** The stage this state represents. */
+    /** La etapa que representa este estado. */
     CropStage stage();
 
-    /** True unless the crop is withered. */
+    /** Verdadero salvo que el cultivo esté marchito. */
     boolean isAlive();
 
-    /** True only when the crop is mature and can be harvested. */
+    /** Verdadero solo cuando el cultivo está maduro y se puede cosechar. */
     boolean canHarvest();
 
     /**
-     * What happens to the crop when the day ends (step 2 of RN-03): a living young crop that was watered
-     * grows; one that was not counts a day without water and withers when it reaches the limit. A mature or
-     * withered crop does nothing.
+     * Lo que le pasa al cultivo cuando termina el día (paso 2 de RN-03): un cultivo joven vivo que fue regado crece;
+     * uno que no lo fue cuenta un día sin agua y se marchita al llegar al límite. Un cultivo maduro o marchito no hace
+     * nada.
      *
-     * @param crop            the crop whose day ends
-     * @param dryDaysToWither consecutive days without water that kill a young crop (3, or 2 in a drought)
+     * @param crop            el cultivo cuyo día termina
+     * @param dryDaysToWither días consecutivos sin agua que matan a un cultivo joven (3, o 2 en una sequía)
      */
     void onDayEnd(Crop crop, int dryDaysToWither);
 
     /**
-     * The state that corresponds to a crop's progress (RN-08): Seed at 0 days; Sprout until half of the days
-     * to mature; Growing until all of them; Mature afterwards; Withered if it died.
+     * El estado que corresponde al progreso de un cultivo (RN-08): Semilla con 0 días; Brote hasta la mitad de los días
+     * para madurar; Crecimiento hasta completarlos; Maduro después; Marchito si murió.
      */
     static CropState forProgress(CropType type, int daysGrown, boolean withered) {
         if (withered) {

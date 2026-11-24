@@ -20,12 +20,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * The REST controller: it only translates HTTP into calls to the game and the answer back into HTTP. The
- * rules live below it; this class does not contain any (AR-11). It is not the GRASP controller, which is
- * {@code GameController}.
+ * El controlador REST: solo traduce HTTP en llamadas al juego y la respuesta de vuelta en HTTP. Las reglas viven más
+ * abajo; esta clase no contiene ninguna (AR-11). No es el controlador GRASP, que es {@code GameController}.
  *
- * <p>There is one game per server (S-01), so every order runs under the same lock (DT-20). The events an
- * order causes travel in the response (DT-19). The routes are documented in {@code docs/API.md}.
+ * <p>Hay un juego por servidor (S-01), así que toda orden corre bajo el mismo candado (DT-20). Los eventos que causa
+ * una orden viajan en la respuesta (DT-19). Las rutas están documentadas en {@code docs/API.md}.
  *
  * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-26, HU-28, HU-29, HU-30, HU-31, HU-32, HU-33, HU-35, HU-37, HU-38, HU-45, HU-46, HU-47, HU-49.
  */
@@ -38,210 +37,210 @@ public class GameRestController {
     private final Object lock = new Object();
 
     /**
-     * Creates the controller.
+     * Crea el controlador.
      *
-     * @param game      the game, answered in this process
-     * @param collector keeps the events of each order
+     * @param game      el juego, que se responde en este proceso
+     * @param collector guarda los eventos de cada orden
      */
     public GameRestController(GameCommands game, EventCollector collector) {
         this.game = game;
         this.collector = collector;
     }
 
-    /** Body of {@code POST /api/game}. */
+    /** Cuerpo de {@code POST /api/game}. */
     public record NewGameRequest(@NotNull Long seed) { }
 
-    /** Body of {@code POST /api/farm/plots/{col}/{row}/crop}. */
+    /** Cuerpo de {@code POST /api/farm/plots/{col}/{row}/crop}. */
     public record SowRequest(@NotBlank String seedId) { }
 
-    /** Body of {@code POST /api/market/purchases} and {@code POST /api/market/sales}. */
+    /** Cuerpo de {@code POST /api/market/purchases} y {@code POST /api/market/sales}. */
     public record TradeRequest(@NotBlank String itemId, @NotNull Integer quantity) { }
 
-    /** Body of {@code POST /api/buildings}. */
+    /** Cuerpo de {@code POST /api/buildings}. */
     public record BuildRequest(@NotBlank String buildingId, @NotNull Integer col, @NotNull Integer row) { }
 
-    /** Body of {@code POST /api/animals}. */
+    /** Cuerpo de {@code POST /api/animals}. */
     public record AnimalPurchaseRequest(@NotBlank String animalId) { }
 
-    /** Body of {@code POST /api/avatar/moves}. */
+    /** Cuerpo de {@code POST /api/avatar/moves}. */
     public record MoveRequest(@NotNull @Pattern(regexp = "NORTH|SOUTH|EAST|WEST") String direction) { }
 
-    /** Every achievement with the player's progress. */
+    /** Todos los logros con el progreso del jugador. */
     @GetMapping("/achievements")
     public ResponseEntity<?> achievements() {
         return run(game::achievements, HttpStatus.OK);
     }
 
-    /** What each save slot holds. */
+    /** Lo que guarda cada ranura de partida. */
     @GetMapping("/saves")
     public ResponseEntity<?> saveSlots() {
         return run(game::saveSlots, HttpStatus.OK);
     }
 
-    /** Saves the game in progress in a slot, replacing what it held (RN-31). */
+    /** Guarda la partida en curso en una ranura, reemplazando lo que tenía (RN-31). */
     @PutMapping("/saves/{slot}")
     public ResponseEntity<?> save(@PathVariable int slot) {
         return run(() -> game.save(slot), HttpStatus.OK);
     }
 
-    /** Loads a slot and makes it the game in progress (RN-33). */
+    /** Carga una ranura y la convierte en la partida en curso (RN-33). */
     @PostMapping("/saves/{slot}/load")
     public ResponseEntity<?> load(@PathVariable int slot) {
         return run(() -> game.load(slot), HttpStatus.OK);
     }
 
-    /** Starts a new game (RN-30). */
+    /** Inicia una partida nueva (RN-30). */
     @PostMapping("/game")
     public ResponseEntity<?> newGame(@Valid @RequestBody NewGameRequest request) {
         return run(() -> game.newGame(request.seed()), HttpStatus.CREATED);
     }
 
-    /** The top bar of the game in progress. */
+    /** La barra superior de la partida en curso. */
     @GetMapping("/game")
     public ResponseEntity<?> hud() {
         return run(game::hud, HttpStatus.OK);
     }
 
-    /** Ends the day (RN-03). */
+    /** Termina el día (RN-03). */
     @PostMapping("/game/days")
     public ResponseEntity<?> endDay() {
         return run(game::endDay, HttpStatus.OK);
     }
 
-    /** The whole farm map. */
+    /** Todo el mapa de la granja. */
     @GetMapping("/farm/map")
     public ResponseEntity<?> map() {
         return run(game::map, HttpStatus.OK);
     }
 
-    /** One step of the avatar (RN-36). */
+    /** Un paso del avatar (RN-36). */
     @PostMapping("/avatar/moves")
     public ResponseEntity<?> move(@Valid @RequestBody MoveRequest request) {
         return run(() -> game.move(request.direction()), HttpStatus.OK);
     }
 
-    /** The people of the valley (RN-37). */
+    /** Las personas del valle (RN-37). */
     @GetMapping("/npcs")
     public ResponseEntity<?> npcs() {
         return run(game::npcs, HttpStatus.OK);
     }
 
-    /** What a person of the valley says, if the avatar is next to it (RN-37). */
+    /** Lo que dice una persona del valle, si el avatar está a su lado (RN-37). */
     @PostMapping("/npcs/{id}/talk")
     public ResponseEntity<?> talk(@PathVariable String id) {
         return run(() -> game.talk(id), HttpStatus.OK);
     }
 
-    /** Delivers the errand of a person of the valley (RN-38). */
+    /** Entrega el encargo de una persona del valle (RN-38). */
     @PostMapping("/npcs/{id}/errand")
     public ResponseEntity<?> deliver(@PathVariable String id) {
         return run(() -> game.deliver(id), HttpStatus.OK);
     }
 
-    /** The start tutorial of the game in progress (RN-39). */
+    /** El tutorial de inicio de la partida en curso (RN-39). */
     @GetMapping("/tutorial")
     public ResponseEntity<?> tutorial() {
         return run(game::tutorial, HttpStatus.OK);
     }
 
-    /** Skips the start tutorial (RN-39). */
+    /** Salta el tutorial de inicio (RN-39). */
     @PostMapping("/tutorial/skip")
     public ResponseEntity<?> skipTutorial() {
         return run(game::skipTutorial, HttpStatus.OK);
     }
 
-    /** Describes one plot without changing anything. */
+    /** Describe una parcela sin cambiar nada. */
     @GetMapping("/farm/plots/{col}/{row}")
     public ResponseEntity<?> inspect(@PathVariable int col, @PathVariable int row) {
         return run(() -> game.inspect(col, row), HttpStatus.OK);
     }
 
-    /** Sows a seed in a plot (RN-06). */
+    /** Siembra una semilla en una parcela (RN-06). */
     @PostMapping("/farm/plots/{col}/{row}/crop")
     public ResponseEntity<?> plant(@PathVariable int col, @PathVariable int row,
                                    @Valid @RequestBody SowRequest request) {
         return run(() -> game.plant(col, row, request.seedId()), HttpStatus.CREATED);
     }
 
-    /** Waters the crop of a plot (RN-07). */
+    /** Riega el cultivo de una parcela (RN-07). */
     @PostMapping("/farm/plots/{col}/{row}/watering")
     public ResponseEntity<?> water(@PathVariable int col, @PathVariable int row) {
         return run(() -> game.water(col, row), HttpStatus.OK);
     }
 
-    /** Harvests a mature crop or clears a withered one (RN-10, RN-34). */
+    /** Cosecha un cultivo maduro o limpia uno marchito (RN-10, RN-34). */
     @PostMapping("/farm/plots/{col}/{row}/harvest")
     public ResponseEntity<?> harvest(@PathVariable int col, @PathVariable int row) {
         return run(() -> game.harvest(col, row), HttpStatus.OK);
     }
 
-    /** Whether at least one save slot holds a game. */
+    /** Si al menos una ranura de guardado contiene una partida. */
     @GetMapping("/saves/any")
     public ResponseEntity<?> hasSavedGames() {
         return run(game::hasSavedGames, HttpStatus.OK);
     }
 
-    /** Prices, trends and the purchase catalogue. */
+    /** Precios, tendencias y el catálogo de compra. */
     @GetMapping("/market")
     public ResponseEntity<?> market() {
         return run(game::market, HttpStatus.OK);
     }
 
-    /** Buys units at the fixed price (RN-16). */
+    /** Compra unidades al precio fijo (RN-16). */
     @PostMapping("/market/purchases")
     public ResponseEntity<?> buy(@Valid @RequestBody TradeRequest request) {
         return run(() -> game.buy(request.itemId(), request.quantity()), HttpStatus.OK);
     }
 
-    /** Sells units at the dynamic price (RN-17, RN-18). */
+    /** Vende unidades al precio dinámico (RN-17, RN-18). */
     @PostMapping("/market/sales")
     public ResponseEntity<?> sell(@Valid @RequestBody TradeRequest request) {
         return run(() -> game.sell(request.itemId(), request.quantity()), HttpStatus.OK);
     }
 
-    /** What selling the quantity would pay now, without selling. */
+    /** Lo que pagaría ahora vender la cantidad, sin vender. */
     @GetMapping("/market/quotes")
     public ResponseEntity<?> quote(@RequestParam String itemId, @RequestParam int quantity) {
         return run(() -> game.quote(itemId, quantity), HttpStatus.OK);
     }
 
-    /** The inventory as a grid. */
+    /** El inventario como una grilla. */
     @GetMapping("/inventory")
     public ResponseEntity<?> inventory() {
         return run(game::inventory, HttpStatus.OK);
     }
 
-    /** The buildings built and the catalogue of what can be built. */
+    /** Los edificios construidos y el catálogo de lo que se puede construir. */
     @GetMapping("/buildings")
     public ResponseEntity<?> buildings() {
         return run(game::buildings, HttpStatus.OK);
     }
 
-    /** Builds a building on free grass (RN-20, RN-21). */
+    /** Construye un edificio sobre pasto libre (RN-20, RN-21). */
     @PostMapping("/buildings")
     public ResponseEntity<?> build(@Valid @RequestBody BuildRequest request) {
         return run(() -> game.build(request.buildingId(), request.col(), request.row()), HttpStatus.CREATED);
     }
 
-    /** Buys an animal and houses it in the first compatible building with room (RN-23). */
+    /** Compra un animal y lo aloja en el primer edificio compatible con espacio (RN-23). */
     @PostMapping("/animals")
     public ResponseEntity<?> buyAnimal(@Valid @RequestBody AnimalPurchaseRequest request) {
         return run(() -> game.buyAnimal(request.animalId()), HttpStatus.CREATED);
     }
 
-    /** Feeds the animals of a building (RN-24). */
+    /** Alimenta a los animales de un edificio (RN-24). */
     @PostMapping("/buildings/{id}/feeding")
     public ResponseEntity<?> feed(@PathVariable int id) {
         return run(() -> game.feed(id), HttpStatus.OK);
     }
 
-    /** Collects the products waiting in a building (RN-26). */
+    /** Recoge los productos que esperan en un edificio (RN-26). */
     @PostMapping("/buildings/{id}/collection")
     public ResponseEntity<?> collect(@PathVariable int id) {
         return run(() -> game.collect(id), HttpStatus.OK);
     }
 
-    /** Cures a sick animal of a building (RN-27). */
+    /** Cura a un animal enfermo de un edificio (RN-27). */
     @PostMapping("/buildings/{id}/animals/{index}/treatment")
     public ResponseEntity<?> cure(@PathVariable int id, @PathVariable int index) {
         return run(() -> game.cure(id, index), HttpStatus.OK);

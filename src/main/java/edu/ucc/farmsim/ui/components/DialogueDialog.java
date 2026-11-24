@@ -26,9 +26,9 @@ import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 
 /**
- * The dialogue box of a person of the valley, at the bottom of the window as in a role-playing game (HU-46):
- * portrait, name and role, what it says, its errand and the buttons Entregar and Cerrar. It is modal; {@code Esc}
- * or {@code E} closes it. All the logic is in {@link DialoguePresenter}.
+ * El cuadro de diálogo de una persona del valle, en la parte de abajo de la ventana como en un juego de rol (HU-46):
+ * retrato, nombre y oficio, lo que dice, su encargo y los botones Entregar y Cerrar. Es modal; {@code Esc} o {@code E}
+ * lo cierran. Toda la lógica está en {@link DialoguePresenter}.
  *
  * <p>Stories: HU-46, HU-47, HU-49.
  */
@@ -49,10 +49,10 @@ public final class DialogueDialog extends JDialog {
     private final WoodButton deliver = new WoodButton(Texts.DELIVER);
 
     /**
-     * Builds the dialog.
+     * Construye el diálogo.
      *
-     * @param owner     the window it belongs to
-     * @param presenter the logic of the conversation
+     * @param owner     la ventana a la que pertenece
+     * @param presenter la lógica de la conversación
      */
     public DialogueDialog(Window owner, DialoguePresenter presenter) {
         super(owner, presenter.view().name(), ModalityType.APPLICATION_MODAL);
@@ -111,7 +111,7 @@ public final class DialogueDialog extends JDialog {
         place(owner);
     }
 
-    /** The current texts of the presenter on screen. */
+    /** Los textos actuales del presentador en pantalla. */
     private void refresh() {
         name.setText(presenter.view().name() + " · " + presenter.view().role());
         text.setText(presenter.view().text());
@@ -132,7 +132,7 @@ public final class DialogueDialog extends JDialog {
         setLocation(area.x + (area.width - width) / 2, area.y + area.height - HEIGHT - MARGIN * 3);
     }
 
-    /** A sprite enlarged without blur to a square of the given side; empty (but of that size) without the sprite. */
+    /** Un sprite ampliado sin desenfoque a un cuadrado del lado dado; vacío (pero de ese tamaño) sin el sprite. */
     static JLabel portrait(String sprite, int side) {
         JLabel label = new JLabel();
         label.setPreferredSize(new Dimension(side, side));

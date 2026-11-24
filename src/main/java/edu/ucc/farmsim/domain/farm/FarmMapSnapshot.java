@@ -7,26 +7,27 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Immutable copy of what changes on the map: one crop per plot in row-major order ({@code null} where the plot
- * has none) and the buildings with their animals. The terrain never changes, so it is not stored.
+ * Copia inmutable de lo que cambia en el mapa: un cultivo por parcela en orden de fila ({@code null} donde la parcela
+ * no tiene) y los edificios con sus animales. El terreno nunca cambia, así que no se guarda.
  *
  * <p>Stories: HU-01, HU-18, HU-50.
  *
- * @param crops     crop snapshot of each plot, or {@code null}
- * @param buildings the buildings in the order they were built
+ * @param crops     instantánea del cultivo de cada parcela, o {@code null}
+ * @param buildings los edificios en el orden en que se construyeron
  */
 public record FarmMapSnapshot(List<CropSnapshot> crops, List<BuildingSnapshot> buildings) {
 
-    /** Makes the building list an unmodifiable copy. */
+    /** Hace de la lista de edificios una copia no modificable. */
     public FarmMapSnapshot {
         buildings = List.copyOf(buildings);
     }
 
     /**
-     * The same crops on a bigger map: a crop of a map {@code fromCols} wide keeps its column and row, and the
-     * new plots have none (RN-40: a save of the 16 x 10 map becomes the north-west corner of the valley).
+     * Los mismos cultivos en un mapa más grande: un cultivo de un mapa de {@code fromCols} de ancho conserva su columna
+     * y su fila, y las parcelas nuevas no tienen ninguno (RN-40: una partida del mapa de 16 x 10 pasa a ser la esquina
+     * noroeste del valle).
      *
-     * @throws IllegalArgumentException if the crops do not fill whole rows of {@code fromCols}, or do not fit
+     * @throws IllegalArgumentException si los cultivos no llenan filas completas de {@code fromCols}, o no caben
      */
     public FarmMapSnapshot widened(int fromCols, int toCols, int toRows) {
         int fromRows = crops.size() / fromCols;

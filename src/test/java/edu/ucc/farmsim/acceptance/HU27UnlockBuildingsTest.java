@@ -16,7 +16,7 @@ import edu.ucc.farmsim.support.TestApp;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-/** HU-27: buildings are unlocked by achievements (RN-28, RN-29). */
+/** HU-27: los edificios se desbloquean con logros (RN-28, RN-29). */
 class HU27UnlockBuildingsTest {
 
     private static List<Boolean> unlocked(TestApp app) {

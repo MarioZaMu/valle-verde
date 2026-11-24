@@ -13,7 +13,7 @@ import edu.ucc.farmsim.support.GameFixtures;
 import edu.ucc.farmsim.support.TestApp;
 import org.junit.jupiter.api.Test;
 
-/** HU-24: building a warehouse to widen the inventory (RN-15, RN-20, RN-29). */
+/** HU-24: construir un almacén para ampliar el inventario (RN-15, RN-20, RN-29). */
 class HU24WarehouseTest {
 
     @Test
@@ -36,7 +36,7 @@ class HU24WarehouseTest {
         GameFixtures.unlock(app.state(), Achievement.FIRST_HARVEST);
         GameFixtures.build(app.state(), BuildingType.WAREHOUSE, 2, 7);
 
-        // (9, 7): free grass away from the avatar, which stands on (7, 7) and is never built over (RN-36)
+                // (9, 7): pasto libre lejos del avatar, que está en (7, 7) y sobre el que nunca se construye (RN-36)
         Result<BuildingView> result = app.controller.build("WAREHOUSE", 9, 7);
 
         assertEquals(ErrorCode.LIMITE_EDIFICIOS, result.code());

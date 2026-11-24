@@ -3,28 +3,28 @@ package edu.ucc.farmsim.ui.components;
 import java.awt.event.KeyEvent;
 
 /**
- * The five tools of the tool bar, in the order of their keys 1 to 5 (RN-34).
+ * Las cinco herramientas de la barra de herramientas, en el orden de sus teclas 1 a 5 (RN-34).
  *
  * <p>Stories: HU-36.
  */
 public enum Tool {
-    /** Sow the selected seed. */
+    /** Sembrar la semilla seleccionada. */
     SOW,
-    /** Water a crop. */
+    /** Regar un cultivo. */
     WATER,
-    /** Harvest a mature crop, clear a withered one or collect a building's products. */
+    /** Cosechar un cultivo maduro, limpiar uno marchito o recoger los productos de un edificio. */
     HARVEST,
-    /** Open the building catalog. */
+    /** Abrir el catálogo de edificios. */
     BUILD,
-    /** Feed the animals of a building. */
+    /** Alimentar a los animales de un edificio. */
     FEED;
 
-    /** The character of this tool's key: {@code '1'} for the first tool, up to {@code '5'}. */
+    /** El carácter de la tecla de esta herramienta: {@code '1'} para la primera, hasta {@code '5'}. */
     public char key() {
         return (char) ('1' + ordinal());
     }
 
-    /** The AWT key code of this tool's key. */
+    /** El código de tecla AWT de la tecla de esta herramienta. */
     public int keyCode() {
         return KeyEvent.VK_1 + ordinal();
     }

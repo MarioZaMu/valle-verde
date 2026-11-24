@@ -22,10 +22,10 @@ import java.util.List;
 /**
  * Pattern: Memento — Role: Originator (creates and restores snapshots of itself).
  *
- * <p>The state of one game: money, energy, inventory, farm map, weather and the random generator, plus the
- * shared calendar ({@link GameClock}). It is the aggregate root that every operation works on.
- * {@link #createMemento()} and {@link #restore(GameMemento)} undo a failed end of the day (HU-10) and
- * will back saving and loading (HU-29, HU-30).
+ * <p>El estado de una partida: dinero, energía, inventario, mapa de la granja, clima y el generador aleatorio, más el
+ * calendario compartido ({@link GameClock}). Es la raíz del agregado sobre la que trabaja toda operación. {@link
+ * #createMemento()} y {@link #restore(GameMemento)} deshacen un final de día fallido (HU-10) y respaldarán el guardado
+ * y la carga (HU-29, HU-30).
  *
  * <p>Stories: HU-01, HU-10, HU-14, HU-15, HU-17, HU-18, HU-26, HU-28, HU-45, HU-47, HU-49.
  */
@@ -56,10 +56,10 @@ public final class GameState {
     }
 
     /**
-     * Creates the initial state of a new game (RN-30). The calendar is reset to Year 1, Spring, day 1,
-     * day 1 is Sunny and the forecast of day 2 is drawn with the generator of the given seed.
+     * Crea el estado inicial de una partida nueva (RN-30). El calendario se reinicia en Año 1, Primavera, día 1; el día
+     * 1 es soleado y el pronóstico del día 2 se sortea con el generador de la semilla dada.
      *
-     * @param seed seed of the random generator; the same seed always gives the same game
+     * @param seed semilla del generador aleatorio; la misma semilla siempre da la misma partida
      */
     public static GameState newGame(long seed) {
         GameClock clock = GameClock.getInstance();
@@ -73,8 +73,8 @@ public final class GameState {
     }
 
     /**
-     * Builds a game from a snapshot read from a save. The snapshot must already be valid (see
-     * {@link GameStateValidator}); the calendar is set to its date.
+     * Construye una partida desde una instantánea leída de un guardado. La instantánea ya debe ser válida (véase {@link
+     * GameStateValidator}); el calendario se fija en su fecha.
      */
     public static GameState fromMemento(GameMemento memento) {
         GameState state = newGame(0L);
@@ -82,12 +82,12 @@ public final class GameState {
         return state;
     }
 
-    /** Money the player has. */
+    /** Dinero que tiene el jugador. */
     public int money() {
         return money;
     }
 
-    /** Adds money (a sale, a reward). */
+    /** Agrega dinero (una venta, una recompensa). */
     public void earn(int amount) {
         if (amount < 0) {
             throw new IllegalArgumentException("amount must not be negative: " + amount);
@@ -97,9 +97,9 @@ public final class GameState {
     }
 
     /**
-     * Takes money if there is enough; the balance never goes below zero (RN-14).
+     * Toma dinero si alcanza; el saldo nunca baja de cero (RN-14).
      *
-     * @return {@code true} if it was spent; {@code false} (and nothing changed) if the balance is smaller
+     * @return {@code true} si se gastó; {@code false} (y nada cambia) si el saldo es menor
      */
     public boolean spend(int amount) {
         if (amount < 0) {
@@ -113,17 +113,17 @@ public final class GameState {
         return true;
     }
 
-    /** What was earned and spent today. */
+    /** Lo que se ganó y se gastó hoy. */
     public DayLedger ledger() {
         return ledger;
     }
 
-    /** The achievements unlocked. */
+    /** Los logros desbloqueados. */
     public AchievementTracker progress() {
         return progress;
     }
 
-    /** Numbers the achievements look at, taken from the game as it is now. */
+    /** Números que miran los logros, tomados de la partida tal como está ahora. */
     public ProgressFacts facts() {
         int animals = farm.buildings().stream().mapToInt(b -> b.animals().size()).sum();
         return new ProgressFacts(money, progress.harvests(), progress.unitsSold(), progress.buildingsBuilt(),
@@ -131,10 +131,10 @@ public final class GameState {
     }
 
     /**
-     * Unlocks every achievement whose condition is met and pays its reward (RN-28). A reward can itself meet
-     * another condition (the balance), so it repeats until nothing new unlocks.
+     * Desbloquea todos los logros cuya condición se cumple y paga su recompensa (RN-28). Una recompensa puede cumplir
+     * otra condición (el saldo), así que se repite hasta que no se desbloquea nada nuevo.
      *
-     * @return the achievements unlocked now, in order
+     * @return los logros desbloqueados ahora, en orden
      */
     public List<Achievement> evaluateAchievements() {
         List<Achievement> all = new ArrayList<>();
@@ -149,69 +149,69 @@ public final class GameState {
         return all;
     }
 
-    /** The market: demand, prices and trends. */
+    /** El mercado: demanda, precios y tendencias. */
     public Market market() {
         return market;
     }
 
-    /** The player's daily energy. */
+    /** La energía diaria del jugador. */
     public Energy energy() {
         return energy;
     }
 
-    /** The inventory. */
+    /** El inventario. */
     public Inventory inventory() {
         return inventory;
     }
 
-    /** The farm map. */
+    /** El mapa de la granja. */
     public FarmMap farm() {
         return farm;
     }
 
-    /** Weather of today and forecast of tomorrow. */
+    /** Clima de hoy y pronóstico de mañana. */
     public WeatherCycle weather() {
         return weather;
     }
 
-    /** The player's character: where it stands and where it looks (RN-36). */
+    /** El personaje del jugador: dónde está y hacia dónde mira (RN-36). */
     public Avatar avatar() {
         return avatar;
     }
 
     /**
-     * One step of the avatar (RN-36): it turns to the direction and moves there if the plot can be walked on.
-     * It costs no energy and does not move the calendar.
+     * Un paso del avatar (RN-36): gira hacia la dirección y se mueve allí si se puede caminar sobre la parcela. No
+     * cuesta energía ni mueve el calendario.
      *
-     * @return {@code true} if it moved; {@code false} if the way was blocked and it only turned
+     * @return {@code true} si se movió; {@code false} si el camino estaba bloqueado y solo giró
      */
     public boolean stepAvatar(Direction direction) {
         return avatar.step(direction, farm);
     }
 
-    /** The errands of the people of the valley already done (RN-38). */
+    /** Los encargos de las personas del valle ya hechos (RN-38). */
     public ErrandBook errands() {
         return errands;
     }
 
-    /** Where the player is in the start tutorial (RN-39). */
+    /** Dónde va el jugador en el tutorial de inicio (RN-39). */
     public Tutorial tutorial() {
         return tutorial;
     }
 
-    /** The random generator of this game. */
+    /** El generador aleatorio de esta partida. */
     public StateRandom random() {
         return random;
     }
 
-    /** Takes an immutable snapshot of everything that changes during play. */
+    /** Toma una instantánea inmutable de todo lo que cambia durante el juego. */
     public GameMemento createMemento() {
         return new GameMemento(date(), money, energy.current(), inventory.snapshot(),
                 farm.snapshot(), weather.today(), weather.forecast(), random.state(), market.snapshot(),
                 ledger.snapshot(), progress.snapshot(), avatar.snapshot(), errands.snapshot(), tutorial.snapshot());
     }
 
-    /** Puts the state back exactly as it was when the snapshot was taken. */
+    /** Deja el estado exactamente como estaba cuando se tomó la instantánea. */
     public void restore(GameMemento memento) {
         GameClock.getInstance().restore(memento.date());
         this.money = memento.money();
@@ -232,7 +232,7 @@ public final class GameState {
         tutorial.restoreFrom(memento.tutorial());
     }
 
-    /** Current calendar date. */
+    /** Fecha actual del calendario. */
     public GameDate date() {
         return GameClock.getInstance().date();
     }

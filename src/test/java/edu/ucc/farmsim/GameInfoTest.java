@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-/** RNF-12: the visible name of the game lives in one constant. */
+/** RNF-12: el nombre visible del juego vive en una sola constante. */
 class GameInfoTest {
 
     @Test

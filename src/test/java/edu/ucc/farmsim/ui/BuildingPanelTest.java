@@ -22,7 +22,7 @@ import javax.swing.JButton;
 import javax.swing.JTable;
 import org.junit.jupiter.api.Test;
 
-/** The building panel: feed, collect and cure from the animal table (HU-20, HU-22, HU-23). */
+/** El panel del edificio: alimentar, recoger y curar desde la tabla de animales (HU-20, HU-22, HU-23). */
 class BuildingPanelTest {
 
     private static Building coopWith(TestApp app, AnimalCondition... conditions) {

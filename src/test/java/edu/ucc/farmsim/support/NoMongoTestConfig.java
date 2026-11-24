@@ -4,13 +4,15 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
 /**
- * For Spring tests with the {@code no-mongo} profile: the saved games live in a {@link FakeSaveRepository},
- * so the API and the client are tested without a database.
+ * Para las pruebas de Spring con el perfil {@code no-mongo}: las partidas guardadas viven en un {@link
+ * FakeSaveRepository}, así que la API y el cliente se prueban sin base de datos.
  */
 @TestConfiguration(proxyBeanMethods = false)
 public class NoMongoTestConfig {
 
-    /** The stand-in the tests can reach in to say which slots exist or that the storage is down. */
+    /**
+     * El sustituto al que las pruebas pueden llegar para decir qué ranuras existen o que el almacenamiento está caído.
+     */
     @Bean
     public FakeSaveRepository saveRepository() {
         return new FakeSaveRepository();

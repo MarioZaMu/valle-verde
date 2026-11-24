@@ -22,9 +22,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
- * HU-36: pick a tool with the keys 1 to 5 or the bar and act on a plot by clicking it. The tool model and the
- * presenter have no Swing, so the whole behaviour is tested without a display. The market, inventory,
- * achievements and save shortcuts are bound when their screens exist (phases 5.3 and 5.5).
+ * HU-36: elegir una herramienta con las teclas 1 a 5 o con la barra y actuar sobre una parcela haciendo clic en ella.
+ * El modelo de herramientas y el presentador no tienen Swing, así que todo el comportamiento se prueba sin pantalla.
+ * Los atajos de mercado, inventario, logros y guardado se enlazan cuando existen sus pantallas (fases 5.3 y 5.5).
  */
 class HU36ToolsAndClicksTest {
 
@@ -85,15 +85,15 @@ class HU36ToolsAndClicksTest {
 
     @Test
     void HU36_ca2_clickingAPlotWithTheSowToolAndASeedSowsIt() {
-        // Given the Sow tool with carrot seeds selected
+                // Dada la herramienta Sembrar con semillas de zanahoria seleccionadas
         TestApp app = TestApp.startedGame();
         tools.select(Tool.SOW);
         tools.selectSeed("CARROT_SEED");
 
-        // When the player clicks a soil plot
+                // Cuando el jugador hace clic en una parcela de tierra
         presenter(app).onPlotClicked(COL, ROW);
 
-        // Then the crop was sown (HU-01) and no error is shown
+                // Entonces el cultivo se sembró (HU-01) y no se muestra ningún error
         assertNotNull(app.state().farm().plotAt(COL, ROW).crop());
         assertEquals(9, app.state().inventory().count(ItemType.CARROT_SEED));
         assertTrue(messages.isEmpty() || messages.stream().allMatch(String::isEmpty), messages.toString());
@@ -112,16 +112,16 @@ class HU36ToolsAndClicksTest {
 
     @Test
     void HU36_ca3_aRejectedActionShowsTheSpanishMessageAndChangesNothing() {
-        // Given the Sow tool and no energy
+                // Dada la herramienta Sembrar y sin energía
         TestApp app = TestApp.startedGame();
         app.state().energy().set(0);
         tools.select(Tool.SOW);
         GameMemento before = app.state().createMemento();
 
-        // When the player clicks a soil plot
+                // Cuando el jugador hace clic en una parcela de tierra
         presenter(app).onPlotClicked(COL, ROW);
 
-        // Then the state is the same and the message explains why
+                // Entonces el estado es el mismo y el mensaje explica por qué
         assertEquals(before, app.state().createMemento());
         assertEquals(List.of("Energía insuficiente: necesitas 2 y tienes 0."), messages);
     }
@@ -151,7 +151,7 @@ class HU36ToolsAndClicksTest {
         assertNull(app.state().farm().plotAt(COL, ROW).crop());
         assertNull(app.state().farm().plotAt(COL + 1, ROW).crop());
         assertEquals(100 - 2 - 1, app.state().energy().current());
-        // (collecting the products of a building with this same tool arrives with HU-22)
+                // (recoger los productos de un edificio con esta misma herramienta llega con HU-22)
     }
 
     @Test

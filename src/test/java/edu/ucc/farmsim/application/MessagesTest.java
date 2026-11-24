@@ -18,7 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 
-/** Q-1: every error code has its Spanish message, and the messages match the RN-35 table. */
+/** Q-1: cada código de error tiene su mensaje en español, y los mensajes coinciden con la tabla de RN-35. */
 class MessagesTest {
 
     private static final Path RULES = Path.of("docs/REGLAS_DE_NEGOCIO.md");
@@ -48,7 +48,7 @@ class MessagesTest {
                     "message of " + code + " differs from RN-35");
         }
         for (String documented : fromDocs.keySet()) {
-            ErrorCode.valueOf(documented); // every documented code must exist
+            ErrorCode.valueOf(documented); // todo código documentado debe existir
         }
     }
 
@@ -88,7 +88,7 @@ class MessagesTest {
         return result;
     }
 
-    /** Placeholders differ between the document ({n}, {cultivo}) and the code (%d, %s): compare their shape. */
+    /** Los marcadores difieren entre el documento ({n}, {cultivo}) y el código (%d, %s): se compara su forma. */
     private static String normalize(String text) {
         return text.replaceAll("\\{[^}]*\\}", "%s").replace("%d", "%s");
     }

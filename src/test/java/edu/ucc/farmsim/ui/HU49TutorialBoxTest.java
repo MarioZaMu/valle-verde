@@ -16,7 +16,7 @@ import java.awt.Dimension;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.Test;
 
-/** HU-49 on the screen: the avatar's box with the step, what to do and the button to skip it. */
+/** HU-49 en pantalla: el cuadro del avatar con el paso, qué hacer y el botón para saltarlo. */
 class HU49TutorialBoxTest {
 
     private static TestApp newGame() {

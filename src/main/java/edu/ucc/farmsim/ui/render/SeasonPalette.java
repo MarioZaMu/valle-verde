@@ -4,8 +4,8 @@ import edu.ucc.farmsim.ui.theme.Palette;
 import java.awt.Color;
 
 /**
- * The look of each season on the map (HU-40 · CA-1): grass changes colour, and the weather adds a tint. Spring
- * keeps the base palette.
+ * El aspecto de cada estación en el mapa (HU-40 · CA-1): el pasto cambia de color y el clima agrega un tinte. La
+ * primavera conserva la paleta base.
  *
  * <p>Stories: HU-40.
  */
@@ -16,10 +16,10 @@ final class SeasonPalette {
     private static final Color WINTER_GRASS = new Color(0xD8E6EE);
 
     private SeasonPalette() {
-        // static helpers only
+                // solo métodos de utilidad estáticos
     }
 
-    /** Grass colour of a season id; unknown ids use the spring colour. */
+    /** Color del pasto de un id de estación; los ids desconocidos usan el color de primavera. */
     static Color grass(String season) {
         if (season == null) {
             return Palette.GRASS;
@@ -32,7 +32,7 @@ final class SeasonPalette {
         };
     }
 
-    /** Translucent tint laid over the whole map for a weather id, or {@code null} if it does not tint. */
+    /** Tinte translúcido que se coloca sobre todo el mapa para un id de clima, o {@code null} si no tiñe. */
     static Color tint(String weather) {
         if (weather == null) {
             return null;

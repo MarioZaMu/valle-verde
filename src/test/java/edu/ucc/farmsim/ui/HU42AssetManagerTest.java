@@ -30,7 +30,7 @@ import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import org.junit.jupiter.api.Test;
 
-/** HU-42: sprites are loaded once through the {@link AssetManager}, and a missing one falls back to vectors. */
+/** HU-42: los sprites se cargan una sola vez mediante el {@link AssetManager}, y uno que falte recurre a vectores. */
 class HU42AssetManagerTest {
 
     private static final int RED = 0xFFFF0000;

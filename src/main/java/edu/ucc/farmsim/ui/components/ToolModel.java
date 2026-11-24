@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Which tool is selected and which seed the Sow tool uses. No Swing: the tool bar, the keys and the map all
- * share this one model, so they can never disagree. Listeners are told after every change.
+ * Qué herramienta está seleccionada y qué semilla usa la herramienta Sembrar. Sin Swing: la barra de herramientas, las
+ * teclas y el mapa comparten este único modelo, así que nunca pueden discrepar. Se avisa a los oyentes después de cada
+ * cambio.
  *
  * <p>Stories: HU-36.
  */
 public final class ToolModel {
 
-    /** Seed used by the Sow tool until the player picks another. */
+    /** Semilla que usa la herramienta Sembrar hasta que el jugador elige otra. */
     public static final String DEFAULT_SEED = "CARROT_SEED";
 
     private static final String SEED_SUFFIX = "_SEED";
@@ -20,27 +21,27 @@ public final class ToolModel {
     private String selectedSeed = DEFAULT_SEED;
     private final List<Runnable> listeners = new ArrayList<>();
 
-    /** The selected tool, or {@code null} when none is selected. */
+    /** La herramienta seleccionada, o {@code null} cuando no hay ninguna. */
     public Tool current() {
         return current;
     }
 
-    /** Selects a tool. */
+    /** Selecciona una herramienta. */
     public void select(Tool tool) {
         this.current = tool;
         fireChanged();
     }
 
-    /** Deselects the tool (Escape). */
+    /** Deselecciona la herramienta (Escape). */
     public void deselect() {
         this.current = null;
         fireChanged();
     }
 
     /**
-     * Handles a typed character: the digits 1 to 5 select a tool.
+     * Maneja un carácter escrito: los dígitos de 1 a 5 seleccionan una herramienta.
      *
-     * @return {@code true} if the character was a tool key
+     * @return {@code true} si el carácter era una tecla de herramienta
      */
     public boolean handleKey(char key) {
         for (Tool tool : Tool.values()) {
@@ -52,15 +53,15 @@ public final class ToolModel {
         return false;
     }
 
-    /** Id of the seed the Sow tool uses, for example {@code CARROT_SEED}. */
+    /** Id de la semilla que usa la herramienta Sembrar, por ejemplo {@code CARROT_SEED}. */
     public String selectedSeed() {
         return selectedSeed;
     }
 
     /**
-     * Chooses the seed the Sow tool uses.
+     * Elige la semilla que usa la herramienta Sembrar.
      *
-     * @throws IllegalArgumentException if the id is not a seed id
+     * @throws IllegalArgumentException si el id no es un id de semilla
      */
     public void selectSeed(String seedId) {
         if (seedId == null || !seedId.endsWith(SEED_SUFFIX)) {
@@ -70,8 +71,8 @@ public final class ToolModel {
         fireChanged();
     }
 
-    /** Registers something to run after every change of the selection. */
-    /** Forgets the chosen seed, for example when the last one has been sown (HU-37 · CA-3). */
+    /** Registra algo que se ejecuta después de cada cambio de la selección. */
+    /** Olvida la semilla elegida, por ejemplo cuando se sembró la última (HU-37 · CA-3). */
     public void clearSeed() {
         this.selectedSeed = null;
         fireChanged();

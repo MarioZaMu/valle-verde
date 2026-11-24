@@ -32,10 +32,10 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
-/** HU-50: a valley with the farm to the west and a village to the east, joined by a path (RN-04, RN-37, RN-40). */
+/** HU-50: un valle con la granja al oeste y una aldea al este, unidas por un camino (RN-04, RN-37, RN-40). */
 class HU50ValleyTest {
 
-    /** The first village column: everything east of it belongs to the village. */
+    /** La primera columna de la aldea: todo lo que está al este de ella pertenece a la aldea. */
     private static final int VILLAGE_COL = 26;
 
     @Test
@@ -128,7 +128,9 @@ class HU50ValleyTest {
         assertEquals(3, SaveCodec.SCHEMA_VERSION);
     }
 
-    /** The same game as version 2 wrote it: a list of 16 x 10 crops (the north-west corner of the valley). */
+    /**
+     * La misma partida como la escribía la versión 2: una lista de cultivos de 16 x 10 (la esquina noroeste del valle).
+     */
     private static SaveDocument asVersionTwo(SaveDocument document) {
         try {
             ObjectMapper json = new ObjectMapper();

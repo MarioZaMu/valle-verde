@@ -22,7 +22,7 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/** HU-11: weather of the day and forecast of tomorrow (RN-11, RN-13). */
+/** HU-11: clima del día y pronóstico de mañana (RN-11, RN-13). */
 class HU11WeatherAndForecastTest {
 
     private static final int DRAWS = 10_000;
@@ -38,10 +38,10 @@ class HU11WeatherAndForecastTest {
 
     @Test
     void HU11_ca1_firstDayIsSunnyAndTheForecastForDay2IsAlreadyDrawn() {
-        // When a new game starts
+                // Cuando empieza una partida nueva
         WeatherCycle weather = WeatherCycle.startNewGame(clock, new StateRandom(1));
 
-        // Then day 1 is Sunny (fixed) and a forecast for day 2 exists
+                // Entonces el día 1 es Sunny (fijo) y existe un pronóstico para el día 2
         assertEquals(Weather.SUNNY, weather.today());
         assertNotNull(weather.forecast());
         assertTrue(SPRING_WEATHER.contains(weather.forecast()), "a Spring forecast: " + weather.forecast());
@@ -49,26 +49,26 @@ class HU11WeatherAndForecastTest {
 
     @Test
     void HU11_ca2_theForecastBecomesTodaysWeatherAndANewForecastIsDrawn() {
-        // Given the forecast "Rainy"
+                // Dado el pronóstico «Rainy»
         WeatherCycle weather = WeatherCycle.startNewGame(clock, new StateRandom(2));
         weather.restore(Weather.SUNNY, Weather.RAINY);
 
-        // When the day ends (the calendar advances first, RN-03 step 5, then the weather, step 6)
+                // Cuando termina el día (primero avanza el calendario, RN-03 paso 5, luego el clima, paso 6)
         clock.advanceDay();
         weather.advance(clock, new StateRandom(3));
 
-        // Then today is Rainy and there is a new, visible forecast
+                // Entonces hoy es Rainy y hay un nuevo pronóstico visible
         assertEquals(Weather.RAINY, weather.today());
         assertNotNull(weather.forecast());
     }
 
     @Test
     void HU11_ca3_sameSeedGivesTheSameWeatherForTheWholeYear() {
-        // Given two games with the same seed
+                // Dadas dos partidas con la misma semilla
         List<Weather> first = weatherOfAYear(12345L);
         List<Weather> second = weatherOfAYear(12345L);
 
-        // Then the 112-day sequences are identical day by day
+                // Entonces las secuencias de 112 días son idénticas día por día
         assertEquals(112, first.size());
         assertEquals(first, second);
         assertTrue(!first.equals(weatherOfAYear(54321L)), "a different seed should give a different year");
@@ -76,7 +76,7 @@ class HU11WeatherAndForecastTest {
 
     @Test
     void HU11_ca4_probabilitiesFollowTheSeasonalTables() {
-        // Spring never brings Drought, Frost or Snow
+                // La Primavera nunca trae Drought, Frost ni Snow
         Map<Weather, Integer> spring = draw(new SeasonalWeatherStrategy(Season.SPRING), 10);
         assertEquals(0, spring.get(Weather.DROUGHT) + spring.get(Weather.FROST) + spring.get(Weather.SNOWY));
 
@@ -85,13 +85,13 @@ class HU11WeatherAndForecastTest {
         assertEquals(0, winter.get(Weather.RAINY));
         assertTrue(winter.get(Weather.SNOWY) > 0);
 
-        // Autumn has Frost only on days 22 to 28
+                // El Otoño tiene Frost solo los días 22 a 28
         SeasonalWeatherStrategy autumn = new SeasonalWeatherStrategy(Season.AUTUMN);
         assertEquals(0, draw(autumn, 21).get(Weather.FROST));
         assertTrue(draw(autumn, 22).get(Weather.FROST) > 0);
         assertTrue(draw(autumn, 28).get(Weather.FROST) > 0);
 
-        // Summer is Sunny about 60 % of the time (±3 %)
+                // El Verano es Sunny cerca del 60 % del tiempo (±3 %)
         double sunny = draw(new SeasonalWeatherStrategy(Season.SUMMER), 10).get(Weather.SUNNY) / (double) DRAWS;
         assertTrue(sunny >= 0.57 && sunny <= 0.63, "sunny ratio in Summer: " + sunny);
     }
@@ -176,7 +176,7 @@ class HU11WeatherAndForecastTest {
     @Test
     void HU11_dateOfTheForecastIsTheDayAfterTheCurrentOne() {
         clock.restore(new GameDate(1, Season.WINTER, GameRules.DAYS_PER_SEASON));
-        // The forecast of the last day of Winter is drawn with the Spring table of the next year
+                // El pronóstico del último día de Invierno se sortea con la tabla de Primavera del año siguiente
         WeatherCycle cycle = WeatherCycle.startNewGame(clock, new StateRandom(5));
         assertTrue(SPRING_WEATHER.contains(cycle.forecast()));
     }

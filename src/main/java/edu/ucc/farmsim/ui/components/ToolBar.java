@@ -12,8 +12,9 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 
 /**
- * The tool bar: one toggle button per tool (labelled with its key) and the seed chooser of the Sow tool.
- * It reads and writes the shared {@link ToolModel}, so the keys and the buttons always agree.
+ * La barra de herramientas: un botón de alternancia por herramienta (con la etiqueta de su tecla) y el selector de
+ * semilla de la herramienta Sembrar. Lee y escribe el {@link ToolModel} compartido, de modo que las teclas y los
+ * botones siempre coinciden.
  *
  * <p>Stories: HU-36, HU-48.
  */
@@ -28,19 +29,19 @@ public final class ToolBar extends JPanel {
     private boolean updating;
 
     /**
-     * Builds the bar.
+     * Construye la barra.
      *
-     * @param model the shared tool selection
+     * @param model la selección de herramienta compartida
      */
     public ToolBar(ToolModel model) {
         this(model, AssetManager.shared());
     }
 
     /**
-     * Builds the bar with icons from the given assets (text only if they are missing).
+     * Construye la barra con íconos de los recursos dados (solo texto si faltan).
      *
-     * @param model  the shared tool selection
-     * @param assets where the tool icons come from
+     * @param model  la selección de herramienta compartida
+     * @param assets de donde vienen los íconos de las herramientas
      */
     public ToolBar(ToolModel model, AssetManager assets) {
         super(new FlowLayout(FlowLayout.CENTER, 6, 2));
@@ -87,7 +88,7 @@ public final class ToolBar extends JPanel {
                 buttons[tool.ordinal()].setSelected(tool == current);
             }
             if (current == null) {
-                // the button group keeps one selected; clear it explicitly
+                                // el grupo de botones mantiene uno seleccionado; límpialo explícitamente
                 for (JToggleButton button : buttons) {
                     button.getModel().setGroup(null);
                     button.setSelected(false);

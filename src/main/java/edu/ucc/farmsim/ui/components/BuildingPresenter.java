@@ -10,10 +10,10 @@ import edu.ucc.farmsim.ui.theme.Texts;
 import java.util.List;
 
 /**
- * The logic of the building panel, without any Swing (HU-20, HU-22, HU-23): the animals to list, which buttons
- * are enabled and the messages after feeding, collecting or curing. The dialog only draws it.
+ * La lógica del panel del edificio, sin nada de Swing (HU-20, HU-22, HU-23): los animales que se listan, qué botones
+ * están habilitados y los mensajes después de alimentar, recoger o curar. El diálogo solo la dibuja.
  *
- * <p>Curing is done here and not with a tool of the bar (RN-27).
+ * <p>Curar se hace aquí y no con una herramienta de la barra (RN-27).
  *
  * <p>Stories: HU-20, HU-22, HU-23.
  */
@@ -26,10 +26,10 @@ public final class BuildingPresenter {
     private BuildingView building;
 
     /**
-     * Creates the presenter and loads the building.
+     * Crea el presentador y carga el edificio.
      *
-     * @param game       the game the building belongs to
-     * @param buildingId id of the building
+     * @param game       la partida a la que pertenece el edificio
+     * @param buildingId id del edificio
      */
     public BuildingPresenter(GameCommands game, int buildingId) {
         this.game = game;
@@ -37,7 +37,7 @@ public final class BuildingPresenter {
         refresh();
     }
 
-    /** Loads the building again. */
+    /** Carga el edificio otra vez. */
     public void refresh() {
         Result<BuildingsView> all = game.buildings();
         if (all.isOk()) {
@@ -46,12 +46,12 @@ public final class BuildingPresenter {
         }
     }
 
-    /** The building, or {@code null} if it could not be loaded. */
+    /** El edificio, o {@code null} si no se pudo cargar. */
     public BuildingView building() {
         return building;
     }
 
-    /** Title of the panel, for example {@code Gallinero 1 — 2/4 animales}. */
+    /** Título del panel, por ejemplo {@code Gallinero 1 · 2/4 animales}. */
     public String title() {
         if (building == null) {
             return Texts.BUILDING_TITLE;
@@ -60,33 +60,33 @@ public final class BuildingPresenter {
                 + building.capacity() + " animales";
     }
 
-    /** The animals of the building. */
+    /** Los animales del edificio. */
     public List<AnimalView> animals() {
         return building == null ? List.of() : building.animals();
     }
 
-    /** The row of an animal as the table shows it. */
+    /** La fila de un animal tal como la muestra la tabla. */
     public Object[] row(AnimalView animal) {
         return new Object[] {animal.name(), animal.conditionName(), animal.daysWithoutFeed(),
                 animal.fedToday() ? Texts.YES : Texts.NO, animal.pending()};
     }
 
-    /** True if some animal can eat and has not eaten today. */
+    /** Verdadero si algún animal puede comer y no ha comido hoy. */
     public boolean canFeed() {
         return animals().stream().anyMatch(a -> !SICK.equals(a.condition()) && !a.fedToday());
     }
 
-    /** True if the building has products waiting. */
+    /** Verdadero si el edificio tiene productos esperando. */
     public boolean canCollect() {
         return building != null && building.pendingProducts() > 0;
     }
 
-    /** True if the animal at the position is sick. */
+    /** Verdadero si el animal de la posición está enfermo. */
     public boolean canCure(int animalIndex) {
         return animalIndex >= 0 && animalIndex < animals().size() && SICK.equals(animals().get(animalIndex).condition());
     }
 
-    /** Feeds the building and answers the message to show. */
+    /** Alimenta el edificio y responde el mensaje que se muestra. */
     public String feed() {
         Result<BuildingActionView> result = game.feed(buildingId);
         refresh();
@@ -97,7 +97,7 @@ public final class BuildingPresenter {
         return view.notice() != null ? view.notice() : "Alimentaste a " + view.amount() + " animal(es).";
     }
 
-    /** Collects the products and answers the message to show. */
+    /** Recoge los productos y responde el mensaje que se muestra. */
     public String collect() {
         Result<BuildingActionView> result = game.collect(buildingId);
         refresh();
@@ -108,7 +108,7 @@ public final class BuildingPresenter {
         return view.notice() != null ? view.notice() : "Recogiste " + view.amount() + " × " + product(view) + ".";
     }
 
-    /** Cures the animal at the position and answers the message to show. */
+    /** Cura al animal de la posición y responde el mensaje que se muestra. */
     public String cure(int animalIndex) {
         Result<BuildingActionView> result = game.cure(buildingId, animalIndex);
         refresh();

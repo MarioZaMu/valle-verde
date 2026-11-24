@@ -17,7 +17,7 @@ import edu.ucc.farmsim.support.GameFixtures;
 import edu.ucc.farmsim.support.TestApp;
 import org.junit.jupiter.api.Test;
 
-/** HU-04: harvest a mature crop into the inventory (RN-02, RN-10, RN-15). */
+/** HU-04: cosechar un cultivo maduro hacia el inventario (RN-02, RN-10, RN-15). */
 class HU04HarvestCropTest {
 
     private static final int COL = GameFixtures.SOIL_COL;
@@ -31,13 +31,13 @@ class HU04HarvestCropTest {
 
     @Test
     void HU04_ca1_harvestingAMatureCropGivesOneUnitFreesThePlotAndCostsTwoEnergy() {
-        // Given a mature carrot, room in the inventory and 100 energy
+                // Dado una zanahoria madura, lugar en el inventario y 100 de energía
         TestApp app = gameWithAMatureCarrot();
 
-        // When the player harvests it
+                // Cuando el jugador la cosecha
         Result<PlotView> result = app.controller.harvest(COL, ROW);
 
-        // Then the player receives 1 carrot, the plot is free and energy is 98
+                // Entonces el jugador recibe 1 zanahoria, la parcela queda libre y la energía es 98
         assertTrue(result.isOk(), String.valueOf(result.message()));
         assertEquals(1, app.state().inventory().count(ItemType.CARROT));
         assertNull(app.state().farm().plotAt(COL, ROW).crop());
@@ -47,15 +47,15 @@ class HU04HarvestCropTest {
 
     @Test
     void HU04_ca2_harvestingWithAFullInventoryIsRejectedAndTheCropStaysMature() {
-        // Given every inventory slot holds a full stack of something else (critical test 2)
+                // Dado que cada casilla del inventario tiene una pila llena de otra cosa (prueba crítica 2)
         TestApp app = gameWithAMatureCarrot();
         app.state().inventory().restoreFrom(new edu.ucc.farmsim.domain.economy.InventorySnapshot(24,
                 java.util.Collections.nCopies(24, new edu.ucc.farmsim.domain.economy.Inventory.ItemStack(ItemType.HAY, 99))));
 
-        // When the player tries to harvest
+                // Cuando el jugador intenta cosechar
         Result<PlotView> result = app.controller.harvest(COL, ROW);
 
-        // Then it is rejected, the crop is still mature and no energy was spent
+                // Entonces se rechaza, el cultivo sigue maduro y no se gastó energía
         assertFalse(result.isOk());
         assertEquals(ErrorCode.INVENTARIO_LLENO, result.code());
         assertEquals("Inventario lleno: libera espacio o construye un Almacén.", result.message());
@@ -66,14 +66,14 @@ class HU04HarvestCropTest {
 
     @Test
     void HU04_ca3_harvestingAnImmatureCropIsRejectedSayingHowManyDaysAreMissing() {
-        // Given a carrot in Sprout stage with d = 1 and T = 4
+                // Dada una zanahoria en etapa Sprout con d = 1 y T = 4
         TestApp app = TestApp.startedGame();
         GameFixtures.plant(app.state(), COL, ROW, CropType.CARROT, 1);
 
-        // When the player tries to harvest
+                // Cuando el jugador intenta cosechar
         Result<PlotView> result = app.controller.harvest(COL, ROW);
 
-        // Then it is rejected: 3 days are missing, and no energy was spent
+                // Entonces se rechaza: faltan 3 días, y no se gastó energía
         assertEquals(ErrorCode.NO_MADURO, result.code());
         assertEquals("El cultivo aún no está maduro: faltan 3 días.", result.message());
         assertEquals(100, app.state().energy().current());
@@ -81,15 +81,15 @@ class HU04HarvestCropTest {
 
     @Test
     void HU04_ca4_harvestCompletesAStackOfNinetyEightAndIsRejectedWhenItIsFull() {
-        // Given a stack of 98 carrots and every other slot full
+                // Dada una pila de 98 zanahorias y todas las demás casillas llenas
         TestApp app = gameWithAMatureCarrot();
         GameFixtures.fillInventoryExcept(app.state(), ItemType.CARROT, 98);
 
-        // When a carrot is harvested, the stack reaches 99
+                // Cuando se cosecha una zanahoria, la pila llega a 99
         assertTrue(app.controller.harvest(COL, ROW).isOk());
         assertEquals(99, app.state().inventory().count(ItemType.CARROT));
 
-        // And with a full stack of 99 the next harvest is rejected
+                // Y con una pila llena de 99 la siguiente cosecha se rechaza
         GameFixtures.plant(app.state(), COL, ROW, CropType.CARROT, 4);
         Result<PlotView> second = app.controller.harvest(COL, ROW);
         assertEquals(ErrorCode.INVENTARIO_LLENO, second.code());

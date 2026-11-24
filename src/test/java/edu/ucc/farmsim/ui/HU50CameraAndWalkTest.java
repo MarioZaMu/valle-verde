@@ -32,7 +32,7 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.Test;
 
-/** HU-50 on the screen: 48 px plots, a camera that follows the avatar, tall people and a walk without pauses. */
+/** HU-50 en pantalla: parcelas de 48 px, una cámara que sigue al avatar, personas altas y una caminata sin pausas. */
 class HU50CameraAndWalkTest {
 
     private static final int COLS = 48;

@@ -5,23 +5,23 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Spanish message templates for every {@link ErrorCode} (RN-35). Placeholders use {@code %s} and {@code %d}.
- * A test compares them with the RN-35 table so the two never drift apart.
+ * Plantillas de mensajes en español para cada {@link ErrorCode} (RN-35). Los marcadores usan {@code %s} y {@code %d}.
+ * Una prueba las compara con la tabla de RN-35 para que nunca se desfasen.
  *
  * <p>Stories: HU-08.
  */
 public final class Messages {
 
-    /** Shown when feeding a building where no animal needs food. */
+    /** Se muestra al alimentar un edificio donde ningún animal necesita comida. */
     public static final String NOTHING_TO_FEED = "No hay animales por alimentar.";
 
-    /** Shown when collecting from a building with nothing waiting. */
+    /** Se muestra al recoger de un edificio sin nada esperando. */
     public static final String NOTHING_TO_COLLECT = "No hay productos que recoger.";
 
-    /** Shown when curing an animal that is not sick. */
+    /** Se muestra al curar a un animal que no está enfermo. */
     public static final String NOT_SICK = "Este animal no está enfermo.";
 
-    /** The only line of the day summary when nothing happened. */
+    /** La única línea del resumen del día cuando no pasó nada. */
     public static final String NO_NEWS = "Sin novedades";
 
     private static final Locale SPANISH = Locale.forLanguageTag("es");
@@ -61,10 +61,10 @@ public final class Messages {
     }
 
     private Messages() {
-        // static helpers only
+                // solo métodos de utilidad estáticos
     }
 
-    /** The raw template of a code, with its placeholders. */
+    /** La plantilla en bruto de un código, con sus marcadores. */
     public static String template(ErrorCode code) {
         String template = TEMPLATES.get(code);
         if (template == null) {
@@ -73,7 +73,7 @@ public final class Messages {
         return template;
     }
 
-    /** The message of a code with its arguments filled in. */
+    /** El mensaje de un código con sus argumentos ya rellenados. */
     public static String of(ErrorCode code, Object... args) {
         return String.format(SPANISH, template(code), args);
     }

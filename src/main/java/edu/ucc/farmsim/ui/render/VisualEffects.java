@@ -12,35 +12,35 @@ import java.util.Random;
 import java.util.function.LongSupplier;
 
 /**
- * Everything that moves or changes colour on the map and is not the game: the palette of the season, the rain
- * and the snow, the night tint of the end-of-day transition, the frames of the animals and the growth of a crop
- * that changes stage (HU-40, HU-41) and the walk of the avatar between two plots (HU-45). It only receives what the screen already knows (the season and weather of
- * the events, the map views) and never calls the game, so switching it off cannot change the state (RN-08,
- * RN-25). It takes its clock from outside and has no Swing, so it is tested without waiting.
+ * Todo lo que se mueve o cambia de color en el mapa y no es el juego: la paleta de la estación, la lluvia y la nieve,
+ * el tinte de noche de la transición de fin de día, los cuadros de los animales y el crecimiento de un cultivo que
+ * cambia de etapa (HU-40, HU-41) y la caminata del avatar entre dos parcelas (HU-45). Solo recibe lo que la pantalla ya
+ * sabe (la estación y el clima de los eventos, las vistas del mapa) y nunca llama al juego, así que apagarlo no puede
+ * cambiar el estado (RN-08, RN-25). Toma su reloj de afuera y no tiene Swing, así que se prueba sin esperar.
  *
  * <p>Stories: HU-40, HU-41, HU-45, HU-48, HU-50.
  */
 public final class VisualEffects {
 
-    /** Milliseconds the night tint lasts after a day ends. */
+    /** Milisegundos que dura el tinte de noche después de que termina un día. */
     public static final int TRANSITION_MS = 900;
 
-    /** Milliseconds a crop takes to grow into its new stage (HU-41 allows 500). */
+    /** Milisegundos que tarda un cultivo en crecer hasta su nueva etapa (HU-41 permite 500). */
     public static final int GROWTH_MS = 400;
 
-    /** Milliseconds each animal frame is shown. */
+    /** Milisegundos que se muestra cada cuadro de animal. */
     public static final int FRAME_MS = 250;
 
-    /** Frames of the animal animation. */
+    /** Cuadros de la animación de los animales. */
     public static final int ANIMAL_FRAMES = 3;
 
-    /** How long the avatar takes to walk from one plot to the next, in milliseconds (HU-45 · CA-5). */
+    /** Cuánto tarda el avatar en caminar de una parcela a la siguiente, en milisegundos (HU-45 · CA-5). */
     public static final int STEP_MS = 180;
 
-    /** Frames of the avatar's walk; at rest it shows the first one. */
+    /** Cuadros de la caminata del avatar; en reposo muestra el primero. */
     public static final int AVATAR_FRAMES = 3;
 
-    /** Most particles on screen, so a frame stays cheap. */
+    /** Máximo de partículas en pantalla, para que un cuadro siga siendo barato. */
     public static final int MAX_PARTICLES = 120;
 
     private static final int RAIN_COUNT = 110;
@@ -67,22 +67,22 @@ public final class VisualEffects {
     private long walkingSince = -1;
 
     /**
-     * Creates the effects.
+     * Crea los efectos.
      *
-     * @param clock  current time in milliseconds
-     * @param random where the particles start
+     * @param clock  hora actual en milisegundos
+     * @param random de donde parten las partículas
      */
     public VisualEffects(LongSupplier clock, Random random) {
         this.clock = clock;
         this.random = random;
     }
 
-    /** Whether the effects and animations are on. */
+    /** Si los efectos y las animaciones están activados. */
     public boolean isEnabled() {
         return enabled;
     }
 
-    /** Switches them on or off; off, the map is drawn plainly and nothing moves. */
+    /** Los activa o desactiva; desactivados, el mapa se dibuja simple y nada se mueve. */
     public void setEnabled(boolean on) {
         this.enabled = on;
         if (on) {
@@ -95,31 +95,31 @@ public final class VisualEffects {
     }
 
     /**
-     * Switches the ambient life on or off: water that ripples, trees that sway in the wind, animals that wander,
-     * clouds, butterflies and leaves (HU-48). With it on, the view keeps drawing frames while it is shown.
+     * Activa o desactiva la vida ambiental: agua que ondea, árboles que se mecen con el viento, animales que deambulan,
+     * nubes, mariposas y hojas (HU-48). Activada, la vista sigue dibujando cuadros mientras se muestra.
      */
     public void setAmbient(boolean on) {
         this.ambient = on;
     }
 
-    /** True when the ambient life is on and the effects are enabled. */
+    /** Verdadero cuando la vida ambiental está activada y los efectos están habilitados. */
     public boolean isAmbient() {
         return ambient && enabled;
     }
 
-    /** The current time of the effects clock, in milliseconds. */
+    /** La hora actual del reloj de los efectos, en milisegundos. */
     public long time() {
         return clock.getAsLong();
     }
 
-    /** The season id and weather id the world is in now. */
+    /** El id de estación y el id de clima en que está el mundo ahora. */
     public void onWorld(String newSeason, String newWeather) {
         this.season = newSeason;
         this.weather = newWeather;
         rebuildParticles();
     }
 
-    /** A game started or was loaded: forget what the previous one looked like. */
+    /** Empezó o se cargó una partida: olvida cómo se veía la anterior. */
     public void reset() {
         stages.clear();
         grownAt.clear();
@@ -130,12 +130,12 @@ public final class VisualEffects {
         stepStart = -1;
     }
 
-    /** The state already advanced to the next day; the night tint starts now. */
+    /** El estado ya avanzó al día siguiente; el tinte de noche empieza ahora. */
     public void onDayEnded() {
         dayEndedAt = clock.getAsLong();
     }
 
-    /** The map as the game has it now: a crop whose stage changed starts its growth animation. */
+    /** El mapa tal como lo tiene ahora la partida: un cultivo cuya etapa cambió empieza su animación de crecimiento. */
     public void onMap(MapView map) {
         long now = clock.getAsLong();
         for (PlotView plot : map.plots()) {
@@ -157,7 +157,7 @@ public final class VisualEffects {
         onAvatar(map.avatar(), now);
     }
 
-    /** A step to a neighbour plot starts the walk; a jump (a game loaded) just puts the avatar there. */
+    /** Un paso a una parcela vecina empieza la caminata; un salto (una partida cargada) solo pone al avatar allí. */
     private void onAvatar(AvatarView avatar, long now) {
         if (avatar == null) {
             avatarAt = null;
@@ -174,12 +174,12 @@ public final class VisualEffects {
         avatarAt = here;
     }
 
-    /** True while the avatar is walking from one plot to the next. */
+    /** Verdadero mientras el avatar camina de una parcela a la siguiente. */
     public boolean isWalking() {
         return enabled && stepStart >= 0 && clock.getAsLong() - stepStart < STEP_MS;
     }
 
-    /** Which frame of the walk the avatar shows: one of {@link #AVATAR_FRAMES} while it walks, 0 at rest. */
+    /** Qué cuadro de la caminata muestra el avatar: uno de {@link #AVATAR_FRAMES} mientras camina, 0 en reposo. */
     public int avatarFrame() {
         if (!isWalking()) {
             return 0;
@@ -188,14 +188,14 @@ public final class VisualEffects {
         return (int) ((walked * AVATAR_FRAMES / STEP_MS) % AVATAR_FRAMES);
     }
 
-    /** How far the avatar is on its way from the plot it left, from 0 (still there) to 1 (arrived). */
+    /** Cuánto ha avanzado el avatar en el camino desde la parcela que dejó, de 0 (todavía allí) a 1 (llegó). */
     public double avatarProgress() {
         return isWalking() ? (clock.getAsLong() - stepStart) / (double) STEP_MS : 1.0;
     }
 
     /**
-     * Where the avatar is drawn now, in plots: between the plot it left and the one it goes to while it walks,
-     * on its plot at rest; {@code null} without avatar. The camera follows this point (RN-40).
+     * Dónde se dibuja ahora el avatar, en parcelas: entre la parcela que dejó y a la que va mientras camina, sobre su
+     * parcela en reposo; {@code null} sin avatar. La cámara sigue este punto (RN-40).
      */
     public double[] avatarPosition() {
         if (avatarAt == null) {
@@ -209,22 +209,22 @@ public final class VisualEffects {
             avatarFrom[1] + (avatarAt[1] - avatarFrom[1]) * t};
     }
 
-    /** The plot {column, row} the avatar is walking from, or {@code null} at rest. */
+    /** La parcela {columna, fila} desde la que camina el avatar, o {@code null} en reposo. */
     public int[] avatarFrom() {
         return isWalking() ? avatarFrom.clone() : null;
     }
 
-    /** The season id shown. */
+    /** El id de la estación que se muestra. */
     public String season() {
         return season;
     }
 
-    /** The weather id shown. */
+    /** El id del clima que se muestra. */
     public String weather() {
         return weather;
     }
 
-    /** How dark the night tint is now, from 0 to 1; 0 when off or outside the transition. */
+    /** Qué tan oscuro es ahora el tinte de noche, de 0 a 1; 0 cuando está apagado o fuera de la transición. */
     public float nightAlpha() {
         if (!enabled || dayEndedAt < 0) {
             return 0f;
@@ -233,12 +233,12 @@ public final class VisualEffects {
         return progress >= 1.0 || progress < 0 ? 0f : (float) Math.sin(Math.PI * progress);
     }
 
-    /** The particles to draw now. */
+    /** Las partículas que se dibujan ahora. */
     public List<Particle> particles() {
         return Collections.unmodifiableList(particles);
     }
 
-    /** Moves the particles according to the time since the last step. */
+    /** Mueve las partículas según el tiempo desde el último paso. */
     public void step() {
         long now = clock.getAsLong();
         double seconds = lastStep < 0 ? FRAME_MS / 1000.0 / 8 : Math.min(MAX_STEP_SECONDS, (now - lastStep) / 1000.0);
@@ -248,7 +248,7 @@ public final class VisualEffects {
         }
     }
 
-    /** Which frame, from 0 to {@link #ANIMAL_FRAMES} - 1, the animal at the given place of its building shows. */
+    /** Qué cuadro, de 0 a {@link #ANIMAL_FRAMES} - 1, muestra el animal del lugar dado de su edificio. */
     public int animalFrame(int animalIndex) {
         if (!enabled) {
             return 0;
@@ -256,7 +256,7 @@ public final class VisualEffects {
         return (int) (((clock.getAsLong() / FRAME_MS) + animalIndex) % ANIMAL_FRAMES);
     }
 
-    /** Size of the crop at a plot, from about one half up to 1 while it grows into its new stage. */
+    /** Tamaño del cultivo en una parcela, de aproximadamente la mitad hasta 1 mientras crece hasta su nueva etapa. */
     public float cropScale(int col, int row) {
         Long start = grownAt.get(row * 1000 + col);
         if (!enabled || start == null) {
@@ -270,7 +270,7 @@ public final class VisualEffects {
         return (float) (START_SCALE + (1 - START_SCALE) * eased);
     }
 
-    /** True while something is moving, so the view needs to keep drawing frames. */
+    /** Verdadero mientras algo se mueve, de modo que la vista necesita seguir dibujando cuadros. */
     public boolean needsFrames() {
         if (!enabled) {
             return false;

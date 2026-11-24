@@ -23,7 +23,7 @@ import java.util.List;
 import javax.swing.JToggleButton;
 import org.junit.jupiter.api.Test;
 
-/** HU-37: the inventory as a grid of slots, with the seed choice (RN-15, RN-34). */
+/** HU-37: el inventario como una grilla de casillas, con la elección de semilla (RN-15, RN-34). */
 class HU37InventoryGridTest {
 
     private static InventoryModel modelOf(TestApp app, ToolModel tools) {
@@ -62,7 +62,7 @@ class HU37InventoryGridTest {
     @Test
     void HU37_ca2_aWarehouseGivesAGridOf36Slots() {
         TestApp app = TestApp.startedGame();
-        // (the inventory view reports whatever capacity the game has)
+                // (la vista del inventario informa la capacidad que tenga la partida)
         var inventory = new edu.ucc.farmsim.domain.economy.Inventory(36);
         inventory.add(ItemType.CARROT_SEED, 1);
         app.state().inventory().restoreFrom(inventory.snapshot());
@@ -74,21 +74,21 @@ class HU37InventoryGridTest {
 
     @Test
     void HU37_ca3_clickingASeedChoosesItForTheSowToolAndAnEmptyAmountClearsTheChoice() {
-        // Given the default carrot seed chosen
+                // Dada la semilla de zanahoria predeterminada elegida
         TestApp app = TestApp.startedGame();
         ToolModel tools = new ToolModel();
         InventoryModel model = modelOf(app, tools);
         assertTrue(model.isSelected(0));
 
-        // When the player clicks the potato slot
+                // Cuando el jugador hace clic en la casilla de la papa
         model.select(1);
 
-        // Then potato is chosen and marked
+                // Entonces la papa queda elegida y marcada
         assertEquals("POTATO_SEED", tools.selectedSeed());
         assertTrue(model.isSelected(1));
         assertFalse(model.isSelected(0));
 
-        // And when the last potato seed is sown, the choice is cleared
+                // Y cuando se siembra la última semilla de papa, la elección se borra
         app.state().inventory().remove(ItemType.POTATO_SEED, 5);
         app.bus.publish(new edu.ucc.farmsim.application.event.GameEvent.InventoryChanged());
         assertNull(tools.selectedSeed());

@@ -1,7 +1,7 @@
 package edu.ucc.farmsim.domain.crop;
 
 /**
- * Growth stage of a crop (RN-08), plus the terminal stage of a dead crop.
+ * Etapa de crecimiento de un cultivo (RN-08), más la etapa final de un cultivo muerto.
  *
  * <p>Stories: HU-01.
  */

@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * What the inventory grid shows (HU-37), without any Swing: one cell per slot, which seed is chosen, and the
- * click that chooses a seed for the Sow tool. It listens to the game events and reloads the inventory when it
- * changes; if the chosen seed runs out, the choice is cleared (HU-37 · CA-3).
+ * Lo que muestra la grilla del inventario (HU-37), sin nada de Swing: una celda por casilla, cuál semilla está elegida
+ * y el clic que elige una semilla para la herramienta Sembrar. Escucha los eventos del juego y recarga el inventario
+ * cuando cambia; si la semilla elegida se agota, la elección se borra (HU-37 · CA-3).
  *
  * <p>Pattern: Observer — Role: ConcreteObserver (keeps the inventory grid up to date from game events)
  *
@@ -21,15 +21,15 @@ import java.util.List;
 public final class InventoryModel implements GameListener {
 
     /**
-     * One cell of the grid.
+     * Una celda de la grilla.
      *
-     * @param itemId item id, or {@code null} for an empty slot
-     * @param name   Spanish name, or an empty text
-     * @param amount units in the slot (0 when empty)
+     * @param itemId id del objeto, o {@code null} para una casilla vacía
+     * @param name   nombre en español, o un texto vacío
+     * @param amount unidades en la casilla (0 si está vacía)
      */
     public record Cell(String itemId, String name, int amount) {
 
-        /** True for a slot without items. */
+        /** Verdadero para una casilla sin objetos. */
         public boolean isEmpty() {
             return itemId == null;
         }
@@ -43,10 +43,10 @@ public final class InventoryModel implements GameListener {
     private InventoryView view = new InventoryView(0, List.of());
 
     /**
-     * Creates the model.
+     * Crea el modelo.
      *
-     * @param game  where the inventory comes from
-     * @param tools the shared tool selection, whose chosen seed this model changes
+     * @param game  de dónde viene el inventario
+     * @param tools la selección de herramienta compartida, cuya semilla elegida cambia este modelo
      */
     public InventoryModel(GameCommands game, ToolModel tools) {
         this.game = game;
@@ -60,7 +60,7 @@ public final class InventoryModel implements GameListener {
         }
     }
 
-    /** Loads the inventory again and fixes the seed choice if that seed is gone. */
+    /** Carga el inventario otra vez y corrige la elección de semilla si esa semilla ya no está. */
     public void refresh() {
         Result<InventoryView> result = game.inventory();
         if (result.isOk()) {
@@ -73,12 +73,12 @@ public final class InventoryModel implements GameListener {
         }
     }
 
-    /** Number of slots of the grid (24, or 36 with a warehouse). */
+    /** Número de casillas de la grilla (24, o 36 con un almacén). */
     public int slotCount() {
         return view.capacity();
     }
 
-    /** The cell at a slot index, from 0. */
+    /** La celda de un índice de casilla, desde 0. */
     public Cell cell(int index) {
         if (index < 0 || index >= view.capacity()) {
             throw new IllegalArgumentException("no such slot: " + index);
@@ -90,13 +90,16 @@ public final class InventoryModel implements GameListener {
         return new Cell(null, "", 0);
     }
 
-    /** Whether the cell holds the seed the Sow tool will use. */
+    /** Si la celda contiene la semilla que usará la herramienta Sembrar. */
     public boolean isSelected(int index) {
         Cell cell = cell(index);
         return !cell.isEmpty() && cell.itemId().equals(tools.selectedSeed());
     }
 
-    /** A click on a cell: if it holds a seed, the Sow tool uses it from now on. Other cells do nothing. */
+    /**
+     * Un clic en una celda: si contiene una semilla, la herramienta Sembrar la usa desde ahora. Las otras celdas no
+     * hacen nada.
+     */
     public void select(int index) {
         Cell cell = cell(index);
         if (!cell.isEmpty() && cell.itemId().endsWith(SEED_SUFFIX)) {
@@ -105,7 +108,7 @@ public final class InventoryModel implements GameListener {
         }
     }
 
-    /** Registers something to run when the grid must be redrawn. */
+    /** Registra algo que se ejecuta cuando hay que redibujar la grilla. */
     public void addChangeListener(Runnable listener) {
         listeners.add(listener);
     }

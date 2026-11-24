@@ -21,13 +21,12 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
 
 /**
- * Stores each game as a document of the {@code partidas} collection, one per slot (RN-31, DT-21). Saving
- * replaces the whole document in one operation, so a failed write leaves the previous one intact. Every
- * technical failure of MongoDB becomes a {@link SaveStorageException}, so nothing above this class knows about
- * MongoDB.
+ * Guarda cada partida como un documento de la colección {@code partidas}, uno por ranura (RN-31, DT-21). Guardar
+ * reemplaza el documento completo en una sola operación, así que una escritura fallida deja intacto el anterior. Todo
+ * fallo técnico de MongoDB se convierte en una {@link SaveStorageException}, de modo que nada por encima de esta clase
+ * sabe de MongoDB.
  *
- * <p>The {@code no-mongo} profile leaves it out, so the tests of the API and the client run without a
- * database.
+ * <p>El perfil {@code no-mongo} lo deja fuera, para que las pruebas de la API y del cliente corran sin base de datos.
  *
  * <p>Stories: HU-29, HU-30, HU-31, HU-32, HU-33.
  */
@@ -42,9 +41,9 @@ public class MongoSaveRepository implements SaveRepository {
     private final SaveCodec codec = new SaveCodec();
 
     /**
-     * Creates the repository.
+     * Crea el repositorio.
      *
-     * @param mongo Spring Data's access to the database configured in {@code valleverde.mongo.uri}
+     * @param mongo el acceso de Spring Data a la base configurada en {@code valleverde.mongo.uri}
      */
     public MongoSaveRepository(MongoTemplate mongo) {
         this.mongo = mongo;

@@ -31,8 +31,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 /**
- * The real Swing screens, driven by the real {@link RemoteGameClient}, against the real server: what the
- * player sees after pressing the buttons is the same as with the in-process controller (DT-17, DT-19).
+ * Las pantallas reales de Swing, manejadas por el {@link RemoteGameClient} real, contra el servidor real: lo que ve el
+ * jugador después de pulsar los botones es lo mismo que con el controlador en proceso (DT-17, DT-19).
  */
 @SpringBootTest(classes = ServerApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("no-mongo")
@@ -53,15 +53,16 @@ class RemoteScreensIntegrationTest {
         RemoteGameClient client = new RemoteGameClient(URI.create("http://127.0.0.1:" + port), clientBus);
         ScreenRouter router = new ScreenRouter(client, clientBus, () -> TestApp.SEED);
 
-        // When the player presses "Nueva partida"
+                // Cuando el jugador pulsa «Nueva partida»
         button(router, "Nueva partida").doClick();
         flush();
 
-        // Then the server holds the game and the client's top bar shows it, refreshed by the GameStarted event
+                // Entonces el servidor tiene la partida y la barra superior del cliente la muestra, actualizada por el evento
+        // GameStarted
         assertTrue(serverSession.hasGame());
         assertTrue(labels(router).contains("500 m"), labels(router).toString());
 
-        // When the player picks the Sow tool and clicks a soil plot
+                // Cuando el jugador elige la herramienta Sembrar y hace clic en una parcela de tierra
         button(router, "1 Sembrar").doClick();
         MapPanel map = first(router, MapPanel.class);
         map.setSize(1024, 600);
@@ -69,16 +70,17 @@ class RemoteScreensIntegrationTest {
         map.handleClick(cell.x + 5, cell.y + 5);
         flush();
 
-        // Then the crop exists on the server and the client's map and energy bar were refreshed by events
+                // Entonces el cultivo existe en el servidor y el mapa y la barra de energía del cliente se actualizaron por
+        // eventos
         assertTrue(serverSession.current().farm().plotAt(5, 3).hasCrop());
         assertNotNull(map.currentView().plotAt(5, 3).crop());
         assertEquals("98/100", first(router, JProgressBar.class).getString());
 
-        // When the player ends the day
+                // Cuando el jugador termina el día
         button(router, "Terminar día").doClick();
         flush();
 
-        // Then the top bar shows day 2 and the energy is back to full
+                // Entonces la barra superior muestra el día 2 y la energía vuelve a estar completa
         assertTrue(labels(router).contains("Año 1 · Primavera · Día 2"), labels(router).toString());
         assertEquals("100/100", first(router, JProgressBar.class).getString());
     }

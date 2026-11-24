@@ -10,7 +10,7 @@ final class TomatoFactory extends CropFactory {
     static final TomatoFactory INSTANCE = new TomatoFactory();
 
     private TomatoFactory() {
-        // shared instance
+                // instancia compartida
     }
 
     @Override

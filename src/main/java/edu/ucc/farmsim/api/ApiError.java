@@ -1,16 +1,16 @@
 package edu.ucc.farmsim.api;
 
 /**
- * Body of every rejected response: the RN-35 code and its Spanish message. A rejection carries no events,
- * because a rejected operation never changes the game.
+ * Cuerpo de toda respuesta rechazada: el código de RN-35 y su mensaje en español. Un rechazo no lleva eventos, porque
+ * una operación rechazada nunca cambia el juego.
  *
  * <p>Stories: none.
  *
- * @param code    name of the {@code ErrorCode}, or {@code SOLICITUD_INVALIDA} for a malformed request
- * @param message text for the player
+ * @param code    nombre del {@code ErrorCode}, o {@code SOLICITUD_INVALIDA} si la petición está mal formada
+ * @param message texto para el jugador
  */
 public record ApiError(String code, String message) {
 
-    /** Code used for requests that are not well formed (they never reach the game). */
+    /** Código para las peticiones mal formadas (nunca llegan al juego). */
     public static final String INVALID_REQUEST = "SOLICITUD_INVALIDA";
 }

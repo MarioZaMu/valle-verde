@@ -16,7 +16,7 @@ import edu.ucc.farmsim.support.GameFixtures;
 import edu.ucc.farmsim.support.TestApp;
 import org.junit.jupiter.api.Test;
 
-/** HU-20: feeding every animal of a building at once (RN-02, RN-15, RN-24). */
+/** HU-20: alimentar a todos los animales de un edificio a la vez (RN-02, RN-15, RN-24). */
 class HU20FeedAnimalsTest {
 
     private static Building coopWithHens(TestApp app, int healthy, int sick) {
@@ -32,15 +32,15 @@ class HU20FeedAnimalsTest {
 
     @Test
     void HU20_ca1_feedingThreeHensCostsThreeHayAndThreeEnergy() {
-        // Given a coop with 3 healthy hens that have not eaten, 5 hay and 100 energy
+                // Dado un gallinero con 3 gallinas sanas que no han comido, 5 de heno y 100 de energía
         TestApp app = TestApp.startedGame();
         Building coop = coopWithHens(app, 3, 0);
         app.state().inventory().add(ItemType.HAY, 5);
 
-        // When the player feeds the building
+                // Cuando el jugador alimenta el edificio
         Result<BuildingActionView> result = app.controller.feed(coop.id());
 
-        // Then 2 hay and 97 energy are left and the 3 hens ate today
+                // Entonces quedan 2 de heno y 97 de energía y las 3 gallinas comieron hoy
         assertTrue(result.isOk(), String.valueOf(result.message()));
         assertEquals(3, result.value().amount());
         assertNull(result.value().notice());

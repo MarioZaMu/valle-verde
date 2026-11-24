@@ -16,7 +16,7 @@ import edu.ucc.farmsim.support.RichGame;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
 
-/** The format of a saved game (RN-32) and the order of the checks of RN-33, without any database. */
+/** El formato de una partida guardada (RN-32) y el orden de las comprobaciones de RN-33, sin ninguna base de datos. */
 class SaveCodecTest {
 
     private final SaveCodec codec = new SaveCodec();
@@ -45,13 +45,13 @@ class SaveCodecTest {
     void theChecksOfRn33RunInOrderAndStopAtTheFirstFailure() {
         SaveDocument good = codec.encode(1, memento, Instant.EPOCH);
 
-        // 2. not well-formed wins over a wrong version and a wrong checksum
+                // 2. lo mal formado gana sobre una versión equivocada y una suma de control equivocada
         assertEquals(Reason.CORRUPT, reasonOf(new SaveDocument("slot1", 99, Instant.EPOCH, "{oops", "x")));
-        // 3. the version wins over a wrong checksum
+                // 3. la versión gana sobre una suma de control equivocada
         assertEquals(Reason.UNSUPPORTED_VERSION, reasonOf(new SaveDocument("slot1", 99, Instant.EPOCH, "{}", "x")));
-        // 4. the checksum
+                // 4. la suma de control
         assertEquals(Reason.CORRUPT, reasonOf(new SaveDocument("slot1", 1, Instant.EPOCH, good.state() + " ", "x")));
-        // a state that is valid JSON with a valid checksum but is not a game
+                // un estado que es JSON válido con una suma de control válida pero no es una partida
         String notAGame = "{\"unknown\":1}";
         assertEquals(Reason.CORRUPT,
                 reasonOf(new SaveDocument("slot1", 1, Instant.EPOCH, notAGame, Checksum.of(notAGame))));
@@ -59,7 +59,7 @@ class SaveCodecTest {
         assertEquals(Reason.CORRUPT, reasonOf(new SaveDocument("slot1", 1, Instant.EPOCH, null, null)));
         // JSON null
         assertEquals(Reason.CORRUPT, reasonOf(new SaveDocument("slot1", 1, Instant.EPOCH, "null", Checksum.of("null"))));
-        // a date that does not exist (day 40)
+                // una fecha que no existe (día 40)
         String badDay = good.state().replaceFirst("\"day\":\\d+", "\"day\":40");
         assertEquals(Reason.CORRUPT, reasonOf(new SaveDocument("slot1", 1, Instant.EPOCH, badDay, Checksum.of(badDay))));
     }

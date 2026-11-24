@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-/** RNF-16: one jar starts the server and the window, or each one on its own. */
+/** RNF-16: un solo jar arranca el servidor y la ventana, o cada uno por separado. */
 class LaunchOptionsTest {
 
     @Test

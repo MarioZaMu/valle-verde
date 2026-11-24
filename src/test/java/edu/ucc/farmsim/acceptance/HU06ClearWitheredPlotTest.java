@@ -15,7 +15,10 @@ import edu.ucc.farmsim.support.GameFixtures;
 import edu.ucc.farmsim.support.TestApp;
 import org.junit.jupiter.api.Test;
 
-/** HU-06: clear a withered plot with the harvest tool so it can be sown again (RN-02, RN-10, RN-34). */
+/**
+ * HU-06: limpiar una parcela marchita con la herramienta de cosechar para poder sembrarla de nuevo (RN-02, RN-10,
+ * RN-34).
+ */
 class HU06ClearWitheredPlotTest {
 
     private static final int COL = GameFixtures.SOIL_COL;
@@ -29,13 +32,13 @@ class HU06ClearWitheredPlotTest {
 
     @Test
     void HU06_ca1_clearingFreesThePlotCostsOneEnergyAndGivesNothing() {
-        // Given a withered crop and 100 energy
+                // Dado un cultivo marchito y 100 de energía
         TestApp app = gameWithAWitheredCrop();
 
-        // When the player uses the harvest tool on it
+                // Cuando el jugador usa la herramienta de cosechar sobre él
         Result<PlotView> result = app.controller.harvest(COL, ROW);
 
-        // Then the plot is free, energy is 99 and the inventory has no carrot
+                // Entonces la parcela queda libre, la energía es 99 y el inventario no tiene zanahoria
         assertTrue(result.isOk(), String.valueOf(result.message()));
         assertNull(app.state().farm().plotAt(COL, ROW).crop());
         assertEquals(99, app.state().energy().current());

@@ -131,4 +131,4 @@ Los 122 sprites (32 × 32 px; personajes de 32 × 64, árboles de 64 × 64 y cas
 
 ## Convenciones
 
-Código, comentarios, nombres de pruebas y commits en inglés; documentación y textos visibles al jugador en español. Commits: `feat(area): description (HUxx)`.
+Código, nombres de pruebas y commits en inglés; comentarios, documentación y textos visibles al jugador en español (las líneas `Stories:` y `Pattern:` del Javadoc se dejan tal cual: las leen las pruebas y los scripts). Commits: `feat(area): description (HUxx)`.

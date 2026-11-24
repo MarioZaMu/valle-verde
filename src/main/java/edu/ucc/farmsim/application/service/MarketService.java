@@ -23,8 +23,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 /**
- * The economy use cases: buying at fixed prices (RN-16), selling at the dynamic price (RN-17, RN-18), the
- * previsional total of a sale, the market and inventory views. Every rejection leaves the game untouched.
+ * Los casos de uso de economía: comprar a precios fijos (RN-16), vender al precio dinámico (RN-17, RN-18), el total
+ * previsto de una venta, y las vistas del mercado y el inventario. Todo rechazo deja la partida intacta.
  *
  * <p>Stories: HU-14, HU-15, HU-16, HU-19, HU-26, HU-37, HU-38.
  */
@@ -36,11 +36,11 @@ public final class MarketService {
     private final AchievementService achievements;
 
     /**
-     * Creates the service.
+     * Crea el servicio.
      *
-     * @param session the game in progress
-     * @param events  where events are published
-     * @param achievements evaluates the achievements after each sale
+     * @param session la partida en curso
+     * @param events  donde se publican los eventos
+     * @param achievements evalúa los logros después de cada venta
      */
     public MarketService(GameSession session, EventBus events, AchievementService achievements) {
         this.session = session;
@@ -49,10 +49,10 @@ public final class MarketService {
     }
 
     /**
-     * Buys units at the fixed price: the quantity must be 1 to 99, the player must afford the total and the
-     * units must fit in the inventory (RN-14, RN-15, RN-16).
+     * Compra unidades al precio fijo: la cantidad debe ser de 1 a 99, el jugador debe poder pagar el total y las
+     * unidades deben caber en el inventario (RN-14, RN-15, RN-16).
      *
-     * @return the total paid in m
+     * @return el total pagado en m
      */
     public Result<Integer> buy(String itemId, int quantity) {
         if (!session.hasGame()) {
@@ -80,9 +80,9 @@ public final class MarketService {
     }
 
     /**
-     * Sells units one by one, each at the price of the demand it finds, which then drops (RN-17, RN-18).
+     * Vende unidades una por una, cada una al precio de la demanda que encuentra, que luego baja (RN-17, RN-18).
      *
-     * @return the total received in m
+     * @return el total recibido en m
      */
     public Result<Integer> sell(String itemId, int quantity) {
         if (!session.hasGame()) {
@@ -108,7 +108,7 @@ public final class MarketService {
         return Result.ok(total);
     }
 
-    /** What selling the quantity would pay right now, without selling (the "total previsto" of HU-38). */
+    /** Lo que pagaría vender la cantidad ahora mismo, sin vender (el «total previsto» de HU-38). */
     public Result<Integer> quote(String itemId, int quantity) {
         if (!session.hasGame()) {
             return Result.failWith(ErrorCode.SIN_PARTIDA);
@@ -122,7 +122,7 @@ public final class MarketService {
         return Result.ok(state.market().quote(item, state.date().season(), quantity));
     }
 
-    /** The market as the dialog shows it: prices, trends and the purchase catalogue. */
+    /** El mercado tal como lo muestra el diálogo: precios, tendencias y el catálogo de compra. */
     public Result<MarketView> market() {
         if (!session.hasGame()) {
             return Result.failWith(ErrorCode.SIN_PARTIDA);
@@ -147,7 +147,7 @@ public final class MarketService {
         return Result.ok(new MarketView(sells, buys, animals));
     }
 
-    /** The inventory as a grid. */
+    /** El inventario como una grilla. */
     public Result<InventoryView> inventory() {
         if (!session.hasGame()) {
             return Result.failWith(ErrorCode.SIN_PARTIDA);

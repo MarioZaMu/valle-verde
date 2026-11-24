@@ -12,16 +12,16 @@ import edu.ucc.farmsim.support.GameFixtures;
 import edu.ucc.farmsim.support.TestApp;
 import org.junit.jupiter.api.Test;
 
-/** HU-21: animals get hungry and fall sick when neglected (RN-03, RN-25). */
+/** HU-21: los animales pasan hambre y se enferman cuando se los descuida (RN-03, RN-25). */
 class HU21AnimalStatesTest {
 
     @Test
     void HU21_ca1_aHenThatIsNeverFedIsHungryTwiceAndThenSick() {
-        // Given a healthy hen that is not fed
+                // Dada una gallina sana a la que no se alimenta
         TestApp app = TestApp.startedGame();
         Animal hen = GameFixtures.hen(GameFixtures.coop(app.state()));
 
-        // When 1, 2 and 3 days go by
+                // Cuando pasan 1, 2 y 3 días
         app.controller.endDay();
         assertEquals(AnimalCondition.HUNGRY, hen.condition());
         assertEquals(1, hen.daysWithoutFeed());
@@ -30,7 +30,7 @@ class HU21AnimalStatesTest {
         assertEquals(2, hen.daysWithoutFeed());
         app.controller.endDay();
 
-        // Then it is hungry with 1, hungry with 2 and sick at 3
+                // Entonces está hambrienta con 1, hambrienta con 2 y enferma con 3
         assertEquals(AnimalCondition.SICK, hen.condition());
         assertEquals(3, hen.daysWithoutFeed());
     }
@@ -75,10 +75,10 @@ class HU21AnimalStatesTest {
         app.controller.feed(coop.id());
         app.controller.endDay();
 
-        // When the new day begins
+                // Cuando empieza el día nuevo
         assertFalse(hen.isFedToday());
 
-        // Then, if the player does not feed her, the day counts as a day without food
+                // Entonces, si el jugador no la alimenta, el día cuenta como un día sin comida
         app.controller.endDay();
         assertEquals(AnimalCondition.HUNGRY, hen.condition());
         assertEquals(1, hen.daysWithoutFeed());

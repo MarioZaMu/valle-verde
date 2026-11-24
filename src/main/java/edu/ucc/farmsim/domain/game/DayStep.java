@@ -1,21 +1,21 @@
 package edu.ucc.farmsim.domain.game;
 
 /**
- * One step of the end of the day. Each story that adds a daily effect registers its own step in the
- * {@link DayPipeline}; the pipeline runs them in the order of their {@link DayPhase}.
+ * Un paso del final del día. Cada historia que agrega un efecto diario registra su propio paso en el {@link
+ * DayPipeline}; el pipeline los ejecuta en el orden de su {@link DayPhase}.
  *
  * <p>Stories: HU-10.
  */
 public interface DayStep {
 
-    /** The phase of RN-03 this step belongs to. */
+    /** La fase de RN-03 a la que pertenece este paso. */
     DayPhase phase();
 
     /**
-     * Applies the step to the game.
+     * Aplica el paso a la partida.
      *
-     * @param state  the game being advanced
-     * @param report facts about the day that the application turns into events
+     * @param state  la partida que se avanza
+     * @param report hechos del día que la aplicación convierte en eventos
      */
     void apply(GameState state, DayReport report);
 }

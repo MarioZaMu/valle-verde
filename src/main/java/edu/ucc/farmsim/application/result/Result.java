@@ -1,12 +1,12 @@
 package edu.ucc.farmsim.application.result;
 
 /**
- * Outcome of an operation: a value, or an error code with a Spanish message. The controller returns this
- * instead of throwing, so no exception ever reaches the UI (R-03, RNF-07).
+ * Resultado de una operación: un valor, o un código de error con un mensaje en español. El controlador devuelve esto en
+ * lugar de lanzar excepciones, de modo que ninguna excepción llega nunca a la UI (R-03, RNF-07).
  *
  * <p>Stories: HU-28.
  *
- * @param <T> type of the value of a successful result
+ * @param <T> tipo del valor de un resultado exitoso
  */
 public final class Result<T> {
 
@@ -22,30 +22,30 @@ public final class Result<T> {
         this.message = message;
     }
 
-    /** A successful result carrying a value. */
+    /** Un resultado exitoso que lleva un valor. */
     public static <T> Result<T> ok(T value) {
         return new Result<>(true, value, null, null);
     }
 
-    /** A rejection with its code and an already formatted message. */
+    /** Un rechazo con su código y un mensaje ya formateado. */
     public static <T> Result<T> fail(ErrorCode code, String message) {
         return new Result<>(false, null, code, message);
     }
 
-    /** A rejection whose message is the RN-35 template of the code filled in with the given arguments. */
+    /** Un rechazo cuyo mensaje es la plantilla de RN-35 del código rellenada con los argumentos dados. */
     public static <T> Result<T> failWith(ErrorCode code, Object... args) {
         return fail(code, Messages.of(code, args));
     }
 
-    /** True if the operation succeeded. */
+    /** Verdadero si la operación tuvo éxito. */
     public boolean isOk() {
         return ok;
     }
 
     /**
-     * The value of a successful result.
+     * El valor de un resultado exitoso.
      *
-     * @throws IllegalStateException if the result is a failure
+     * @throws IllegalStateException si el resultado es un fallo
      */
     public T value() {
         if (!ok) {
@@ -54,12 +54,12 @@ public final class Result<T> {
         return value;
     }
 
-    /** Error code of a failure, or {@code null} for a success. */
+    /** Código de error de un fallo, o {@code null} si fue un éxito. */
     public ErrorCode code() {
         return code;
     }
 
-    /** Spanish message of a failure, or {@code null} for a success. */
+    /** Mensaje en español de un fallo, o {@code null} si fue un éxito. */
     public String message() {
         return message;
     }

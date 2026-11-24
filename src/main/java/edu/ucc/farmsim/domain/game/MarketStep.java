@@ -1,7 +1,7 @@
 package edu.ucc.farmsim.domain.game;
 
 /**
- * Step 4 of RN-03: yesterday's prices are remembered and the demand recovers (RN-18, RN-19).
+ * Paso 4 de RN-03: se recuerdan los precios de ayer y la demanda se recupera (RN-18, RN-19).
  *
  * <p>Stories: HU-15, HU-16.
  */

@@ -5,8 +5,8 @@ import edu.ucc.farmsim.domain.building.BuildingType;
 import edu.ucc.farmsim.domain.crop.Crop;
 
 /**
- * One square of the farm map: its terrain, the crop growing in it (on soil) or the building that covers it
- * (on grass).
+ * Un cuadro del mapa de la granja: su terreno, el cultivo que crece en él (sobre tierra) o el edificio que lo cubre
+ * (sobre pasto).
  *
  * <p>Stories: HU-01, HU-25, HU-28.
  */
@@ -17,33 +17,33 @@ public final class Plot {
     private Building building;
 
     /**
-     * Creates a plot.
+     * Crea una parcela.
      *
-     * @param terrain kind of ground
+     * @param terrain tipo de suelo
      */
     public Plot(Terrain terrain) {
         this.terrain = terrain;
     }
 
-    /** Kind of ground. */
+    /** Tipo de suelo. */
     public Terrain terrain() {
         return terrain;
     }
 
-    /** The crop growing here, or {@code null}. */
+    /** El cultivo que crece aquí, o {@code null}. */
     public Crop crop() {
         return crop;
     }
 
-    /** True if a crop (alive or withered) occupies the plot. */
+    /** Verdadero si un cultivo (vivo o marchito) ocupa la parcela. */
     public boolean hasCrop() {
         return crop != null;
     }
 
     /**
-     * Plants a crop.
+     * Planta un cultivo.
      *
-     * @throws IllegalStateException if the plot is not soil or already has a crop
+     * @throws IllegalStateException si la parcela no es tierra o ya tiene un cultivo
      */
     public void plant(Crop newCrop) {
         if (!canBeSown()) {
@@ -55,22 +55,22 @@ public final class Plot {
         this.crop = newCrop;
     }
 
-    /** True if a greenhouse covers the plot: its crop is a protected crop (RN-22). */
+    /** Verdadero si un invernadero cubre la parcela: su cultivo es un cultivo protegido (RN-22). */
     public boolean isSheltered() {
         return building != null && building.type() == BuildingType.GREENHOUSE;
     }
 
-    /** True if a crop can be sown here: soil, or a plot of a greenhouse (RN-06, RN-22). */
+    /** Verdadero si aquí se puede sembrar: tierra, o una parcela de un invernadero (RN-06, RN-22). */
     public boolean canBeSown() {
         return terrain == Terrain.SOIL || isSheltered();
     }
 
-    /** Removes the crop (harvest or clearing). */
+    /** Quita el cultivo (cosecha o limpieza). */
     public void removeCrop() {
         this.crop = null;
     }
 
-    /** The building that covers this plot, or {@code null}. */
+    /** El edificio que cubre esta parcela, o {@code null}. */
     public Building building() {
         return building;
     }

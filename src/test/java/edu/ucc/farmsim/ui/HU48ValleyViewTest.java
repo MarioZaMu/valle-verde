@@ -29,7 +29,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import org.junit.jupiter.api.Test;
 
-/** HU-48 · CA-6 to CA-8: a continuous 3/4 view of the valley, ambient life, and an animated start screen. */
+/** HU-48 · CA-6 a CA-8: una vista continua a 3/4 del valle, vida ambiental y una pantalla de inicio animada. */
 class HU48ValleyViewTest {
 
     private static final int W = 1024;

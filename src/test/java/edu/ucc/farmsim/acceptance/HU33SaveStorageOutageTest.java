@@ -13,7 +13,9 @@ import edu.ucc.farmsim.support.TestApp;
 import edu.ucc.farmsim.application.service.GameSession;
 import org.junit.jupiter.api.Test;
 
-/** RN-31 and RNF-11: when the saved games cannot be reached the player is told, and playing is unaffected. */
+/**
+ * RN-31 y RNF-11: cuando no se puede llegar a las partidas guardadas se le avisa al jugador, y jugar no se ve afectado.
+ */
 class HU33SaveStorageOutageTest {
 
     private static TestApp appWithStorageDown() {

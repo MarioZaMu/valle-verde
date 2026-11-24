@@ -1,19 +1,19 @@
 package edu.ucc.farmsim.ui.components;
 
 /**
- * The kind of a notice (HU-39): it decides how long it stays and the symbol that goes with it, so the colour
- * is never the only cue (RNF-14).
+ * El tipo de un aviso (HU-39): decide cuánto tiempo se queda y el símbolo que lo acompaña, de modo que el color nunca
+ * sea la única señal (RNF-14).
  *
  * <p>Stories: HU-39.
  */
 public enum ToastKind {
-    /** Neutral information, such as the start of a season. */
+    /** Información neutra, como el comienzo de una estación. */
     INFO(3_000, "ℹ"),
-    /** Something worked. */
+    /** Algo funcionó. */
     SUCCESS(3_000, "✔"),
-    /** An order was rejected; the text is the message of RN-35. */
+    /** Se rechazó una orden; el texto es el mensaje de RN-35. */
     ERROR(3_000, "✖"),
-    /** An achievement was unlocked: it stays longer. */
+    /** Se desbloqueó un logro: se queda más tiempo. */
     ACHIEVEMENT(5_000, "★");
 
     private final int durationMs;
@@ -24,12 +24,12 @@ public enum ToastKind {
         this.symbol = symbol;
     }
 
-    /** Milliseconds fully visible, before the fade starts. */
+    /** Milisegundos totalmente visible, antes de que empiece el desvanecimiento. */
     public int durationMs() {
         return durationMs;
     }
 
-    /** Symbol drawn before the text. */
+    /** Símbolo dibujado antes del texto. */
     public String symbol() {
         return symbol;
     }

@@ -12,7 +12,7 @@ final class AutumnState implements SeasonState {
     static final AutumnState INSTANCE = new AutumnState();
 
     private AutumnState() {
-        // shared instance
+                // instancia compartida
     }
 
     @Override

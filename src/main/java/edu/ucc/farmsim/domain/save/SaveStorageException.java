@@ -1,9 +1,9 @@
 package edu.ucc.farmsim.domain.save;
 
 /**
- * The place where games are stored could not be reached or refused the operation. The infrastructure turns
- * every technical failure into this unchecked exception, so the domain and the application never see MongoDB
- * types; the application translates it into {@code ERROR_ES} (RN-31, RN-35).
+ * El lugar donde se guardan las partidas no se pudo alcanzar o rechazó la operación. La infraestructura convierte todo
+ * fallo técnico en esta excepción no comprobada, de modo que el dominio y la aplicación nunca ven tipos de MongoDB; la
+ * aplicación la traduce a {@code ERROR_ES} (RN-31, RN-35).
  *
  * <p>Stories: HU-33.
  */
@@ -12,10 +12,10 @@ public final class SaveStorageException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Creates the exception.
+     * Crea la excepción.
      *
-     * @param detail short Spanish explanation that is shown to the player
-     * @param cause  the technical failure
+     * @param detail explicación corta en español que se muestra al jugador
+     * @param cause  el fallo técnico
      */
     public SaveStorageException(String detail, Throwable cause) {
         super(detail, cause);

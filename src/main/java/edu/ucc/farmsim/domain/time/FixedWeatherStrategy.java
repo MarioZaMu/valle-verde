@@ -5,7 +5,7 @@ import java.util.Random;
 /**
  * Pattern: Strategy — Role: ConcreteStrategy (always the same weather).
  *
- * <p>Used for the fixed first day of a game (RN-13) and by tests that need a known weather.
+ * <p>Se usa para el primer día fijo de una partida (RN-13) y en las pruebas que necesitan un clima conocido.
  *
  * <p>Stories: HU-11.
  */
@@ -14,9 +14,9 @@ public final class FixedWeatherStrategy implements WeatherStrategy {
     private final Weather weather;
 
     /**
-     * Creates a strategy that always returns the same weather.
+     * Crea una estrategia que siempre devuelve el mismo clima.
      *
-     * @param weather the weather to return
+     * @param weather el clima que se devuelve
      */
     public FixedWeatherStrategy(Weather weather) {
         this.weather = weather;

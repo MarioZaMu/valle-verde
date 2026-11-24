@@ -12,7 +12,7 @@ final class SpringState implements SeasonState {
     static final SpringState INSTANCE = new SpringState();
 
     private SpringState() {
-        // shared instance
+                // instancia compartida
     }
 
     @Override

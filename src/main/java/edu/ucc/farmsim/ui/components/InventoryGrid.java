@@ -8,9 +8,9 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 
 /**
- * The inventory as a grid of slots (HU-37): the name and amount of each occupied slot (the amount of a full
- * stack is 99) and the chosen seed marked. A click on a seed chooses it for the Sow tool. Each occupied slot shows
- * the sprite of its item above the text; without sprites it shows only text.
+ * El inventario como una grilla de casillas (HU-37): el nombre y la cantidad de cada casilla ocupada (la cantidad de
+ * una pila llena es 99) y la semilla elegida marcada. Un clic en una semilla la elige para la herramienta Sembrar. Cada
+ * casilla ocupada muestra el sprite de su objeto sobre el texto; sin sprites muestra solo texto.
  *
  * <p>Stories: HU-37, HU-48.
  */
@@ -23,19 +23,19 @@ public final class InventoryGrid extends JPanel {
     private final transient AssetManager assets;
 
     /**
-     * Builds the grid and keeps it in step with the model.
+     * Construye la grilla y la mantiene al día con el modelo.
      *
-     * @param model what the slots hold
+     * @param model lo que contienen las casillas
      */
     public InventoryGrid(InventoryModel model) {
         this(model, AssetManager.shared());
     }
 
     /**
-     * Builds the grid with item icons from the given assets (text only if they are missing).
+     * Construye la grilla con íconos de objetos de los recursos dados (solo texto si faltan).
      *
-     * @param model  what the slots hold
-     * @param assets where the item icons come from
+     * @param model  lo que contienen las casillas
+     * @param assets de donde vienen los íconos de objetos
      */
     public InventoryGrid(InventoryModel model, AssetManager assets) {
         super(new GridLayout(0, COLUMNS, 4, 4));

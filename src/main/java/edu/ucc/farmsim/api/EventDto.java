@@ -3,17 +3,17 @@ package edu.ucc.farmsim.api;
 import edu.ucc.farmsim.application.event.GameEvent;
 
 /**
- * A game event as it travels in a response: its type name and its fields. The client picks the event class
- * by the name, so a new event only needs to be added to {@link GameEvent}.
+ * Un evento del juego tal como viaja en una respuesta: el nombre de su tipo y sus campos. El cliente elige la clase del
+ * evento por el nombre, así que un evento nuevo solo necesita agregarse a {@link GameEvent}.
  *
  * <p>Stories: none.
  *
- * @param type name of the event record, for example {@code DayEnded}
- * @param data the event itself (an immutable record of views)
+ * @param type nombre del record del evento, por ejemplo {@code DayEnded}
+ * @param data el evento en sí (un record inmutable de vistas)
  */
 public record EventDto(String type, GameEvent data) {
 
-    /** Wraps an event for the response. */
+    /** Envuelve un evento para la respuesta. */
     public static EventDto of(GameEvent event) {
         return new EventDto(event.getClass().getSimpleName(), event);
     }

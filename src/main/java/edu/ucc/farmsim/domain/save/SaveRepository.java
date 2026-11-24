@@ -5,45 +5,46 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * Port the domain defines and the infrastructure implements: where games are stored (dependency
- * inversion, DT-11). Every technical failure of the storage is a {@link SaveStorageException}; a slot that
- * cannot be turned into a game is a {@link SaveLoadException}.
+ * Puerto que define el dominio y que implementa la infraestructura: dónde se guardan las partidas (inversión de
+ * dependencias, DT-11). Todo fallo técnico del almacenamiento es una {@link SaveStorageException}; una ranura que no se
+ * puede convertir en partida es una {@link SaveLoadException}.
  *
  * <p>Stories: HU-29, HU-30, HU-31, HU-32, HU-33.
  */
 public interface SaveRepository {
 
     /**
-     * Whether a slot holds a saved game.
+     * Si una ranura contiene una partida guardada.
      *
-     * @param slot slot number, from 1 to the number of slots
+     * @param slot número de ranura, de 1 al número de ranuras
      */
     boolean slotExists(int slot);
 
     /**
-     * Writes the game into the slot in one atomic operation: the previous content is replaced or, if the write
-     * fails, stays as it was (RN-31).
+     * Escribe la partida en la ranura en una sola operación atómica: el contenido anterior se reemplaza o, si falla la
+     * escritura, queda como estaba (RN-31).
      *
-     * @param slot    slot number
-     * @param memento the game to keep
-     * @param savedAt moment of the save
-     * @throws SaveStorageException if the storage fails
+     * @param slot    número de ranura
+     * @param memento la partida a conservar
+     * @param savedAt momento del guardado
+     * @throws SaveStorageException si falla el almacenamiento
      */
     void save(int slot, GameMemento memento, Instant savedAt);
 
     /**
-     * Reads the game kept in the slot, checking existence, format, version and checksum in that order (RN-33).
+     * Lee la partida guardada en la ranura, comprobando existencia, formato, versión y suma de control en ese orden
+     * (RN-33).
      *
-     * @param slot slot number
-     * @throws SaveLoadException    if the slot is empty, damaged or from an unsupported version
-     * @throws SaveStorageException if the storage fails
+     * @param slot número de ranura
+     * @throws SaveLoadException    si la ranura está vacía, dañada o es de una versión no admitida
+     * @throws SaveStorageException si falla el almacenamiento
      */
     GameMemento load(int slot);
 
     /**
-     * The state of every slot, in order. A damaged slot does not stop the rest of the list.
+     * El estado de cada ranura, en orden. Una ranura dañada no detiene el resto de la lista.
      *
-     * @throws SaveStorageException if the storage fails
+     * @throws SaveStorageException si falla el almacenamiento
      */
     List<SlotInfo> slots();
 }

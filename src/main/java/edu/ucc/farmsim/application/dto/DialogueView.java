@@ -1,16 +1,16 @@
 package edu.ucc.farmsim.application.dto;
 
 /**
- * What a person of the valley says when the player talks to it (RN-37, RN-38). Immutable.
+ * Lo que dice una persona del valle cuando el jugador le habla (RN-37, RN-38). Inmutable.
  *
  * <p>Stories: HU-46, HU-47.
  *
- * @param npcId      id of the person
- * @param name       its name in Spanish
- * @param role       what it does, in Spanish
- * @param text       the advice, which depends only on the state of the game
- * @param errand     the line about its errand: what it asks for, or its thanks once it is done
- * @param errandDone whether the errand was already delivered (then there is nothing to deliver)
+ * @param npcId      id de la persona
+ * @param name       su nombre en español
+ * @param role       lo que hace, en español
+ * @param text       el consejo, que depende solo del estado de la partida
+ * @param errand     la línea sobre su encargo: lo que pide, o su agradecimiento una vez hecho
+ * @param errandDone si el encargo ya fue entregado (entonces no hay nada que entregar)
  */
 public record DialogueView(String npcId, String name, String role, String text, String errand,
                            boolean errandDone) { }

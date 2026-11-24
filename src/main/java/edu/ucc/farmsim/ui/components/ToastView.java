@@ -1,12 +1,12 @@
 package edu.ucc.farmsim.ui.components;
 
 /**
- * One notice as it must be drawn right now. Immutable.
+ * Un aviso tal como debe dibujarse ahora mismo. Inmutable.
  *
  * <p>Stories: HU-39.
  *
- * @param text    what it says, in Spanish
- * @param kind    its kind
- * @param opacity 1 while fully visible, falling to 0 while it fades
+ * @param text    lo que dice, en español
+ * @param kind    su tipo
+ * @param opacity 1 mientras es totalmente visible, bajando a 0 mientras se desvanece
  */
 public record ToastView(String text, ToastKind kind, float opacity) { }

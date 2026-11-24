@@ -6,7 +6,7 @@ import edu.ucc.farmsim.application.result.ErrorCode;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-/** RNF-15: every rejection code has a deliberate HTTP status (docs/API.md). */
+/** RNF-15: cada código de rechazo tiene un estado HTTP deliberado (docs/API.md). */
 class ErrorStatusMapperTest {
 
     @Test

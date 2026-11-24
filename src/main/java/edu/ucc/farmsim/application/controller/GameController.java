@@ -39,11 +39,11 @@ import org.springframework.stereotype.Component;
 /**
  * Pattern: Controller — Role: GRASP controller (the single entry point the UI calls).
  *
- * <p>It only orchestrates: it asks the services to do the work and always answers with a {@link Result}.
- * No exception ever reaches the UI or the API: anything unexpected becomes {@code ERROR_INTERNO} (R-03,
- * RNF-07), and it never touches repositories (AR-4). It is not the REST controller: the {@code api} package
- * translates HTTP into calls to this class. After an accepted walk, sowing, watering, talk or end of the day it
- * tells the start tutorial, which moves on if that was the action of its step (RN-39).
+ * <p>Solo orquesta: pide a los servicios que hagan el trabajo y siempre responde con un {@link Result}. Ninguna
+ * excepción llega nunca a la UI ni a la API: todo imprevisto se convierte en {@code ERROR_INTERNO} (R-03, RNF-07), y
+ * nunca toca los repositorios (AR-4). No es el controlador REST: el paquete {@code api} traduce HTTP en llamadas a esta
+ * clase. Tras un paso, siembra, riego, conversación o final de día aceptados, avisa al tutorial de inicio, que avanza
+ * si esa era la acción de su paso (RN-39).
  *
  * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-26, HU-28, HU-29, HU-30, HU-31, HU-32, HU-33, HU-35, HU-37, HU-38, HU-45, HU-46, HU-47, HU-49.
  */
@@ -67,21 +67,21 @@ public final class GameController implements GameCommands {
     private final TutorialService tutorial;
 
     /**
-     * Creates the controller.
+     * Crea el controlador.
      *
-     * @param session  the game in progress
-     * @param mapper   builds the views the UI draws
-     * @param progress starts games
-     * @param day      ends days
-     * @param saves    knows about the save slots
-     * @param farm     crop use cases
-     * @param market   buying, selling and the market and inventory views
-     * @param buildings construction
-     * @param animals  animal care
-     * @param achievements the achievements and their progress
-     * @param avatar   walking with the avatar
-     * @param npcs     the people of the valley and their errands
-     * @param tutorial the start tutorial
+     * @param session  la partida en curso
+     * @param mapper   construye las vistas que dibuja la UI
+     * @param progress inicia partidas
+     * @param day      termina los días
+     * @param saves    conoce las ranuras de guardado
+     * @param farm     casos de uso de cultivos
+     * @param market   compra, venta y las vistas del mercado y el inventario
+     * @param buildings construcción
+     * @param animals  cuidado de animales
+     * @param achievements los logros y su progreso
+     * @param avatar   caminar con el avatar
+     * @param npcs     las personas del valle y sus encargos
+     * @param tutorial el tutorial de inicio
      */
     public GameController(GameSession session, ViewMapper mapper, ProgressService progress, DayService day,
                           SaveGameService saves, FarmService farm, MarketService market,
@@ -103,7 +103,7 @@ public final class GameController implements GameCommands {
         this.tutorial = tutorial;
     }
 
-    /** True if a game is in progress (the UI asks for confirmation before discarding it). */
+    /** Verdadero si hay una partida en curso (la UI pide confirmación antes de descartarla). */
     @Override
     public boolean hasGameInProgress() {
         try {
@@ -115,27 +115,27 @@ public final class GameController implements GameCommands {
     }
 
     /**
-     * Starts a new game with the initial state of RN-30, replacing any game in progress.
+     * Inicia una partida nueva con el estado inicial de RN-30, reemplazando cualquier partida en curso.
      *
-     * @param seed seed of the random generator
+     * @param seed semilla del generador aleatorio
      */
     @Override
     public Result<HudView> newGame(long seed) {
         return guard(() -> progress.newGame(seed));
     }
 
-    /** Ends the day: effects are resolved in the order of RN-03 and the new top bar is returned. */
+    /** Termina el día: los efectos se resuelven en el orden de RN-03 y se devuelve la nueva barra superior. */
     @Override
     public Result<HudView> endDay() {
         return guard(() -> tracked(TutorialStep.END_DAY, day.endDay()));
     }
 
     /**
-     * Sows a seed from the inventory in a plot (RN-06).
+     * Siembra una semilla del inventario en una parcela (RN-06).
      *
-     * @param col    column of the plot
-     * @param row    row of the plot
-     * @param seedId item id of the seed, for example {@code CARROT_SEED}
+     * @param col    columna de la parcela
+     * @param row    fila de la parcela
+     * @param seedId id del objeto semilla, por ejemplo {@code CARROT_SEED}
      */
     @Override
     public Result<PlotView> plant(int col, int row, String seedId) {
@@ -143,10 +143,10 @@ public final class GameController implements GameCommands {
     }
 
     /**
-     * Waters the crop of a plot (RN-07).
+     * Riega el cultivo de una parcela (RN-07).
      *
-     * @param col column of the plot
-     * @param row row of the plot
+     * @param col columna de la parcela
+     * @param row fila de la parcela
      */
     @Override
     public Result<PlotView> water(int col, int row) {
@@ -154,10 +154,10 @@ public final class GameController implements GameCommands {
     }
 
     /**
-     * The harvest tool (RN-10, RN-34): harvests a mature crop, or clears a withered one.
+     * La herramienta de cosechar (RN-10, RN-34): cosecha un cultivo maduro o limpia uno marchito.
      *
-     * @param col column of the plot
-     * @param row row of the plot
+     * @param col columna de la parcela
+     * @param row fila de la parcela
      */
     @Override
     public Result<PlotView> harvest(int col, int row) {
@@ -165,17 +165,17 @@ public final class GameController implements GameCommands {
     }
 
     /**
-     * Describes a plot for the tooltip (HU-07). A pure query: it never changes the game.
+     * Describe una parcela para el tooltip (HU-07). Una consulta pura: nunca cambia el juego.
      *
-     * @param col column of the plot
-     * @param row row of the plot
+     * @param col columna de la parcela
+     * @param row fila de la parcela
      */
     @Override
     public Result<PlotView> inspect(int col, int row) {
         return guard(() -> farm.inspect(col, row));
     }
 
-    /** The whole farm map, for drawing it. A pure query. */
+    /** Todo el mapa de la granja, para dibujarlo. Una consulta pura. */
     @Override
     public Result<MapView> map() {
         return guard(farm::map);
@@ -211,13 +211,13 @@ public final class GameController implements GameCommands {
         return guard(tutorial::skip);
     }
 
-    /** True if at least one of the save slots holds a game. */
+    /** Verdadero si al menos una de las ranuras de guardado contiene una partida. */
     @Override
     public Result<Boolean> hasSavedGames() {
         return guard(saves::hasAnySave);
     }
 
-    /** The top bar of the game in progress. */
+    /** La barra superior de la partida en curso. */
     @Override
     public Result<HudView> hud() {
         return guard(() -> {
@@ -303,7 +303,7 @@ public final class GameController implements GameCommands {
         return guard(() -> saves.load(slot));
     }
 
-    /** An accepted action of a step tells the tutorial, after the events of the action itself. */
+    /** Una acción aceptada de un paso avisa al tutorial, después de los eventos de la propia acción. */
     private <T> Result<T> tracked(TutorialStep step, Result<T> result) {
         if (result.isOk()) {
             tutorial.done(step);

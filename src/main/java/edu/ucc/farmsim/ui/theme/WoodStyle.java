@@ -10,46 +10,46 @@ import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 
 /**
- * The look of the panels and buttons of the game: a frame of warm wood with a dark outline around a sheet of
- * parchment, and wooden buttons that light up and rise under the cursor. Everything is painted with Java2D,
- * so it needs no image and looks the same with or without the sprite pack.
+ * El aspecto de los paneles y botones del juego: un marco de madera cálida con un contorno oscuro alrededor de una hoja
+ * de pergamino, y botones de madera que se iluminan y suben bajo el cursor. Todo se pinta con Java2D, así que no
+ * necesita imágenes y se ve igual con o sin el paquete de sprites.
  *
  * <p>Stories: HU-43, HU-48.
  */
 public final class WoodStyle {
 
-    /** Dark outline of every frame. */
+    /** Contorno oscuro de cada marco. */
     public static final Color OUTLINE = new Color(0x2E1A0C);
-    /** Wood in shadow. */
+    /** Madera en sombra. */
     public static final Color WOOD_DARK = new Color(0x7A4A22);
-    /** Wood. */
+    /** Madera. */
     public static final Color WOOD = new Color(0xA8692F);
-    /** Wood in the light. */
+    /** Madera a la luz. */
     public static final Color WOOD_LIGHT = new Color(0xD08E48);
-    /** Parchment inside a frame. */
+    /** Pergamino dentro de un marco. */
     public static final Color PARCHMENT = new Color(0xF6E3B4);
-    /** Parchment in shadow, along the inner edge of a frame. */
+    /** Pergamino en sombra, a lo largo del borde interior de un marco. */
     public static final Color PARCHMENT_SHADOW = new Color(0xE2C487);
-    /** Text on parchment. */
+    /** Texto sobre pergamino. */
     public static final Color INK = new Color(0x3B2412);
-    /** Text on wood. */
+    /** Texto sobre madera. */
     public static final Color CREAM = new Color(0xFFF4D6);
-    /** Frame of the chosen slot. */
+    /** Marco de la casilla elegida. */
     public static final Color SELECTED = new Color(0xE0502A);
-    /** Glow around the chosen slot. */
+    /** Resplandor alrededor de la casilla elegida. */
     public static final Color GLOW = new Color(0xFFD23F);
 
-    /** Thickness of the wooden frame, in pixels. */
+    /** Grosor del marco de madera, en píxeles. */
     public static final int FRAME = 5;
 
     private static final int ARC = 10;
     private static final Color HOVER_LIGHT = new Color(255, 255, 255, 60);
 
     private WoodStyle() {
-        // static helpers only
+                // solo métodos de utilidad estáticos
     }
 
-    /** Paints a wooden frame around parchment covering the given rectangle. */
+    /** Pinta un marco de madera alrededor de pergamino que cubre el rectángulo dado. */
     public static void paintFrame(Graphics2D g, int x, int y, int w, int h) {
         if (w <= 2 * FRAME || h <= 2 * FRAME) {
             return;
@@ -81,13 +81,13 @@ public final class WoodStyle {
     }
 
     /**
-     * Paints the body of a button. A plain button is a plank of wood; a slot is a parchment square in a
-     * frame, as in a tool bar, and gets a bright frame when it is the chosen one.
+     * Pinta el cuerpo de un botón. Un botón simple es una tabla de madera; una casilla es un cuadrado de pergamino en
+     * un marco, como en una barra de herramientas, y recibe un marco brillante cuando es la elegida.
      *
-     * @param g        where to paint
-     * @param b        the button
-     * @param hover    how lit it is, from 0 (cursor away) to 1 (cursor on it)
-     * @param slot     true for a tool bar slot
+     * @param g        dónde pintar
+     * @param b        el botón
+     * @param hover    qué tan iluminado está, de 0 (cursor lejos) a 1 (cursor encima)
+     * @param slot     verdadero para una casilla de la barra de herramientas
      */
     public static void paintButton(Graphics2D g, AbstractButton b, float hover, boolean slot) {
         int w = b.getWidth();
@@ -131,7 +131,7 @@ public final class WoodStyle {
         }
     }
 
-    /** Makes a Swing button ready to be painted by {@link #paintButton}. */
+    /** Deja un botón de Swing listo para pintarse con {@link #paintButton}. */
     public static void prepare(AbstractButton b, boolean slot) {
         b.setContentAreaFilled(false);
         b.setBorderPainted(false);

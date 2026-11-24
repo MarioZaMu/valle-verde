@@ -8,9 +8,9 @@ import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 
 /**
- * The life of the valley that is not the game: shadows of clouds sliding over the fields, butterflies in
- * spring and summer, leaves falling in autumn, and a soft dark edge around the view. Every position is a pure
- * function of the clock, so nothing is stored, nothing is random and two frames at the same time are equal.
+ * La vida del valle que no es el juego: sombras de nubes que se deslizan sobre los campos, mariposas en primavera y
+ * verano, hojas que caen en otoño, y un borde oscuro suave alrededor de la vista. Toda posición es una función pura del
+ * reloj, así que no se guarda nada, nada es aleatorio y dos cuadros a la misma hora son iguales.
  *
  * <p>Stories: HU-41, HU-48.
  */
@@ -25,18 +25,18 @@ final class AmbientPainter {
     private static final int FALLING_LEAVES = 12;
 
     private AmbientPainter() {
-        // static helpers only
+                // solo métodos de utilidad estáticos
     }
 
     /**
-     * Paints the ambient life over the map.
+     * Pinta la vida ambiental sobre el mapa.
      *
-     * @param g       where to paint
-     * @param area    the map, in logical pixels
-     * @param cell    side of a tile
-     * @param time    the clock, in milliseconds
-     * @param season  season id
-     * @param weather weather id
+     * @param g       dónde pintar
+     * @param area    el mapa, en píxeles lógicos
+     * @param cell    lado de una baldosa
+     * @param time    el reloj, en milisegundos
+     * @param season  id de la estación
+     * @param weather id del clima
      */
     static void paint(Graphics2D g, Rectangle area, int cell, long time, String season, String weather) {
         boolean wet = "RAINY".equals(weather) || "SNOWY".equals(weather);
@@ -51,7 +51,7 @@ final class AmbientPainter {
         }
     }
 
-    /** A dark edge around the whole view, so the eye rests on the farm in the middle. */
+    /** Un borde oscuro alrededor de toda la vista, para que el ojo descanse en la granja del centro. */
     static void vignette(Graphics2D g, int width, int height) {
         float radius = (float) Math.hypot(width, height) / 2f;
         if (radius <= 0) {

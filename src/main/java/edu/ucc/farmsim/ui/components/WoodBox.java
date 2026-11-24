@@ -8,7 +8,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 /**
- * A panel drawn as a wooden frame around parchment; what it holds sits on the parchment.
+ * Un panel dibujado como un marco de madera alrededor de pergamino; lo que contiene queda sobre el pergamino.
  *
  * <p>Stories: HU-48.
  */
@@ -18,9 +18,9 @@ public class WoodBox extends JPanel {
     private static final int PAD = 6;
 
     /**
-     * Creates the box.
+     * Crea la caja.
      *
-     * @param layout how its content is laid out
+     * @param layout cómo se distribuye su contenido
      */
     public WoodBox(LayoutManager layout) {
         super(layout);

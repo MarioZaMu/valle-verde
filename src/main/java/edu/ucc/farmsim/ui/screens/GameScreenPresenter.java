@@ -21,8 +21,8 @@ import edu.ucc.farmsim.ui.theme.Texts;
 import java.util.function.Consumer;
 
 /**
- * Logic of the game screen, with no Swing: what happens when the player clicks a plot, presses a button or
- * uses a shortcut. Messages go to a sink (the status bar in production); an empty string clears the bar.
+ * Lógica de la pantalla de juego, sin Swing: qué pasa cuando el jugador hace clic en una parcela, pulsa un botón o usa
+ * un atajo. Los mensajes van a un destino (la barra de estado en producción); una cadena vacía borra la barra.
  *
  * <p>Stories: HU-10, HU-17, HU-18, HU-20, HU-22, HU-26, HU-29, HU-30, HU-34, HU-36, HU-39, HU-45, HU-46.
  */
@@ -39,13 +39,13 @@ public final class GameScreenPresenter {
     private boolean blocked;
 
     /**
-     * Creates the presenter.
+     * Crea el presentador.
      *
-     * @param controller entry point to the game
-     * @param tools      the selected tool and seed
-     * @param messages   where messages for the player are sent
-     * @param dialogs    opens the dialogs
-     * @param toasts     where errors and notices are shown as toasts (HU-39)
+     * @param controller punto de entrada al juego
+     * @param tools      la herramienta y la semilla seleccionadas
+     * @param messages   donde se envían los mensajes para el jugador
+     * @param dialogs    abre los diálogos
+     * @param toasts     donde se muestran los errores y avisos como toasts (HU-39)
      */
     public GameScreenPresenter(GameCommands controller, ToolModel tools, Consumer<String> messages,
                                GameDialogs dialogs, ToastPresenter toasts) {
@@ -57,19 +57,19 @@ public final class GameScreenPresenter {
     }
 
     /**
-     * Creates the presenter without notices: only the message sink hears about the result of an order.
+     * Crea el presentador sin avisos: solo el destino de mensajes se entera del resultado de una orden.
      *
-     * @param controller entry point to the game
-     * @param tools      the selected tool and seed
-     * @param messages   where messages for the player are sent
-     * @param dialogs    opens the dialogs
+     * @param controller punto de entrada al juego
+     * @param tools      la herramienta y la semilla seleccionadas
+     * @param messages   donde se envían los mensajes para el jugador
+     * @param dialogs    abre los diálogos
      */
     public GameScreenPresenter(GameCommands controller, ToolModel tools, Consumer<String> messages,
                                GameDialogs dialogs) {
         this(controller, tools, messages, dialogs, new ToastPresenter(new ToastQueue(() -> 0L)));
     }
 
-    /** Sends a message to the status bar; a rejection also becomes an error notice (HU-39 · CA-2). */
+    /** Envía un mensaje a la barra de estado; un rechazo también se vuelve un aviso de error (HU-39 · CA-2). */
     private void show(boolean ok, String onSuccess, String onFailure) {
         messages.accept(ok ? onSuccess : onFailure);
         if (!ok) {
@@ -79,16 +79,19 @@ public final class GameScreenPresenter {
         }
     }
 
-    /** "End day": the top bar updates through the events; a message appears only if the day could not end. */
+    /**
+     * «Terminar día»: la barra superior se actualiza por los eventos; solo aparece un mensaje si el día no pudo
+     * terminar.
+     */
     public void onEndDay() {
         Result<HudView> result = controller.endDay();
         show(result.isOk(), CLEAR, result.message());
     }
 
     /**
-     * A click on a plot: the selected tool acts on it. Without a tool nothing happens, except on a building,
-     * whose panel opens. Build opens the construction dialog; Feed and Harvest act on the building under the
-     * click (HU-36 · CA-4).
+     * Un clic en una parcela: la herramienta seleccionada actúa sobre ella. Sin herramienta no pasa nada, salvo sobre
+     * un edificio, cuyo panel se abre. Construir abre el diálogo de construcción; Alimentar y Cosechar actúan sobre el
+     * edificio bajo el clic (HU-36 · CA-4).
      */
     public void onPlotClicked(int col, int row) {
         Result<MapView> map = controller.map();
@@ -132,11 +135,11 @@ public final class GameScreenPresenter {
     }
 
     /**
-     * An arrow or W A S D: one step of the avatar (RN-36). A blocked step shows its message; holding the key
-     * against a wall shows the notice once, not on every repeat.
+     * Una flecha o W A S D: un paso del avatar (RN-36). Un paso bloqueado muestra su mensaje; mantener la tecla contra
+     * una pared muestra el aviso una vez, no en cada repetición.
      *
      * @param direction {@code NORTH}, {@code SOUTH}, {@code EAST} or {@code WEST}
-     * @return {@code true} if the avatar moved; {@code false} if it only turned (or there is no game)
+     * @return {@code true} si el avatar se movió; {@code false} si solo giró (o no hay partida)
      */
     public boolean onMove(String direction) {
         Result<AvatarView> result = controller.move(direction);
@@ -154,8 +157,8 @@ public final class GameScreenPresenter {
     }
 
     /**
-     * Space: the selected tool acts on the plot in front of the avatar, with the same rules as a click there
-     * (RN-36).
+     * Espacio: la herramienta seleccionada actúa sobre la parcela que tiene enfrente el avatar, con las mismas reglas
+     * que un clic allí (RN-36).
      */
     public void onUseTool() {
         Result<MapView> map = controller.map();
@@ -174,7 +177,7 @@ public final class GameScreenPresenter {
     }
 
     /**
-     * E: talk to the person in front of the avatar, or else to any person next to it (RN-37).
+     * E: hablar con la persona que está frente al avatar, o si no con cualquier persona a su lado (RN-37).
      */
     public void onTalkKey() {
         Result<MapView> map = controller.map();
@@ -199,7 +202,9 @@ public final class GameScreenPresenter {
         onTalk(npc.id());
     }
 
-    /** Talks to a person of the valley: its dialogue opens, or the reason it cannot (too far) is shown. */
+    /**
+     * Habla con una persona del valle: se abre su diálogo, o se muestra la razón por la que no se puede (muy lejos).
+     */
     public void onTalk(String npcId) {
         Result<DialogueView> result = controller.talk(npcId);
         if (result.isOk()) {
@@ -210,7 +215,7 @@ public final class GameScreenPresenter {
         }
     }
 
-    /** The summary of the day arrived: it is shown to the player (HU-17). */
+    /** Llegó el resumen del día: se muestra al jugador (HU-17). */
     public void onSummary(DaySummaryView summary) {
         dialogs.showSummary(summary);
     }
@@ -244,24 +249,24 @@ public final class GameScreenPresenter {
         return map.isOk() ? map.value().buildingAt(col, row) : null;
     }
 
-    /** The Save button: the slots open so the player chooses where to save (CU-14, HU-29). */
+    /** El botón Guardar: se abren las ranuras para que el jugador elija dónde guardar (CU-14, HU-29). */
     public void onSave() {
         dialogs.showSlots(true);
     }
 
-    /** The slot saved or loaded last, or 0 if none has been used. */
+    /** La última ranura guardada o cargada, o 0 si no se ha usado ninguna. */
     public int lastSlot() {
         return lastSlot;
     }
 
-    /** Remembers the slot the player saved or loaded last, for the quick keys. */
+    /** Recuerda la última ranura que el jugador guardó o cargó, para las teclas rápidas. */
     public void useSlot(int slot) {
         this.lastSlot = slot;
     }
 
     /**
-     * A keyboard shortcut (RN-34): end the day, open the market, the inventory or the achievements, and save or
-     * load quickly in the slot used last (the slots dialog opens if none has been used yet).
+     * Un atajo de teclado (RN-34): terminar el día, abrir el mercado, el inventario o los logros, y guardar o cargar
+     * rápido en la última ranura usada (se abre el diálogo de ranuras si todavía no se ha usado ninguna).
      */
     public void onShortcut(Shortcut shortcut) {
         switch (shortcut) {

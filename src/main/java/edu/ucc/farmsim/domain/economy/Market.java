@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The market: what each product sells for, how its demand falls when sold and recovers each day (RN-17, RN-18),
- * its trend (RN-19) and the fixed catalogue of purchases (RN-16).
+ * El mercado: por cuánto se vende cada producto, cómo baja su demanda al venderse y se recupera cada día (RN-17,
+ * RN-18), su tendencia (RN-19) y el catálogo fijo de compras (RN-16).
  *
- * <p>Every sellable product (the five crops, eggs and milk) has its own demand between 50 and 100 percent. The
- * price of a unit is worked out by the {@link PricingStrategy} of the product with the demand of that moment.
+ * <p>Cada producto vendible (los cinco cultivos, huevos y leche) tiene su propia demanda entre 50 y 100 por ciento. El
+ * precio de una unidad lo calcula la {@link PricingStrategy} del producto con la demanda de ese momento.
  *
  * <p>Stories: HU-14, HU-15, HU-16.
  */
@@ -30,17 +30,17 @@ public final class Market {
         }
     }
 
-    /** A market of a new game: full demand everywhere and no price history. */
+    /** Un mercado de partida nueva: demanda completa en todo y sin historial de precios. */
     public static Market standard() {
         return new Market();
     }
 
-    /** Whether a product can be sold: crops, eggs and milk. */
+    /** Si un producto se puede vender: cultivos, huevos y leche. */
     public static boolean isSellable(ItemType item) {
         return item.kind() == ItemType.Kind.CROP || item.kind() == ItemType.Kind.ANIMAL_PRODUCT;
     }
 
-    /** Every sellable product, in a stable order. */
+    /** Todos los productos vendibles, en un orden estable. */
     public static List<ItemType> sellableItems() {
         List<ItemType> items = new ArrayList<>();
         for (ItemType item : ItemType.values()) {
@@ -51,12 +51,12 @@ public final class Market {
         return items;
     }
 
-    /** Whether a product is in the fixed purchase catalogue: seeds, hay and medicine (RN-16). */
+    /** Si un producto está en el catálogo fijo de compras: semillas, heno y medicina (RN-16). */
     public static boolean isPurchasable(ItemType item) {
         return item.kind() == ItemType.Kind.SEED || item.kind() == ItemType.Kind.SUPPLY;
     }
 
-    /** Every purchasable product, in a stable order. */
+    /** Todos los productos comprables, en un orden estable. */
     public static List<ItemType> purchasableItems() {
         List<ItemType> items = new ArrayList<>();
         for (ItemType item : ItemType.values()) {
@@ -67,7 +67,7 @@ public final class Market {
         return items;
     }
 
-    /** The fixed price in m of one unit of a purchasable product. */
+    /** El precio fijo en m de una unidad de un producto comprable. */
     public static int buyPrice(ItemType item) {
         return switch (item) {
             case HAY -> GameRules.PRICE_HAY;
@@ -81,19 +81,19 @@ public final class Market {
         };
     }
 
-    /** The demand of a sellable product, in percent. */
+    /** La demanda de un producto vendible, en porcentaje. */
     public int demandOf(ItemType item) {
         requireSellable(item);
         return demand.get(item);
     }
 
-    /** The price of the next unit of a product at the current demand. */
+    /** El precio de la siguiente unidad de un producto con la demanda actual. */
     public int priceOf(ItemType item, Season season) {
         return strategyFor(item).unitPrice(item, season, demandOf(item));
     }
 
     /**
-     * Sells one unit: returns its price at the current demand and then lowers the demand by 2 (never below 50).
+     * Vende una unidad: devuelve su precio con la demanda actual y luego baja la demanda en 2 (nunca por debajo de 50).
      */
     public int sellUnit(ItemType item, Season season) {
         int price = priceOf(item, season);
@@ -101,7 +101,7 @@ public final class Market {
         return price;
     }
 
-    /** What selling the given quantity would pay, each unit at the demand it would find. Changes nothing. */
+    /** Lo que pagaría vender la cantidad dada, cada unidad con la demanda que encontraría. No cambia nada. */
     public int quote(ItemType item, Season season, int quantity) {
         int current = demandOf(item);
         int total = 0;
@@ -113,8 +113,8 @@ public final class Market {
     }
 
     /**
-     * Step 4 of RN-03: remembers the current price of every product as yesterday's (RN-19) and then recovers
-     * the demand by 5 (never above 100, RN-18).
+     * Paso 4 de RN-03: recuerda el precio actual de cada producto como el de ayer (RN-19) y luego recupera la demanda
+     * en 5 (nunca por encima de 100, RN-18).
      */
     public void endOfDay(Season season) {
         for (ItemType item : sellableItems()) {
@@ -123,7 +123,7 @@ public final class Market {
         }
     }
 
-    /** Whether the price went up, down or stayed the same since the last end of day (RN-19). */
+    /** Si el precio subió, bajó o quedó igual desde el último fin de día (RN-19). */
     public Trend trendOf(ItemType item, Season season) {
         int before = previousPrice.get(item);
         if (before == 0) {
@@ -136,12 +136,12 @@ public final class Market {
         return now < before ? Trend.DOWN : Trend.SAME;
     }
 
-    /** An immutable copy of the market. */
+    /** Una copia inmutable del mercado. */
     public MarketSnapshot snapshot() {
         return new MarketSnapshot(demand, previousPrice);
     }
 
-    /** Puts the market back as it was when the snapshot was taken. */
+    /** Deja el mercado como estaba cuando se tomó la instantánea. */
     public void restoreFrom(MarketSnapshot snapshot) {
         demand.putAll(snapshot.demand());
         previousPrice.putAll(snapshot.previousPrice());

@@ -1,13 +1,13 @@
 package edu.ucc.farmsim.ui.render;
 
 /**
- * Told when the player clicks a plot of the map.
+ * Se le avisa cuando el jugador hace clic en una parcela del mapa.
  *
  * <p>Stories: HU-35.
  */
 @FunctionalInterface
 public interface PlotClickListener {
 
-    /** Called with the coordinates of the clicked plot. */
+    /** Se llama con las coordenadas de la parcela pulsada. */
     void plotClicked(int col, int row);
 }

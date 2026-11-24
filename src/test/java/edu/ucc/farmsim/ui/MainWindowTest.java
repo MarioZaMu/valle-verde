@@ -8,7 +8,7 @@ import edu.ucc.farmsim.ui.screens.MainWindow;
 import java.awt.GraphicsEnvironment;
 import org.junit.jupiter.api.Test;
 
-/** Smoke test of the empty main window (R-07: usable from 1024 x 768). Skipped without a display. */
+/** Prueba de humo de la ventana principal vacía (R-07: utilizable desde 1024 x 768). Se omite sin pantalla. */
 class MainWindowTest {
 
     @Test

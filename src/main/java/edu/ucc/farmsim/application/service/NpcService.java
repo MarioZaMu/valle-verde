@@ -14,9 +14,9 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 /**
- * Talking to the people of the valley and delivering their errands (RN-37, RN-38). Talking needs the avatar on
- * one of the four plots next to the person, costs no energy and changes nothing. Delivering takes the items,
- * pays the reward as income of the day and marks the errand as done; it is never paid twice.
+ * Hablar con las personas del valle y entregar sus encargos (RN-37, RN-38). Hablar necesita al avatar en una de las
+ * cuatro parcelas junto a la persona, no cuesta energía y no cambia nada. Entregar toma los objetos, paga la recompensa
+ * como ingreso del día y marca el encargo como hecho; nunca se paga dos veces.
  *
  * <p>Stories: HU-46, HU-47.
  */
@@ -30,13 +30,13 @@ public final class NpcService {
     private final AchievementService achievements;
 
     /**
-     * Creates the service.
+     * Crea el servicio.
      *
-     * @param session      the game in progress
-     * @param mapper       builds the views the UI draws
-     * @param dialogues    writes what each person says
-     * @param events       where events are published
-     * @param achievements evaluates the achievements after a reward
+     * @param session      la partida en curso
+     * @param mapper       construye las vistas que dibuja la UI
+     * @param dialogues    escribe lo que dice cada persona
+     * @param events       donde se publican los eventos
+     * @param achievements evalúa los logros después de una recompensa
      */
     public NpcService(GameSession session, ViewMapper mapper, DialogueService dialogues, EventBus events,
                       AchievementService achievements) {
@@ -47,7 +47,7 @@ public final class NpcService {
         this.achievements = achievements;
     }
 
-    /** The people of the valley, where they stand and how their errands are. A pure query. */
+    /** Las personas del valle, dónde están y cómo van sus encargos. Una consulta pura. */
     public Result<List<NpcView>> npcs() {
         if (!session.hasGame()) {
             return Result.failWith(ErrorCode.SIN_PARTIDA);
@@ -56,7 +56,7 @@ public final class NpcService {
     }
 
     /**
-     * What a person says, if the avatar stands next to it. A pure query.
+     * Lo que dice una persona, si el avatar está a su lado. Una consulta pura.
      *
      * @param npcId {@code MARTA}, {@code TOMAS}, {@code LUCIA} or {@code INES}
      */
@@ -73,10 +73,10 @@ public final class NpcService {
     }
 
     /**
-     * Delivers the errand of a person standing next to the avatar. A done errand is thanked and not paid again.
+     * Entrega el encargo de una persona que está junto al avatar. Un encargo hecho se agradece y no se vuelve a pagar.
      *
      * @param npcId {@code MARTA}, {@code TOMAS}, {@code LUCIA} or {@code INES}
-     * @return what the person says now; {@code ENCARGO_INCOMPLETO} if the inventory lacks units
+     * @return lo que dice la persona ahora; {@code ENCARGO_INCOMPLETO} si al inventario le faltan unidades
      */
     public Result<DialogueView> deliver(String npcId) {
         if (!session.hasGame()) {

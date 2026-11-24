@@ -10,7 +10,7 @@ final class WitheredState implements CropState {
     static final WitheredState INSTANCE = new WitheredState();
 
     private WitheredState() {
-        // shared instance
+                // instancia compartida
     }
 
     @Override
@@ -30,6 +30,6 @@ final class WitheredState implements CropState {
 
     @Override
     public void onDayEnd(Crop crop, int dryDaysToWither) {
-        // a withered crop neither grows nor needs water
+                // un cultivo marchito ni crece ni necesita agua
     }
 }

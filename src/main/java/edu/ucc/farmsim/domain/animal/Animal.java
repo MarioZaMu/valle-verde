@@ -5,8 +5,8 @@ import edu.ucc.farmsim.domain.config.GameRules;
 /**
  * Pattern: State — Role: Context (an animal whose behaviour depends on its health state).
  *
- * <p>Holds what RN-24 to RN-27 track: the state, {@code daysWithoutFeed}, {@code fedToday} and the units of
- * product waiting in the building.
+ * <p>Guarda lo que siguen RN-24 a RN-27: el estado, {@code daysWithoutFeed}, {@code fedToday} y las unidades de
+ * producto que esperan en el edificio.
  *
  * <p>Stories: HU-19, HU-20, HU-21, HU-22, HU-23.
  */
@@ -18,7 +18,7 @@ public final class Animal {
     private boolean fedToday;
     private int pending;
 
-    /** Creates a healthy animal that has not eaten and has nothing to collect (RN-23). */
+    /** Crea un animal sano que no ha comido y no tiene nada que recoger (RN-23). */
     public Animal(AnimalType type) {
         this(type, AnimalCondition.HEALTHY, 0, false, 0);
     }
@@ -31,56 +31,56 @@ public final class Animal {
         this.pending = pending;
     }
 
-    /** Rebuilds an animal from a snapshot (memento, tests). */
+    /** Reconstruye un animal desde una instantánea (memento, pruebas). */
     public static Animal fromSnapshot(AnimalSnapshot snapshot) {
         return new Animal(snapshot.type(), snapshot.condition(), snapshot.daysWithoutFeed(),
                 snapshot.fedToday(), snapshot.pending());
     }
 
-    /** An immutable copy of this animal. */
+    /** Una copia inmutable de este animal. */
     public AnimalSnapshot snapshot() {
         return new AnimalSnapshot(type, condition(), daysWithoutFeed, fedToday, pending);
     }
 
-    /** Kind of animal. */
+    /** Tipo de animal. */
     public AnimalType type() {
         return type;
     }
 
-    /** Healthy, hungry or sick. */
+    /** Sano, hambriento o enfermo. */
     public AnimalCondition condition() {
         return state.condition();
     }
 
-    /** True when the animal is sick. */
+    /** Verdadero cuando el animal está enfermo. */
     public boolean isSick() {
         return condition() == AnimalCondition.SICK;
     }
 
-    /** Consecutive days without eating. */
+    /** Días consecutivos sin comer. */
     public int daysWithoutFeed() {
         return daysWithoutFeed;
     }
 
-    /** Whether it ate today. */
+    /** Si comió hoy. */
     public boolean isFedToday() {
         return fedToday;
     }
 
-    /** Units of product waiting to be collected. */
+    /** Unidades de producto que esperan ser recogidas. */
     public int pending() {
         return pending;
     }
 
-    /** True if feeding it now makes sense: it can eat and has not eaten today (RN-24). */
+    /** Verdadero si alimentarlo ahora tiene sentido: puede comer y no ha comido hoy (RN-24). */
     public boolean needsFeeding() {
         return state.canEat() && !fedToday;
     }
 
     /**
-     * Marks the animal as fed today.
+     * Marca al animal como alimentado hoy.
      *
-     * @return {@code true} if it ate; {@code false} if it is sick or already ate
+     * @return {@code true} si comió; {@code false} si está enfermo o ya comió
      */
     public boolean feed() {
         if (!needsFeeding()) {
@@ -91,9 +91,9 @@ public final class Animal {
     }
 
     /**
-     * Cures a sick animal at once (RN-27).
+     * Cura de inmediato a un animal enfermo (RN-27).
      *
-     * @return {@code true} if it was sick; {@code false} (and nothing changed) otherwise
+     * @return {@code true} si estaba enfermo; {@code false} (y nada cambia) en caso contrario
      */
     public boolean cure() {
         if (!isSick()) {
@@ -104,14 +104,14 @@ public final class Animal {
         return true;
     }
 
-    /** Takes every unit waiting to be collected. */
+    /** Toma todas las unidades que esperan ser recogidas. */
     public int collect() {
         int taken = pending;
         pending = 0;
         return taken;
     }
 
-    /** Resolves the end of the day (RN-25) and clears the daily mark. */
+    /** Resuelve el final del día (RN-25) y borra la marca diaria. */
     public void endOfDay() {
         state.onDayEnd(this);
         fedToday = false;

@@ -6,8 +6,8 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 /**
- * A panel that stacks components on top of each other, every one covering the whole area. The first one added
- * is the one on top; its size is the one of the base component (the last one added).
+ * Un panel que apila componentes uno encima de otro, cada uno cubriendo toda el área. El primero que se agrega es el de
+ * arriba; su tamaño es el del componente base (el último agregado).
  *
  * <p>Stories: HU-39.
  */
@@ -18,9 +18,9 @@ public final class OverlayPanel extends JPanel {
     private final transient JComponent base;
 
     /**
-     * Creates the panel around its base component.
+     * Crea el panel alrededor de su componente base.
      *
-     * @param base the component that sets the size and sits at the bottom
+     * @param base el componente que fija el tamaño y queda al fondo
      */
     public OverlayPanel(JComponent base) {
         super(null);
@@ -28,12 +28,12 @@ public final class OverlayPanel extends JPanel {
         add(base);
     }
 
-    /** Puts a component above everything added before. */
+    /** Pone un componente encima de todo lo agregado antes. */
     public void addOnTop(JComponent overlay) {
         add(overlay, 0);
     }
 
-    /** The layers overlap, so Swing must paint every one of them, not only the one that asked. */
+    /** Las capas se superponen, así que Swing debe pintar todas, no solo la que lo pidió. */
     @Override
     public boolean isOptimizedDrawingEnabled() {
         return false;

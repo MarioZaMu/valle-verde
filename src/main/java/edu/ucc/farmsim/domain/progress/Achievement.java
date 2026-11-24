@@ -4,8 +4,7 @@ import edu.ucc.farmsim.domain.config.GameRules;
 import java.util.function.Predicate;
 
 /**
- * The achievements of RN-28 with their reward and the condition that grants each one. Some of them unlock
- * buildings (RN-29).
+ * Los logros de RN-28 con su recompensa y la condición que concede cada uno. Algunos desbloquean edificios (RN-29).
  *
  * <p>Stories: HU-18, HU-26.
  */
@@ -32,17 +31,17 @@ public enum Achievement {
         this.condition = condition;
     }
 
-    /** The identifier of RN-28, for example {@code LG-02}. */
+    /** El identificador de RN-28, por ejemplo {@code LG-02}. */
     public String code() {
         return code;
     }
 
-    /** Money in m paid when the achievement is unlocked. */
+    /** Dinero en m que se paga al desbloquear el logro. */
     public int reward() {
         return reward;
     }
 
-    /** True if the facts meet the condition of this achievement. */
+    /** Verdadero si los hechos cumplen la condición de este logro. */
     public boolean isMetBy(ProgressFacts facts) {
         return condition.test(facts);
     }

@@ -16,7 +16,10 @@ import edu.ucc.farmsim.support.RichGame;
 import edu.ucc.farmsim.support.TestApp;
 import org.junit.jupiter.api.Test;
 
-/** HU-29: saving a game in one of three slots as a document with a version and a checksum (RN-31, RN-32). */
+/**
+ * HU-29: guardar una partida en una de tres ranuras como un documento con una versión y una suma de control (RN-31,
+ * RN-32).
+ */
 class HU29SaveGameTest {
 
     private final InMemoryMongo mongo = new InMemoryMongo();
@@ -29,13 +32,14 @@ class HU29SaveGameTest {
 
     @Test
     void HU29_ca1_savingCreatesTheSlotDocumentWithVersionDateStateAndChecksum() {
-        // Given a game in progress
+                // Dada una partida en curso
         TestApp app = appWith(mongo);
 
-        // When the player saves in slot 2
+                // Cuando el jugador guarda en la ranura 2
         Result<SaveSlotView> result = app.controller.save(2);
 
-        // Then the document slot2 exists with schemaVersion 3 (1 before the avatar, 2 before the valley), savedAt, state and the SHA-256 of the state
+                // Entonces existe el documento slot2 con schemaVersion 3 (1 antes del avatar, 2 antes del valle), savedAt,
+        // state y el SHA-256 del estado
         assertTrue(result.isOk(), String.valueOf(result.message()));
         SaveDocument document = mongo.document(2);
         assertNotNull(document);

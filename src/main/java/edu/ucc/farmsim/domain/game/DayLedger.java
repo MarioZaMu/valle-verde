@@ -1,8 +1,8 @@
 package edu.ucc.farmsim.domain.game;
 
 /**
- * What the player earned and spent during the current day. It starts at zero every day, so the summary never
- * mixes days (HU-17 · CA-4).
+ * Lo que el jugador ganó y gastó durante el día en curso. Empieza en cero cada día, así que el resumen nunca mezcla
+ * días (HU-17 · CA-4).
  *
  * <p>Stories: HU-17.
  */
@@ -11,12 +11,12 @@ public final class DayLedger {
     private int income;
     private int expenses;
 
-    /** m earned today. */
+    /** m ganados hoy. */
     public int income() {
         return income;
     }
 
-    /** m spent today. */
+    /** m gastados hoy. */
     public int expenses() {
         return expenses;
     }

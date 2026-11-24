@@ -20,9 +20,9 @@ import javax.swing.SwingUtilities;
 /**
  * Pattern: Observer — Role: ConcreteObserver (the Swing top bar, repainted when an event arrives).
  *
- * <p>Shows date, weather, forecast, money and an energy bar with its text, in a wooden box that floats over
- * the top right corner of the farm. It subscribes itself to the event bus and repaints its labels from
- * {@link HudModel} each time an event arrives.
+ * <p>Muestra fecha, clima, pronóstico, dinero y una barra de energía con su texto, en una caja de madera que flota
+ * sobre la esquina superior derecha de la granja. Se suscribe sola al bus de eventos y repinta sus etiquetas desde
+ * {@link HudModel} cada vez que llega un evento.
  *
  * <p>Stories: HU-34, HU-48.
  */
@@ -43,19 +43,19 @@ public final class HudPanel extends JPanel implements GameListener {
     private final transient AssetManager assets;
 
     /**
-     * Builds the panel and subscribes it to the event bus.
+     * Construye el panel y lo suscribe al bus de eventos.
      *
-     * @param bus where game events are published
+     * @param bus donde se publican los eventos del juego
      */
     public HudPanel(EventBus bus) {
         this(bus, AssetManager.shared());
     }
 
     /**
-     * Builds the panel with icons from the given assets (none if they are missing).
+     * Construye el panel con íconos de los recursos dados (ninguno si faltan).
      *
-     * @param bus    where game events are published
-     * @param assets where the icons come from
+     * @param bus    donde se publican los eventos del juego
+     * @param assets de donde vienen los íconos
      */
     public HudPanel(EventBus bus, AssetManager assets) {
         super(new FlowLayout(FlowLayout.RIGHT, 0, 0));
@@ -89,7 +89,7 @@ public final class HudPanel extends JPanel implements GameListener {
         bus.subscribe(this);
     }
 
-    /** The wooden box itself, which is what floats over the map. */
+    /** La caja de madera en sí, que es lo que flota sobre el mapa. */
     public JComponent box() {
         return box;
     }

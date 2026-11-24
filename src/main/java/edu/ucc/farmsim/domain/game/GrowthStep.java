@@ -1,8 +1,8 @@
 package edu.ucc.farmsim.domain.game;
 
 /**
- * Step 2 of the end of the day: crops grow if they were watered, count a dry day, or wither (RN-03, RN-08,
- * RN-09). The weather that counts is today's, before the forecast step replaces it.
+ * Paso 2 del final del día: los cultivos crecen si fueron regados, cuentan un día seco o se marchitan (RN-03, RN-08,
+ * RN-09). El clima que cuenta es el de hoy, antes de que el paso del pronóstico lo reemplace.
  *
  * <p>Stories: HU-03, HU-05.
  */

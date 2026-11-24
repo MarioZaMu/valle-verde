@@ -14,8 +14,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * In-memory stand-in for the save repository. Tests can say which slots "exist", that a slot is damaged, or that
- * the storage is down; saving and loading really keep the game, so a round trip can be checked without MongoDB.
+ * Sustituto en memoria del repositorio de partidas. Las pruebas pueden decir qué ranuras «existen», que una ranura está
+ * dañada, o que el almacenamiento está caído; guardar y cargar realmente conservan la partida, así que se puede
+ * comprobar un viaje de ida y vuelta sin MongoDB.
  */
 public final class FakeSaveRepository implements SaveRepository {
 
@@ -26,30 +27,30 @@ public final class FakeSaveRepository implements SaveRepository {
     private final Set<Integer> damaged = new HashSet<>();
     private boolean down;
 
-    /** Marks a slot as occupied (its content cannot be loaded). */
+    /** Marca una ranura como ocupada (su contenido no se puede cargar). */
     public FakeSaveRepository withSlot(int slot) {
         occupied.add(slot);
         return this;
     }
 
-    /** Marks a slot as holding a damaged document. */
+    /** Marca una ranura como con un documento dañado. */
     public FakeSaveRepository withDamagedSlot(int slot) {
         damaged.add(slot);
         return this;
     }
 
-    /** Makes every call fail as if MongoDB did not answer. */
+    /** Hace que toda llamada falle como si MongoDB no respondiera. */
     public FakeSaveRepository unreachable() {
         this.down = true;
         return this;
     }
 
-    /** Brings the storage back. */
+    /** Devuelve el almacenamiento. */
     public void reachable() {
         this.down = false;
     }
 
-    /** Forgets every slot and brings the storage back (for tests that share one repository). */
+    /** Olvida todas las ranuras y devuelve el almacenamiento (para las pruebas que comparten un repositorio). */
     public void reset() {
         stored.clear();
         occupied.clear();

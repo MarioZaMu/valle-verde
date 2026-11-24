@@ -14,8 +14,8 @@ import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
 
 /**
- * The summary shown when a day ends (HU-17): income, expenses, balances and what happened. It does not block
- * the game; {@code Esc} or the button close it.
+ * El resumen que se muestra cuando termina un día (HU-17): ingresos, gastos, saldos y lo que pasó. No bloquea el juego;
+ * {@code Esc} o el botón lo cierran.
  *
  * <p>Stories: HU-17.
  */
@@ -25,10 +25,10 @@ public final class DaySummaryDialog extends JDialog {
     private static final int PADDING = 12;
 
     /**
-     * Builds the dialog.
+     * Construye el diálogo.
      *
-     * @param owner   the window it belongs to
-     * @param summary what happened during the day
+     * @param owner   la ventana a la que pertenece
+     * @param summary lo que pasó durante el día
      */
     public DaySummaryDialog(Window owner, DaySummaryView summary) {
         super(owner, Texts.SUMMARY_TITLE, ModalityType.MODELESS);

@@ -3,7 +3,7 @@ package edu.ucc.farmsim.domain.economy;
 import edu.ucc.farmsim.domain.crop.CropType;
 
 /**
- * Every item that can be stored in the inventory (RN-15): 5 seeds, 5 crops, egg, milk, hay and medicine.
+ * Todo objeto que se puede guardar en el inventario (RN-15): 5 semillas, 5 cultivos, huevo, leche, heno y medicina.
  *
  * <p>Stories: HU-01, HU-13.
  */
@@ -23,7 +23,7 @@ public enum ItemType {
     HAY(Kind.SUPPLY, null),
     MEDICINE(Kind.SUPPLY, null);
 
-    /** Broad category of an item. */
+    /** Categoría general de un objeto. */
     public enum Kind { SEED, CROP, ANIMAL_PRODUCT, SUPPLY }
 
     private final Kind kind;
@@ -34,22 +34,25 @@ public enum ItemType {
         this.cropType = cropType;
     }
 
-    /** Category of this item. */
+    /** Categoría de este objeto. */
     public Kind kind() {
         return kind;
     }
 
-    /** The crop this item is the seed or the harvest of, or {@code null} for items unrelated to crops. */
+    /**
+     * El cultivo del que este objeto es la semilla o la cosecha, o {@code null} para los objetos sin relación con
+     * cultivos.
+     */
     public CropType cropType() {
         return cropType;
     }
 
-    /** The seed item of a crop. */
+    /** El objeto semilla de un cultivo. */
     public static ItemType seedOf(CropType type) {
         return find(Kind.SEED, type);
     }
 
-    /** The harvest item of a crop. */
+    /** El objeto cosecha de un cultivo. */
     public static ItemType produceOf(CropType type) {
         return find(Kind.CROP, type);
     }

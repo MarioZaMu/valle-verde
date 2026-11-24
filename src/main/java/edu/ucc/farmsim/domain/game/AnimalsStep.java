@@ -5,8 +5,8 @@ import edu.ucc.farmsim.domain.animal.AnimalCondition;
 import edu.ucc.farmsim.domain.building.Building;
 
 /**
- * Step 3 of the end of the day: every animal eats or goes hungry, may fall sick and, if it is healthy and fed,
- * produces (RN-03, RN-25, RN-26).
+ * Paso 3 del final del día: cada animal come o pasa hambre, puede enfermarse y, si está sano y alimentado, produce
+ * (RN-03, RN-25, RN-26).
  *
  * <p>Stories: HU-21, HU-22.
  */

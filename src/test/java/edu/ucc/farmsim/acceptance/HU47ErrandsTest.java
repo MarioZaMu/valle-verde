@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-/** HU-47: the errands of the people of the valley (RN-38). */
+/** HU-47: los encargos de las personas del valle (RN-38). */
 class HU47ErrandsTest {
 
     private static TestApp nextToMarta(int carrots) {

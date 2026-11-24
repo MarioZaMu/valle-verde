@@ -14,7 +14,7 @@ import edu.ucc.farmsim.domain.economy.ItemType;
 import edu.ucc.farmsim.domain.farm.FarmMap;
 import org.junit.jupiter.api.Test;
 
-/** The four builders and their director produce the buildings of RN-20; the map keeps them (RN-21). */
+/** Los cuatro constructores y su director producen los edificios de RN-20; el mapa los conserva (RN-21). */
 class BuildingDirectorTest {
 
     @Test

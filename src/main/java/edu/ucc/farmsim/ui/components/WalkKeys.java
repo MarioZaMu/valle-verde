@@ -5,12 +5,13 @@ import java.util.Deque;
 import java.util.Iterator;
 
 /**
- * The walking keys that are held down, and when the avatar takes its next step (RN-40). Pressing a key while
- * standing steps at once; while keys stay down the avatar steps again every {@code stepMs}, exactly when the
- * previous step ends, so the walk never pauses and never jerks. A key pressed in the middle of a step waits for
- * that step to end. The key repeat of the system is ignored. With several keys down the last one pressed leads;
- * with two perpendicular keys (such as W and D) the steps alternate between them, which walks in a diagonal.
- * Releasing a key goes on with the ones still held. It keeps no clock of its own: the caller passes the time.
+ * Las teclas de caminar que se mantienen pulsadas, y cuándo da el avatar su siguiente paso (RN-40). Pulsar una tecla
+ * estando quieto da un paso de inmediato; mientras las teclas siguen pulsadas el avatar vuelve a dar un paso cada
+ * {@code stepMs}, justo cuando termina el paso anterior, de modo que la caminata nunca se detiene ni da tirones. Una
+ * tecla pulsada a mitad de un paso espera a que ese paso termine. Se ignora la repetición de teclas del sistema. Con
+ * varias teclas pulsadas lidera la última presionada; con dos teclas perpendiculares (como W y D) los pasos se alternan
+ * entre ellas, lo que camina en diagonal. Soltar una tecla continúa con las que siguen pulsadas. No lleva reloj propio:
+ * quien llama pasa la hora.
  *
  * <p>Stories: HU-50.
  */
@@ -22,21 +23,21 @@ public final class WalkKeys {
     private String last;
 
     /**
-     * Creates the keys.
+     * Crea las teclas.
      *
-     * @param stepMs how long one step takes, in milliseconds
+     * @param stepMs cuánto dura un paso, en milisegundos
      */
     public WalkKeys(long stepMs) {
         this.stepMs = stepMs;
     }
 
     /**
-     * A walking key went down.
+     * Una tecla de caminar se pulsó.
      *
-     * @param direction the direction of the key
-     * @param now       the time, in milliseconds
-     * @return the direction to step to now, or {@code null} when the key was already down (a key repeat) or a
-     *         step is still under way (the key then counts from the next step)
+     * @param direction la dirección de la tecla
+     * @param now       la hora, en milisegundos
+     * @return la dirección a la que dar el paso ahora, o {@code null} cuando la tecla ya estaba pulsada (una
+     *         repetición) o un paso sigue en curso (la tecla cuenta entonces desde el siguiente paso)
      */
     public String press(String direction, long now) {
         if (held.contains(direction)) {
@@ -52,21 +53,21 @@ public final class WalkKeys {
         return direction;
     }
 
-    /** A walking key went up. */
+    /** Una tecla de caminar se soltó. */
     public void release(String direction) {
         held.remove(direction);
     }
 
-    /** Forgets every key, for when the window loses the keyboard and would never hear them go up. */
+    /** Olvida todas las teclas, para cuando la ventana pierde el teclado y nunca oiría que se sueltan. */
     public void clear() {
         held.clear();
     }
 
     /**
-     * Called often while walking.
+     * Se llama a menudo mientras se camina.
      *
-     * @param now the time, in milliseconds
-     * @return the direction of the next step when its time has come, or {@code null}
+     * @param now la hora, en milisegundos
+     * @return la dirección del siguiente paso cuando llega su hora, o {@code null}
      */
     public String tick(long now) {
         if (held.isEmpty() || now < next) {
@@ -80,8 +81,8 @@ public final class WalkKeys {
     }
 
     /**
-     * The held key to try when a step to {@code direction} is blocked: the most recent one at a right angle to
-     * it, or {@code null}. The step taken instead counts for the zigzag.
+     * La tecla pulsada que se prueba cuando un paso hacia {@code direction} está bloqueado: la más reciente en ángulo
+     * recto con él, o {@code null}. El paso que se da en su lugar cuenta para el zigzag.
      */
     public String alternative(String direction) {
         for (Iterator<String> it = held.descendingIterator(); it.hasNext();) {
@@ -93,12 +94,12 @@ public final class WalkKeys {
         return null;
     }
 
-    /** Tells that the step went to {@code direction} instead (the planned one was blocked). */
+    /** Avisa que el paso fue hacia {@code direction} en su lugar (el planeado estaba bloqueado). */
     public void steppedInstead(String direction) {
         last = direction;
     }
 
-    /** True while a walking key is held down. */
+    /** Verdadero mientras hay una tecla de caminar pulsada. */
     public boolean isWalking() {
         return !held.isEmpty();
     }

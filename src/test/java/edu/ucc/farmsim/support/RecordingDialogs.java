@@ -6,14 +6,16 @@ import edu.ucc.farmsim.ui.screens.GameDialogs;
 import java.util.ArrayList;
 import java.util.List;
 
-/** A {@link GameDialogs} that opens nothing and remembers what the screen asked for. */
+/** Un {@link GameDialogs} que no abre nada y recuerda lo que pidió la pantalla. */
 public final class RecordingDialogs implements GameDialogs {
 
-    /** What was opened, in order: {@code market}, {@code inventory}, {@code construction:col,row}, {@code building:id}. */
+    /**
+     * Lo que se abrió, en orden: {@code market}, {@code inventory}, {@code construction:col,row}, {@code building:id}.
+     */
     public final List<String> opened = new ArrayList<>();
-    /** The dialogues opened. */
+    /** Los diálogos abiertos. */
     public final List<DialogueView> dialogues = new ArrayList<>();
-    /** The summaries shown. */
+    /** Los resúmenes mostrados. */
     public final List<DaySummaryView> summaries = new ArrayList<>();
 
     @Override

@@ -1,7 +1,7 @@
 package edu.ucc.farmsim.domain.animal;
 
 /**
- * The three states an animal can be in (RN-25), as plain data for views and snapshots.
+ * Los tres estados en que puede estar un animal (RN-25), como datos simples para vistas e instantáneas.
  *
  * <p>Stories: HU-21.
  */

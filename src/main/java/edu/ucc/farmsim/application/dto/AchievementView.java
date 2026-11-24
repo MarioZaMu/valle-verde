@@ -1,17 +1,17 @@
 package edu.ucc.farmsim.application.dto;
 
 /**
- * One achievement as the achievements dialog shows it.
+ * Un logro tal como lo muestra el diálogo de logros.
  *
  * <p>Stories: HU-26.
  *
- * @param code        identifier of RN-28, for example {@code LG-02}
- * @param name        Spanish name
- * @param description Spanish text of the condition
- * @param reward      reward in m
- * @param unlocked    whether the player has it
- * @param progress    how far the player is (capped at {@code target})
- * @param target      what the condition asks for
+ * @param code        identificador de RN-28, por ejemplo {@code LG-02}
+ * @param name        nombre en español
+ * @param description texto de la condición en español
+ * @param reward      recompensa en m
+ * @param unlocked    si el jugador lo tiene
+ * @param progress    cuánto lleva el jugador (limitado a {@code target})
+ * @param target      lo que pide la condición
  */
 public record AchievementView(String code, String name, String description, int reward, boolean unlocked,
                               int progress, int target) { }

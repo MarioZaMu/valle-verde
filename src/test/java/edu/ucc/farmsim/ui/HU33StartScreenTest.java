@@ -23,13 +23,13 @@ import javax.swing.JButton;
 import org.junit.jupiter.api.Test;
 
 /**
- * HU-33: start screen with "New game", "Load" and "Exit". The screen logic lives in
- * {@link StartScreenPresenter}, which has no Swing, so it is tested without a display. Also holds the UI side
- * of HU-28 · CA-3 (confirmation before discarding a game in progress).
+ * HU-33: pantalla de inicio con «Nueva partida», «Cargar» y «Salir». La lógica de la pantalla vive en {@link
+ * StartScreenPresenter}, que no tiene Swing, así que se prueba sin pantalla. También contiene el lado de UI de HU-28 ·
+ * CA-3 (confirmación antes de descartar una partida en curso).
  */
 class HU33StartScreenTest {
 
-    /** Records what the presenter asks the navigation to do. */
+    /** Registra lo que el presentador le pide hacer a la navegación. */
     private static class FakeNavigator implements ScreenNavigator {
         final List<String> calls = new ArrayList<>();
         boolean answerToConfirmation = true;
@@ -63,7 +63,7 @@ class HU33StartScreenTest {
         assertEquals("Salir", Texts.START_EXIT);
     }
 
-    /** The controller, writing the name of every order into {@code calls}. */
+    /** El controlador, escribiendo el nombre de cada orden en {@code calls}. */
     private static edu.ucc.farmsim.application.controller.GameCommands recording(TestApp app, List<String> calls) {
         return (edu.ucc.farmsim.application.controller.GameCommands) java.lang.reflect.Proxy.newProxyInstance(
                 HU33StartScreenTest.class.getClassLoader(),
@@ -175,17 +175,17 @@ class HU33StartScreenTest {
 
     @Test
     void HU28_ca3_cancellingTheConfirmationKeepsTheGameInProgress() {
-        // Given a game in progress where energy was spent
+                // Dada una partida en curso donde se gastó energía
         TestApp app = TestApp.create();
         app.controller.newGame(TestApp.SEED);
         app.session.current().energy().trySpend(10);
         FakeNavigator navigator = new FakeNavigator();
         navigator.answerToConfirmation = false;
 
-        // When the player chooses "New game" and cancels the confirmation
+                // Cuando el jugador elige «Nueva partida» y cancela la confirmación
         new StartScreenPresenter(app.controller, navigator, () -> TestApp.SEED).onNewGame();
 
-        // Then the confirmation was asked, no game screen was shown, and the game is untouched
+                // Entonces se preguntó la confirmación, no se mostró ninguna pantalla de juego y la partida no se tocó
         assertEquals(List.of("confirm:" + Texts.CONFIRM_DISCARD_GAME), navigator.calls);
         assertEquals(90, app.session.current().energy().current());
     }

@@ -19,10 +19,10 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.table.DefaultTableModel;
 
 /**
- * The market: a modal dialog with the tabs "Comprar" and "Vender" (HU-38). Being modal, the map does not
- * answer clicks while it is open; {@code Esc} closes it. The quantity chooser allows 1 to 99 when buying and 1 to
- * the units owned when selling, the sale shows its forecast total and the buy button is disabled while the
- * player cannot pay. All the logic is in {@link MarketPresenter}.
+ * El mercado: un diálogo modal con las pestañas «Comprar» y «Vender» (HU-38). Al ser modal, el mapa no responde a los
+ * clics mientras está abierto; {@code Esc} lo cierra. El selector de cantidad permite de 1 a 99 al comprar y de 1 hasta
+ * las unidades que se tienen al vender, la venta muestra su total previsto y el botón de comprar se deshabilita
+ * mientras el jugador no pueda pagar. Toda la lógica está en {@link MarketPresenter}.
  *
  * <p>Stories: HU-14, HU-15, HU-16, HU-38.
  */
@@ -37,10 +37,10 @@ public final class MarketDialog extends JDialog {
     private final Tab sellTab;
 
     /**
-     * Builds the dialog and loads the market.
+     * Construye el diálogo y carga el mercado.
      *
-     * @param owner     the window it belongs to
-     * @param presenter the logic of the market
+     * @param owner     la ventana a la que pertenece
+     * @param presenter la lógica del mercado
      */
     public MarketDialog(Window owner, MarketPresenter presenter) {
         super(owner, Texts.MARKET_TITLE, ModalityType.APPLICATION_MODAL);
@@ -62,7 +62,7 @@ public final class MarketDialog extends JDialog {
         setLocationRelativeTo(owner);
     }
 
-    /** The tab with the given title ({@code Comprar} or {@code Vender}) as a component, for tests. */
+    /** La pestaña con el título dado ({@code Comprar} o {@code Vender}) como componente, para las pruebas. */
     JTabbedPane tabs() {
         return (JTabbedPane) ((BorderLayout) getContentPane().getLayout()).getLayoutComponent(BorderLayout.CENTER);
     }
@@ -73,14 +73,14 @@ public final class MarketDialog extends JDialog {
         sellTab.reload();
     }
 
-    /** One tab: the table, the quantity chooser, the forecast and the action button. */
+    /** Una pestaña: la tabla, el selector de cantidad, la previsión y el botón de acción. */
     private final class Tab {
         private final boolean buying;
         private final DefaultTableModel rows;
         private final JTable table;
         private final JSpinner quantity = new JSpinner(new SpinnerNumberModel(1, 1, 1, 1));
         private final JLabel total = new JLabel(" ");
-        private final JButton action = new JButton(); // enabled by refreshTotal
+        private final JButton action = new JButton(); // lo habilita refreshTotal
         private final JPanel panel = new JPanel(new BorderLayout());
 
         Tab(boolean buying) {

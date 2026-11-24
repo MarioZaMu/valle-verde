@@ -7,8 +7,8 @@ import edu.ucc.farmsim.ui.theme.Texts;
 /**
  * Pattern: Observer — Role: ConcreteObserver (turns game events into notices).
  *
- * <p>It listens to the event bus: an unlocked achievement and the start of a new season become notices, and the
- * screen asks it directly for the errors and information that come from the player's own orders. It has no
+ * <p>Escucha el bus de eventos: un logro desbloqueado y el comienzo de una estación nueva se vuelven avisos, y la
+ * pantalla le pide directamente los errores y la información que vienen de las órdenes del propio jugador. No tiene
  * Swing.
  *
  * <p>Stories: HU-26, HU-39, HU-47, HU-49.
@@ -19,9 +19,9 @@ public final class ToastPresenter implements GameListener {
     private String season;
 
     /**
-     * Creates the presenter.
+     * Crea el presentador.
      *
-     * @param queue where the notices are posted
+     * @param queue donde se publican los avisos
      */
     public ToastPresenter(ToastQueue queue) {
         this.queue = queue;
@@ -46,12 +46,12 @@ public final class ToastPresenter implements GameListener {
         }
     }
 
-    /** A rejection: the message of RN-35 as an error notice. */
+    /** Un rechazo: el mensaje de RN-35 como aviso de error. */
     public void error(String message) {
         queue.post(ToastKind.ERROR, message);
     }
 
-    /** Information for the player, such as a notice that came with a successful order. */
+    /** Información para el jugador, como un aviso que vino con una orden exitosa. */
     public void info(String message) {
         queue.post(ToastKind.INFO, message);
     }

@@ -7,27 +7,27 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Limited storage: a fixed number of slots, each holding one item type in a stack of up to
- * {@link GameRules#MAX_STACK} units (RN-15).
+ * Almacenamiento limitado: un número fijo de casillas, cada una con un tipo de objeto en una pila de hasta {@link
+ * GameRules#MAX_STACK} unidades (RN-15).
  *
- * <p>Insertion is atomic: if the whole amount does not fit, nothing is inserted. Domain operations signal
- * a normal rejection with {@code false}; the application layer turns it into the {@code INVENTARIO_LLENO}
- * error. A non-positive amount is a programming error and raises {@link IllegalArgumentException}.
+ * <p>La inserción es atómica: si no cabe toda la cantidad, no se inserta nada. Las operaciones del dominio señalan un
+ * rechazo normal con {@code false}; la capa de aplicación lo convierte en el error {@code INVENTARIO_LLENO}. Una
+ * cantidad no positiva es un error de programación y lanza {@link IllegalArgumentException}.
  *
  * <p>Stories: HU-10, HU-13.
  */
 public final class Inventory {
 
-    /** One occupied slot. */
+    /** Una casilla ocupada. */
     public record ItemStack(ItemType type, int amount) { }
 
     private ItemType[] types;
     private int[] amounts;
 
     /**
-     * Creates an empty inventory.
+     * Crea un inventario vacío.
      *
-     * @param capacity number of slots
+     * @param capacity número de casillas
      */
     public Inventory(int capacity) {
         if (capacity <= 0) {
@@ -37,20 +37,20 @@ public final class Inventory {
         this.amounts = new int[capacity];
     }
 
-    /** Creates an empty inventory with the base number of slots (RN-15). */
+    /** Crea un inventario vacío con el número base de casillas (RN-15). */
     public static Inventory standard() {
         return new Inventory(GameRules.INVENTORY_BASE_SLOTS);
     }
 
-    /** Number of slots. */
+    /** Número de casillas. */
     public int capacity() {
         return types.length;
     }
 
     /**
-     * Adds empty slots (a warehouse, RN-20). Nothing already stored moves.
+     * Agrega casillas vacías (un almacén, RN-20). Nada de lo ya guardado se mueve.
      *
-     * @param extra how many slots to add
+     * @param extra cuántas casillas agregar
      */
     public void addSlots(int extra) {
         requirePositive(extra);
@@ -58,7 +58,7 @@ public final class Inventory {
         amounts = Arrays.copyOf(amounts, amounts.length + extra);
     }
 
-    /** Number of slots currently occupied. */
+    /** Número de casillas ocupadas actualmente. */
     public int usedSlots() {
         int used = 0;
         for (int amount : amounts) {
@@ -69,7 +69,7 @@ public final class Inventory {
         return used;
     }
 
-    /** Total units of the given item across all slots. */
+    /** Total de unidades del objeto dado en todas las casillas. */
     public int count(ItemType type) {
         int total = 0;
         for (int i = 0; i < types.length; i++) {
@@ -80,7 +80,7 @@ public final class Inventory {
         return total;
     }
 
-    /** Occupied slots in slot order. */
+    /** Casillas ocupadas en orden de casilla. */
     public List<ItemStack> stacks() {
         List<ItemStack> result = new ArrayList<>();
         for (int i = 0; i < types.length; i++) {
@@ -92,9 +92,9 @@ public final class Inventory {
     }
 
     /**
-     * Inserts units, first completing stacks of the same type and then using empty slots.
+     * Inserta unidades, completando primero las pilas del mismo tipo y usando después las casillas vacías.
      *
-     * @return {@code true} if everything was inserted; {@code false} (and nothing inserted) if it does not fit
+     * @return {@code true} si se insertó todo; {@code false} (y no se inserta nada) si no cabe
      */
     public boolean add(ItemType type, int amount) {
         requirePositive(amount);
@@ -121,9 +121,9 @@ public final class Inventory {
     }
 
     /**
-     * Removes units, starting from the last stack of that type.
+     * Quita unidades, empezando por la última pila de ese tipo.
      *
-     * @return {@code true} if removed; {@code false} (and nothing removed) if there are fewer units
+     * @return {@code true} si se quitó; {@code false} (y no se quita nada) si hay menos unidades
      */
     public boolean remove(ItemType type, int amount) {
         requirePositive(amount);
@@ -144,7 +144,7 @@ public final class Inventory {
         return true;
     }
 
-    /** An immutable copy of every slot, empty ones included, for the memento. */
+    /** Una copia inmutable de todas las casillas, incluidas las vacías, para el memento. */
     public InventorySnapshot snapshot() {
         List<ItemStack> slots = new ArrayList<>();
         for (int i = 0; i < types.length; i++) {
@@ -153,7 +153,7 @@ public final class Inventory {
         return new InventorySnapshot(types.length, List.copyOf(slots));
     }
 
-    /** Replaces the whole content (and the number of slots) with a snapshot taken earlier. */
+    /** Reemplaza todo el contenido (y el número de casillas) con una instantánea tomada antes. */
     public void restoreFrom(InventorySnapshot snapshot) {
         this.types = new ItemType[snapshot.capacity()];
         this.amounts = new int[snapshot.capacity()];

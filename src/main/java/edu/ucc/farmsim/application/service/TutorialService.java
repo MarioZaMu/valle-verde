@@ -12,8 +12,8 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 /**
- * The start tutorial (RN-39): what the avatar says at each step, moving on when the player did the action of the
- * step, and skipping it. It only guides: it never changes energy, money, the inventory or the day.
+ * El tutorial de inicio (RN-39): lo que dice el avatar en cada paso, avanzando cuando el jugador hizo la acción del
+ * paso, y saltándolo. Solo guía: nunca cambia la energía, el dinero, el inventario ni el día.
  *
  * <p>Stories: HU-49.
  */
@@ -34,17 +34,17 @@ public final class TutorialService {
     private final EventBus events;
 
     /**
-     * Creates the service.
+     * Crea el servicio.
      *
-     * @param session the game in progress
-     * @param events  where the changes of step are published
+     * @param session la partida en curso
+     * @param events  donde se publican los cambios de paso
      */
     public TutorialService(GameSession session, EventBus events) {
         this.session = session;
         this.events = events;
     }
 
-    /** The tutorial of the game in progress. A pure query. */
+    /** El tutorial de la partida en curso. Una consulta pura. */
     public Result<TutorialView> tutorial() {
         if (!session.hasGame()) {
             return Result.failWith(ErrorCode.SIN_PARTIDA);
@@ -52,7 +52,7 @@ public final class TutorialService {
         return Result.ok(view(session.current().tutorial()));
     }
 
-    /** Ends the tutorial at once; skipping a finished one is harmless and publishes nothing. */
+    /** Termina el tutorial de inmediato; saltar uno ya terminado es inofensivo y no publica nada. */
     public Result<TutorialView> skip() {
         if (!session.hasGame()) {
             return Result.failWith(ErrorCode.SIN_PARTIDA);
@@ -65,9 +65,9 @@ public final class TutorialService {
     }
 
     /**
-     * The player did an accepted action: the tutorial moves on if it was the action of the current step.
+     * El jugador hizo una acción aceptada: el tutorial avanza si era la acción del paso actual.
      *
-     * @param action the step the action belongs to
+     * @param action el paso al que pertenece la acción
      */
     public void done(TutorialStep action) {
         if (!session.hasGame()) {

@@ -4,19 +4,18 @@ import edu.ucc.farmsim.application.result.ErrorCode;
 import org.springframework.http.HttpStatus;
 
 /**
- * Translates each rejection code of RN-35 into the HTTP status of the response (DT-18, docs/API.md). The
- * {@code switch} has no default branch, so adding an {@link ErrorCode} without deciding its status does not
- * compile.
+ * Traduce cada código de rechazo de RN-35 al estado HTTP de la respuesta (DT-18, docs/API.md). El {@code switch} no
+ * tiene rama por defecto, así que agregar un {@link ErrorCode} sin decidir su estado no compila.
  *
  * <p>Stories: none.
  */
 public final class ErrorStatusMapper {
 
     private ErrorStatusMapper() {
-        // static helper
+                // clase de utilidad estática
     }
 
-    /** The HTTP status that answers a rejection with the given code. */
+    /** El estado HTTP con el que se responde a un rechazo con el código dado. */
     public static HttpStatus statusOf(ErrorCode code) {
         return switch (code) {
             case SIN_PARTIDA, SIN_CULTIVO, ARCHIVO_INEXISTENTE -> HttpStatus.NOT_FOUND;

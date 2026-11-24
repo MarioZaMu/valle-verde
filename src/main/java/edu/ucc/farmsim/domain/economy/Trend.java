@@ -1,7 +1,7 @@
 package edu.ucc.farmsim.domain.economy;
 
 /**
- * Whether the price of a product went up, down or stayed the same since yesterday (RN-19).
+ * Si el precio de un producto subió, bajó o quedó igual desde ayer (RN-19).
  *
  * <p>Stories: HU-16.
  */

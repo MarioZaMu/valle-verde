@@ -9,17 +9,18 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * The ground of the farm and of the land around it, painted at the size of the art (32 pixels a tile) as one
- * continuous image: grass with a few variants chosen by position, tilled soil, the path of the valley and water
- * (houses stand on grass). Where soil, path or water meets grass, the grass grows a ragged pixel edge over it and casts a short shadow, so the plots read as one
- * field and one pond instead of a grid of squares. The image only changes when a terrain, a watered plot, the
- * season or the frame of the water changes, so it is built once and reused frame after frame.
+ * El suelo de la granja y de la tierra que la rodea, pintado al tamaño del arte (32 píxeles por baldosa) como una sola
+ * imagen continua: pasto con algunas variantes elegidas por posición, tierra labrada, el camino del valle y agua (las
+ * casas se levantan sobre pasto). Donde la tierra, el camino o el agua tocan el pasto, el pasto le crece un borde
+ * irregular de píxeles encima y proyecta una sombra corta, de modo que las parcelas se leen como un solo campo y un
+ * solo estanque en lugar de una grilla de cuadrados. La imagen solo cambia cuando cambia un terreno, una parcela
+ * regada, la estación o el cuadro del agua, así que se construye una vez y se reutiliza cuadro tras cuadro.
  *
  * <p>Stories: HU-35, HU-44, HU-48, HU-50.
  */
 final class GroundLayer {
 
-    /** Frames of the water animation. */
+    /** Cuadros de la animación del agua. */
     static final int WATER_FRAMES = 3;
 
     private static final int T = MapGeometry.TILE;
@@ -44,15 +45,18 @@ final class GroundLayer {
         this.assets = assets;
     }
 
-    /** True when every ground sprite of the season exists, so the continuous ground can be painted. */
+    /**
+     * Verdadero cuando existen todos los sprites de suelo de la estación, de modo que se puede pintar el suelo
+     * continuo.
+     */
     boolean available(String season) {
         return assets.sprite(grassName(season, 0)).isPresent() && assets.sprite("terrain/SOIL.png").isPresent()
                 && assets.sprite("terrain/SOIL_WATERED.png").isPresent() && assets.sprite("terrain/WATER.png").isPresent();
     }
 
     /**
-     * The ground of the tiles from {@code (col0, row0)} (inclusive) to {@code (col1, row1)} (exclusive), where the
-     * tiles outside the map are grass.
+     * El suelo de las baldosas desde {@code (col0, row0)} (inclusive) hasta {@code (col1, row1)} (exclusive), donde las
+     * baldosas fuera del mapa son pasto.
      */
     BufferedImage image(MapView map, String season, int frame, int col0, int row0, int col1, int row1) {
         StringBuilder key = new StringBuilder(map.plots().size() + 40);
@@ -64,7 +68,7 @@ final class GroundLayer {
         return cache.computeIfAbsent(key.toString(), k -> paint(map, season, frame, col0, row0, col1, row1));
     }
 
-    /** How many times the ground was really painted (not taken from the cache). */
+    /** Cuántas veces se pintó realmente el suelo (no se tomó de la caché). */
     int paints() {
         return paints;
     }
@@ -100,7 +104,7 @@ final class GroundLayer {
         return out;
     }
 
-    /** Grass grows over the sides of soil and water that touch something else, and casts a short shadow. */
+    /** El pasto crece sobre los lados de la tierra y el agua que tocan otra cosa, y proyecta una sombra corta. */
     private static void edges(int[] tile, int[] grass, String here, String[] terrain, MapView map, int col, int row) {
         boolean water = "WATER".equals(here);
         int[][] sides = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
@@ -128,7 +132,7 @@ final class GroundLayer {
         }
     }
 
-    /** How many pixels the grass reaches over the edge at that point; ragged but continuous across tiles. */
+    /** Cuántos píxeles alcanza el pasto sobre el borde en ese punto; irregular pero continuo entre baldosas. */
     private static int fringe(int global, int side) {
         int v = Math.floorMod(global * 37 + side * 11 + (global / 5) * 3, 9);
         return v < 2 ? 4 : (v < 5 ? 3 : 2);
@@ -141,7 +145,7 @@ final class GroundLayer {
         return (argb & 0xFF000000) | (r << 16) | (g << 8) | b;
     }
 
-    /** Which of the four grass tiles covers a place: mostly the plain one, sometimes tufts, flowers or pebbles. */
+    /** Cuál de las cuatro baldosas de pasto cubre un lugar: sobre todo la lisa, a veces matas, flores o piedrecitas. */
     static int variant(int col, int row) {
         int h = Math.floorMod(col * 73_856_093 ^ row * 19_349_663, 20);
         return h < 12 ? 0 : (h < 16 ? 1 : (h < 18 ? 2 : 3));
@@ -151,7 +155,7 @@ final class GroundLayer {
         return "terrain/GRASS_" + season + (variant == 0 ? "" : "_" + variant) + ".png";
     }
 
-    /** The trodden earth of the path, or plain soil when the pack has no path tile. */
+    /** La tierra pisada del camino, o tierra lisa cuando el paquete no tiene baldosa de camino. */
     private String pathName() {
         return sprite("terrain/PATH.png").isPresent() ? "terrain/PATH.png" : "terrain/SOIL.png";
     }

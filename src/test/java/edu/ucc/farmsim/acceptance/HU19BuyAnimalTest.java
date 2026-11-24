@@ -13,19 +13,19 @@ import edu.ucc.farmsim.support.GameFixtures;
 import edu.ucc.farmsim.support.TestApp;
 import org.junit.jupiter.api.Test;
 
-/** HU-19: buying hens and cows and housing them (RN-14, RN-20, RN-23). */
+/** HU-19: comprar gallinas y vacas y alojarlas (RN-14, RN-20, RN-23). */
 class HU19BuyAnimalTest {
 
     @Test
     void HU19_ca1_buyingAHenCosts150AndHousesAHealthyHen() {
-        // Given an empty coop and 500 m
+                // Dados un gallinero vacío y 500 m
         TestApp app = TestApp.startedGame();
         GameFixtures.coop(app.state());
 
-        // When the player buys a hen
+                // Cuando el jugador compra una gallina
         Result<BuildingView> result = app.controller.buyAnimal("HEN");
 
-        // Then the balance is 350 m and a healthy hen lives in the coop
+                // Entonces el saldo es 350 m y una gallina sana vive en el gallinero
         assertTrue(result.isOk(), String.valueOf(result.message()));
         assertEquals(350, app.state().money());
         AnimalView hen = result.value().animals().get(0);

@@ -3,104 +3,104 @@ package edu.ucc.farmsim.ui.theme;
 import java.awt.Color;
 
 /**
- * The colors of the game drawn with Java2D. Every terrain and crop stage has its own color or shape so the map
- * never depends on color alone (RNF-14).
+ * Los colores del juego dibujados con Java2D. Cada terreno y etapa de cultivo tiene su propio color o forma, de modo
+ * que el mapa nunca depende solo del color (RNF-14).
  *
  * <p>Stories: HU-35, HU-39, HU-43.
  */
 public final class Palette {
 
-    /** Behind the map. */
+    /** Detrás del mapa. */
     public static final Color BACKGROUND = new Color(0x2B3A2B);
-    /** Grass. */
+    /** Pasto. */
     public static final Color GRASS = new Color(0x6AAE4B);
-    /** Soil, dry. */
+    /** Tierra, seca. */
     public static final Color SOIL = new Color(0x8B5A2B);
-    /** Soil darkened by watering. */
+    /** Tierra oscurecida por el riego. */
     public static final Color SOIL_WATERED = new Color(0x5C3A1A);
-    /** Furrow lines on soil. */
+    /** Líneas de surco sobre la tierra. */
     public static final Color FURROW = new Color(0x70471F);
-    /** Water. */
+    /** Agua. */
     public static final Color WATER = new Color(0x3A7BD5);
-    /** Wave lines on water. */
+    /** Líneas de ola sobre el agua. */
     public static final Color WAVE = new Color(0xA9CBF2);
-    /** Obstacle ground (rock and trees). */
+    /** Suelo de obstáculos (rocas y árboles). */
     public static final Color OBSTACLE = new Color(0x2F5D2F);
-    /** Tree trunk. */
+    /** Tronco de árbol. */
     public static final Color TRUNK = new Color(0x5A3A1E);
-    /** Tree crown and plant leaves. */
+    /** Copa de árbol y hojas de las plantas. */
     public static final Color LEAF = new Color(0x3FA34D);
-    /** A seed. */
+    /** Una semilla. */
     public static final Color SEED = new Color(0x3B2410);
-    /** A withered plant. */
+    /** Una planta marchita. */
     public static final Color WITHERED = new Color(0xA68B5B);
-    /** Grid line between plots. */
+    /** Línea de la grilla entre parcelas. */
     public static final Color GRID = new Color(0, 0, 0, 40);
-    /** Border of the plot under the cursor. */
+    /** Borde de la parcela bajo el cursor. */
     public static final Color HOVER = new Color(0xFFFFFF);
 
-    /** Wall of a coop. */
+    /** Pared de un gallinero. */
     public static final Color COOP_WALL = new Color(0xD9A066);
 
-    /** Wall of a barn. */
+    /** Pared de un establo. */
     public static final Color BARN_WALL = new Color(0xB5473B);
 
-    /** Wall of a warehouse. */
+    /** Pared de un almacén. */
     public static final Color WAREHOUSE_WALL = new Color(0x9A8F7A);
 
-    /** Frame and glass of a greenhouse. */
+    /** Marco y vidrio de un invernadero. */
     public static final Color GREENHOUSE_GLASS = new Color(0xBDE8E0);
 
-    /** Roof of every building. */
+    /** Techo de todos los edificios. */
     public static final Color ROOF = new Color(0x5B2E1F);
 
-    /** Outline of a building. */
+    /** Contorno de un edificio. */
     public static final Color BUILDING_OUTLINE = new Color(0x2A1A10);
 
-    /** A healthy animal. */
+    /** Un animal sano. */
     public static final Color ANIMAL_HEALTHY = new Color(0xFFFDF2);
 
-    /** A hungry animal. */
+    /** Un animal hambriento. */
     public static final Color ANIMAL_HUNGRY = new Color(0xF2C14E);
 
-    /** A sick animal. */
+    /** Un animal enfermo. */
     public static final Color ANIMAL_SICK = new Color(0x7FA36B);
 
-    /** Marker of products waiting to be collected. */
+    /** Marcador de productos que esperan ser recogidos. */
     public static final Color PENDING = new Color(0xFFD23F);
 
-    /** Text on a notice (HU-39, HU-43). */
+    /** Texto de un aviso (HU-39, HU-43). */
     public static final Color TOAST_TEXT = new Color(0xFFFFFF);
 
-    /** Background of an error notice. */
+    /** Fondo de un aviso de error. */
     public static final Color TOAST_ERROR = new Color(0xA33A32);
 
-    /** Background of a success notice. */
+    /** Fondo de un aviso de éxito. */
     public static final Color TOAST_SUCCESS = new Color(0x2E7D4F);
 
-    /** Background of an achievement notice. */
+    /** Fondo de un aviso de logro. */
     public static final Color TOAST_ACHIEVEMENT = new Color(0x8A6A12);
 
-    /** Background of an information notice. */
+    /** Fondo de un aviso informativo. */
     public static final Color TOAST_INFO = new Color(0x2F4F6F);
 
-    /** Text of the top bar. */
+    /** Texto de la barra superior. */
     public static final Color HUD_TEXT = new Color(0xFFF4D6);
 
-    /** Background of the top bar. */
+    /** Fondo de la barra superior. */
     public static final Color HUD_BACKGROUND = new Color(0x3B2F1E);
 
-    /** Text of dialogs. */
+    /** Texto de los diálogos. */
     public static final Color DIALOG_TEXT = new Color(0x2B2118);
 
-    /** Background of dialogs. */
+    /** Fondo de los diálogos. */
     public static final Color DIALOG_BACKGROUND = new Color(0xFFF8E7);
 
     private Palette() {
-        // constants holder
+                // contenedor de constantes
     }
 
-    /** Fruit color of each crop, by crop id; unknown crops use a neutral color. */
+    /** Color del fruto de cada cultivo, por id de cultivo; los cultivos desconocidos usan un color neutro. */
     public static Color crop(String cropId) {
         return switch (cropId) {
             case "CARROT" -> new Color(0xF28C28);

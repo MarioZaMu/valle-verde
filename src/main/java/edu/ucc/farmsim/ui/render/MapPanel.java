@@ -32,26 +32,29 @@ import javax.swing.ToolTipManager;
 /**
  * Pattern: Observer — Role: ConcreteObserver (the farm map, repainted when a map event arrives).
  *
- * <p>The panel keeps the last {@link MapView}. It asks the controller for a new one only when an event says
- * the map changed (game started, day ended, map changed): it never polls the game. Its own {@link Timer}
- * only draws frames of the {@link VisualEffects} (rain, snow, night tint, animals, growing crops and the
- * ambient life of the valley) while the panel is on screen and something moves, and stops otherwise; the
- * effects can be switched off at any time and never touch the game (HU-40, HU-41). Bars that float over the
- * view are registered with {@link #addFloating}. The plots are 48 screen pixels and a camera follows the avatar
- * through the valley, always keeping it in the part of the view the bars leave free (HU-48, HU-50). Hovering a plot
- * shows its tooltip after {@link #TOOLTIP_DELAY_MS}, and clicking tells the {@link PlotClickListener}.
+ * <p>El panel guarda el último {@link MapView}. Pide uno nuevo al controlador solo cuando un evento dice que el mapa
+ * cambió (empezó la partida, terminó el día, cambió el mapa): nunca sondea el juego. Su propio {@link Timer} solo
+ * dibuja cuadros de los {@link VisualEffects} (lluvia, nieve, tinte de noche, animales, cultivos que crecen y la vida
+ * ambiental del valle) mientras el panel está en pantalla y algo se mueve, y se detiene en caso contrario; los efectos
+ * se pueden apagar en cualquier momento y nunca tocan el juego (HU-40, HU-41). Las barras que flotan sobre la vista se
+ * registran con {@link #addFloating}. Las parcelas miden 48 píxeles de pantalla y una cámara sigue al avatar por el
+ * valle, manteniéndolo siempre en la parte de la vista que las barras dejan libre (HU-48, HU-50). Pasar el cursor sobre
+ * una parcela muestra su tooltip tras {@link #TOOLTIP_DELAY_MS}, y hacer clic avisa al {@link PlotClickListener}.
  *
  * <p>Stories: HU-07, HU-25, HU-35, HU-40, HU-41, HU-45, HU-46, HU-48, HU-50.
  */
 public final class MapPanel extends JPanel implements GameListener {
 
-    /** Delay before the plot tooltip appears (HU-07). */
+    /** Retraso antes de que aparezca el tooltip de la parcela (HU-07). */
     public static final int TOOLTIP_DELAY_MS = 300;
 
-    /** Milliseconds between two frames of the effects: about 30 frames per second. */
+    /** Milisegundos entre dos cuadros de los efectos: unos 30 cuadros por segundo. */
     public static final int FRAME_DELAY_MS = 33;
 
-    /** Milliseconds between two frames while the avatar walks: about 60 frames per second, so the camera glides. */
+    /**
+     * Milisegundos entre dos cuadros mientras el avatar camina: unos 60 cuadros por segundo, para que la cámara se
+     * deslice.
+     */
     public static final int WALK_FRAME_DELAY_MS = 16;
 
     private static final long serialVersionUID = 1L;
@@ -72,11 +75,11 @@ public final class MapPanel extends JPanel implements GameListener {
     private transient CellPos hover;
 
     /**
-     * Builds the panel and subscribes it to the event bus.
+     * Construye el panel y lo suscribe al bus de eventos.
      *
-     * @param controller entry point to the game
-     * @param bus        where game events are published
-     * @param clicks     told when a plot is clicked
+     * @param controller punto de entrada al juego
+     * @param bus        donde se publican los eventos del juego
+     * @param clicks     se le avisa cuando se hace clic en una parcela
      */
     public MapPanel(GameCommands controller, EventBus bus, PlotClickListener clicks) {
         this.controller = controller;
@@ -122,24 +125,24 @@ public final class MapPanel extends JPanel implements GameListener {
     }
 
     /**
-     * Asks the game for the map again and redraws it; used after a step was blocked, because then the avatar
-     * only turned and no event announces it.
+     * Le pide otra vez el mapa a la partida y lo redibuja; se usa después de un paso bloqueado, porque entonces el
+     * avatar solo giró y ningún evento lo anuncia.
      */
     public void reload() {
         refresh();
     }
 
-    /** The map currently shown, or {@code null} before a game starts. */
+    /** El mapa que se muestra ahora, o {@code null} antes de que empiece una partida. */
     public MapView currentView() {
         return view;
     }
 
-    /** The effects this panel draws; the screen switches them on and off through here. */
+    /** Los efectos que dibuja este panel; la pantalla los enciende y apaga por aquí. */
     public VisualEffects effects() {
         return effects;
     }
 
-    /** Switches the visual effects and the animations on or off; the game is not touched. */
+    /** Enciende o apaga los efectos visuales y las animaciones; no se toca la partida. */
     public void setEffectsEnabled(boolean on) {
         effects.setEnabled(on);
         startOrStopFrames();
@@ -147,17 +150,17 @@ public final class MapPanel extends JPanel implements GameListener {
     }
 
     /**
-     * Registers a bar that floats over the view: the plots are placed so that none ends up under it, while the
-     * land around the farm is still drawn below it.
+     * Registra una barra que flota sobre la vista: las parcelas se colocan de modo que ninguna quede debajo de ella,
+     * mientras la tierra alrededor de la granja se sigue dibujando bajo ella.
      */
     public void addFloating(JComponent bar) {
         floating.add(bar);
     }
 
     /**
-     * Where each plot is drawn now: plots of {@link MapGeometry#SCREEN_CELL} screen pixels with the camera on
-     * the avatar (on the spot where it is drawn while it walks), kept inside the part of the panel the floating
-     * bars leave free and never showing beyond the edges of the valley (RN-40).
+     * Dónde se dibuja ahora cada parcela: parcelas de {@link MapGeometry#SCREEN_CELL} píxeles de pantalla con la cámara
+     * sobre el avatar (en el punto donde se dibuja mientras camina), mantenidas dentro de la parte del panel que dejan
+     * libre las barras flotantes y sin mostrar nunca más allá de los bordes del valle (RN-40).
      */
     public MapGeometry geometry() {
         int cols = view == null ? DEFAULT_COLS : view.cols();
@@ -171,7 +174,7 @@ public final class MapPanel extends JPanel implements GameListener {
         return MapGeometry.follow(cols, rows, cell, freeArea(width, height), col, row);
     }
 
-    /** The part of the panel not covered by the bars that float over it, at the top and at the bottom. */
+    /** La parte del panel no cubierta por las barras que flotan sobre él, arriba y abajo. */
     private Rectangle freeArea(int width, int height) {
         int top = 0;
         int bottom = 0;
@@ -201,12 +204,12 @@ public final class MapPanel extends JPanel implements GameListener {
         return scale > 0 ? scale : 1.0;
     }
 
-    /** True while the frame timer is running, that is, while something is moving on the map. */
+    /** Verdadero mientras corre el temporizador de cuadros, es decir, mientras algo se mueve en el mapa. */
     public boolean isAnimating() {
         return frames.isRunning();
     }
 
-    /** Tells the click listener which plot was clicked; a click outside the map does nothing. */
+    /** Le dice al oyente de clics qué parcela se pulsó; un clic fuera del mapa no hace nada. */
     public void handleClick(int x, int y) {
         CellPos pos = cellAt(x, y);
         if (pos != null) {
@@ -242,10 +245,10 @@ public final class MapPanel extends JPanel implements GameListener {
     }
 
     /**
-     * A blocked step only turned the avatar: the map shown turns it too, with no call to the server (asking for
-     * the whole valley on every step made the walk jerk).
+     * Un paso bloqueado solo giró al avatar: el mapa que se muestra también lo gira, sin llamar al servidor (pedir todo
+     * el valle en cada paso hacía que la caminata diera tirones).
      *
-     * @param direction where the avatar now looks
+     * @param direction hacia dónde mira ahora el avatar
      */
     public void face(String direction) {
         if (view != null && view.avatar() != null) {
@@ -294,7 +297,10 @@ public final class MapPanel extends JPanel implements GameListener {
         }
     }
 
-    /** Milliseconds between the frames drawn now: fewer while walking, so the walk looks smooth (HU-50 · CA-5). */
+    /**
+     * Milisegundos entre los cuadros que se dibujan ahora: menos mientras se camina, para que la caminata se vea fluida
+     * (HU-50 · CA-5).
+     */
     public int frameDelay() {
         return frames.getDelay();
     }

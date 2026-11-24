@@ -1,18 +1,18 @@
 package edu.ucc.farmsim.ui.render;
 
 /**
- * A drop of rain or a snowflake that falls over the map. Its position is a fraction of the map area, so it does
- * not depend on the size of the window. It only exists in the view: nothing in the game knows about it.
+ * Una gota de lluvia o un copo de nieve que cae sobre el mapa. Su posición es una fracción del área del mapa, así que
+ * no depende del tamaño de la ventana. Solo existe en la vista: nada del juego lo conoce.
  *
  * <p>Stories: HU-40.
  */
 public final class Particle {
 
-    /** What falls. */
+    /** Lo que cae. */
     public enum Kind {
-        /** A drop of rain: fast and slanted. */
+        /** Una gota de lluvia: rápida e inclinada. */
         RAIN,
-        /** A snowflake: slow and drifting. */
+        /** Un copo de nieve: lento y a la deriva. */
         SNOW
     }
 
@@ -30,17 +30,17 @@ public final class Particle {
         this.drift = drift;
     }
 
-    /** What this particle is. */
+    /** Lo que es esta partícula. */
     public Kind kind() {
         return kind;
     }
 
-    /** Horizontal position, from 0 (left) to 1 (right). */
+    /** Posición horizontal, de 0 (izquierda) a 1 (derecha). */
     public double x() {
         return x;
     }
 
-    /** Vertical position, from 0 (top) to 1 (bottom). */
+    /** Posición vertical, de 0 (arriba) a 1 (abajo). */
     public double y() {
         return y;
     }

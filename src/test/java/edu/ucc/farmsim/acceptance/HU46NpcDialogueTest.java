@@ -29,10 +29,12 @@ import edu.ucc.farmsim.support.TestApp;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-/** HU-46: talking to the people of the valley (RN-37). */
+/** HU-46: hablar con las personas del valle (RN-37). */
 class HU46NpcDialogueTest {
 
-    /** Puts the avatar on the plot west of the person, looking at it (south of it for Lucía, east for Inés). */
+    /**
+     * Pone al avatar en la parcela al oeste de la persona, mirándola (al sur de ella para Lucía, al este para Inés).
+     */
     static void nextTo(TestApp app, Npc npc) {
         app.state().avatar().restoreFrom(new AvatarSnapshot(npc.col() - 1, npc.row(), Direction.EAST));
     }

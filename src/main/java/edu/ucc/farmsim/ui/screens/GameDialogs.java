@@ -4,48 +4,49 @@ import edu.ucc.farmsim.application.dto.DaySummaryView;
 import edu.ucc.farmsim.application.dto.DialogueView;
 
 /**
- * What the game screen logic needs to open its dialogs (market, inventory, construction, a building and the
- * summary of the day). The real one opens Swing dialogs; tests use a fake, so no display is needed.
+ * Lo que necesita la lógica de la pantalla de juego para abrir sus diálogos (mercado, inventario, construcción, un
+ * edificio y el resumen del día). El real abre diálogos de Swing; las pruebas usan uno falso, así que no hace falta
+ * pantalla.
  *
  * <p>Stories: HU-17, HU-18, HU-26, HU-29, HU-30, HU-37, HU-38, HU-46.
  */
 public interface GameDialogs {
 
-    /** Opens the market dialog (shortcut M). */
+    /** Abre el diálogo del mercado (atajo M). */
     void showMarket();
 
-    /** Opens the inventory (shortcut I). */
+    /** Abre el inventario (atajo I). */
     void showInventory();
 
     /**
-     * Opens the construction dialog for the plot that was clicked with the Build tool.
+     * Abre el diálogo de construcción para la parcela en la que se hizo clic con la herramienta Construir.
      *
-     * @param col column of the plot, the top-left corner of the building
-     * @param row row of the plot
+     * @param col columna de la parcela, la esquina superior izquierda del edificio
+     * @param row fila de la parcela
      */
     void showConstruction(int col, int row);
 
     /**
-     * Opens the panel of a building: its animals and the buttons to feed, collect and cure.
+     * Abre el panel de un edificio: sus animales y los botones para alimentar, recoger y curar.
      *
-     * @param buildingId id of the building
+     * @param buildingId id del edificio
      */
     void showBuilding(int buildingId);
 
-    /** Opens the achievements dialog (shortcut L). */
+    /** Abre el diálogo de logros (atajo L). */
     void showAchievements();
 
     /**
-     * Opens the save slots dialog.
+     * Abre el diálogo de ranuras de guardado.
      *
-     * @param saving {@code true} when the player came to save, {@code false} to load (it only changes which
-     *               button is the natural one; both are available)
+     * @param saving {@code true} cuando el jugador vino a guardar, {@code false} para cargar (solo cambia cuál botón es
+     *               el natural; ambos están disponibles)
      */
     void showSlots(boolean saving);
 
-    /** Shows the summary of the day that just ended. */
+    /** Muestra el resumen del día que acaba de terminar. */
     void showSummary(DaySummaryView summary);
 
-    /** Opens the dialogue box of a person of the valley with what it just said (HU-46). */
+    /** Abre el cuadro de diálogo de una persona del valle con lo que acaba de decir (HU-46). */
     void showDialogue(DialogueView dialogue);
 }

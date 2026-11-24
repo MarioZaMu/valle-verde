@@ -3,9 +3,9 @@ package edu.ucc.farmsim.domain.building;
 /**
  * Pattern: Builder — Role: Builder (declares the steps that assemble a building).
  *
- * <p>The {@link BuildingDirector} calls the steps in a fixed order; each concrete builder decides what the
- * housing and the effects of its building are. Rejections never happen here: the use case checks every rule
- * of RN-21 before asking for a building.
+ * <p>El {@link BuildingDirector} llama a los pasos en un orden fijo; cada constructor concreto decide cuál es el
+ * alojamiento y los efectos de su edificio. Aquí nunca ocurren rechazos: el caso de uso comprueba todas las reglas de
+ * RN-21 antes de pedir un edificio.
  *
  * <p>Stories: HU-18.
  */
@@ -15,32 +15,32 @@ public abstract class BuildingBuilder {
     private int col;
     private int row;
 
-    /** The kind of building this builder assembles. */
+    /** El tipo de edificio que arma este constructor. */
     abstract BuildingType type();
 
-    /** Step 1: where it is and which one it is. */
+    /** Paso 1: dónde está y cuál es. */
     final void placeAt(int buildingId, int topLeftCol, int topLeftRow) {
         this.id = buildingId;
         this.col = topLeftCol;
         this.row = topLeftRow;
     }
 
-    /** Step 2: how many animals live inside and of which species ({@code null} species: none). */
+    /** Paso 2: cuántos animales viven dentro y de qué especie (especie {@code null}: ninguno). */
     abstract void defineHousing();
 
-    /** Step 3: what else the building does (more inventory slots, protected crops). */
+    /** Paso 3: qué más hace el edificio (más casillas de inventario, cultivos protegidos). */
     abstract void defineEffects();
 
-    /** The housing capacity decided in step 2. */
+    /** La capacidad de alojamiento decidida en el paso 2. */
     abstract int animalCapacity();
 
-    /** The inventory slots decided in step 3. */
+    /** Las casillas de inventario decididas en el paso 3. */
     abstract int extraInventorySlots();
 
-    /** The protected plots decided in step 3. */
+    /** Las parcelas protegidas decididas en el paso 3. */
     abstract int protectedPlots();
 
-    /** Final step: the finished building. */
+    /** Paso final: el edificio terminado. */
     final Building result() {
         return new Building(id, type(), col, row, type().housedAnimal(), animalCapacity(),
                 extraInventorySlots(), protectedPlots());

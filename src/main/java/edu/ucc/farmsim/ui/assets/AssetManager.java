@@ -13,14 +13,14 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
 /**
- * Loads the sprites of the game once and keeps them (HU-42 · CA-1). A sprite that does not exist or cannot be
- * read is not an error: the answer is empty and the renderer draws the vector graphic instead (CA-2), so the
- * game is fully playable with no image at all (CA-3). The first failure is logged as a warning; the same
- * file is never tried twice.
+ * Carga una sola vez los sprites del juego y los conserva (HU-42 · CA-1). Un sprite que no existe o no se puede leer no
+ * es un error: la respuesta es vacía y el renderizador dibuja el gráfico vectorial en su lugar (CA-2), de modo que el
+ * juego se puede jugar por completo sin ninguna imagen (CA-3). El primer fallo se registra como advertencia; nunca se
+ * intenta dos veces el mismo archivo.
  *
- * <p>Sprite names are relative paths below {@code /assets/}, for example {@code crops/CARROT_MATURE.png} or
- * {@code animals/HEN_0.png}. Every package of images must be listed in {@code docs/ASSETS.md} with its source
- * and licence (CC0 or CC-BY).
+ * <p>Los nombres de sprite son rutas relativas bajo {@code /assets/}, por ejemplo {@code crops/CARROT_MATURE.png} o
+ * {@code animals/HEN_0.png}. Todo paquete de imágenes debe estar listado en {@code docs/ASSETS.md} con su origen y
+ * licencia (CC0 o CC-BY).
  *
  * <p>Stories: HU-42, HU-44, HU-48.
  */
@@ -29,14 +29,14 @@ public final class AssetManager {
     private static final Logger LOG = Logger.getLogger(AssetManager.class.getName());
     private static final String ROOT = "/assets/";
 
-    /** Where the bytes of a sprite come from. */
+    /** De dónde vienen los bytes de un sprite. */
     @FunctionalInterface
     public interface Source {
         /**
-         * Opens a sprite.
+         * Abre un sprite.
          *
-         * @param name relative path of the sprite, for example {@code crops/CARROT_MATURE.png}
-         * @throws IOException if there is no such sprite or it cannot be opened
+         * @param name ruta relativa del sprite, por ejemplo {@code crops/CARROT_MATURE.png}
+         * @throws IOException si no existe ese sprite o no se puede abrir
          */
         InputStream open(String name) throws IOException;
     }
@@ -50,15 +50,15 @@ public final class AssetManager {
     private boolean warned;
 
     /**
-     * Creates a manager over a source.
+     * Crea un administrador sobre una fuente.
      *
-     * @param source where the sprites are read from
+     * @param source de dónde se leen los sprites
      */
     public AssetManager(Source source) {
         this.source = source;
     }
 
-    /** A manager that reads from the {@code assets} folder of the class path. */
+    /** Un administrador que lee de la carpeta {@code assets} del classpath. */
     public static AssetManager fromClasspath() {
         return new AssetManager(name -> {
             InputStream stream = AssetManager.class.getResourceAsStream(ROOT + name);
@@ -69,7 +69,9 @@ public final class AssetManager {
         });
     }
 
-    /** The manager the whole interface shares, so every sprite is read once for the whole game. */
+    /**
+     * El administrador que comparte toda la interfaz, de modo que cada sprite se lee una sola vez para todo el juego.
+     */
     public static synchronized AssetManager shared() {
         if (shared == null) {
             shared = fromClasspath();
@@ -77,7 +79,7 @@ public final class AssetManager {
         return shared;
     }
 
-    /** A manager with no images at all: everything is drawn with vectors. */
+    /** Un administrador sin ninguna imagen: todo se dibuja con vectores. */
     public static AssetManager vectorOnly() {
         return new AssetManager(name -> {
             throw new FileNotFoundException(name);
@@ -85,9 +87,9 @@ public final class AssetManager {
     }
 
     /**
-     * The sprite with the given name, read the first time and kept afterwards.
+     * El sprite con el nombre dado, leído la primera vez y conservado después.
      *
-     * @return the image, or empty if it is missing or unreadable
+     * @return la imagen, o vacío si falta o no se puede leer
      */
     public synchronized Optional<BufferedImage> sprite(String name) {
         Optional<BufferedImage> known = cache.get(name);
@@ -101,9 +103,9 @@ public final class AssetManager {
     }
 
     /**
-     * The sprite as a Swing icon whose description is its name, read once; empty if it is missing.
+     * El sprite como un ícono de Swing cuya descripción es su nombre, leído una sola vez; vacío si falta.
      *
-     * @param name relative path of the sprite, for example {@code icons/SOW.png}
+     * @param name ruta relativa del sprite, por ejemplo {@code icons/SOW.png}
      */
     public synchronized Optional<ImageIcon> icon(String name) {
         Optional<ImageIcon> known = icons.get(name);
@@ -114,7 +116,7 @@ public final class AssetManager {
         return known;
     }
 
-    /** How many files were asked of the source (a sprite requested again does not count). */
+    /** Cuántos archivos se pidieron a la fuente (un sprite pedido otra vez no cuenta). */
     public synchronized int reads() {
         return reads;
     }

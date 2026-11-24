@@ -26,8 +26,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 /**
- * RNF-15 and AR-12: one integration test per endpoint with the HTTP status of the success and of each
- * rejection, against the real Spring context (without MongoDB).
+ * RNF-15 y AR-12: una prueba de integración por endpoint con el estado HTTP del éxito y de cada rechazo, contra el
+ * contexto real de Spring (sin MongoDB).
  */
 @SpringBootTest(classes = ServerApplication.class)
 @AutoConfigureMockMvc

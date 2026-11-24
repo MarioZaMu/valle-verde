@@ -6,43 +6,46 @@ import edu.ucc.farmsim.application.dto.HudView;
 import edu.ucc.farmsim.application.dto.TutorialView;
 
 /**
- * Something that happened in the game and the screen may want to show. Events carry immutable views, never
- * domain objects, so the UI can react without importing the domain.
+ * Algo que ocurrió en el juego y que la pantalla puede querer mostrar. Los eventos llevan vistas inmutables, nunca
+ * objetos del dominio, de modo que la UI puede reaccionar sin importar el dominio.
  *
  * <p>Stories: HU-01, HU-10, HU-14, HU-15, HU-17, HU-26, HU-34, HU-45, HU-47, HU-49.
  */
 public sealed interface GameEvent {
 
-    /** A new game was created. */
+    /** Se creó una partida nueva. */
     record GameStarted(HudView hud) implements GameEvent { }
 
-    /** The day ended; the HUD shows the new date, weather and energy. */
+    /** El día terminó; el HUD muestra la nueva fecha, el clima y la energía. */
     record DayEnded(HudView hud) implements GameEvent { }
 
-    /** An achievement was unlocked and its reward paid (RN-28). */
+    /** Se desbloqueó un logro y se pagó su recompensa (RN-28). */
     record AchievementUnlocked(String code, String name, int reward) implements GameEvent { }
 
-    /** The summary of the day that just ended (HU-17). */
+    /** El resumen del día que acaba de terminar (HU-17). */
     record DaySummaryReady(DaySummaryView summary) implements GameEvent { }
 
-    /** Something on the farm map changed (a crop was sown, watered, harvested, grew, withered; a building was built; an animal arrived, ate or produced...). */
+    /**
+     * Algo cambió en el mapa de la granja (se sembró, regó o cosechó un cultivo, creció, se marchitó; se construyó un
+     * edificio; llegó, comió o produjo un animal...).
+     */
     record MapChanged() implements GameEvent { }
 
-    /** The player's money changed (a purchase or a sale). */
+    /** El dinero del jugador cambió (una compra o una venta). */
     record MoneyChanged(int money) implements GameEvent { }
 
-    /** Something in the inventory changed. */
+    /** Algo cambió en el inventario. */
     record InventoryChanged() implements GameEvent { }
 
-    /** The avatar took a step (RN-36). */
+    /** El avatar dio un paso (RN-36). */
     record AvatarMoved(AvatarView avatar) implements GameEvent { }
 
-    /** An errand of a person of the valley was delivered and paid (RN-38). */
+    /** Se entregó y pagó un encargo de una persona del valle (RN-38). */
     record ErrandCompleted(String npcId, String name, int reward) implements GameEvent { }
 
-    /** The start tutorial moved to its next step, or ended (RN-39). */
+    /** El tutorial de inicio pasó a su siguiente paso, o terminó (RN-39). */
     record TutorialAdvanced(TutorialView tutorial) implements GameEvent { }
 
-    /** Energy changed after an action. */
+    /** La energía cambió tras una acción. */
     record EnergyChanged(int energy, int maxEnergy) implements GameEvent { }
 }

@@ -10,10 +10,11 @@ import java.awt.image.BufferedImage;
 import java.util.Optional;
 
 /**
- * The living picture behind the start screen: a spring morning over the valley, with a sky that fades to the
- * horizon, clouds and two rows of hills that drift at different speeds, birds, and at the front a strip of
- * farm with its fence, trees, barn, coop and crops, where hens peck and the farmer walks by. Every position is
- * a function of the time, so it needs no state and is drawn the same way on any {@link Graphics2D}.
+ * La imagen viva detrás de la pantalla de inicio: una mañana de primavera sobre el valle, con un cielo que se desvanece
+ * hacia el horizonte, nubes y dos filas de colinas que se desplazan a distintas velocidades, pájaros, y al frente una
+ * franja de granja con su cerca, árboles, establo, gallinero y cultivos, donde las gallinas picotean y el granjero pasa
+ * caminando. Toda posición es una función del tiempo, así que no necesita estado y se dibuja igual en cualquier {@link
+ * Graphics2D}.
  *
  * <p>Stories: HU-33, HU-48.
  */
@@ -37,21 +38,21 @@ public final class TitleScene {
     private final PixelScaler scaler = new PixelScaler();
 
     /**
-     * Creates the scene.
+     * Crea la escena.
      *
-     * @param assets where the sprites come from; without them the land is drawn with plain shapes
+     * @param assets de donde vienen los sprites; sin ellos la tierra se dibuja con formas simples
      */
     public TitleScene(AssetManager assets) {
         this.assets = assets;
     }
 
     /**
-     * Paints the scene.
+     * Pinta la escena.
      *
-     * @param g      where to paint
-     * @param width  width of the area
-     * @param height height of the area
-     * @param time   milliseconds since the scene appeared
+     * @param g      dónde pintar
+     * @param width  ancho del área
+     * @param height alto del área
+     * @param time   milisegundos desde que apareció la escena
      */
     public void paint(Graphics2D g, int width, int height, long time) {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

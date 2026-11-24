@@ -27,7 +27,7 @@ import javax.swing.JList;
 import javax.swing.JTable;
 import org.junit.jupiter.api.Test;
 
-/** The save slots and achievements screens (HU-26, HU-29, HU-30, HU-32). */
+/** Las pantallas de ranuras de guardado y de logros (HU-26, HU-29, HU-30, HU-32). */
 class SlotsAndAchievementsUiTest {
 
     private static TestApp app(InMemoryMongo mongo) {

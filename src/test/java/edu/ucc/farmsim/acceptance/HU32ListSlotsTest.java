@@ -15,7 +15,7 @@ import edu.ucc.farmsim.ui.components.SlotsPresenter;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-/** HU-32: listing the three slots with what they hold (RN-31). */
+/** HU-32: listar las tres ranuras con lo que contienen (RN-31). */
 class HU32ListSlotsTest {
 
     private final InMemoryMongo mongo = new InMemoryMongo();

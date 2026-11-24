@@ -17,18 +17,19 @@ import edu.ucc.farmsim.support.TestApp;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-/** HU-18: building coops, barns, warehouses and greenhouses on free grass (RN-20, RN-21, RN-29). */
+/** HU-18: construir gallineros, establos, almacenes e invernaderos sobre pasto libre (RN-20, RN-21, RN-29). */
 class HU18BuildTest {
 
     @Test
     void HU18_ca1_buildingACoopCosts400AndOccupiesFourPlots() {
-        // Given 500 m and a free 2 x 2 grass area with its corner at (2,7)
+                // Dados 500 m y un área libre de pasto de 2 x 2 con su esquina en (2,7)
         TestApp app = TestApp.startedGame();
 
-        // When the player builds a coop there
+                // Cuando el jugador construye un gallinero allí
         Result<BuildingView> result = app.controller.build("COOP", 2, 7);
 
-        // Then 400 m are charged (the first building then pays LG-06: 100 m) and the four plots are occupied
+                // Entonces se cobran 400 m (el primer edificio paga entonces LG-06: 100 m) y las cuatro parcelas quedan
+        // ocupadas
         assertTrue(result.isOk(), String.valueOf(result.message()));
         assertEquals("Gallinero", result.value().name());
         assertEquals(500 - 400 + 100, app.state().money());
@@ -45,11 +46,11 @@ class HU18BuildTest {
     void HU18_ca2_anAreaWithSoilOrOutsideTheMapIsRejectedAndNothingChanges() {
         TestApp app = TestApp.startedGame();
 
-        // When the area includes soil (4,2)
+                // Cuando el área incluye tierra (4,2)
         Result<BuildingView> onSoil = app.controller.build("COOP", 3, 2);
-        // When it sticks out of the map (column 15, width 2)
+                // Cuando sobresale del mapa (columna 15, ancho 2)
         Result<BuildingView> outside = app.controller.build("COOP", 15, 3);
-        // When it covers the pond
+                // Cuando cubre el estanque
         Result<BuildingView> onWater = app.controller.build("COOP", 13, 0);
 
         for (Result<BuildingView> result : List.of(onSoil, outside, onWater)) {
@@ -119,7 +120,7 @@ class HU18BuildTest {
         TestApp app = TestApp.startedGame();
         GameFixtures.build(app.state(), BuildingType.COOP, 2, 7);
 
-        // The new area (3,8)-(4,9) shares the plot (3,8) with the first coop
+                // El área nueva (3,8)-(4,9) comparte la parcela (3,8) con el primer gallinero
         Result<BuildingView> result = app.controller.build("COOP", 3, 8);
 
         assertEquals(ErrorCode.UBICACION_INVALIDA, result.code());

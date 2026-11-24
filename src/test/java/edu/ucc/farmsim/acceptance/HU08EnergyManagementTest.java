@@ -12,8 +12,8 @@ import edu.ucc.farmsim.domain.game.Energy;
 import org.junit.jupiter.api.Test;
 
 /**
- * HU-08: daily energy (RN-02). The end-to-end restoration at the end of the day is verified in HU-10 · CA-2;
- * the sowing flow that spends energy arrives with HU-01.
+ * HU-08: energía diaria (RN-02). La restauración de punta a punta al final del día se verifica en HU-10 · CA-2; el
+ * flujo de siembra que gasta energía llega con HU-01.
  */
 class HU08EnergyManagementTest {
 
@@ -23,12 +23,12 @@ class HU08EnergyManagementTest {
         Energy energy = new Energy();
         assertEquals(100, energy.current());
 
-        // When 50 sowings (2 each) are paid
+                // Cuando se pagan 50 siembras (2 cada una)
         for (int i = 0; i < 50; i++) {
             assertTrue(energy.trySpend(GameRules.ENERGY_COST_SOW));
         }
 
-        // Then energy reaches 0
+                // Entonces la energía llega a 0
         assertEquals(0, energy.current());
     }
 
@@ -37,10 +37,10 @@ class HU08EnergyManagementTest {
         // Given 1 energy
         Energy energy = Energy.withCurrent(1);
 
-        // When an action that costs 2 is attempted
+                // Cuando se intenta una acción que cuesta 2
         boolean paid = energy.trySpend(GameRules.ENERGY_COST_SOW);
 
-        // Then it is rejected, energy stays at 1, and the message says what was needed
+                // Entonces se rechaza, la energía queda en 1, y el mensaje dice qué hacía falta
         assertFalse(paid);
         assertEquals(1, energy.current());
         assertEquals("Energía insuficiente: necesitas 2 y tienes 1.",
@@ -52,23 +52,23 @@ class HU08EnergyManagementTest {
         // Given 37 energy left
         Energy energy = Energy.withCurrent(37);
 
-        // When the day ends (the pipeline step calls restore)
+                // Cuando termina el día (el paso del pipeline llama a restore)
         energy.restore();
 
-        // Then energy is 100, not 137
+                // Entonces la energía es 100, no 137
         assertEquals(GameRules.MAX_ENERGY, energy.current());
     }
 
     @Test
     void HU08_ca4_zeroCostActionsAreAlwaysAcceptedAndEnergyStaysWithinZeroAndMaximum() {
-        // Given 0 energy, a free action (buy, sell, save) is accepted and energy stays at 0
+                // Dada 0 de energía, una acción gratuita (comprar, vender, guardar) se acepta y la energía queda en 0
         Energy empty = Energy.withCurrent(0);
         assertTrue(empty.trySpend(0));
         assertEquals(0, empty.current());
         assertFalse(empty.trySpend(1));
         assertEquals(0, empty.current());
 
-        // And energy never goes above the maximum
+                // Y la energía nunca pasa del máximo
         Energy full = new Energy();
         full.restore();
         assertEquals(100, full.current());

@@ -26,11 +26,14 @@ import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import org.junit.jupiter.api.Test;
 
-/** HU-44: our own 32 x 32 pixel-art sprites, drawn sharp at integer scales. */
+/** HU-44: nuestros propios sprites de pixel art de 32 x 32, dibujados nítidos a escalas enteras. */
 class HU44PixelSpritesTest {
 
     private static final Path ASSETS = Path.of("src/main/resources/assets");
-    /** Tall sprites: buildings have one tile of roof above the ground they use, trees are two tiles high. */
+    /**
+     * Sprites altos: los edificios tienen una baldosa de techo sobre el suelo que usan, los árboles miden dos baldosas
+     * de alto.
+     */
     private static final Map<String, int[]> SHEETS = Map.of(
             "buildings/COOP.png", new int[] {64, 96}, "buildings/BARN.png", new int[] {96, 96},
             "buildings/WAREHOUSE.png", new int[] {64, 96}, "buildings/GREENHOUSE.png", new int[] {96, 128});

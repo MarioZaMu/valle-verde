@@ -5,11 +5,12 @@ import edu.ucc.farmsim.domain.config.GameRules;
 /**
  * Pattern: Singleton — Role: Singleton instance (the game's only calendar).
  *
- * <p>Holds the current date and moves it forward one day at a time (RN-01). There is one calendar per
- * running game; the services and the memento read and restore it through this instance. The game is
- * single-threaded (S-01), so no synchronization is needed.
+ * <p>Guarda la fecha actual y la avanza de un día a la vez (RN-01). Hay un calendario por partida en marcha; los
+ * servicios y el memento lo leen y restauran a través de esta instancia. El juego usa un solo hilo (S-01), así que no
+ * hace falta sincronización.
  *
- * <p>Tests must call {@link #resetForTests()} before each case so no date leaks between them.
+ * <p>Las pruebas deben llamar a {@link #resetForTests()} antes de cada caso para que ninguna fecha se filtre entre
+ * ellos.
  *
  * <p>Stories: HU-09.
  */
@@ -25,22 +26,22 @@ public final class GameClock {
         resetForTests();
     }
 
-    /** Returns the one and only clock. */
+    /** Devuelve el único reloj. */
     public static GameClock getInstance() {
         return INSTANCE;
     }
 
-    /** Current date. */
+    /** Fecha actual. */
     public GameDate date() {
         return new GameDate(year, season.season(), day);
     }
 
-    /** State of the current season. */
+    /** Estado de la estación actual. */
     public SeasonState seasonState() {
         return season;
     }
 
-    /** The date of the next day, without advancing the clock. */
+    /** La fecha del día siguiente, sin avanzar el reloj. */
     public GameDate tomorrow() {
         if (day < GameRules.DAYS_PER_SEASON) {
             return new GameDate(year, season.season(), day + 1);
@@ -50,7 +51,7 @@ public final class GameClock {
         return new GameDate(nextYear, next.season(), GameRules.START_DAY);
     }
 
-    /** Moves the calendar one day forward: day 28 of a season rolls into day 1 of the next one. */
+    /** Mueve el calendario un día adelante: el día 28 de una estación pasa al día 1 de la siguiente. */
     public void advanceDay() {
         GameDate next = tomorrow();
         this.year = next.year();
@@ -58,14 +59,14 @@ public final class GameClock {
         this.season = SeasonState.of(next.season());
     }
 
-    /** Sets the calendar to a given date (used by the memento when restoring a game). */
+    /** Fija el calendario en una fecha dada (lo usa el memento al restaurar una partida). */
     public void restore(GameDate date) {
         this.year = date.year();
         this.day = date.day();
         this.season = SeasonState.of(date.season());
     }
 
-    /** Puts the clock back at Year 1, Spring, day 1. */
+    /** Devuelve el reloj al Año 1, Primavera, día 1. */
     public void resetForTests() {
         restore(GameDate.start());
     }

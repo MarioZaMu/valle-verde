@@ -3,12 +3,12 @@ package edu.ucc.farmsim.domain.economy;
 import java.util.List;
 
 /**
- * Immutable copy of an inventory: its number of slots and the content of every slot (an empty slot is a
- * stack with {@code null} type and amount 0).
+ * Copia inmutable de un inventario: su número de casillas y el contenido de cada casilla (una casilla vacía es una pila
+ * con tipo {@code null} y cantidad 0).
  *
  * <p>Stories: HU-10.
  *
- * @param capacity number of slots
- * @param slots    content of every slot, in slot order
+ * @param capacity número de casillas
+ * @param slots    contenido de cada casilla, en orden de casilla
  */
 public record InventorySnapshot(int capacity, List<Inventory.ItemStack> slots) { }

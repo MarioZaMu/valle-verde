@@ -11,8 +11,8 @@ import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 
 /**
- * The achievements dialog opened with {@code L} (HU-26): what each one asks for, its reward and the progress.
- * It is modal; {@code Esc} or {@code L} close it. All the logic is in {@link AchievementsPresenter}.
+ * El diálogo de logros que se abre con {@code L} (HU-26): lo que pide cada uno, su recompensa y el progreso. Es modal;
+ * {@code Esc} o {@code L} lo cierran. Toda la lógica está en {@link AchievementsPresenter}.
  *
  * <p>Stories: HU-26.
  */
@@ -21,10 +21,10 @@ public final class AchievementsDialog extends JDialog {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Builds the dialog.
+     * Construye el diálogo.
      *
-     * @param owner     the window it belongs to
-     * @param presenter the logic of the dialog
+     * @param owner     la ventana a la que pertenece
+     * @param presenter la lógica del diálogo
      */
     public AchievementsDialog(Window owner, AchievementsPresenter presenter) {
         super(owner, Texts.ACHIEVEMENTS_TITLE, ModalityType.APPLICATION_MODAL);

@@ -22,8 +22,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 /**
- * The crop use cases: sow, water, harvest and clear (RN-06 to RN-10). Each operation checks every rule
- * first and only then changes the game, so a rejection never leaves anything half done.
+ * Los casos de uso de cultivos: sembrar, regar, cosechar y limpiar (RN-06 a RN-10). Cada operación comprueba primero
+ * todas las reglas y solo después cambia la partida, de modo que un rechazo nunca deja nada a medias.
  *
  * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-25, HU-26, HU-35.
  */
@@ -38,12 +38,12 @@ public final class FarmService {
     private final AchievementService achievements;
 
     /**
-     * Creates the service.
+     * Crea el servicio.
      *
-     * @param session the game in progress
-     * @param mapper  builds the views the UI draws
-     * @param events  where events are published
-     * @param achievements evaluates the achievements after each harvest
+     * @param session la partida en curso
+     * @param mapper  construye las vistas que dibuja la UI
+     * @param events  donde se publican los eventos
+     * @param achievements evalúa los logros después de cada cosecha
      */
     public FarmService(GameSession session, ViewMapper mapper, EventBus events, AchievementService achievements) {
         this.session = session;
@@ -53,11 +53,11 @@ public final class FarmService {
     }
 
     /**
-     * Sows a seed from the inventory in a free soil plot of a valid season (RN-06).
+     * Siembra una semilla del inventario en una parcela de tierra libre de una estación válida (RN-06).
      *
-     * @param col    column of the plot
-     * @param row    row of the plot
-     * @param seedId item id of the seed, for example {@code CARROT_SEED}
+     * @param col    columna de la parcela
+     * @param row    fila de la parcela
+     * @param seedId id del objeto semilla, por ejemplo {@code CARROT_SEED}
      */
     public Result<PlotView> plant(int col, int row, String seedId) {
         if (!session.hasGame()) {
@@ -100,10 +100,10 @@ public final class FarmService {
     }
 
     /**
-     * Waters the crop of a plot (RN-07): 1 energy, or 2 when the weather of the day is Drought.
+     * Riega el cultivo de una parcela (RN-07): 1 de energía, o 2 cuando el clima del día es sequía.
      *
-     * @param col column of the plot
-     * @param row row of the plot
+     * @param col columna de la parcela
+     * @param row fila de la parcela
      */
     public Result<PlotView> water(int col, int row) {
         if (!session.hasGame()) {
@@ -135,12 +135,12 @@ public final class FarmService {
     }
 
     /**
-     * The harvest tool (RN-10, RN-34): a mature crop is harvested into the inventory (2 energy and room for
-     * one unit); a withered crop is cleared (1 energy, nothing collected). If any rule fails, nothing changes;
-     * in particular a full inventory never costs the crop or the energy.
+     * La herramienta de cosechar (RN-10, RN-34): un cultivo maduro se cosecha hacia el inventario (2 de energía y lugar
+     * para una unidad); un cultivo marchito se limpia (1 de energía, no se recoge nada). Si alguna regla falla, no
+     * cambia nada; en particular un inventario lleno nunca cuesta el cultivo ni la energía.
      *
-     * @param col column of the plot
-     * @param row row of the plot
+     * @param col columna de la parcela
+     * @param row fila de la parcela
      */
     public Result<PlotView> harvest(int col, int row) {
         if (!session.hasGame()) {
@@ -174,10 +174,10 @@ public final class FarmService {
     }
 
     /**
-     * Describes a plot without changing anything (HU-07): terrain, crop, stage, watered and days left.
+     * Describe una parcela sin cambiar nada (HU-07): terreno, cultivo, etapa, regado y días restantes.
      *
-     * @param col column of the plot
-     * @param row row of the plot
+     * @param col columna de la parcela
+     * @param row fila de la parcela
      */
     public Result<PlotView> inspect(int col, int row) {
         if (!session.hasGame()) {
@@ -186,7 +186,7 @@ public final class FarmService {
         return Result.ok(mapper.plot(session.current(), col, row));
     }
 
-    /** The whole farm map, for drawing it. A pure query. */
+    /** Todo el mapa de la granja, para dibujarlo. Una consulta pura. */
     public Result<MapView> map() {
         if (!session.hasGame()) {
             return Result.failWith(ErrorCode.SIN_PARTIDA);

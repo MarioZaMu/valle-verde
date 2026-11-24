@@ -12,7 +12,7 @@ import edu.ucc.farmsim.support.TestApp;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-/** HU-17: the summary of the day that has just ended (RN-03, RN-14). */
+/** HU-17: el resumen del día que acaba de terminar (RN-03, RN-14). */
 class HU17DaySummaryTest {
 
     private static DaySummaryView summaryOf(TestApp app) {
@@ -22,16 +22,16 @@ class HU17DaySummaryTest {
 
     @Test
     void HU17_ca1_aSaleAndAPurchaseAppearAsIncomeAndExpenses() {
-        // Given a day with a sale of 79 m and a purchase of 150 m
+                // Dado un día con una venta de 79 m y una compra de 150 m
         TestApp app = TestApp.startedGame();
         app.state().inventory().add(ItemType.CARROT, 3);
         app.controller.buy("CORN_SEED", 5);
         app.controller.sell("CARROT", 3);
 
-        // When the day ends
+                // Cuando termina el día
         app.controller.endDay();
 
-        // Then the summary shows income 79, expenses 150 and the balances
+                // Entonces el resumen muestra ingresos 79, gastos 150 y los saldos
         DaySummaryView summary = summaryOf(app);
         assertEquals(79, summary.income());
         assertEquals(150, summary.expenses());

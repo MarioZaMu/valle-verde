@@ -8,7 +8,7 @@ import edu.ucc.farmsim.domain.game.GameState;
 import org.springframework.stereotype.Service;
 
 /**
- * Starts games (and, in later phases, tracks achievements and unlocks).
+ * Inicia partidas (y, en fases posteriores, sigue los logros y los desbloqueos).
  *
  * <p>Stories: HU-28.
  */
@@ -20,11 +20,11 @@ public final class ProgressService {
     private final EventBus events;
 
     /**
-     * Creates the service.
+     * Crea el servicio.
      *
-     * @param session the game in progress
-     * @param mapper  builds the views the UI draws
-     * @param events  where events are published
+     * @param session la partida en curso
+     * @param mapper  construye las vistas que dibuja la UI
+     * @param events  donde se publican los eventos
      */
     public ProgressService(GameSession session, ViewMapper mapper, EventBus events) {
         this.session = session;
@@ -32,7 +32,7 @@ public final class ProgressService {
         this.events = events;
     }
 
-    /** Creates the initial state of RN-30, makes it the game in progress and announces it. */
+    /** Crea el estado inicial de RN-30, lo convierte en la partida en curso y lo anuncia. */
     public Result<HudView> newGame(long seed) {
         GameState state = GameState.newGame(seed);
         session.replace(state);

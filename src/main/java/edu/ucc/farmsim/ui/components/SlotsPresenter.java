@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.function.BooleanSupplier;
 
 /**
- * The logic of the save slots, without any Swing (HU-29, HU-30, HU-32): the text of each slot, saving with the
- * confirmation that overwriting asks for, and loading. The dialogs only draw it.
+ * La lógica de las ranuras de guardado, sin nada de Swing (HU-29, HU-30, HU-32): el texto de cada ranura, guardar con
+ * la confirmación que pide sobrescribir, y cargar. Los diálogos solo la dibujan.
  *
  * <p>Stories: HU-29, HU-30, HU-32.
  */
@@ -21,16 +21,16 @@ public final class SlotsPresenter {
     private String error = "";
 
     /**
-     * Creates the presenter and reads the slots.
+     * Crea el presentador y lee las ranuras.
      *
-     * @param game the game the slots belong to
+     * @param game la partida a la que pertenecen las ranuras
      */
     public SlotsPresenter(GameCommands game) {
         this.game = game;
         refresh();
     }
 
-    /** Reads the slots again (so a new save shows at once). */
+    /** Lee las ranuras otra vez (para que un guardado nuevo se vea de inmediato). */
     public void refresh() {
         Result<List<SaveSlotView>> result = game.saveSlots();
         error = result.isOk() ? "" : result.message();
@@ -39,22 +39,22 @@ public final class SlotsPresenter {
         }
     }
 
-    /** The reason the slots could not be read, or an empty text. */
+    /** La razón por la que no se pudieron leer las ranuras, o un texto vacío. */
     public String error() {
         return error;
     }
 
-    /** The slots as the last refresh found them. */
+    /** Las ranuras tal como las encontró la última actualización. */
     public List<SaveSlotView> slots() {
         return slots;
     }
 
-    /** The line of each slot, for example {@code Ranura 1: Año 1 · Verano · día 5 · 1.250 m · 2026-11-22 10:30}. */
+    /** La línea de cada ranura, por ejemplo {@code Ranura 1: Año 1 · Verano · día 5 · 1.250 m · 2026-11-22 10:30}. */
     public List<String> lines() {
         return slots.stream().map(SlotsPresenter::line).toList();
     }
 
-    /** The line of one slot. */
+    /** La línea de una ranura. */
     public static String line(SaveSlotView slot) {
         String prefix = "Ranura " + slot.slot() + ": ";
         return switch (slot.status()) {
@@ -65,22 +65,22 @@ public final class SlotsPresenter {
         };
     }
 
-    /** True if the slot holds a game that can be loaded. */
+    /** Verdadero si la ranura contiene una partida que se puede cargar. */
     public boolean canLoad(int slot) {
         return slots.stream().anyMatch(s -> s.slot() == slot && "OK".equals(s.status()));
     }
 
-    /** True if saving in the slot would replace something (the player is asked first, HU-29 · CA-3). */
+    /** Verdadero si guardar en la ranura reemplazaría algo (se le pregunta primero al jugador, HU-29 · CA-3). */
     public boolean needsConfirmation(int slot) {
         return slots.stream().anyMatch(s -> s.slot() == slot && !"EMPTY".equals(s.status()));
     }
 
     /**
-     * Saves in the slot, asking first if it is occupied.
+     * Guarda en la ranura, preguntando primero si está ocupada.
      *
-     * @param slot      slot number
-     * @param confirmed asked when the slot is occupied; saving goes on only if it answers {@code true}
-     * @return the message to show, or an empty text if the player cancelled
+     * @param slot      número de ranura
+     * @param confirmed se le pregunta cuando la ranura está ocupada; el guardado sigue solo si responde {@code true}
+     * @return el mensaje que se muestra, o un texto vacío si el jugador canceló
      */
     public String save(int slot, BooleanSupplier confirmed) {
         if (needsConfirmation(slot) && !confirmed.getAsBoolean()) {
@@ -91,7 +91,7 @@ public final class SlotsPresenter {
         return result.isOk() ? Texts.SAVED_IN_SLOT + slot + "." : result.message();
     }
 
-    /** Loads the slot; the game in progress changes only if this succeeds. */
+    /** Carga la ranura; la partida en curso cambia solo si esto tiene éxito. */
     public Result<HudView> load(int slot) {
         Result<HudView> result = game.load(slot);
         refresh();

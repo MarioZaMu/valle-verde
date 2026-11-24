@@ -10,10 +10,10 @@ import java.util.Random;
 public interface WeatherStrategy {
 
     /**
-     * Draws the weather of a day.
+     * Sortea el clima de un día.
      *
-     * @param day day of the season (1 to 28) the weather is drawn for
-     * @param rnd injected random generator
+     * @param day día de la estación (1 a 28) para el que se sortea el clima
+     * @param rnd generador aleatorio inyectado
      */
     Weather nextWeather(int day, Random rnd);
 }

@@ -7,35 +7,38 @@ import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
 /**
- * Top-level application window. In phase 5.0 it is an empty frame; from phase 5.1 it hosts the
- * {@code ScreenRouter} that switches between the start screen and the game screen.
+ * Ventana principal de la aplicación. En la fase 5.0 es un marco vacío; desde la fase 5.1 aloja el {@code ScreenRouter}
+ * que alterna entre la pantalla de inicio y la pantalla de juego.
  *
  * <p>Stories: none (technical setup, phase 5.0).
- * The start screen that replaces this empty frame belongs to a later story.
+ * La pantalla de inicio que reemplaza este marco vacío pertenece a una historia posterior.
  */
 public final class MainWindow extends JFrame {
 
-    /** Minimum window width in pixels (R-07: usable from 1024 x 768). */
+    /** Ancho mínimo de la ventana en píxeles (R-07: utilizable desde 1024 x 768). */
     public static final int MIN_WIDTH = 1024;
 
-    /** Minimum window height in pixels. */
+    /** Alto mínimo de la ventana en píxeles. */
     public static final int MIN_HEIGHT = 768;
 
     /**
-     * Opening width before the window is maximized: room for the map at twice the size of its 32-pixel sprites.
-     * The window opens maximized and never larger than the usable part of the screen.
+     * Ancho de apertura antes de maximizar la ventana: espacio para el mapa al doble del tamaño de sus sprites de 32
+     * píxeles. La ventana abre maximizada y nunca más grande que la parte utilizable de la pantalla.
      */
     public static final int DEFAULT_WIDTH = 1100;
 
-    /** Opening height: the map at twice the size (640 px) plus the top bar, tool bar and buttons. */
+    /**
+     * Alto de apertura: el mapa al doble del tamaño (640 px) más la barra superior, la barra de herramientas y los
+     * botones.
+     */
     public static final int DEFAULT_HEIGHT = 860;
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Creates the window; it is not shown until {@link #setVisible(boolean)} is called.
+     * Crea la ventana; no se muestra hasta que se llama a {@link #setVisible(boolean)}.
      *
-     * @param title text for the title bar
+     * @param title texto para la barra de título
      */
     public MainWindow(String title) {
         super(title);
@@ -47,7 +50,10 @@ public final class MainWindow extends JFrame {
         setExtendedState(getExtendedState() | MAXIMIZED_BOTH);
     }
 
-    /** The part of the screen a window may cover (without the task bar); the default size if there is none. */
+    /**
+     * La parte de la pantalla que puede cubrir una ventana (sin la barra de tareas); el tamaño predeterminado si no hay
+     * ninguna.
+     */
     private static Rectangle usableScreen() {
         if (GraphicsEnvironment.isHeadless()) {
             return new Rectangle(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT);

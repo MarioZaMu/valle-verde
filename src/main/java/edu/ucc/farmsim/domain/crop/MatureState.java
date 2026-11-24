@@ -10,7 +10,7 @@ final class MatureState implements CropState {
     static final MatureState INSTANCE = new MatureState();
 
     private MatureState() {
-        // shared instance
+                // instancia compartida
     }
 
     @Override
@@ -30,6 +30,6 @@ final class MatureState implements CropState {
 
     @Override
     public void onDayEnd(Crop crop, int dryDaysToWither) {
-        // a mature crop neither grows nor needs water
+                // un cultivo maduro ni crece ni necesita agua
     }
 }

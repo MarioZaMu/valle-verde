@@ -10,9 +10,9 @@ import org.springframework.stereotype.Component;
 /**
  * Pattern: Observer — Role: ConcreteObserver (keeps the events of the current request so they travel in the response).
  *
- * <p>The server has no screen to refresh: it listens to its own {@link EventBus} and hands what happened to
- * the REST controller, which returns it to the client (DT-19). Requests are served one at a time (DT-20), so
- * a plain list is enough.
+ * <p>El servidor no tiene pantalla que refrescar: escucha su propio {@link EventBus} y entrega lo ocurrido al
+ * controlador REST, que se lo devuelve al cliente (DT-19). Las peticiones se atienden de una en una (DT-20), así que
+ * una lista simple basta.
  *
  * <p>Stories: none.
  */
@@ -22,9 +22,9 @@ public final class EventCollector implements GameListener {
     private final List<GameEvent> events = new ArrayList<>();
 
     /**
-     * Starts listening to the server's event bus.
+     * Empieza a escuchar el bus de eventos del servidor.
      *
-     * @param bus where the services publish events
+     * @param bus donde los servicios publican los eventos
      */
     public EventCollector(EventBus bus) {
         bus.subscribe(this);
@@ -35,7 +35,7 @@ public final class EventCollector implements GameListener {
         events.add(event);
     }
 
-    /** Returns the events collected so far, in order, and forgets them. */
+    /** Devuelve los eventos recogidos hasta ahora, en orden, y los olvida. */
     public synchronized List<GameEvent> drain() {
         List<GameEvent> collected = List.copyOf(events);
         events.clear();

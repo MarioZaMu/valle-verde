@@ -21,7 +21,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import org.junit.jupiter.api.Test;
 
-/** HU-38: the market with its Buy and Sell tabs (RN-16, RN-17, RN-19). */
+/** HU-38: el mercado con sus pestañas Comprar y Vender (RN-16, RN-17, RN-19). */
 class HU38MarketDialogTest {
 
     private static MarketPresenter presenterOf(TestApp app) {
@@ -32,14 +32,14 @@ class HU38MarketDialogTest {
 
     @Test
     void HU38_ca2_theSellTabShowsThePriceWithItsTrendAndTheForecastTotal() {
-        // Given 3 carrots in Spring
+                // Dadas 3 zanahorias en Primavera
         TestApp app = TestApp.startedGame();
         app.state().inventory().add(ItemType.CARROT, 3);
         MarketPresenter presenter = presenterOf(app);
 
         var carrot = presenter.sells().stream().filter(o -> o.itemId().equals("CARROT")).findFirst().orElseThrow();
 
-        // Then the price is 27 m with a trend that has a symbol and a word, and 3 units forecast 79 m
+                // Entonces el precio es 27 m con una tendencia que tiene un símbolo y una palabra, y 3 unidades prevén 79 m
         assertEquals("27 m ▬ igual", presenter.sellPriceText(carrot));
         assertEquals("Total previsto: 79 m", presenter.previewSale("CARROT", 3));
     }
@@ -63,7 +63,7 @@ class HU38MarketDialogTest {
         GameFixtures.setMoney(app.state(), 100);
         MarketPresenter presenter = presenterOf(app);
 
-        // Then buying 3 medicines (120 m) cannot be done and says why; the balance does not change
+                // Entonces comprar 3 medicinas (120 m) no se puede hacer y dice por qué; el saldo no cambia
         assertFalse(presenter.canBuy("MEDICINE", 3));
         assertEquals("Fondos insuficientes: faltan 20 m.", presenter.purchaseBlock("MEDICINE", 3));
         assertEquals(100, app.state().money());

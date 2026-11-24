@@ -3,17 +3,17 @@ package edu.ucc.farmsim.application.dto;
 import java.util.List;
 
 /**
- * Everything the market dialog shows: what can be sold and what can be bought.
+ * Todo lo que muestra el diálogo del mercado: lo que se puede vender y lo que se puede comprar.
  *
  * <p>Stories: HU-14, HU-15, HU-16, HU-19, HU-38.
  *
- * @param sells   the sellable products with their price and trend
- * @param buys    the purchase catalogue
- * @param animals the animals for sale
+ * @param sells   los productos vendibles con su precio y tendencia
+ * @param buys    el catálogo de compra
+ * @param animals los animales en venta
  */
 public record MarketView(List<SellOfferView> sells, List<BuyOfferView> buys, List<AnimalOfferView> animals) {
 
-    /** A market without animals. */
+    /** Un mercado sin animales. */
     public MarketView(List<SellOfferView> sells, List<BuyOfferView> buys) {
         this(sells, buys, List.of());
     }

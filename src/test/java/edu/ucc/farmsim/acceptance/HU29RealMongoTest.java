@@ -27,9 +27,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 /**
- * HU-29 to HU-31 against a real MongoDB on {@code localhost:27017} (RN-31, RN-32), in a database of its own
- * ({@code valleverde_test}) that is dropped after each test, so the saved games of the player are never touched.
- * Without a MongoDB on this machine the tests are skipped, as the game itself does not need one to play.
+ * HU-29 a HU-31 contra un MongoDB real en {@code localhost:27017} (RN-31, RN-32), en una base de datos propia ({@code
+ * valleverde_test}) que se borra después de cada prueba, de modo que las partidas guardadas del jugador nunca se tocan.
+ * Sin un MongoDB en esta máquina las pruebas se omiten, ya que el juego mismo no necesita uno para jugar.
  */
 class HU29RealMongoTest {
 

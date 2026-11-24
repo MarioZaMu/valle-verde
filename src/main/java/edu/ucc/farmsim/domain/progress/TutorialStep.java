@@ -1,41 +1,41 @@
 package edu.ucc.farmsim.domain.progress;
 
 /**
- * The steps of the start tutorial, in the order the player goes through them (RN-39), and the two ways it ends:
- * every step done, or skipped.
+ * Los pasos del tutorial de inicio, en el orden en que los recorre el jugador (RN-39), y las dos formas en que termina:
+ * todos los pasos hechos, o saltado.
  *
  * <p>Stories: HU-49.
  */
 public enum TutorialStep {
-    /** Take a step with the avatar. */
+    /** Dar un paso con el avatar. */
     WALK,
-    /** Sow a seed. */
+    /** Sembrar una semilla. */
     SOW,
-    /** Water a crop. */
+    /** Regar un cultivo. */
     WATER,
-    /** Talk to a person of the valley. */
+    /** Hablar con una persona del valle. */
     TALK,
-    /** End the day. */
+    /** Terminar el día. */
     END_DAY,
-    /** Every step was done. */
+    /** Se hicieron todos los pasos. */
     DONE,
-    /** The player skipped it. */
+    /** El jugador lo saltó. */
     SKIPPED;
 
-    /** How many steps the player goes through. */
+    /** Cuántos pasos recorre el jugador. */
     public static final int COUNT = 5;
 
-    /** True once the tutorial ended, done or skipped. */
+    /** Verdadero cuando el tutorial terminó, hecho o saltado. */
     public boolean isFinished() {
         return this == DONE || this == SKIPPED;
     }
 
-    /** Position of the step, from 1 to {@link #COUNT}; a finished tutorial counts as the last one. */
+    /** Posición del paso, de 1 a {@link #COUNT}; un tutorial terminado cuenta como el último. */
     public int number() {
         return isFinished() ? COUNT : ordinal() + 1;
     }
 
-    /** The step that comes after this one; {@link #DONE} after the last. */
+    /** El paso que viene después de este; {@link #DONE} después del último. */
     TutorialStep next() {
         return isFinished() ? this : values()[ordinal() + 1];
     }

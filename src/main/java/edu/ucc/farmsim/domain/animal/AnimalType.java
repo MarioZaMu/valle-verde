@@ -4,7 +4,7 @@ import edu.ucc.farmsim.domain.config.GameRules;
 import edu.ucc.farmsim.domain.economy.ItemType;
 
 /**
- * Catalog of animals (RN-23): what each costs and the product it gives.
+ * Catálogo de animales (RN-23): lo que cuesta cada uno y el producto que da.
  *
  * <p>Stories: HU-19.
  */
@@ -20,12 +20,12 @@ public enum AnimalType {
         this.product = product;
     }
 
-    /** Price in m of one animal. */
+    /** Precio en m de un animal. */
     public int price() {
         return price;
     }
 
-    /** What the animal produces. */
+    /** Lo que produce el animal. */
     public ItemType product() {
         return product;
     }

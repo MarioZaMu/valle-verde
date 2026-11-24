@@ -7,11 +7,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Scales pixel art so it stays sharp at any size. The image is first enlarged by a whole factor with nearest
- * neighbour (every art pixel becomes an exact square) and only then brought to the final size with bilinear
- * filtering, which blurs at most the one-pixel seams between squares. At a whole scale the result is the
- * nearest-neighbour image itself, with no colour other than the original ones (HU-44 · CA-3). The scaled
- * copies are kept, so a frame only draws ready images.
+ * Escala el pixel art para que se mantenga nítido a cualquier tamaño. La imagen primero se agranda por un factor entero
+ * con vecino más cercano (cada píxel del arte se vuelve un cuadrado exacto) y solo después se lleva al tamaño final con
+ * filtrado bilineal, que como mucho difumina las costuras de un píxel entre cuadrados. En una escala entera el
+ * resultado es la propia imagen de vecino más cercano, sin ningún color distinto de los originales (HU-44 · CA-3). Las
+ * copias escaladas se conservan, así que un cuadro solo dibuja imágenes listas.
  *
  * <p>Stories: HU-44, HU-48.
  */
@@ -33,17 +33,20 @@ final class PixelScaler {
         }
     };
 
-    /** A scaler that keeps up to 600 scaled copies: enough for every sprite at a few sizes. */
+    /** Un escalador que conserva hasta 600 copias escaladas: suficiente para cada sprite en unos pocos tamaños. */
     PixelScaler() {
         this(MAX_ENTRIES);
     }
 
-    /** A scaler that keeps at most {@code maxEntries} scaled copies; few for large images such as the ground. */
+    /**
+     * Un escalador que conserva como mucho {@code maxEntries} copias escaladas; pocas para imágenes grandes como el
+     * suelo.
+     */
     PixelScaler(int maxEntries) {
         this.maxEntries = maxEntries;
     }
 
-    /** The image at the given size in device pixels. */
+    /** La imagen al tamaño dado en píxeles de dispositivo. */
     BufferedImage scaled(BufferedImage source, int width, int height) {
         int w = Math.max(1, width);
         int h = Math.max(1, height);
@@ -54,14 +57,14 @@ final class PixelScaler {
     }
 
     /**
-     * Draws an image so that it covers the given logical rectangle, scaled for the device of {@code g}.
+     * Dibuja una imagen de modo que cubra el rectángulo lógico dado, escalada para el dispositivo de {@code g}.
      *
-     * @param g      where to draw
-     * @param source the art, at its own size
-     * @param x      left, in logical pixels
-     * @param y      top, in logical pixels
-     * @param width  width, in logical pixels (negative mirrors the image)
-     * @param height height, in logical pixels
+     * @param g      dónde dibujar
+     * @param source el arte, a su propio tamaño
+     * @param x      izquierda, en píxeles lógicos
+     * @param y      arriba, en píxeles lógicos
+     * @param width  ancho, en píxeles lógicos (negativo refleja la imagen)
+     * @param height alto, en píxeles lógicos
      */
     void draw(Graphics2D g, BufferedImage source, int x, int y, int width, int height) {
         double device = deviceScale(g);
@@ -74,7 +77,7 @@ final class PixelScaler {
         }
     }
 
-    /** How many device pixels one logical pixel of {@code g} covers. */
+    /** Cuántos píxeles de dispositivo cubre un píxel lógico de {@code g}. */
     static double deviceScale(Graphics2D g) {
         double scale = g.getTransform().getScaleX();
         return scale > 0 ? scale : 1.0;

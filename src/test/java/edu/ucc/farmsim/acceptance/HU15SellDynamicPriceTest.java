@@ -13,7 +13,7 @@ import edu.ucc.farmsim.support.GameFixtures;
 import edu.ucc.farmsim.support.TestApp;
 import org.junit.jupiter.api.Test;
 
-/** HU-15: selling at a price that depends on the season and on how much was sold (RN-14, RN-17, RN-18). */
+/** HU-15: vender a un precio que depende de la estación y de cuánto se vendió (RN-14, RN-17, RN-18). */
 class HU15SellDynamicPriceTest {
 
     private static int priceOf(TestApp app, ItemType item) {
@@ -22,14 +22,14 @@ class HU15SellDynamicPriceTest {
 
     @Test
     void HU15_ca1_threeCarrotsInSpringPay79AndTheDemandFallsTo94() {
-        // Given Spring, demand 100 and 3 carrots
+                // Dada Primavera, demanda 100 y 3 zanahorias
         TestApp app = TestApp.startedGame();
         app.state().inventory().add(ItemType.CARROT, 3);
 
-        // When the player sells them
+                // Cuando el jugador las vende
         Result<Integer> result = app.controller.sell("CARROT", 3);
 
-        // Then the player receives 27 + 26 + 26 = 79 m and the demand is 94
+                // Entonces el jugador recibe 27 + 26 + 26 = 79 m y la demanda es 94
         assertTrue(result.isOk(), String.valueOf(result.message()));
         assertEquals(79, result.value());
         assertEquals(579, app.state().money());
@@ -55,18 +55,18 @@ class HU15SellDynamicPriceTest {
         app.controller.sell("CARROT", 10);
         assertEquals(80, app.state().market().demandOf(ItemType.CARROT));
 
-        // Then the price of the next one is 22 m and not 27 m
+                // Entonces el precio de la siguiente es 22 m y no 27 m
         assertEquals(22, priceOf(app, ItemType.CARROT));
     }
 
     @Test
     void HU15_ca3_theDemandNeverFallsBelow50() {
-        // Given demand 50 for carrots in Spring
+                // Dada demanda 50 de zanahorias en Primavera
         TestApp app = TestApp.startedGame();
         GameFixtures.setDemand(app.state(), ItemType.CARROT, 50);
         app.state().inventory().add(ItemType.CARROT, 1);
 
-        // When one more is sold, it pays 14 m (13,5 rounds half up) and the demand stays at 50
+                // Cuando se vende una más, paga 14 m (13,5 redondea hacia arriba) y la demanda se queda en 50
         Result<Integer> result = app.controller.sell("CARROT", 1);
 
         assertEquals(14, result.value());
@@ -87,14 +87,14 @@ class HU15SellDynamicPriceTest {
 
     @Test
     void HU15_ca5_theSeasonFactorIs120OutOfSeasonAnd90InSeason() {
-        // Given demand 100 for pumpkins
+                // Dada demanda 100 de calabazas
         TestApp app = TestApp.startedGame();
         app.state().inventory().add(ItemType.PUMPKIN, 2);
 
-        // In Spring (out of season, factor 120) one pumpkin pays 132 m
+                // En Primavera (fuera de temporada, factor 120) una calabaza paga 132 m
         assertEquals(132, app.controller.sell("PUMPKIN", 1).value());
 
-        // In Autumn (in season, factor 90) with full demand it pays 99 m
+                // En Otoño (en temporada, factor 90) con demanda completa paga 99 m
         GameFixtures.setDemand(app.state(), ItemType.PUMPKIN, 100);
         GameFixtures.setDate(1, Season.AUTUMN, 1);
         assertEquals(99, app.controller.sell("PUMPKIN", 1).value());
@@ -106,10 +106,10 @@ class HU15SellDynamicPriceTest {
         TestApp app = TestApp.startedGame();
         app.state().inventory().add(ItemType.CARROT, 2);
 
-        // When the player tries to sell 5
+                // Cuando el jugador intenta vender 5
         Result<Integer> result = app.controller.sell("CARROT", 5);
 
-        // Then it is rejected and inventory, money and demand are unchanged
+                // Entonces se rechaza y el inventario, el dinero y la demanda no cambian
         assertFalse(result.isOk());
         assertEquals(ErrorCode.CANTIDAD_INVALIDA, result.code());
         assertEquals("La cantidad debe estar entre 1 y 2.", result.message());

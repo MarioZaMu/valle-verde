@@ -17,9 +17,9 @@ import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 
 /**
- * The save slots: the three of them with what they hold, and the buttons Guardar and Cargar (HU-29, HU-30,
- * HU-32). Saving in an occupied slot asks first. It is modal; {@code Esc} closes it. All the logic is in
- * {@link SlotsPresenter}.
+ * Las ranuras de guardado: las tres con lo que contienen, y los botones Guardar y Cargar (HU-29, HU-30, HU-32). Guardar
+ * en una ranura ocupada pregunta primero. Es modal; {@code Esc} lo cierra. Toda la lógica está en {@link
+ * SlotsPresenter}.
  *
  * <p>Stories: HU-29, HU-30, HU-32.
  */
@@ -37,12 +37,12 @@ public final class SlotsDialog extends JDialog {
     private final JLabel message = new JLabel(" ");
 
     /**
-     * Builds the dialog.
+     * Construye el diálogo.
      *
-     * @param owner     the window it belongs to
-     * @param presenter the logic of the slots
-     * @param onUsed    told which slot was saved or loaded, so the quick keys know it
-     * @param onLoaded  told when a game was loaded (the dialog closes itself afterwards)
+     * @param owner     la ventana a la que pertenece
+     * @param presenter la lógica de las ranuras
+     * @param onUsed    se le avisa qué ranura se guardó o se cargó, para que las teclas rápidas lo sepan
+     * @param onLoaded  se le avisa cuando se cargó una partida (el diálogo se cierra solo después)
      */
     public SlotsDialog(Window owner, SlotsPresenter presenter, IntConsumer onUsed, Runnable onLoaded) {
         super(owner, Texts.SLOTS_TITLE, ModalityType.APPLICATION_MODAL);

@@ -28,9 +28,9 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 /**
- * The start screen: a living farm scene ({@link TitleScene}) with the game name on top, gently floating, and
- * the wooden buttons "New game", "Load" and "Exit". Every button just calls the {@link StartScreenPresenter}.
- * The scene is only animated while the screen is shown.
+ * La pantalla de inicio: una escena viva de granja ({@link TitleScene}) con el nombre del juego arriba, flotando
+ * suavemente, y los botones de madera «Nueva partida», «Cargar» y «Salir». Cada botón solo llama al {@link
+ * StartScreenPresenter}. La escena solo se anima mientras se muestra la pantalla.
  *
  * <p>Stories: HU-33, HU-48.
  */
@@ -53,9 +53,9 @@ public final class StartScreen extends JPanel {
     private long shownAt = System.currentTimeMillis();
 
     /**
-     * Builds the screen.
+     * Construye la pantalla.
      *
-     * @param presenter handles the button presses
+     * @param presenter maneja las pulsaciones de los botones
      */
     public StartScreen(StartScreenPresenter presenter) {
         super(new GridBagLayout());
@@ -107,7 +107,9 @@ public final class StartScreen extends JPanel {
         return button;
     }
 
-    /** The game name in large golden letters with a dark edge, floating up and down, and a line under it. */
+    /**
+     * El nombre del juego en letras grandes doradas con un borde oscuro, flotando arriba y abajo, y una línea debajo.
+     */
     private final class Banner extends JComponent {
 
         private static final long serialVersionUID = 1L;

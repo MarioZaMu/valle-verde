@@ -26,8 +26,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
- * Performance at full load (RNF-01, RNF-03): a farm with 40 crops in the open, 9 in the greenhouse, six
- * buildings and 16 animals.
+ * Rendimiento a plena carga (RNF-01, RNF-03): una granja con 40 cultivos a la intemperie, 9 en el invernadero, seis
+ * edificios y 16 animales.
  */
 class FullFarmPerformanceTest {
 
@@ -36,7 +36,7 @@ class FullFarmPerformanceTest {
     private static final int SAVE_LIMIT_MS = 1000;
     private static final int DOCUMENT_LIMIT_BYTES = 200 * 1024;
 
-    /** A farm with every soil plot sown, six buildings and sixteen animals. */
+    /** Una granja con todas las parcelas de tierra sembradas, seis edificios y dieciséis animales. */
     static TestApp fullFarm(InMemoryMongo mongo) {
         TestApp app = TestApp.create(new GameSession(), DayPipeline.standard(), mongo.repository());
         app.controller.newGame(TestApp.SEED);

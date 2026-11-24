@@ -3,8 +3,8 @@ package edu.ucc.farmsim.ui.theme;
 import java.awt.Color;
 
 /**
- * WCAG contrast ratio between two colours, used to prove that the text of the interface is readable
- * (RNF-14: at least 4.5 : 1).
+ * Razón de contraste WCAG entre dos colores, usada para demostrar que el texto de la interfaz es legible (RNF-14: al
+ * menos 4,5 : 1).
  *
  * <p>Stories: HU-43.
  */
@@ -14,10 +14,10 @@ public final class Contrast {
     private static final double OFFSET = 0.05;
 
     private Contrast() {
-        // static helpers only
+                // solo métodos de utilidad estáticos
     }
 
-    /** Contrast ratio from 1 (identical) to 21 (black on white); the order of the colours does not matter. */
+    /** Razón de contraste de 1 (idénticos) a 21 (negro sobre blanco); el orden de los colores no importa. */
     public static double ratio(Color first, Color second) {
         double a = luminance(first);
         double b = luminance(second);

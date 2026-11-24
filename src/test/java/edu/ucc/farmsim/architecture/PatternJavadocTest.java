@@ -13,19 +13,18 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
- * AR-9: every class that implements a design pattern carries the Javadoc line
- * {@code Pattern: <name> — Role: <role>}.
+ * AR-9: toda clase que implementa un patrón de diseño lleva la línea Javadoc {@code Pattern: <nombre> — Role: <rol>}.
  *
- * <p>Classes are registered in {@code src/test/resources/patterns.txt} (one per line:
- * {@code fully.qualified.ClassName | Pattern | Role}). Each phase adds its pattern classes there, so a
- * class that implements a pattern without documenting it fails the build.
+ * <p>Las clases se registran en {@code src/test/resources/patterns.txt} (una por línea: {@code paquete.ClaseCompleta |
+ * Pattern | Role}). Cada fase agrega allí sus clases de patrón, de modo que una clase que implementa un patrón sin
+ * documentarlo rompe el build.
  */
 class PatternJavadocTest {
 
     private static final Path REGISTRY = Path.of("src/test/resources/patterns.txt");
     private static final Path SOURCES = Path.of("src/main/java");
 
-    /** One registry entry. */
+    /** Una entrada del registro. */
     record Entry(String className, String pattern, String role) {
 
         String expectedJavadoc() {

@@ -1,375 +1,377 @@
 package edu.ucc.farmsim.domain.config;
 
 /**
- * Single source of the numeric business rules (RN-01 to RN-35): no magic numbers elsewhere (RNF-12).
+ * Fuente única de las reglas de negocio numéricas (RN-01 a RN-35): sin números mágicos en otros lugares (RNF-12).
  *
- * <p>The values mirror docs/REGLAS_DE_NEGOCIO.md; if a rule changes there, it changes here only.
- * This class depends on nothing (it holds primitives), so every domain package may use it.
+ * <p>Los valores reflejan docs/REGLAS_DE_NEGOCIO.md; si una regla cambia allí, cambia solo aquí. Esta clase no depende
+ * de nada (guarda primitivos), así que cualquier paquete del dominio puede usarla.
  *
  * <p>Stories: HU-01, HU-05, HU-08, HU-09, HU-11, HU-13, HU-28, HU-33.
  */
 public final class GameRules {
 
-    // ---- RN-01: calendar ----
+        // ---- RN-01: calendario ----
 
-    /** Days in each season; a year of four seasons lasts 112 days. */
+    /** Días de cada estación; un año de cuatro estaciones dura 112 días. */
     public static final int DAYS_PER_SEASON = 28;
 
-    /** Year in which a new game starts. */
+    /** Año en que empieza una partida nueva. */
     public static final int START_YEAR = 1;
 
-    /** Day of the season in which a new game starts. */
+    /** Día de la estación en que empieza una partida nueva. */
     public static final int START_DAY = 1;
 
-    // ---- RN-11: weather probabilities (percent, in the order of the Weather enum) ----
-    // Order: SUNNY, CLOUDY, RAINY, DROUGHT, FROST, SNOWY. Each table adds up to 100.
+        // ---- RN-11: probabilidades del clima (porcentaje, en el orden del enum Weather) ---- Orden: SUNNY, CLOUDY, RAINY,
+    // DROUGHT, FROST, SNOWY. Cada tabla suma 100.
 
-    /** Spring weather table. */
+    /** Tabla del clima de primavera. */
     public static final int[] WEATHER_WEIGHTS_SPRING = {55, 15, 30, 0, 0, 0};
 
-    /** Summer weather table. */
+    /** Tabla del clima de verano. */
     public static final int[] WEATHER_WEIGHTS_SUMMER = {60, 10, 15, 15, 0, 0};
 
-    /** Autumn weather table for days 1 to 21. */
+    /** Tabla del clima de otoño para los días 1 a 21. */
     public static final int[] WEATHER_WEIGHTS_AUTUMN_EARLY = {50, 20, 30, 0, 0, 0};
 
-    /** Autumn weather table for days 22 to 28 (frost becomes possible). */
+    /** Tabla del clima de otoño para los días 22 a 28 (la helada se vuelve posible). */
     public static final int[] WEATHER_WEIGHTS_AUTUMN_LATE = {35, 15, 25, 0, 25, 0};
 
-    /** Winter weather table. */
+    /** Tabla del clima de invierno. */
     public static final int[] WEATHER_WEIGHTS_WINTER = {25, 20, 0, 0, 15, 40};
 
-    /** First day of Autumn on which frost is possible. */
+    /** Primer día de otoño en que es posible la helada. */
     public static final int AUTUMN_FROST_FROM_DAY = 22;
 
-    /** Total of every weather table: the roll is made between 0 and this value. */
+    /** Total de cada tabla del clima: el sorteo se hace entre 0 y este valor. */
     public static final int WEATHER_TABLE_TOTAL = 100;
 
-    // ---- RN-02: daily energy ----
+        // ---- RN-02: energía diaria ----
 
-    /** Maximum (and starting) energy. */
+    /** Energía máxima (e inicial). */
     public static final int MAX_ENERGY = 100;
 
-    /** Energy cost of sowing. */
+    /** Costo de energía de sembrar. */
     public static final int ENERGY_COST_SOW = 2;
 
-    /** Energy cost of watering a crop on a normal day. */
+    /** Costo de energía de regar un cultivo en un día normal. */
     public static final int ENERGY_COST_WATER = 1;
 
-    /** Energy cost of watering a crop when the weather is drought. */
+    /** Costo de energía de regar un cultivo cuando el clima es sequía. */
     public static final int ENERGY_COST_WATER_IN_DROUGHT = 2;
 
-    /** Energy cost of harvesting a mature crop. */
+    /** Costo de energía de cosechar un cultivo maduro. */
     public static final int ENERGY_COST_HARVEST = 2;
 
-    /** Energy cost of clearing a withered plot. */
+    /** Costo de energía de limpiar una parcela marchita. */
     public static final int ENERGY_COST_CLEAN = 1;
 
-    /** Energy cost of feeding each animal. */
+    /** Costo de energía de alimentar a cada animal. */
     public static final int ENERGY_COST_FEED_PER_ANIMAL = 1;
 
-    /** Energy cost of collecting the products of a building. */
+    /** Costo de energía de recoger los productos de un edificio. */
     public static final int ENERGY_COST_COLLECT = 1;
 
-    /** Energy cost of curing an animal. */
+    /** Costo de energía de curar a un animal. */
     public static final int ENERGY_COST_CURE = 1;
 
-    // ---- RN-04: the valley (48 x 24 = 1152 plots): the farm to the west, the village to the east ----
+        // ---- RN-04: el valle (48 x 24 = 1152 parcelas): la granja al oeste, la aldea al este ----
 
-    /** Number of plot columns. */
+    /** Número de columnas de parcelas. */
     public static final int MAP_COLS = 48;
 
-    /** Number of plot rows. */
+    /** Número de filas de parcelas. */
     public static final int MAP_ROWS = 24;
 
-    /** Columns of the map before phase 5.7g; saves of version 1 and 2 hold that many (RN-40). */
+    /** Columnas del mapa antes de la fase 5.7g; las partidas de versión 1 y 2 guardan esa cantidad (RN-40). */
     public static final int LEGACY_MAP_COLS = 16;
 
-    /** Rows of the map before phase 5.7g. */
+    /** Filas del mapa antes de la fase 5.7g. */
     public static final int LEGACY_MAP_ROWS = 10;
 
-    /** Column of the top-left plot of the soil block (8 x 5 = 40 soil plots). */
+    /** Columna de la parcela superior izquierda del bloque de tierra (8 x 5 = 40 parcelas de tierra). */
     public static final int SOIL_COL = 4;
 
-    /** Row of the top-left plot of the soil block. */
+    /** Fila de la parcela superior izquierda del bloque de tierra. */
     public static final int SOIL_ROW = 2;
 
-    /** Width of the soil block. */
+    /** Ancho del bloque de tierra. */
     public static final int SOIL_WIDTH = 8;
 
-    /** Height of the soil block. */
+    /** Alto del bloque de tierra. */
     public static final int SOIL_HEIGHT = 5;
 
-    /** Column of the top-left plot of the pond (3 x 2 = 6 water plots). */
+    /** Columna de la parcela superior izquierda del estanque (3 x 2 = 6 parcelas de agua). */
     public static final int POND_COL = 13;
 
-    /** Row of the top-left plot of the pond. */
+    /** Fila de la parcela superior izquierda del estanque. */
     public static final int POND_ROW = 0;
 
-    /** Width of the pond. */
+    /** Ancho del estanque. */
     public static final int POND_WIDTH = 3;
 
-    /** Height of the pond. */
+    /** Alto del estanque. */
     public static final int POND_HEIGHT = 2;
 
-    /** Fixed positions {column, row} of the 30 obstacles (trees and rocks): 12 on the old farm, 18 around. */
+    /**
+     * Posiciones fijas {columna, fila} de los 30 obstáculos (árboles y rocas): 12 en la granja antigua, 18 alrededor.
+     */
     public static final int[][] OBSTACLES = {
         {0, 0}, {1, 0}, {0, 1}, {8, 0}, {0, 5}, {15, 5}, {0, 9}, {1, 9}, {7, 9}, {14, 9}, {15, 9}, {15, 8},
         {21, 1}, {22, 4}, {20, 9}, {23, 17}, {21, 21}, {10, 15}, {3, 13}, {14, 19}, {6, 20},
         {25, 3}, {33, 4}, {44, 6}, {46, 10}, {41, 19}, {31, 21}, {45, 22}, {26, 20}, {40, 2}
     };
 
-    /** The dirt path {column, row, width, height}: from your house south, then east through the village. */
+    /** El camino de tierra {columna, fila, ancho, alto}: desde tu casa hacia el sur y luego al este por la aldea. */
     public static final int[][] PATHS = {{18, 6, 1, 7}, {19, 12, 27, 1}};
 
     /**
-     * The houses {column, row, width, height} in the order of {@code House}: your house on the farm, then the
-     * shop of Marta, the house of Don Tomás, the clinic of Dra. Lucía and the house of Inés in the village.
+     * Las casas {columna, fila, ancho, alto} en el orden de {@code House}: tu casa en la granja, luego la tienda de
+     * Marta, la casa de Don Tomás, la clínica de la Dra. Lucía y la casa de Inés en la aldea.
      */
     public static final int[][] HOUSES = {{16, 3, 4, 3}, {27, 8, 5, 3}, {36, 8, 4, 3}, {27, 14, 5, 3}, {36, 14, 4, 3}};
 
-    // ---- RN-36: avatar ----
+        // ---- RN-36: avatar ----
 
-    /** Column of the grass plot where the avatar of a new game stands, just south of the soil. */
+    /** Columna de la parcela de pasto donde está el avatar de una partida nueva, justo al sur de la tierra. */
     public static final int AVATAR_START_COL = 7;
 
-    /** Row of the grass plot where the avatar of a new game stands. */
+    /** Fila de la parcela de pasto donde está el avatar de una partida nueva. */
     public static final int AVATAR_START_ROW = 7;
 
-    // ---- RN-37, RN-38: the people of the valley and their errands ----
+        // ---- RN-37, RN-38: las personas del valle y sus encargos ----
 
-    /** Column of Marta, the market seller, in front of her shop. */
+    /** Columna de Marta, la vendedora del mercado, frente a su tienda. */
     public static final int NPC_MARTA_COL = 29;
 
-    /** Row of Marta, just south of her shop and north of the path. */
+    /** Fila de Marta, justo al sur de su tienda y al norte del camino. */
     public static final int NPC_MARTA_ROW = 11;
 
-    /** Column of Don Tomás, the veteran farmer, in front of his house. */
+    /** Columna de Don Tomás, el granjero veterano, frente a su casa. */
     public static final int NPC_TOMAS_COL = 37;
 
-    /** Row of Don Tomás. */
+    /** Fila de Don Tomás. */
     public static final int NPC_TOMAS_ROW = 11;
 
-    /** Column of Dra. Lucía, the vet, in front of her clinic. */
+    /** Columna de la Dra. Lucía, la veterinaria, frente a su clínica. */
     public static final int NPC_LUCIA_COL = 29;
 
-    /** Row of Dra. Lucía, just south of her clinic, at its door. */
+    /** Fila de la Dra. Lucía, justo al sur de su clínica, en su puerta. */
     public static final int NPC_LUCIA_ROW = 17;
 
-    /** Column of Inés, the neighbour, in front of her house. */
+    /** Columna de Inés, la vecina, frente a su casa. */
     public static final int NPC_INES_COL = 37;
 
-    /** Row of Inés. */
+    /** Fila de Inés. */
     public static final int NPC_INES_ROW = 17;
 
-    /** Carrots Marta asks for. */
+    /** Zanahorias que pide Marta. */
     public static final int ERRAND_MARTA_AMOUNT = 5;
 
-    /** What Marta pays, in m. */
+    /** Lo que paga Marta, en m. */
     public static final int ERRAND_MARTA_REWARD = 60;
 
-    /** Potatoes Don Tomás asks for. */
+    /** Papas que pide Don Tomás. */
     public static final int ERRAND_TOMAS_AMOUNT = 3;
 
-    /** What Don Tomás pays, in m. */
+    /** Lo que paga Don Tomás, en m. */
     public static final int ERRAND_TOMAS_REWARD = 50;
 
-    /** Rations of hay Dra. Lucía asks for. */
+    /** Raciones de heno que pide la Dra. Lucía. */
     public static final int ERRAND_LUCIA_AMOUNT = 2;
 
-    /** What Dra. Lucía pays, in m. */
+    /** Lo que paga la Dra. Lucía, en m. */
     public static final int ERRAND_LUCIA_REWARD = 30;
 
-    /** Eggs Inés asks for. */
+    /** Huevos que pide Inés. */
     public static final int ERRAND_INES_AMOUNT = 4;
 
-    /** What Inés pays, in m. */
+    /** Lo que paga Inés, en m. */
     public static final int ERRAND_INES_REWARD = 80;
 
-    // ---- RN-30: new game ----
+        // ---- RN-30: partida nueva ----
 
-    /** Money at the start of a game. */
+    /** Dinero al inicio de una partida. */
     public static final int START_MONEY = 500;
 
-    /** Carrot seeds in the starting inventory. */
+    /** Semillas de zanahoria en el inventario inicial. */
     public static final int START_CARROT_SEEDS = 10;
 
-    /** Potato seeds in the starting inventory. */
+    /** Semillas de papa en el inventario inicial. */
     public static final int START_POTATO_SEEDS = 5;
 
-    // ---- RN-16, RN-17, RN-18: market ----
+        // ---- RN-16, RN-17, RN-18: mercado ----
 
-    /** Price in m of one ration of hay. */
+    /** Precio en m de una ración de heno. */
     public static final int PRICE_HAY = 5;
 
-    /** Price in m of one medicine. */
+    /** Precio en m de una medicina. */
     public static final int PRICE_MEDICINE = 40;
 
-    /** Base selling price in m of an egg. */
+    /** Precio base de venta en m de un huevo. */
     public static final int BASE_PRICE_EGG = 20;
 
-    /** Base selling price in m of a bottle of milk. */
+    /** Precio base de venta en m de una botella de leche. */
     public static final int BASE_PRICE_MILK = 60;
 
-    /** Season factor, in percent, of a crop sold in one of its valid seasons. */
+    /** Factor de estación, en porcentaje, de un cultivo vendido en una de sus estaciones válidas. */
     public static final int SEASON_FACTOR_IN_SEASON = 90;
 
-    /** Season factor, in percent, of a crop sold out of its valid seasons. */
+    /** Factor de estación, en porcentaje, de un cultivo vendido fuera de sus estaciones válidas. */
     public static final int SEASON_FACTOR_OUT_OF_SEASON = 120;
 
-    /** Season factor, in percent, of animal products. */
+    /** Factor de estación, en porcentaje, de los productos animales. */
     public static final int SEASON_FACTOR_FLAT = 100;
 
-    /** Smallest quantity of one transaction. */
+    /** Cantidad más pequeña de una transacción. */
     public static final int MIN_TRANSACTION = 1;
 
-    /** Largest quantity of one purchase. */
+    /** Cantidad más grande de una compra. */
     public static final int MAX_TRANSACTION = 99;
 
-    /** Demand of every product when a game starts, and its ceiling, in percent. */
+    /** Demanda de cada producto cuando empieza una partida, y su techo, en porcentaje. */
     public static final int DEMAND_MAX = 100;
 
-    /** Lowest demand a product can fall to, in percent. */
+    /** Demanda más baja a la que puede caer un producto, en porcentaje. */
     public static final int DEMAND_MIN = 50;
 
-    /** Demand lost by each unit sold. */
+    /** Demanda que pierde cada unidad vendida. */
     public static final int DEMAND_DROP_PER_UNIT = 2;
 
-    /** Demand recovered when a day ends. */
+    /** Demanda que se recupera cuando termina un día. */
     public static final int DEMAND_RECOVERY_PER_DAY = 5;
 
-    // ---- RN-31: save slots ----
+        // ---- RN-31: ranuras de guardado ----
 
-    /** Number of save slots. */
+    /** Número de ranuras de guardado. */
     public static final int SAVE_SLOTS = 3;
 
-    // ---- RN-06: sowing ----
+        // ---- RN-06: siembra ----
 
-    /** Seeds consumed by one sowing. */
+    /** Semillas que consume una siembra. */
     public static final int SEEDS_PER_SOWING = 1;
 
-    // ---- RN-09: withering ----
+        // ---- RN-09: marchitamiento ----
 
-    /** Consecutive days without water after which a young crop withers. */
+    /** Días consecutivos sin agua después de los cuales se marchita un cultivo joven. */
     public static final int DRY_DAYS_TO_WITHER = 3;
 
-    /** Same, when the weather of the day that ends is Drought. */
+    /** Lo mismo, cuando el clima del día que termina es sequía. */
     public static final int DRY_DAYS_TO_WITHER_IN_DROUGHT = 2;
 
-    /** Same inside a greenhouse, whatever the weather: it shields its crops from drought (RN-22). */
+    /** Lo mismo dentro de un invernadero, sea cual sea el clima: protege sus cultivos de la sequía (RN-22). */
     public static final int DRY_DAYS_TO_WITHER_IN_GREENHOUSE = 3;
 
-    // ---- RN-15: inventory ----
+        // ---- RN-15: inventario ----
 
-    /** Base number of inventory slots. */
+    /** Número base de casillas de inventario. */
     public static final int INVENTORY_BASE_SLOTS = 24;
 
-    /** Maximum number of units in one stack. */
+    /** Número máximo de unidades en una pila. */
     public static final int MAX_STACK = 99;
 
-    // ---- RN-20, RN-21, RN-22: buildings ----
+        // ---- RN-20, RN-21, RN-22: edificios ----
 
-    /** Cost in m of a coop. */
+    /** Costo en m de un gallinero. */
     public static final int COOP_COST = 400;
 
-    /** Largest number of coops. */
+    /** Mayor número de gallineros. */
     public static final int COOP_MAX = 2;
 
-    /** Cost in m of a barn. */
+    /** Costo en m de un establo. */
     public static final int BARN_COST = 1000;
 
-    /** Largest number of barns. */
+    /** Mayor número de establos. */
     public static final int BARN_MAX = 2;
 
-    /** Cost in m of a warehouse. */
+    /** Costo en m de un almacén. */
     public static final int WAREHOUSE_COST = 300;
 
-    /** Largest number of warehouses. */
+    /** Mayor número de almacenes. */
     public static final int WAREHOUSE_MAX = 1;
 
-    /** Inventory slots a warehouse adds. */
+    /** Casillas de inventario que agrega un almacén. */
     public static final int WAREHOUSE_EXTRA_SLOTS = 12;
 
-    /** Cost in m of a greenhouse. */
+    /** Costo en m de un invernadero. */
     public static final int GREENHOUSE_COST = 1500;
 
-    /** Largest number of greenhouses. */
+    /** Mayor número de invernaderos. */
     public static final int GREENHOUSE_MAX = 1;
 
-    /** Plots a greenhouse protects (3 x 3). */
+    /** Parcelas que protege un invernadero (3 x 3). */
     public static final int GREENHOUSE_PROTECTED_PLOTS = 9;
 
-    // ---- RN-28: achievements ----
+        // ---- RN-28: logros ----
 
-    /** Reward in m of LG-01, first harvest. */
+    /** Recompensa en m de LG-01, primera cosecha. */
     public static final int REWARD_FIRST_HARVEST = 50;
 
-    /** Harvests that grant LG-02. */
+    /** Cosechas que otorgan LG-02. */
     public static final int HARVESTS_GREEN_THUMB = 25;
 
-    /** Reward in m of LG-02. */
+    /** Recompensa en m de LG-02. */
     public static final int REWARD_GREEN_THUMB = 150;
 
-    /** Harvests that grant LG-03. */
+    /** Cosechas que otorgan LG-03. */
     public static final int HARVESTS_BIG_HARVESTER = 100;
 
-    /** Reward in m of LG-03. */
+    /** Recompensa en m de LG-03. */
     public static final int REWARD_BIG_HARVESTER = 400;
 
-    /** Units sold that grant LG-04. */
+    /** Unidades vendidas que otorgan LG-04. */
     public static final int UNITS_SOLD_TRADER = 50;
 
-    /** Reward in m of LG-04. */
+    /** Recompensa en m de LG-04. */
     public static final int REWARD_TRADER = 100;
 
-    /** Balance in m that grants LG-05. */
+    /** Saldo en m que otorga LG-05. */
     public static final int BALANCE_CAPITALIST = 3000;
 
-    /** Reward in m of LG-05. */
+    /** Recompensa en m de LG-05. */
     public static final int REWARD_CAPITALIST = 200;
 
-    /** Reward in m of LG-06, first building. */
+    /** Recompensa en m de LG-06, primer edificio. */
     public static final int REWARD_BUILDER = 100;
 
-    /** Animals at the same time that grant LG-07. */
+    /** Animales a la vez que otorgan LG-07. */
     public static final int ANIMALS_BARNYARD_FARMER = 4;
 
-    /** Reward in m of LG-07. */
+    /** Recompensa en m de LG-07. */
     public static final int REWARD_BARNYARD_FARMER = 150;
 
-    /** Reward in m of LG-08, first animal cured. */
+    /** Recompensa en m de LG-08, primer animal curado. */
     public static final int REWARD_VETERINARIAN = 80;
 
-    /** Year that grants LG-09. */
+    /** Año que otorga LG-09. */
     public static final int YEAR_ONE_YEAR_IN_THE_VALLEY = 2;
 
-    /** Reward in m of LG-09. */
+    /** Recompensa en m de LG-09. */
     public static final int REWARD_ONE_YEAR_IN_THE_VALLEY = 500;
 
-    // ---- RN-23 to RN-27: animals ----
+        // ---- RN-23 a RN-27: animales ----
 
-    /** Animals a coop or a barn can house. */
+    /** Animales que puede alojar un gallinero o un establo. */
     public static final int ANIMALS_PER_BUILDING = 4;
 
-    /** Price in m of a hen. */
+    /** Precio en m de una gallina. */
     public static final int PRICE_HEN = 150;
 
-    /** Price in m of a cow. */
+    /** Precio en m de una vaca. */
     public static final int PRICE_COW = 800;
 
-    /** Hay each animal eats per day. */
+    /** Heno que come cada animal por día. */
     public static final int HAY_PER_ANIMAL = 1;
 
-    /** Consecutive days without eating after which an animal falls sick. */
+    /** Días consecutivos sin comer después de los cuales un animal se enferma. */
     public static final int DAYS_WITHOUT_FEED_TO_SICK = 3;
 
-    /** Units of product one animal can have waiting to be collected. */
+    /** Unidades de producto que puede tener un animal esperando ser recogidas. */
     public static final int MAX_PENDING_PER_ANIMAL = 2;
 
-    /** Medicines one cure uses. */
+    /** Medicinas que usa una curación. */
     public static final int MEDICINE_PER_CURE = 1;
 
     private GameRules() {
-        // constants holder
+                // contenedor de constantes
     }
 }

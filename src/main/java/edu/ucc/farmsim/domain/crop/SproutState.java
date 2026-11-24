@@ -10,7 +10,7 @@ final class SproutState extends GrowingPhaseState {
     static final SproutState INSTANCE = new SproutState();
 
     private SproutState() {
-        // shared instance
+                // instancia compartida
     }
 
     @Override

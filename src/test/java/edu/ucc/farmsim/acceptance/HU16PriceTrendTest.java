@@ -10,7 +10,7 @@ import edu.ucc.farmsim.support.GameFixtures;
 import edu.ucc.farmsim.support.TestApp;
 import org.junit.jupiter.api.Test;
 
-/** HU-16: the price trend of each product compared with yesterday (RN-19). */
+/** HU-16: la tendencia del precio de cada producto comparada con la de ayer (RN-19). */
 class HU16PriceTrendTest {
 
     private static Trend trend(TestApp app, ItemType item) {
@@ -28,31 +28,31 @@ class HU16PriceTrendTest {
 
     @Test
     void HU16_ca2_priceGoesUpAfterTheDemandRecovers() {
-        // Given carrots in Spring with demand 80 (price 22 m)
+                // Dadas zanahorias en Primavera con demanda 80 (precio 22 m)
         TestApp app = TestApp.startedGame();
         GameFixtures.setDemand(app.state(), ItemType.CARROT, 80);
         assertEquals(22, app.state().market().priceOf(ItemType.CARROT, app.state().date().season()));
 
-        // When the day ends (demand 85)
+                // Cuando termina el día (demanda 85)
         app.controller.endDay();
 
-        // Then the price is 23 m and the trend is UP
+                // Entonces el precio es 23 m y la tendencia es UP
         assertEquals(23, app.state().market().priceOf(ItemType.CARROT, app.state().date().season()));
         assertEquals(Trend.UP, trend(app, ItemType.CARROT));
     }
 
     @Test
     void HU16_ca3_sellingDuringTheDayMakesThePriceGoDown() {
-        // Given yesterday's price 23 m with demand 85
+                // Dado el precio de ayer 23 m con demanda 85
         TestApp app = TestApp.startedGame();
         GameFixtures.setDemand(app.state(), ItemType.CARROT, 80);
         app.controller.endDay();
         app.state().inventory().add(ItemType.CARROT, 10);
 
-        // When 10 units are sold (demand 65, price 18 m)
+                // Cuando se venden 10 unidades (demanda 65, precio 18 m)
         app.controller.sell("CARROT", 10);
 
-        // Then the trend is DOWN
+                // Entonces la tendencia es DOWN
         assertEquals(18, app.state().market().priceOf(ItemType.CARROT, app.state().date().season()));
         assertEquals(Trend.DOWN, trend(app, ItemType.CARROT));
     }

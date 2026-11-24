@@ -3,11 +3,11 @@ package edu.ucc.farmsim.domain.time;
 import java.util.Random;
 
 /**
- * A reproducible random generator whose whole internal state is a single {@code long} (SplitMix64).
+ * Un generador aleatorio reproducible cuyo estado interno completo es un solo {@code long} (SplitMix64).
  *
- * <p>{@link Random} does not let anyone read its internal state, so a saved game could not continue the
- * same sequence. With {@code StateRandom}, {@link #state()} and {@link #restore(long)} make saving and
- * loading continue exactly the same draws (RN-32, DT-07). It is injected everywhere randomness is needed.
+ * <p>{@link Random} no deja leer su estado interno, así que una partida guardada no podría continuar la misma
+ * secuencia. Con {@code StateRandom}, {@link #state()} y {@link #restore(long)} hacen que guardar y cargar continúen
+ * exactamente los mismos sorteos (RN-32, DT-07). Se inyecta en todo lugar donde hace falta azar.
  *
  * <p>Stories: HU-11.
  */
@@ -22,24 +22,24 @@ public final class StateRandom extends Random {
     private static final int MIX_SHIFT_3 = 31;
     private static final int LONG_BITS = 64;
 
-    // No initializer on purpose: Random's constructor calls setSeed, which fills this field first.
+        // Sin inicializador a propósito: el constructor de Random llama a setSeed, que llena este campo primero.
     private long state;
 
     /**
-     * Creates a generator from a seed.
+     * Crea un generador a partir de una semilla.
      *
-     * @param seed initial seed; the same seed always gives the same sequence
+     * @param seed semilla inicial; la misma semilla siempre da la misma secuencia
      */
     public StateRandom(long seed) {
         super(seed);
     }
 
-    /** The complete internal state, enough to continue the sequence later. */
+    /** El estado interno completo, suficiente para continuar la secuencia más tarde. */
     public long state() {
         return state;
     }
 
-    /** Sets the internal state to a value previously returned by {@link #state()}. */
+    /** Fija el estado interno en un valor devuelto antes por {@link #state()}. */
     public void restore(long savedState) {
         this.state = savedState;
     }

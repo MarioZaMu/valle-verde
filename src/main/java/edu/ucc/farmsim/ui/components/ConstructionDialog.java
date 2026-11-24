@@ -16,9 +16,9 @@ import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 
 /**
- * The construction dialog opened by clicking a plot with the Build tool (HU-18): the catalogue with sizes,
- * costs and what is locked, and a button that builds the selected building with its corner on that plot. It is
- * modal; {@code Esc} closes it. All the logic is in {@link ConstructionPresenter}.
+ * El diálogo de construcción que se abre al hacer clic en una parcela con la herramienta Construir (HU-18): el catálogo
+ * con tamaños, costos y lo bloqueado, y un botón que construye el edificio seleccionado con su esquina en esa parcela.
+ * Es modal; {@code Esc} lo cierra. Toda la lógica está en {@link ConstructionPresenter}.
  *
  * <p>Stories: HU-18.
  */
@@ -42,10 +42,10 @@ public final class ConstructionDialog extends JDialog {
     private final JTable table = new JTable(rows);
 
     /**
-     * Builds the dialog.
+     * Construye el diálogo.
      *
-     * @param owner     the window it belongs to
-     * @param presenter the logic of the construction
+     * @param owner     la ventana a la que pertenece
+     * @param presenter la lógica de la construcción
      */
     public ConstructionDialog(Window owner, ConstructionPresenter presenter) {
         super(owner, Texts.CONSTRUCTION_TITLE, ModalityType.APPLICATION_MODAL);

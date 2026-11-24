@@ -14,8 +14,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 /**
- * Evaluates the achievements after every successful action and announces the ones unlocked (RN-28), and lists
- * them for the achievements dialog.
+ * Evalúa los logros después de cada acción exitosa y anuncia los desbloqueados (RN-28), y los lista para el diálogo de
+ * logros.
  *
  * <p>Stories: HU-26, HU-27.
  */
@@ -26,22 +26,22 @@ public final class AchievementService {
     private final EventBus events;
 
     /**
-     * Creates the service.
+     * Crea el servicio.
      *
-     * @param session the game in progress
-     * @param events  where events are published
+     * @param session la partida en curso
+     * @param events  donde se publican los eventos
      */
     public AchievementService(GameSession session, EventBus events) {
         this.session = session;
         this.events = events;
     }
 
-    /** Unlocks what the game now deserves, pays the rewards and publishes what happened. */
+    /** Desbloquea lo que la partida merece ahora, paga las recompensas y publica lo ocurrido. */
     public void check(GameState state) {
         announce(state, state.evaluateAchievements());
     }
 
-    /** Publishes the events of achievements that were unlocked (by an action or by the end of the day). */
+    /** Publica los eventos de los logros que se desbloquearon (por una acción o por el final del día). */
     public void announce(GameState state, List<Achievement> unlocked) {
         for (Achievement achievement : unlocked) {
             events.publish(new GameEvent.AchievementUnlocked(achievement.code(), Names.achievement(achievement.name()),
@@ -52,7 +52,7 @@ public final class AchievementService {
         }
     }
 
-    /** Every achievement with the player's progress. A pure query. */
+    /** Todos los logros con el progreso del jugador. Una consulta pura. */
     public Result<List<AchievementView>> achievements() {
         if (!session.hasGame()) {
             return Result.failWith(ErrorCode.SIN_PARTIDA);

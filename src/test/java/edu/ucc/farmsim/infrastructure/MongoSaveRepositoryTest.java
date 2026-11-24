@@ -18,7 +18,7 @@ import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 
-/** RN-31: the repository asks MongoDB which slots exist and hides every technical failure (DT-21). */
+/** RN-31: el repositorio le pregunta a MongoDB qué ranuras existen y oculta todo fallo técnico (DT-21). */
 class MongoSaveRepositoryTest {
 
     private final MongoTemplate mongo = mock(MongoTemplate.class);

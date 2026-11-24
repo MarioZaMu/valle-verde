@@ -18,24 +18,24 @@ import edu.ucc.farmsim.support.TestApp;
 import org.junit.jupiter.api.Test;
 
 /**
- * HU-28: start a new game with the initial state of RN-30.
+ * HU-28: iniciar una partida nueva con el estado inicial de RN-30.
  *
- * <p>The market demand (100 for every product) and the locked achievements with counters at 0 are asserted
- * when those classes exist (HU-15 in phase 5.3 and HU-26 in phase 5.5). The confirmation before discarding
- * a game in progress is completed on the UI side by {@code HU28_ca3_cancellingTheConfirmation...} in the
- * start-screen tests (HU-33).
+ * <p>La demanda del mercado (100 para todos los productos) y los logros bloqueados con contadores en 0 se comprueban
+ * cuando existan esas clases (HU-15 en la fase 5.3 y HU-26 en la fase 5.5). La confirmación antes de descartar una
+ * partida en curso se completa del lado de la UI con {@code HU28_ca3_cancellingTheConfirmation...} en las pruebas de la
+ * pantalla de inicio (HU-33).
  */
 class HU28NewGameTest {
 
     @Test
     void HU28_ca1_newGameStartsWithTheInitialValuesOfRn30() {
-        // Given the player chooses "New game"
+                // Dado que el jugador elige «Nueva partida»
         TestApp app = TestApp.create();
 
-        // When the game is created
+                // Cuando se crea la partida
         Result<HudView> result = app.controller.newGame(TestApp.SEED);
 
-        // Then the state is Year 1, Spring, day 1, Sunny, 500 m and 100 energy
+                // Entonces el estado es Año 1, Primavera, día 1, Sunny, 500 m y 100 de energía
         assertTrue(result.isOk());
         GameState state = app.session.current();
         assertEquals(new GameDate(1, Season.SPRING, 1), state.date());
@@ -43,19 +43,19 @@ class HU28NewGameTest {
         assertEquals(500, state.money());
         assertEquals(100, state.energy().current());
 
-        // And the inventory holds 10 carrot seeds and 5 potato seeds, nothing else
+                // Y el inventario tiene 10 semillas de zanahoria y 5 de papa, nada más
         assertEquals(10, state.inventory().count(ItemType.CARROT_SEED));
         assertEquals(5, state.inventory().count(ItemType.POTATO_SEED));
         assertEquals(2, state.inventory().usedSlots());
 
-        // And no buildings, no animals, locked achievements and every counter at 0
+                // Y no hay edificios, ni animales, los logros están bloqueados y todos los contadores en 0
         assertTrue(state.farm().buildings().isEmpty());
         assertEquals(new edu.ucc.farmsim.domain.progress.ProgressSnapshot(java.util.Set.of(), 0, 0, 0, 0),
                 state.progress().snapshot());
         assertTrue(app.controller.achievements().value().stream()
                 .noneMatch(edu.ucc.farmsim.application.dto.AchievementView::unlocked));
 
-        // And the view the screen draws shows the same values
+                // Y la vista que dibuja la pantalla muestra los mismos valores
         HudView hud = result.value();
         assertEquals(500, hud.money());
         assertEquals(1, hud.year());
@@ -68,10 +68,10 @@ class HU28NewGameTest {
 
     @Test
     void HU28_ca2_initialValleyHas1152PlotsWith40Soil976Grass6Water30Obstacles34PathAnd66House() {
-        // When a new game is created
+                // Cuando se crea una partida nueva
         FarmMap map = GameState.newGame(TestApp.SEED).farm();
 
-        // Then the valley is 48 x 24 = 1152 plots with the RN-04 distribution
+                // Entonces el valle es de 48 x 24 = 1152 parcelas con la distribución de RN-04
         assertEquals(48, map.cols());
         assertEquals(24, map.rows());
         assertEquals(40, map.count(Terrain.SOIL));
@@ -86,7 +86,7 @@ class HU28NewGameTest {
         }
         assertEquals(1152, total);
 
-        // And the 40 soil plots form one 8 x 5 block
+                // Y las 40 parcelas de tierra forman un solo bloque de 8 x 5
         for (int row = 0; row < map.rows(); row++) {
             for (int col = 0; col < map.cols(); col++) {
                 boolean insideBlock = col >= GameRules.SOIL_COL && col < GameRules.SOIL_COL + GameRules.SOIL_WIDTH
@@ -103,12 +103,12 @@ class HU28NewGameTest {
         app.controller.newGame(TestApp.SEED);
         assertTrue(app.controller.hasGameInProgress());
 
-        // Given a game in progress where the player has spent energy
+                // Dada una partida en curso en la que el jugador gastó energía
         GameState before = app.session.current();
         before.energy().trySpend(10);
 
-        // When the player is asked to confirm and cancels, the UI simply does not call newGame again
-        // Then the current game stays exactly as it was
+                // Cuando se le pide confirmar y cancela, la UI simplemente no vuelve a llamar a newGame Entonces la partida
+        // actual queda exactamente como estaba
         assertTrue(app.controller.hasGameInProgress());
         assertEquals(90, app.session.current().energy().current());
     }
@@ -126,12 +126,12 @@ class HU28NewGameTest {
 
     @Test
     void HU28_ca4_sameSeedGivesTheSameInitialGameAndForecast() {
-        // Given the same generator seed
+                // Dada la misma semilla del generador
         GameState first = GameState.newGame(77L);
         Weather firstForecast = first.weather().forecast();
         GameState second = GameState.newGame(77L);
 
-        // Then both games have the same forecast for day 2 and the same random state
+                // Entonces ambas partidas tienen el mismo pronóstico para el día 2 y el mismo estado aleatorio
         assertEquals(firstForecast, second.weather().forecast());
         assertEquals(first.random().state(), second.random().state());
     }

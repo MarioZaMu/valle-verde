@@ -1,8 +1,8 @@
 package edu.ucc.farmsim.domain.crop;
 
 /**
- * Behaviour shared by the three living, not yet mature stages (Seed, Sprout and Growing): they need water to
- * grow, and cannot be harvested.
+ * Comportamiento compartido por las tres etapas vivas que aún no maduran (Semilla, Brote y Crecimiento): necesitan agua
+ * para crecer y no se pueden cosechar.
  *
  * <p>Stories: HU-03, HU-05.
  */

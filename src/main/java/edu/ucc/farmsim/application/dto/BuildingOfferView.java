@@ -1,19 +1,19 @@
 package edu.ucc.farmsim.application.dto;
 
 /**
- * One row of the construction dialog: a building, its price and whether it can be built.
+ * Una fila del diálogo de construcción: un edificio, su precio y si se puede construir.
  *
  * <p>Stories: HU-18.
  *
- * @param type        building id, for example {@code COOP}
- * @param name        Spanish name
- * @param width       columns it covers
- * @param height      rows it covers
- * @param cost        price in m
- * @param built       how many the player already has
- * @param max         the most the player can have
- * @param unlocked    whether the player has the achievement it requires
- * @param requirement Spanish name of the achievement that unlocks it, or {@code null} if none is needed
+ * @param type        id del edificio, por ejemplo {@code COOP}
+ * @param name        nombre en español
+ * @param width       columnas que cubre
+ * @param height      filas que cubre
+ * @param cost        precio en m
+ * @param built       cuántos tiene ya el jugador
+ * @param max         el máximo que puede tener el jugador
+ * @param unlocked    si el jugador tiene el logro que se requiere
+ * @param requirement nombre en español del logro que lo desbloquea, o {@code null} si no hace falta ninguno
  */
 public record BuildingOfferView(String type, String name, int width, int height, int cost, int built, int max,
                                 boolean unlocked, String requirement) { }

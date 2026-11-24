@@ -1,26 +1,26 @@
 package edu.ucc.farmsim.domain.game;
 
 /**
- * The steps of the end of the day in the exact order of RN-03. Step 9 (publishing the events) belongs to
- * the application layer and runs after all of these.
+ * Los pasos del final del día en el orden exacto de RN-03. El paso 9 (publicar los eventos) pertenece a la capa de
+ * aplicación y corre después de todos estos.
  *
  * <p>Stories: HU-10.
  */
 public enum DayPhase {
-    /** 1. Weather of the day: rain waters outdoor crops, frost withers them. */
+    /** 1. Clima del día: la lluvia riega los cultivos a la intemperie, la helada los marchita. */
     WEATHER_EFFECTS,
-    /** 2. Watering, growth and withering of crops. */
+    /** 2. Riego, crecimiento y marchitamiento de los cultivos. */
     GROWTH,
-    /** 3. Animals: feeding, health and production. */
+    /** 3. Animales: alimentación, salud y producción. */
     ANIMALS,
-    /** 4. Market: save previous prices, then recover demand. */
+    /** 4. Mercado: guardar los precios anteriores y luego recuperar la demanda. */
     MARKET,
-    /** 5. Calendar: move to the next day (and season, and year). */
+    /** 5. Calendario: pasar al día siguiente (y a la estación y al año). */
     CALENDAR,
-    /** 6. Forecast: tomorrow's forecast becomes today's weather and a new one is drawn. */
+    /** 6. Pronóstico: el pronóstico de mañana pasa a ser el clima de hoy y se sortea uno nuevo. */
     FORECAST,
-    /** 7. Energy back to the maximum. */
+    /** 7. La energía vuelve al máximo. */
     ENERGY,
-    /** 8. Achievements are evaluated. */
+    /** 8. Se evalúan los logros. */
     ACHIEVEMENTS
 }

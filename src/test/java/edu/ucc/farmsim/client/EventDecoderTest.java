@@ -9,7 +9,7 @@ import edu.ucc.farmsim.application.event.GameEvent;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-/** DT-19: events travel as {type, data} and come back as the same records. */
+/** DT-19: los eventos viajan como {type, data} y regresan como los mismos records. */
 class EventDecoderTest {
 
     private final ObjectMapper mapper = new ObjectMapper();

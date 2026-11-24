@@ -5,8 +5,8 @@ import java.util.EnumSet;
 import java.util.Set;
 
 /**
- * Catalog of crops (RN-05): days to mature and the seasons in which each can be sown. This enum is a
- * configuration table; the prices of seeds and harvests are added by the economy stories.
+ * Catálogo de cultivos (RN-05): días para madurar y las estaciones en que se puede sembrar cada uno. Este enum es una
+ * tabla de configuración; los precios de semillas y cosechas los agregan las historias de economía.
  *
  * <p>Stories: HU-01.
  */
@@ -29,18 +29,18 @@ public enum CropType {
         this.validSeasons = EnumSet.of(first, more);
     }
 
-    /** Days a crop must be watered to become mature (T in RN-08). */
+    /** Días que hay que regar un cultivo para que madure (T en RN-08). */
     public int daysToMature() {
         return daysToMature;
     }
 
-    /** Seasons in which this crop can be sown and stays alive. */
-    /** Price in m of one seed in the market (RN-05, RN-16). */
+    /** Estaciones en que se puede sembrar este cultivo y sigue vivo. */
+    /** Precio en m de una semilla en el mercado (RN-05, RN-16). */
     public int seedPrice() {
         return seedPrice;
     }
 
-    /** Base selling price in m of one harvested unit (RN-05, RN-17). */
+    /** Precio base de venta en m de una unidad cosechada (RN-05, RN-17). */
     public int sellBasePrice() {
         return sellBasePrice;
     }
@@ -49,7 +49,7 @@ public enum CropType {
         return EnumSet.copyOf(validSeasons);
     }
 
-    /** Day of growth at which the crop leaves the Sprout stage: {@code ceil(T / 2)} (RN-08). */
+    /** Día de crecimiento en que el cultivo deja la etapa Brote: {@code ceil(T / 2)} (RN-08). */
     public int halfwayDays() {
         return (daysToMature + 1) / 2;
     }

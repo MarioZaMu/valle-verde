@@ -13,8 +13,8 @@ import javax.swing.JComponent;
 import javax.swing.Timer;
 
 /**
- * Draws the notices of a {@link ToastQueue} in the bottom-right corner, over whatever is below, and lets every
- * mouse event through. A Swing {@link Timer} repaints it only while there is something to show.
+ * Dibuja los avisos de una {@link ToastQueue} en la esquina inferior derecha, sobre lo que haya debajo, y deja pasar
+ * todos los eventos del ratón. Un {@link Timer} de Swing la repinta solo mientras hay algo que mostrar.
  *
  * <p>Stories: HU-39.
  */
@@ -32,9 +32,9 @@ public final class ToastLayer extends JComponent {
     private boolean wasShowing;
 
     /**
-     * Creates the layer.
+     * Crea la capa.
      *
-     * @param queue the notices to draw
+     * @param queue los avisos que se dibujan
      */
     public ToastLayer(ToastQueue queue) {
         this.queue = queue;
@@ -61,7 +61,7 @@ public final class ToastLayer extends JComponent {
         super.removeNotify();
     }
 
-    /** Never catches the mouse: the map below keeps receiving the clicks. */
+    /** Nunca atrapa el ratón: el mapa de abajo sigue recibiendo los clics. */
     @Override
     public boolean contains(int x, int y) {
         return false;

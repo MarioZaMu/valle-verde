@@ -21,7 +21,7 @@ import java.util.List;
 import javax.swing.JLabel;
 import org.junit.jupiter.api.Test;
 
-/** The summary shown when the day ends (HU-17). */
+/** El resumen que se muestra cuando termina el día (HU-17). */
 class HU17DaySummaryDialogTest {
 
     private static final DaySummaryView SUMMARY = new DaySummaryView(1, "SPRING", 1, 79, 150, 500, 429,

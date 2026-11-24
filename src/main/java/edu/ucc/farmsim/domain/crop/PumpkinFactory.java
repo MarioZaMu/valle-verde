@@ -10,7 +10,7 @@ final class PumpkinFactory extends CropFactory {
     static final PumpkinFactory INSTANCE = new PumpkinFactory();
 
     private PumpkinFactory() {
-        // shared instance
+                // instancia compartida
     }
 
     @Override

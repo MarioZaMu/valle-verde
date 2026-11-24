@@ -7,6 +7,6 @@ package edu.ucc.farmsim.application.event;
  */
 public interface GameListener {
 
-    /** Called by the {@link EventBus} each time an event is published. */
+    /** Lo llama el {@link EventBus} cada vez que se publica un evento. */
     void onEvent(GameEvent event);
 }

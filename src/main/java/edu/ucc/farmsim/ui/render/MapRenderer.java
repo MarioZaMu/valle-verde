@@ -26,23 +26,22 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Draws the farm map with Java2D, in one of two ways.
+ * Dibuja el mapa de la granja con Java2D, de una de dos maneras.
  *
- * <p>With the pixel-art pack (HU-44, HU-48) the view is a piece of countryside seen from above at three
- * quarters: one continuous ground where soil, the path and water blend into the grass, woods around the valley,
- * and trees, houses, buildings, crops and animals that stand on their tile, rise above it and are drawn from
- * back to front, each with its shadow. The farm lies to the west and the village with its houses to the east
- * (HU-50). Something that hides a crop or the plot under the cursor
- * turns see-through. With the ambient life on, the water ripples, the trees sway, the animals wander and
- * clouds, butterflies or leaves cross the fields. The avatar stands among them and walks from plot to plot
- * with three frames (HU-45), and the people of the valley stand on their plots with a bubble that shows what
- * their errand asks for while it is not done (HU-46, HU-47). People are one plot wide and two tall: their feet
- * are on their plot and their head rises into the plot above (HU-50).
+ * <p>Con el paquete de pixel art (HU-44, HU-48) la vista es un trozo de campo visto desde arriba a tres cuartos: un
+ * suelo continuo donde la tierra, el camino y el agua se funden con el pasto, bosques alrededor del valle, y árboles,
+ * casas, edificios, cultivos y animales que se paran sobre su baldosa, se elevan sobre ella y se dibujan de atrás hacia
+ * adelante, cada uno con su sombra. La granja queda al oeste y la aldea con sus casas al este (HU-50). Lo que tapa un
+ * cultivo o la parcela bajo el cursor se vuelve translúcido. Con la vida ambiental activada, el agua ondea, los árboles
+ * se mecen, los animales deambulan y nubes, mariposas u hojas cruzan los campos. El avatar está entre ellos y camina de
+ * parcela en parcela con tres cuadros (HU-45), y las personas del valle están sobre sus parcelas con un globo que
+ * muestra lo que pide su encargo mientras no está hecho (HU-46, HU-47). Las personas miden una parcela de ancho y dos
+ * de alto: sus pies están en su parcela y su cabeza se eleva a la parcela de arriba (HU-50).
  *
- * <p>Without the pack each terrain and each crop stage is drawn with vector shapes, so the game needs no image
- * at all (HU-42); a single missing sprite also falls back to its vector shape. With a {@link VisualEffects}
- * it paints the palette of the season, the weather, the night tint and the animations (HU-40, HU-41). It works
- * on any {@link Graphics2D}, including one of an image, so it is tested without a display.
+ * <p>Sin el paquete, cada terreno y cada etapa de cultivo se dibuja con formas vectoriales, de modo que el juego no
+ * necesita ninguna imagen (HU-42); un solo sprite que falte también recurre a su forma vectorial. Con unos {@link
+ * VisualEffects} pinta la paleta de la estación, el clima, el tinte de noche y las animaciones (HU-40, HU-41). Funciona
+ * sobre cualquier {@link Graphics2D}, incluido el de una imagen, así que se prueba sin pantalla.
  *
  * <p>Stories: HU-18, HU-19, HU-25, HU-35, HU-40, HU-41, HU-42, HU-44, HU-45, HU-46, HU-47, HU-48, HU-50.
  */
@@ -80,9 +79,9 @@ public final class MapRenderer {
     private static final Color ROOF = new Color(0xA0442E);
     private static final Color DOOR = new Color(0x6B4226);
     private static final int GROUND_COPIES = 4;
-    /** Tiles of woods painted around the valley; more only when the window shows more than that outside it. */
+    /** Baldosas de bosque pintadas alrededor del valle; más solo cuando la ventana muestra más que eso fuera de él. */
     private static final int GROUND_EDGE = 8;
-    /** Tiles beyond the window edge, for the trees that reach past it. */
+    /** Baldosas más allá del borde de la ventana, para los árboles que lo sobrepasan. */
     private static final int GROUND_SPILL = 2;
 
     private final AssetManager assets;
@@ -90,19 +89,19 @@ public final class MapRenderer {
     private final PixelScaler groundScaler = new PixelScaler(GROUND_COPIES);
     private final GroundLayer ground;
 
-    /** One thing that stands on the map, drawn in order of its foot (the lower, the later). */
+    /** Algo que está en el mapa, dibujado en orden de sus pies (cuanto más abajo, más tarde). */
     private record Item(double depth, int order, Runnable paint) {
     }
 
-    /** Creates a renderer that looks for sprites in the {@code assets} folder of the class path. */
+    /** Crea un renderizador que busca sprites en la carpeta {@code assets} del classpath. */
     public MapRenderer() {
         this(AssetManager.shared());
     }
 
     /**
-     * Creates a renderer.
+     * Crea un renderizador.
      *
-     * @param assets where the sprites come from
+     * @param assets de donde vienen los sprites
      */
     public MapRenderer(AssetManager assets) {
         this.assets = assets;
@@ -110,42 +109,42 @@ public final class MapRenderer {
     }
 
     /**
-     * Paints the whole map into the given area, without effects.
+     * Pinta todo el mapa en el área dada, sin efectos.
      *
-     * @param g      where to paint
-     * @param map    the map to draw
-     * @param width  width of the area
-     * @param height height of the area
-     * @param hover  plot under the cursor, or {@code null}
+     * @param g      dónde pintar
+     * @param map    el mapa que se dibuja
+     * @param width  ancho del área
+     * @param height alto del área
+     * @param hover  parcela bajo el cursor, o {@code null}
      */
     public void render(Graphics2D g, MapView map, int width, int height, CellPos hover) {
         render(g, map, width, height, hover, null);
     }
 
     /**
-     * Paints the whole map into the given area.
+     * Pinta todo el mapa en el área dada.
      *
-     * @param g       where to paint
-     * @param map     the map to draw
-     * @param width   width of the area
-     * @param height  height of the area
-     * @param hover   plot under the cursor, or {@code null}
-     * @param effects the season, weather and animations to show, or {@code null} for the plain look
+     * @param g       dónde pintar
+     * @param map     el mapa que se dibuja
+     * @param width   ancho del área
+     * @param height  alto del área
+     * @param hover   parcela bajo el cursor, o {@code null}
+     * @param effects la estación, el clima y las animaciones que se muestran, o {@code null} para el aspecto simple
      */
     public void render(Graphics2D g, MapView map, int width, int height, CellPos hover, VisualEffects effects) {
         render(g, map, MapGeometry.fit(map.cols(), map.rows(), width, height), width, height, hover, effects);
     }
 
     /**
-     * Paints the whole map with the given placement of the plots; the land around them fills the rest.
+     * Pinta todo el mapa con la colocación de parcelas dada; la tierra alrededor llena el resto.
      *
-     * @param g        where to paint
-     * @param map      the map to draw
-     * @param geometry where each plot goes
-     * @param width    width of the area
-     * @param height   height of the area
-     * @param hover    plot under the cursor, or {@code null}
-     * @param effects  the season, weather and animations to show, or {@code null} for the plain look
+     * @param g        dónde pintar
+     * @param map      el mapa que se dibuja
+     * @param geometry dónde va cada parcela
+     * @param width    ancho del área
+     * @param height   alto del área
+     * @param hover    parcela bajo el cursor, o {@code null}
+     * @param effects  la estación, el clima y las animaciones que se muestran, o {@code null} para el aspecto simple
      */
     public void render(Graphics2D g, MapView map, MapGeometry geometry, int width, int height, CellPos hover,
                        VisualEffects effects) {
@@ -168,23 +167,24 @@ public final class MapRenderer {
         }
     }
 
-    /** How many times the ground was painted; a moving camera reuses it (HU-50 · CA-5). */
+    /** Cuántas veces se pintó el suelo; una cámara en movimiento lo reutiliza (HU-50 · CA-5). */
     public int groundPaints() {
         return ground.paints();
     }
 
-    /** Tiles of ground to paint beyond one side of the valley, which shows {@code outside} pixels past it. */
+    /** Baldosas de suelo que se pintan más allá de un lado del valle, que muestra {@code outside} píxeles más allá. */
     private static int edge(int outside, int cell) {
         return Math.max(GROUND_EDGE, ceilDiv(Math.max(0, outside), cell) + GROUND_SPILL);
     }
 
-    // ------------------------------------------------------------------ pixel art
+        // ------------------------------------------------------------------ pixel art
 
     private void paintPixelArt(Graphics2D g, MapView map, MapGeometry geo, int width, int height, CellPos hover,
                                VisualEffects fx, String season, boolean ambient, long time) {
         int s = geo.cellSize();
-        // The ground of the whole valley plus a border of woods, whatever the camera shows: walking only slides
-        // it. Bounds that followed the camera painted and scaled it again on every row and made the walk jerk.
+                // El suelo de todo el valle más un borde de bosque, sea lo que sea que muestre la cámara: caminar solo lo
+        // desliza. Unos límites que seguían a la cámara lo pintaban y escalaban otra vez en cada fila y hacían que la
+        // caminata diera tirones.
         int col0 = -edge(geo.originX(), s);
         int row0 = -edge(geo.originY(), s);
         int col1 = map.cols() + edge(width - geo.originX() - map.cols() * s, s);
@@ -249,7 +249,7 @@ public final class MapRenderer {
         }
     }
 
-    /** The woods beyond the edges of the valley, on the tiles outside the map. */
+    /** Los bosques más allá de los bordes del valle, sobre las baldosas fuera del mapa. */
     private void surroundings(Graphics2D g, MapView map, MapGeometry geo, String season, boolean ambient, long time,
                               int col0, int row0, int col1, int row1, List<Rectangle> shadows, List<Item> items) {
         int s = geo.cellSize();
@@ -310,7 +310,10 @@ public final class MapRenderer {
         return true;
     }
 
-    /** Draws a tall sprite whose upper part (the crown) can lean sideways while the lower part stays still. */
+    /**
+     * Dibuja un sprite alto cuya parte superior (la copa) puede inclinarse hacia un lado mientras la parte inferior
+     * queda quieta.
+     */
     private void drawSplit(Graphics2D g, BufferedImage img, int x, int y, int w, int h, double split, int lean, float alpha) {
         Composite saved = g.getComposite();
         if (alpha < 1f) {
@@ -391,7 +394,7 @@ public final class MapRenderer {
         }
     }
 
-    /** A house of the valley: its sprite stands on its plots and its roof rises one plot above them. */
+    /** Una casa del valle: su sprite se levanta sobre sus parcelas y su techo se eleva una parcela sobre ellas. */
     private void house(Graphics2D g, HouseView house, MapGeometry geo, Set<Long> hidden, List<Rectangle> shadows,
                        List<Item> items) {
         Rectangle foot = footprint(geo, house);
@@ -421,7 +424,7 @@ public final class MapRenderer {
         }));
     }
 
-    /** The sprite of a house of the valley. */
+    /** El sprite de una casa del valle. */
     static String houseSprite(HouseView house) {
         return "village/" + house.id() + ".png";
     }
@@ -431,7 +434,7 @@ public final class MapRenderer {
                 .union(geo.cellBounds(house.col() + house.width() - 1, house.row() + house.height() - 1));
     }
 
-    /** A house without sprites: light walls with a door and a red roof over its upper plot. */
+    /** Una casa sin sprites: paredes claras con una puerta y un techo rojo sobre su parcela superior. */
     private static void drawHouseVector(Graphics2D g, Rectangle foot, int s) {
         int roofH = Math.max(2, foot.height / 2);
         g.setColor(WALL);
@@ -444,7 +447,7 @@ public final class MapRenderer {
         g.fillRect(foot.x + (foot.width - doorW) / 2, foot.y + foot.height - s * 3 / 4, doorW, s * 3 / 4);
     }
 
-    /** A speech bubble with an item in it, for what an animal needs or what waits to be collected. */
+    /** Un globo de diálogo con un objeto dentro, para lo que necesita un animal o lo que espera ser recogido. */
     private void bubble(Graphics2D g, int cx, int bottom, int size, String icon, Color fallback, int bob) {
         int x = cx - size / 2;
         int y = bottom - size - size / 4 + bob;
@@ -476,7 +479,7 @@ public final class MapRenderer {
         scaler.draw(g, sprite.get(), c.x + (c.width - size) / 2, c.y + c.height - size, size, size);
     }
 
-    /** Pixel brackets on the corners of the plot under the cursor, over a light veil; they breathe slowly. */
+    /** Corchetes de píxeles en las esquinas de la parcela bajo el cursor, sobre un velo claro; respiran lentamente. */
     private static void drawCursor(Graphics2D g, Rectangle cell, boolean ambient, long time) {
         int pulse = ambient ? (int) Math.round((Math.sin(time / 220.0) + 1) * cell.width / 48.0) : 0;
         int x = cell.x - pulse;
@@ -518,7 +521,7 @@ public final class MapRenderer {
         return a <= 0 ? 0 : (a + b - 1) / b;
     }
 
-    // ------------------------------------------------------------------ vector fallback
+        // ------------------------------------------------------------------ respaldo vectorial
 
     private void paintVector(Graphics2D g, MapView map, MapGeometry geometry, int width, int height, VisualEffects fx,
                              String season) {
@@ -556,7 +559,7 @@ public final class MapRenderer {
         }
     }
 
-    // ------------------------------------------------------------------ people of the valley
+        // ------------------------------------------------------------------ personas del valle
 
     private static List<NpcView> npcs(MapView map) {
         return map.npcs() == null ? List.of() : map.npcs();
@@ -566,13 +569,13 @@ public final class MapRenderer {
         return map.houses() == null ? List.of() : map.houses();
     }
 
-    /** The shadow at the feet of a person, inside its own plot. */
+    /** La sombra a los pies de una persona, dentro de su propia parcela. */
     private static Rectangle feet(Rectangle cell) {
         int s = cell.width;
         return new Rectangle(cell.x + s / 5, cell.y + s - s / 5, s * 3 / 5, s / 5);
     }
 
-    /** Draws a person sprite one plot wide, standing on {@code cell} and as tall as its art says. */
+    /** Dibuja un sprite de persona de una parcela de ancho, parado sobre {@code cell} y tan alto como dice su arte. */
     private void standing(Graphics2D g, BufferedImage sprite, Rectangle cell, int lift) {
         int s = cell.width;
         int h = sprite.getHeight() * s / sprite.getWidth();
@@ -613,14 +616,14 @@ public final class MapRenderer {
         }
     }
 
-    // ------------------------------------------------------------------ avatar
+        // ------------------------------------------------------------------ avatar
 
-    /** The sprite of the avatar looking to a direction, in one frame of its walk. */
+    /** El sprite del avatar mirando hacia una dirección, en un cuadro de su caminata. */
     static String avatarSprite(String facing, int frame) {
         return "characters/AVATAR_" + facing.charAt(0) + "_" + frame + ".png";
     }
 
-    /** Where the avatar is drawn: its plot, or on the way to it while it walks. */
+    /** Dónde se dibuja el avatar: su parcela, o en camino hacia ella mientras camina. */
     private static Rectangle avatarCell(AvatarView avatar, MapGeometry geo, VisualEffects fx) {
         Rectangle to = geo.cellBounds(avatar.col(), avatar.row());
         int[] from = fx == null ? null : fx.avatarFrom();
@@ -648,14 +651,14 @@ public final class MapRenderer {
         }));
     }
 
-    /** The avatar without sprites: a farmer with a straw hat, looking to its direction. */
+    /** El avatar sin sprites: un granjero con sombrero de paja, mirando hacia su dirección. */
     private static void drawAvatarVector(Graphics2D g, Rectangle c, String facing) {
         drawPersonVector(g, c, AVATAR_SHIRT, facing);
     }
 
     /**
-     * A person drawn with shapes, one plot wide and two tall with the feet on {@code c}: trousers, a shirt of the
-     * given colour, a face, a straw hat and eyes towards its direction.
+     * Una persona dibujada con formas, de una parcela de ancho y dos de alto con los pies en {@code c}: pantalones, una
+     * camisa del color dado, una cara, un sombrero de paja y ojos hacia su dirección.
      */
     private static void drawPersonVector(Graphics2D g, Rectangle c, Color shirt, String facing) {
         int s = c.width;
@@ -789,7 +792,10 @@ public final class MapRenderer {
         }
     }
 
-    /** Animals in front of a building drawn with a sprite: one tile-sized sprite each, with a badge if not well. */
+    /**
+     * Animales frente a un edificio dibujados con un sprite: un sprite del tamaño de una baldosa cada uno, con una
+     * insignia si no están bien.
+     */
     private void drawAnimalSprites(Graphics2D g, BuildingView building, Rectangle area, VisualEffects fx) {
         int slots = Math.max(1, building.capacity());
         int d = Math.max(8, Math.min(area.width / slots, area.height / 2));
@@ -874,7 +880,7 @@ public final class MapRenderer {
         }
     }
 
-    /** How many pixels the animal rises on each frame of its little hop: down, up, halfway. */
+    /** Cuántos píxeles sube el animal en cada cuadro de su saltito: abajo, arriba, a medio camino. */
     private static int bob(int frame, int d) {
         return switch (frame) {
             case 1 -> Math.max(1, d / 6);

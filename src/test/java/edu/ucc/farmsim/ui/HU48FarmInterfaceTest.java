@@ -34,7 +34,9 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 import org.junit.jupiter.api.Test;
 
-/** HU-48: icons in the tool bar, the top bar and the inventory, and no text cut at 1024 x 768. */
+/**
+ * HU-48: íconos en la barra de herramientas, la barra superior y el inventario, y ningún texto cortado a 1024 x 768.
+ */
 class HU48FarmInterfaceTest {
 
     private static <T extends Component> List<T> all(Container root, Class<T> type) {

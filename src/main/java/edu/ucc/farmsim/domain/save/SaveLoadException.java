@@ -1,8 +1,8 @@
 package edu.ucc.farmsim.domain.save;
 
 /**
- * A slot could not be turned into a game: it holds nothing, it is damaged or it comes from another version
- * (RN-33). The application maps the reason to its RN-35 code.
+ * Una ranura no se pudo convertir en una partida: no contiene nada, está dañada o viene de otra versión (RN-33). La
+ * aplicación asigna el motivo a su código de RN-35.
  *
  * <p>Stories: HU-30, HU-31.
  */
@@ -10,30 +10,30 @@ public final class SaveLoadException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
-    /** Why the slot could not be loaded. */
+    /** Por qué no se pudo cargar la ranura. */
     public enum Reason {
-        /** The slot holds no document. */
+        /** La ranura no contiene ningún documento. */
         MISSING,
-        /** The text is not valid, the checksum does not match or the data does not make sense. */
+        /** El texto no es válido, la suma de control no coincide o los datos no tienen sentido. */
         CORRUPT,
-        /** The document was written by a version of the game this one does not know. */
+        /** El documento lo escribió una versión del juego que esta no conoce. */
         UNSUPPORTED_VERSION
     }
 
     private final Reason reason;
 
     /**
-     * Creates the exception.
+     * Crea la excepción.
      *
-     * @param reason why the load failed
-     * @param detail technical detail for the log
+     * @param reason por qué falló la carga
+     * @param detail detalle técnico para el registro
      */
     public SaveLoadException(Reason reason, String detail) {
         super(detail);
         this.reason = reason;
     }
 
-    /** Why the load failed. */
+    /** Por qué falló la carga. */
     public Reason reason() {
         return reason;
     }

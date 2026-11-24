@@ -14,10 +14,10 @@ import edu.ucc.farmsim.LaunchOptions;
 import edu.ucc.farmsim.Main;
 
 /**
- * Architecture rules AR-1 to AR-5, AR-7 and AR-11 (see docs/ARQUITECTURA.md section 1).
+ * Reglas de arquitectura AR-1 a AR-5, AR-7 y AR-11 (véase docs/ARQUITECTURA.md sección 1).
  *
- * <p>Every rule tolerates an empty selection ({@code allowEmptyShould(true)}) because the layers are
- * filled phase by phase; as classes appear the rules start checking them automatically.
+ * <p>Cada regla tolera una selección vacía ({@code allowEmptyShould(true)}) porque las capas se llenan fase por fase; a
+ * medida que aparecen clases, las reglas empiezan a comprobarlas automáticamente.
  */
 @AnalyzeClasses(packages = "edu.ucc.farmsim", importOptions = ImportOption.DoNotIncludeTests.class)
 class ArchitectureTest {
@@ -31,7 +31,7 @@ class ArchitectureTest {
     private static final String DOMAIN = ROOT + ".domain..";
     private static final String INFRASTRUCTURE = ROOT + ".infrastructure..";
 
-    /** Main, its argument parser and the Spring configuration form the composition root. */
+    /** Main, su analizador de argumentos y la configuración de Spring forman la raíz de composición. */
     private static final DescribedPredicate<JavaClass> COMPOSITION =
             JavaClass.Predicates.equivalentTo(Main.class)
                     .or(JavaClass.Predicates.equivalentTo(LaunchOptions.class))
@@ -39,8 +39,8 @@ class ArchitectureTest {
                     .as("Main, LaunchOptions and the config package");
 
     /**
-     * AR-1: server api to application to domain, infrastructure to domain; client ui and client to
-     * application; only the composition root may see every layer.
+     * AR-1: servidor api a application a domain, infrastructure a domain; cliente ui y client a application; solo la
+     * raíz de composición puede ver todas las capas.
      */
     @ArchTest
     static final ArchRule AR1_layersAreRespected = layeredArchitecture()
@@ -62,7 +62,7 @@ class ArchitectureTest {
             .whereLayer("Infrastructure").mayOnlyBeAccessedByLayers("Composition")
             .allowEmptyShould(true);
 
-    /** AR-2: the domain knows nothing about Swing, AWT, Spring, Jackson, MongoDB, files or the network. */
+    /** AR-2: el dominio no sabe nada de Swing, AWT, Spring, Jackson, MongoDB, archivos ni la red. */
     @ArchTest
     static final ArchRule AR2_domainHasNoFrameworkOrIoImports = noClasses()
             .that().resideInAPackage(DOMAIN)
@@ -71,28 +71,28 @@ class ArchitectureTest {
                     "com.mongodb..", "org.bson..", "java.io..", "java.nio.file..", "java.net..")
             .allowEmptyShould(true);
 
-    /** AR-3: the UI draws from application DTOs; it never imports domain, infrastructure, api or client. */
+    /** AR-3: la UI dibuja desde los DTO de application; nunca importa domain, infrastructure, api ni client. */
     @ArchTest
     static final ArchRule AR3_uiDoesNotImportDomainInfrastructureApiOrClient = noClasses()
             .that().resideInAPackage(UI)
             .should().dependOnClassesThat().resideInAnyPackage(DOMAIN, INFRASTRUCTURE, API, CLIENT)
             .allowEmptyShould(true);
 
-    /** AR-4: the controller only orchestrates; it never reaches repositories or infrastructure. */
+    /** AR-4: el controlador solo orquesta; nunca llega a los repositorios ni a la infraestructura. */
     @ArchTest
     static final ArchRule AR4_controllerNeverTouchesRepositories = noClasses()
             .that().resideInAPackage(ROOT + ".application.controller..")
             .should().dependOnClassesThat().resideInAnyPackage(INFRASTRUCTURE, ROOT + ".domain.save..")
             .allowEmptyShould(true);
 
-    /** AR-5: no dependency cycles between the sub-packages of the domain. */
+    /** AR-5: sin ciclos de dependencia entre los subpaquetes del dominio. */
     @ArchTest
     static final ArchRule AR5_domainPackagesHaveNoCycles = slices()
             .matching(ROOT + ".domain.(*)..")
             .should().beFreeOfCycles()
             .allowEmptyShould(true);
 
-    /** AR-7: randomness is always injected; only Main (and StateRandom itself) may create generators. */
+    /** AR-7: el azar siempre se inyecta; solo Main (y el propio StateRandom) pueden crear generadores. */
     @ArchTest
     static final ArchRule AR7_noUnseededRandomnessOutsideMain = noClasses()
             .that().doNotHaveFullyQualifiedName(ROOT + ".Main")
@@ -101,14 +101,14 @@ class ArchitectureTest {
             .orShould().callMethod(Math.class, "random")
             .allowEmptyShould(true);
 
-    /** AR-11: the REST controllers only translate HTTP; they never import domain or infrastructure. */
+    /** AR-11: los controladores REST solo traducen HTTP; nunca importan domain ni infrastructure. */
     @ArchTest
     static final ArchRule AR11_apiDoesNotImportDomainOrInfrastructure = noClasses()
             .that().resideInAPackage(API)
             .should().dependOnClassesThat().resideInAnyPackage(DOMAIN, INFRASTRUCTURE, UI, CLIENT)
             .allowEmptyShould(true);
 
-    /** AR-11: the client never imports domain, infrastructure or the server's api. */
+    /** AR-11: el cliente nunca importa domain, infrastructure ni la api del servidor. */
     @ArchTest
     static final ArchRule AR11_clientDoesNotImportServerSide = noClasses()
             .that().resideInAPackage(CLIENT)

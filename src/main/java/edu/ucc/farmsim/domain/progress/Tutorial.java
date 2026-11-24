@@ -1,9 +1,9 @@
 package edu.ucc.farmsim.domain.progress;
 
 /**
- * Where the player is in the start tutorial (RN-39). It starts at {@link TutorialStep#WALK}; an action moves it
- * on only if it is the action of the current step, and once finished, done or skipped, it never starts again.
- * It changes nothing else in the game.
+ * Dónde va el jugador en el tutorial de inicio (RN-39). Empieza en {@link TutorialStep#WALK}; una acción lo hace
+ * avanzar solo si es la acción del paso actual, y una vez terminado, hecho o saltado, nunca vuelve a empezar. No cambia
+ * nada más del juego.
  *
  * <p>Stories: HU-49.
  */
@@ -11,21 +11,21 @@ public final class Tutorial {
 
     private TutorialStep step = TutorialStep.WALK;
 
-    /** The current step, or how it ended. */
+    /** El paso actual, o cómo terminó. */
     public TutorialStep step() {
         return step;
     }
 
-    /** True once the tutorial ended. */
+    /** Verdadero cuando el tutorial terminó. */
     public boolean isFinished() {
         return step.isFinished();
     }
 
     /**
-     * The player did an action.
+     * El jugador hizo una acción.
      *
-     * @param action the step the action belongs to
-     * @return {@code true} if it was the current step and the tutorial moved on
+     * @param action el paso al que pertenece la acción
+     * @return {@code true} si era el paso actual y el tutorial avanzó
      */
     public boolean complete(TutorialStep action) {
         if (isFinished() || action != step) {
@@ -36,9 +36,9 @@ public final class Tutorial {
     }
 
     /**
-     * Ends the tutorial at once.
+     * Termina el tutorial de inmediato.
      *
-     * @return {@code true} if it was still running
+     * @return {@code true} si todavía estaba en curso
      */
     public boolean skip() {
         if (isFinished()) {
@@ -48,12 +48,12 @@ public final class Tutorial {
         return true;
     }
 
-    /** The step, for the memento. */
+    /** El paso, para el memento. */
     public TutorialStep snapshot() {
         return step;
     }
 
-    /** Puts the step back; a save written before the tutorial ({@code null}) loads it finished. */
+    /** Deja el paso como estaba; una partida escrita antes del tutorial ({@code null}) lo carga terminado. */
     public void restoreFrom(TutorialStep saved) {
         step = saved == null ? TutorialStep.DONE : saved;
     }

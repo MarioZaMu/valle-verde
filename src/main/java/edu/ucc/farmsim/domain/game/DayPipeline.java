@@ -5,13 +5,13 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Runs the end of the day as an ordered list of {@link DayStep}s (RN-03).
+ * Ejecuta el final del día como una lista ordenada de {@link DayStep} (RN-03).
  *
- * <p>Steps can be registered in any order: the pipeline always runs them sorted by {@link DayPhase}, so
- * the order of RN-03 cannot be broken by whoever adds a step. Each story adds its own step.
+ * <p>Los pasos se pueden registrar en cualquier orden: el pipeline siempre los ejecuta ordenados por {@link DayPhase},
+ * de modo que quien agrega un paso no puede romper el orden de RN-03. Cada historia agrega su propio paso.
  *
- * <p>It also closes the daily ledger: the money of the day is recorded in the report and the counters start
- * again at zero for the next day (HU-17).
+ * <p>También cierra el libro diario: el dinero del día se registra en el informe y los contadores vuelven a cero para
+ * el día siguiente (HU-17).
  *
  * <p>Stories: HU-03, HU-10, HU-17.
  */
@@ -19,7 +19,7 @@ public final class DayPipeline {
 
     private final List<DayStep> steps = new ArrayList<>();
 
-    /** The pipeline with every step implemented so far. */
+    /** El pipeline con todos los pasos implementados hasta ahora. */
     public static DayPipeline standard() {
         return new DayPipeline()
                 .add(new WeatherEffectsStep())
@@ -33,10 +33,10 @@ public final class DayPipeline {
     }
 
     /**
-     * Registers a step.
+     * Registra un paso.
      *
-     * @return this pipeline, for chaining
-     * @throws IllegalArgumentException if the step is {@code null}
+     * @return este pipeline, para encadenar llamadas
+     * @throws IllegalArgumentException si el paso es {@code null}
      */
     public DayPipeline add(DayStep step) {
         if (step == null) {
@@ -47,9 +47,9 @@ public final class DayPipeline {
     }
 
     /**
-     * Runs every step in phase order on the given game.
+     * Ejecuta todos los pasos en orden de fase sobre la partida dada.
      *
-     * @return the facts recorded by the steps
+     * @return los hechos registrados por los pasos
      */
     public DayReport run(GameState state) {
         List<DayStep> ordered = new ArrayList<>(steps);

@@ -3,8 +3,8 @@ package edu.ucc.farmsim.domain.game;
 import edu.ucc.farmsim.domain.time.GameClock;
 
 /**
- * Step 6 of the end of the day: the forecast becomes today's weather and a new forecast is drawn (RN-13).
- * It runs after the calendar step, so the new forecast is for the day after the new today.
+ * Paso 6 del final del día: el pronóstico pasa a ser el clima de hoy y se sortea un pronóstico nuevo (RN-13). Corre
+ * después del paso del calendario, así que el pronóstico nuevo es para el día siguiente al nuevo hoy.
  *
  * <p>Stories: HU-10.
  */

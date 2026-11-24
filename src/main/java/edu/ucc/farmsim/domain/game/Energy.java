@@ -3,10 +3,10 @@ package edu.ucc.farmsim.domain.game;
 import edu.ucc.farmsim.domain.config.GameRules;
 
 /**
- * The player's daily energy, between 0 and {@link GameRules#MAX_ENERGY} (RN-02).
+ * La energía diaria del jugador, entre 0 y {@link GameRules#MAX_ENERGY} (RN-02).
  *
- * <p>Actions pay their cost with {@link #trySpend(int)}; a rejected payment changes nothing.
- * The end of the day calls {@link #restore()}: leftover energy never accumulates.
+ * <p>Las acciones pagan su costo con {@link #trySpend(int)}; un pago rechazado no cambia nada. El final del día llama a
+ * {@link #restore()}: la energía sobrante nunca se acumula.
  *
  * <p>Stories: HU-01, HU-08.
  */
@@ -14,7 +14,7 @@ public final class Energy {
 
     private int current;
 
-    /** Creates full energy. */
+    /** Crea la energía completa. */
     public Energy() {
         this.current = GameRules.MAX_ENERGY;
     }
@@ -24,35 +24,35 @@ public final class Energy {
     }
 
     /**
-     * Creates energy with a given value (used by tests and when restoring a saved game).
+     * Crea la energía con un valor dado (lo usan las pruebas y al restaurar una partida guardada).
      *
-     * @throws IllegalArgumentException if the value is outside 0..maximum
+     * @throws IllegalArgumentException si el valor está fuera de 0..máximo
      */
     public static Energy withCurrent(int value) {
         requireInRange(value);
         return new Energy(value);
     }
 
-    /** Energy available now. */
+    /** Energía disponible ahora. */
     public int current() {
         return current;
     }
 
-    /** Maximum energy. */
+    /** Energía máxima. */
     public int max() {
         return GameRules.MAX_ENERGY;
     }
 
-    /** True if an action costing this much can be paid now (nothing is spent). */
+    /** Verdadero si ahora se puede pagar una acción que cuesta tanto (no se gasta nada). */
     public boolean canSpend(int cost) {
         return cost >= 0 && cost <= current;
     }
 
     /**
-     * Pays an action cost.
+     * Paga el costo de una acción.
      *
-     * @return {@code true} if paid; {@code false} (and nothing spent) if energy is insufficient
-     * @throws IllegalArgumentException if the cost is negative
+     * @return {@code true} si se pagó; {@code false} (y no se gasta nada) si la energía no alcanza
+     * @throws IllegalArgumentException si el costo es negativo
      */
     public boolean trySpend(int cost) {
         if (cost < 0) {
@@ -65,12 +65,12 @@ public final class Energy {
         return true;
     }
 
-    /** Sets energy back to the maximum (step 7 of the end of the day, RN-03). */
+    /** Devuelve la energía al máximo (paso 7 del final del día, RN-03). */
     public void restore() {
         current = GameRules.MAX_ENERGY;
     }
 
-    /** Overwrites the value (used by the memento when restoring a game). */
+    /** Sobrescribe el valor (lo usa el memento al restaurar una partida). */
     public void set(int value) {
         requireInRange(value);
         current = value;

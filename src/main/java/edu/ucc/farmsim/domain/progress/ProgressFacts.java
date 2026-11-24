@@ -1,18 +1,18 @@
 package edu.ucc.farmsim.domain.progress;
 
 /**
- * What the achievements look at: a plain copy of the counters and of the figures of the game, so the tracker
- * never needs the game state itself (no cycle between {@code game} and {@code progress}, C-01).
+ * Lo que miran los logros: una copia simple de los contadores y de las cifras de la partida, de modo que el rastreador
+ * nunca necesita el estado de la partida (sin ciclo entre {@code game} y {@code progress}, C-01).
  *
  * <p>Stories: HU-26.
  *
- * @param money          money the player has
- * @param harvests       crops harvested so far (clearing a withered plot does not count)
- * @param unitsSold      units sold so far
- * @param buildingsBuilt buildings built so far
- * @param animals        animals living on the farm now
- * @param animalsCured   animals cured so far
- * @param year           current year
+ * @param money          dinero que tiene el jugador
+ * @param harvests       cultivos cosechados hasta ahora (limpiar una parcela marchita no cuenta)
+ * @param unitsSold      unidades vendidas hasta ahora
+ * @param buildingsBuilt edificios construidos hasta ahora
+ * @param animals        animales que viven ahora en la granja
+ * @param animalsCured   animales curados hasta ahora
+ * @param year           año actual
  */
 public record ProgressFacts(int money, int harvests, int unitsSold, int buildingsBuilt, int animals,
                             int animalsCured, int year) { }

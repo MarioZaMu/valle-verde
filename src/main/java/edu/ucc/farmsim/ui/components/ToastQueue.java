@@ -8,19 +8,19 @@ import java.util.List;
 import java.util.function.LongSupplier;
 
 /**
- * The notices of the screen: at most {@link #MAX_VISIBLE} at once, the rest waiting in order (HU-39 · CA-3).
- * A notice stays {@link ToastKind#durationMs()} fully visible and then fades for {@link #FADE_MS}; the time
- * counts from the moment it becomes visible, not from the moment it was posted. It has no Swing and takes its
- * clock from outside, so it is tested without waiting. It is safe to post from any thread.
+ * Los avisos de la pantalla: como máximo {@link #MAX_VISIBLE} a la vez, el resto esperando en orden (HU-39 · CA-3). Un
+ * aviso se queda {@link ToastKind#durationMs()} totalmente visible y luego se desvanece durante {@link #FADE_MS}; el
+ * tiempo cuenta desde el momento en que se vuelve visible, no desde que se publicó. No tiene Swing y toma su reloj de
+ * afuera, así que se prueba sin esperar. Es seguro publicar desde cualquier hilo.
  *
  * <p>Stories: HU-39.
  */
 public final class ToastQueue {
 
-    /** Most notices on screen at the same time. */
+    /** Máximo de avisos en pantalla al mismo tiempo. */
     public static final int MAX_VISIBLE = 4;
 
-    /** Milliseconds of the fade-out. */
+    /** Milisegundos del desvanecimiento. */
     public static final int FADE_MS = 400;
 
     private record Shown(String text, ToastKind kind, long since) { }
@@ -32,21 +32,21 @@ public final class ToastQueue {
     private final Deque<Pending> waiting = new ArrayDeque<>();
 
     /**
-     * Creates an empty queue.
+     * Crea una cola vacía.
      *
-     * @param clock current time in milliseconds
+     * @param clock hora actual en milisegundos
      */
     public ToastQueue(LongSupplier clock) {
         this.clock = clock;
     }
 
-    /** Adds a notice; it is shown at once if there is room, otherwise it waits its turn. */
+    /** Agrega un aviso; se muestra de inmediato si hay lugar, y si no espera su turno. */
     public synchronized void post(ToastKind kind, String text) {
         waiting.add(new Pending(text, kind));
         refresh();
     }
 
-    /** The notices to draw now, oldest first. */
+    /** Los avisos que se dibujan ahora, del más antiguo al más nuevo. */
     public synchronized List<ToastView> visible() {
         refresh();
         long now = clock.getAsLong();
@@ -61,13 +61,13 @@ public final class ToastQueue {
         return views;
     }
 
-    /** How many notices are waiting for room. */
+    /** Cuántos avisos esperan lugar. */
     public synchronized int waiting() {
         refresh();
         return waiting.size();
     }
 
-    /** True when nothing is shown and nothing is waiting. */
+    /** Verdadero cuando no se muestra nada y nada espera. */
     public synchronized boolean isIdle() {
         refresh();
         return shown.isEmpty() && waiting.isEmpty();

@@ -8,14 +8,17 @@ import edu.ucc.farmsim.domain.crop.CropType;
 import edu.ucc.farmsim.domain.economy.ItemType;
 import edu.ucc.farmsim.domain.progress.Achievement;
 
-/** Plays a few real days so that a game has crops, a building with animals, market movement and achievements. */
+/**
+ * Juega unos cuantos días reales para que una partida tenga cultivos, un edificio con animales, movimiento del mercado
+ * y logros.
+ */
 public final class RichGame {
 
     private RichGame() {
-        // static helpers only
+                // solo métodos de utilidad estáticos
     }
 
-    /** Starts a game and plays it into a state where every part of the memento holds something. */
+    /** Inicia una partida y la juega hasta un estado en el que cada parte del memento contiene algo. */
     public static TestApp play() {
         TestApp app = TestApp.startedGame();
         GameFixtures.unlock(app.state(), Achievement.FIRST_HARVEST);

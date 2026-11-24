@@ -18,7 +18,7 @@ import edu.ucc.farmsim.support.GameFixtures;
 import edu.ucc.farmsim.support.TestApp;
 import org.junit.jupiter.api.Test;
 
-/** HU-25: the greenhouse protects crops from the season, the frost and the drought, but not from thirst (RN-22). */
+/** HU-25: el invernadero protege los cultivos de la estación, la helada y la sequía, pero no de la sed (RN-22). */
 class HU25GreenhouseTest {
 
     private static final int GH_COL = GameFixtures.GRASS_COL;

@@ -3,10 +3,10 @@ package edu.ucc.farmsim.domain.time;
 import java.util.Random;
 
 /**
- * The weather of today and the forecast of tomorrow (RN-13).
+ * El clima de hoy y el pronóstico de mañana (RN-13).
  *
- * <p>A new game starts Sunny with the forecast of day 2 already drawn. Each end of the day the forecast
- * becomes today's weather and a new forecast is drawn for the day after. The forecast is always reliable.
+ * <p>Una partida nueva empieza soleada con el pronóstico del día 2 ya sorteado. Cada final de día el pronóstico pasa a
+ * ser el clima de hoy y se sortea uno nuevo para el día siguiente. El pronóstico siempre es fiable.
  *
  * <p>Stories: HU-11.
  */
@@ -22,15 +22,19 @@ public final class WeatherCycle {
         this.override = override;
     }
 
-    /** Starts a new game: day 1 is Sunny and the forecast of day 2 is drawn from its season table. */
+    /**
+     * Empieza una partida nueva: el día 1 es soleado y el pronóstico del día 2 se sortea de la tabla de su estación.
+     */
     public static WeatherCycle startNewGame(GameClock clock, Random rnd) {
         return startNewGame(clock, rnd, null);
     }
 
     /**
-     * Starts a new game using a given strategy for every forecast (for tests that need a known weather).
+     * Empieza una partida nueva usando una estrategia dada para cada pronóstico (para las pruebas que necesitan un
+     * clima conocido).
      *
-     * @param override strategy used instead of the seasonal tables, or {@code null} for the normal tables
+     * @param override estrategia que se usa en lugar de las tablas por estación, o {@code null} para las tablas
+     *                 normales
      */
     public static WeatherCycle startNewGame(GameClock clock, Random rnd, WeatherStrategy override) {
         WeatherCycle cycle = new WeatherCycle(Weather.SUNNY, Weather.SUNNY, override);
@@ -39,25 +43,25 @@ public final class WeatherCycle {
     }
 
     /**
-     * Step 6 of the end of the day (RN-03): call it after the calendar has advanced.
-     * Today's weather becomes the old forecast, and a new forecast is drawn for the day after.
+     * Paso 6 del final del día (RN-03): llámalo después de que el calendario avanzó. El clima de hoy pasa a ser el
+     * antiguo pronóstico y se sortea un pronóstico nuevo para el día siguiente.
      */
     public void advance(GameClock clock, Random rnd) {
         this.today = forecast;
         this.forecast = drawForTomorrow(clock, rnd);
     }
 
-    /** Weather of the current day. */
+    /** Clima del día actual. */
     public Weather today() {
         return today;
     }
 
-    /** Forecast for the next day. */
+    /** Pronóstico para el día siguiente. */
     public Weather forecast() {
         return forecast;
     }
 
-    /** Sets both values (used by tests and by the memento when restoring a game). */
+    /** Fija ambos valores (lo usan las pruebas y el memento al restaurar una partida). */
     public void restore(Weather restoredToday, Weather restoredForecast) {
         this.today = restoredToday;
         this.forecast = restoredForecast;

@@ -29,7 +29,7 @@ import edu.ucc.farmsim.support.InMemoryMongo;
 import edu.ucc.farmsim.support.TestApp;
 import org.junit.jupiter.api.Test;
 
-/** HU-45: walking with the avatar on the farm (RN-36). */
+/** HU-45: caminar con el avatar en la granja (RN-36). */
 class HU45AvatarMovementTest {
 
     private static final String BLOCKED = "No puedes pasar por ahí.";
@@ -44,15 +44,15 @@ class HU45AvatarMovementTest {
 
     @Test
     void HU45_ca1_aStepEastMovesOnePlotLooksEastAndCostsNoEnergyNorTime() {
-        // Given a new game: the avatar on its grass plot, looking south, with the plot to the east free
+                // Dada una partida nueva: el avatar en su parcela de pasto, mirando al sur, con la parcela del este libre
         TestApp app = TestApp.startedGame();
         assertEquals(new AvatarView(GameRules.AVATAR_START_COL, GameRules.AVATAR_START_ROW, "SOUTH"), avatar(app));
         HudView before = app.controller.hud().value();
 
-        // When the player steps east
+                // Cuando el jugador da un paso al este
         Result<AvatarView> result = app.controller.move("EAST");
 
-        // Then it stands one plot to the east, looks east, and neither the energy nor the day changed
+                // Entonces está una parcela al este, mira al este, y ni la energía ni el día cambiaron
         AvatarView moved = new AvatarView(GameRules.AVATAR_START_COL + 1, GameRules.AVATAR_START_ROW, "EAST");
         assertTrue(result.isOk(), String.valueOf(result.message()));
         assertEquals(moved, result.value());
@@ -81,11 +81,11 @@ class HU45AvatarMovementTest {
         GameFixtures.coop(app.state());
         int energy = app.state().energy().current();
         Object[][] cases = {
-            // where it stands, where it looks, where it tries to go
-            {12, 0, Direction.SOUTH, "EAST"},  // the pond
-            {12, 0, Direction.EAST, "NORTH"},  // the top edge of the map
-            {7, 8, Direction.NORTH, "SOUTH"},  // a tree at (7, 9)
-            {4, 7, Direction.SOUTH, "WEST"},   // the coop covers (2..3, 7..8)
+                        // dónde está, hacia dónde mira, hacia dónde intenta ir
+            {12, 0, Direction.SOUTH, "EAST"},  // el estanque
+            {12, 0, Direction.EAST, "NORTH"},  // el borde superior del mapa
+            {7, 8, Direction.NORTH, "SOUTH"},  // un árbol en (7, 9)
+            {4, 7, Direction.SOUTH, "WEST"},   // el gallinero cubre (2..3, 7..8)
         };
         for (Object[] c : cases) {
             place(app, (int) c[0], (int) c[1], (Direction) c[2]);
@@ -191,7 +191,10 @@ class HU45AvatarMovementTest {
         }
     }
 
-    /** The same game written as version 1 wrote it: no avatar in the state, version 1, checksum of the text. */
+    /**
+     * La misma partida escrita como la escribía la versión 1: sin avatar en el estado, versión 1, suma de control del
+     * texto.
+     */
     private static SaveDocument asVersionOne(SaveDocument document) {
         try {
             ObjectMapper json = new ObjectMapper();

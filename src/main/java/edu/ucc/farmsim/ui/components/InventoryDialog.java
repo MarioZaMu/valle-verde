@@ -8,7 +8,7 @@ import javax.swing.JDialog;
 import javax.swing.KeyStroke;
 
 /**
- * The inventory dialog opened with the {@code I} key (HU-37). {@code Esc} or {@code I} closes it.
+ * El diálogo del inventario que se abre con la tecla {@code I} (HU-37). {@code Esc} o {@code I} lo cierran.
  *
  * <p>Stories: HU-37.
  */
@@ -17,10 +17,10 @@ public final class InventoryDialog extends JDialog {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Builds the dialog.
+     * Construye el diálogo.
      *
-     * @param owner the window it belongs to
-     * @param model what the grid shows
+     * @param owner la ventana a la que pertenece
+     * @param model lo que muestra la grilla
      */
     public InventoryDialog(Window owner, InventoryModel model) {
         super(owner, Texts.INVENTORY_TITLE, ModalityType.APPLICATION_MODAL);

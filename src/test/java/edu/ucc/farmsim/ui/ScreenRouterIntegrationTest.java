@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/** The real Swing screens wired to the real controller: a smoke test of HU-33, HU-34 and HU-10 together. */
+/** Las pantallas reales de Swing conectadas al controlador real: una prueba de humo de HU-33, HU-34 y HU-10 juntas. */
 class ScreenRouterIntegrationTest {
 
     @Test
@@ -30,19 +30,19 @@ class ScreenRouterIntegrationTest {
         TestApp app = TestApp.create();
         ScreenRouter router = new ScreenRouter(app.controller, app.bus, () -> TestApp.SEED);
 
-        // When the player presses "Nueva partida" on the start screen
+                // Cuando el jugador pulsa «Nueva partida» en la pantalla de inicio
         button(router, "Nueva partida").doClick();
         flush();
 
-        // Then the game screen shows the initial top bar
+                // Entonces la pantalla de juego muestra la barra superior inicial
         assertTrue(labels(router).contains("500 m"), labels(router).toString());
         assertTrue(labels(router).contains("Año 1 · Primavera · Día 1"), labels(router).toString());
 
-        // When the player presses "Terminar día"
+                // Cuando el jugador pulsa «Terminar día»
         button(router, "Terminar día").doClick();
         flush();
 
-        // Then the top bar shows day 2
+                // Entonces la barra superior muestra el día 2
         assertTrue(labels(router).contains("Año 1 · Primavera · Día 2"), labels(router).toString());
     }
 
@@ -115,7 +115,7 @@ class ScreenRouterIntegrationTest {
         button(router, "Nueva partida").doClick();
         flush();
 
-        // When the player picks the Sow tool and clicks a soil plot of the map
+                // Cuando el jugador elige la herramienta Sembrar y hace clic en una parcela de tierra del mapa
         button(router, "1 Sembrar").doClick();
         MapPanel map = first(router, MapPanel.class);
         map.setSize(1024, 600);
@@ -123,12 +123,12 @@ class ScreenRouterIntegrationTest {
         map.handleClick(cell.x + 5, cell.y + 5);
         flush();
 
-        // Then the crop is planted, the map view shows it and the energy bar says 98/100
+                // Entonces el cultivo se planta, la vista del mapa lo muestra y la barra de energía dice 98/100
         assertTrue(app.state().farm().plotAt(5, 3).hasCrop());
         assertNotNull(map.currentView().plotAt(5, 3).crop());
         assertEquals("98/100", first(router, JProgressBar.class).getString());
 
-        // And the Enter shortcut ends the day
+                // Y el atajo Enter termina el día
         var endDay = ((edu.ucc.farmsim.ui.screens.GameScreen) first(router, edu.ucc.farmsim.ui.screens.GameScreen.class))
                 .getActionMap().get("shortcut-END_DAY");
         endDay.actionPerformed(new java.awt.event.ActionEvent(router, 0, "enter"));

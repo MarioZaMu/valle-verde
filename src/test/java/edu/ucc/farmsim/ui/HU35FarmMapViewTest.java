@@ -27,15 +27,15 @@ import javax.swing.SwingUtilities;
 import org.junit.jupiter.api.Test;
 
 /**
- * HU-35: the farm map drawn with Java2D. Geometry and drawing are separate classes with no component, so they
- * are tested by painting on an image. Buildings and animals are drawn over the plots (HU-35 · CA-3).
+ * HU-35: el mapa de la granja dibujado con Java2D. La geometría y el dibujo son clases separadas sin componente, así
+ * que se prueban pintando sobre una imagen. Los edificios y animales se dibujan sobre las parcelas (HU-35 · CA-3).
  */
 class HU35FarmMapViewTest {
 
     private static final int WIDTH = 1024;
     private static final int HEIGHT = 600;
 
-    /** Where the renderer puts the plots of the whole valley when it is drawn without a camera. */
+    /** Dónde pone el renderizador las parcelas de todo el valle cuando se dibuja sin cámara. */
     private static final MapGeometry VALLEY = MapGeometry.fit(48, 24, WIDTH, HEIGHT);
 
     private static BufferedImage paint(MapView map, CellPos hover) {
@@ -76,10 +76,11 @@ class HU35FarmMapViewTest {
         assertEquals(48 * 24, map.plots().size());
         MapGeometry geometry = VALLEY;
 
-        // When it is drawn
+                // Cuando se dibuja
         BufferedImage image = paint(map, null);
 
-        // Then soil, grass, water and obstacles use different colors (corner pixel of each cell)
+                // Entonces la tierra, el pasto, el agua y los obstáculos usan colores distintos (píxel de la esquina de cada
+        // celda)
         Set<Integer> colors = new HashSet<>();
         colors.add(centerColor(image, geometry, GameFixtures.SOIL_COL, GameFixtures.SOIL_ROW)); // soil
         colors.add(centerColor(image, geometry, 1, 1));   // grass
@@ -165,7 +166,8 @@ class HU35FarmMapViewTest {
 
     @Test
     void HU35_ca5_theMapIsLegibleFrom1024x768WithCellsOfAtLeast40Pixels() {
-        // The map area of a 1024 x 768 window is about 1024 x 600 once the top bar and buttons are taken out
+                // El área del mapa de una ventana de 1024 x 768 es de unos 1024 x 600 una vez quitadas la barra superior y los
+        // botones
         MapGeometry geometry = MapGeometry.fit(16, 10, 1024, 600);
 
         assertTrue(geometry.cellSize() >= 40, "cell size " + geometry.cellSize());
@@ -175,7 +177,8 @@ class HU35FarmMapViewTest {
 
     @Test
     void HU35_ca5_thePanelRedrawsWhenAMapEventArrivesAndNeverPollsTheGame() throws Exception {
-        // Given a panel showing the map of a new game, over a controller that counts the map requests
+                // Dado un panel que muestra el mapa de una partida nueva, sobre un controlador que cuenta las peticiones del
+        // mapa
         TestApp app = TestApp.startedGame();
         int[] mapRequests = {0};
         edu.ucc.farmsim.application.controller.GameCommands counting =
@@ -192,11 +195,11 @@ class HU35FarmMapViewTest {
         SwingUtilities.invokeAndWait(() -> { });
         assertNull(panel.currentView().plotAt(5, 3).crop());
 
-        // When a crop is sown (the controller publishes MapChanged)
+                // Cuando se siembra un cultivo (el controlador publica MapChanged)
         app.controller.plant(5, 3, "CARROT_SEED");
         SwingUtilities.invokeAndWait(() -> { });
 
-        // Then the panel already holds the new view, and with nothing moving it has no timer running
+                // Entonces el panel ya tiene la vista nueva, y sin nada en movimiento no tiene ningún temporizador corriendo
         assertNotNull(panel.currentView().plotAt(5, 3).crop());
         assertFalse(panel.isAnimating());
         int requests = mapRequests[0];
@@ -217,7 +220,7 @@ class HU35FarmMapViewTest {
 
     @Test
     void HU35_ca3_aCoopWithTwoHensIsDrawnInItsPositionAndTheHensChangeWhatIsSeen() {
-        // Given a coop built at (2,7), which covers (2,7) to (3,8)
+                // Dado un gallinero construido en (2,7), que cubre de (2,7) a (3,8)
         TestApp app = TestApp.startedGame();
         var coop = GameFixtures.coop(app.state());
         MapGeometry geometry = VALLEY;
@@ -226,13 +229,14 @@ class HU35FarmMapViewTest {
         int[] grass = cellPixels(paint(noBuildings, null), geometry, 2, 8);
         int[] coopEmpty = cellPixels(paint(empty, null), geometry, 2, 8);
 
-        // When two hens move in
+                // Cuando se mudan dos gallinas
         GameFixtures.hen(coop);
         GameFixtures.hen(coop);
         MapView withHens = app.controller.map().value();
         int[] coopWithHens = cellPixels(paint(withHens, null), geometry, 2, 8);
 
-        // Then the building replaces the grass, the hens change its look and the plot next to it is untouched
+                // Entonces el edificio reemplaza al pasto, las gallinas cambian su aspecto y la parcela de al lado queda
+        // intacta
         assertEquals(1, empty.buildings().size());
         assertEquals(2, withHens.buildingAt(3, 8).animals().size());
         assertNotEquals(Arrays.hashCode(grass), Arrays.hashCode(coopEmpty));

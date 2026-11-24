@@ -11,8 +11,8 @@ import java.util.List;
 /**
  * Pattern: Builder — Role: Product (the building the builders assemble step by step).
  *
- * <p>A building placed on the map. A coop or a barn houses animals and keeps what they produce until the
- * player collects it (RN-26); a warehouse widens the inventory; a greenhouse protects crops.
+ * <p>Un edificio colocado en el mapa. Un gallinero o un establo aloja animales y guarda lo que producen hasta que el
+ * jugador lo recoge (RN-26); un almacén amplía el inventario; un invernadero protege cultivos.
  *
  * <p>Stories: HU-18, HU-19, HU-20, HU-22, HU-24.
  */
@@ -40,7 +40,7 @@ public final class Building {
         this.protectedPlots = protectedPlots;
     }
 
-    /** Rebuilds a building and its animals from a snapshot. */
+    /** Reconstruye un edificio y sus animales desde una instantánea. */
     public static Building fromSnapshot(BuildingSnapshot snapshot) {
         Building building = BuildingDirector.construct(snapshot.type(), snapshot.id(), snapshot.col(), snapshot.row());
         for (AnimalSnapshot animal : snapshot.animals()) {
@@ -49,81 +49,80 @@ public final class Building {
         return building;
     }
 
-    /** An immutable copy of this building. */
+    /** Una copia inmutable de este edificio. */
     public BuildingSnapshot snapshot() {
         return new BuildingSnapshot(id, type, col, row, animals.stream().map(Animal::snapshot).toList());
     }
 
-    /** Position in the order buildings were built; it identifies the building. */
+    /** Posición en el orden en que se construyeron los edificios; lo identifica. */
     public int id() {
         return id;
     }
 
-    /** Kind of building. */
+    /** Tipo de edificio. */
     public BuildingType type() {
         return type;
     }
 
-    /** Column of the top-left plot. */
+    /** Columna de la parcela superior izquierda. */
     public int col() {
         return col;
     }
 
-    /** Row of the top-left plot. */
+    /** Fila de la parcela superior izquierda. */
     public int row() {
         return row;
     }
 
-    /** Columns it covers. */
+    /** Columnas que cubre. */
     public int width() {
         return type.width();
     }
 
-    /** Rows it covers. */
+    /** Filas que cubre. */
     public int height() {
         return type.height();
     }
 
-    /** True if the plot belongs to the building. */
+    /** Verdadero si la parcela pertenece al edificio. */
     public boolean covers(int plotCol, int plotRow) {
         return plotCol >= col && plotCol < col + width() && plotRow >= row && plotRow < row + height();
     }
 
-    /** The animal this building houses, or {@code null}. */
+    /** El animal que aloja este edificio, o {@code null}. */
     public AnimalType species() {
         return species;
     }
 
-    /** How many animals fit. */
+    /** Cuántos animales caben. */
     public int animalCapacity() {
         return animalCapacity;
     }
 
-    /** Inventory slots this building adds. */
+    /** Casillas de inventario que agrega este edificio. */
     public int extraInventorySlots() {
         return extraInventorySlots;
     }
 
-    /** Plots of crop this building protects. */
+    /** Parcelas de cultivo que protege este edificio. */
     public int protectedPlots() {
         return protectedPlots;
     }
 
-    /** The animals inside, in the order they arrived. */
+    /** Los animales que hay dentro, en el orden en que llegaron. */
     public List<Animal> animals() {
         return Collections.unmodifiableList(animals);
     }
 
-    /** True if one more animal of the type fits (RN-23). */
+    /** Verdadero si cabe un animal más del tipo (RN-23). */
     public boolean hasRoomFor(AnimalType animal) {
         return species == animal && animals.size() < animalCapacity;
     }
 
     /**
-     * Houses an animal.
+     * Aloja a un animal.
      *
-     * @return {@code true} if it fit; {@code false} (and nothing changed) if the building houses another
-     *         species or is full
+     * @return {@code true} si cupo; {@code false} (y nada cambia) si el edificio aloja otra especie o está lleno
      */
     public boolean addAnimal(Animal animal) {
         if (!hasRoomFor(animal.type())) {
@@ -133,17 +132,17 @@ public final class Building {
         return true;
     }
 
-    /** Units of product waiting to be collected, from every animal (RN-26). */
+    /** Unidades de producto que esperan ser recogidas, de todos los animales (RN-26). */
     public int pendingProducts() {
         return animals.stream().mapToInt(Animal::pending).sum();
     }
 
-    /** What the animals of this building produce, or {@code null} if it houses none. */
+    /** Lo que producen los animales de este edificio, o {@code null} si no aloja ninguno. */
     public ItemType product() {
         return species == null ? null : species.product();
     }
 
-    /** Takes every unit waiting to be collected. */
+    /** Toma todas las unidades que esperan ser recogidas. */
     public int collectAll() {
         int total = 0;
         for (Animal animal : animals) {

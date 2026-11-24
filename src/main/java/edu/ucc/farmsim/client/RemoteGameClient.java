@@ -41,22 +41,27 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Sends each order of the player to the REST server and rebuilds the {@link Result} the screens expect, so
- * the UI cannot tell this class from the in-process {@code GameController} (DT-17). The events carried in
- * the response are republished on the local {@link EventBus}, after the result is rebuilt and in the order
- * the server produced them (DT-19).
+ * Envía cada orden del jugador al servidor REST y reconstruye el {@link Result} que esperan las pantallas, de modo que
+ * la interfaz no distingue esta clase del {@code GameController} interno (DT-17). Los eventos que trae la respuesta se
+ * republican en el {@link EventBus} local, después de reconstruir el resultado y en el orden en que los produjo el
+ * servidor (DT-19).
  *
- * <p>Orders are sent synchronously from the calling thread with a time limit (DT-20). It never throws: an
- * unreachable server, a timeout or an unreadable answer becomes {@code ERROR_INTERNO}.
+ * <p>Las órdenes se envían de forma síncrona desde el hilo que llama, con un límite de tiempo (DT-20). Nunca lanza
+ * excepciones: un servidor inalcanzable, un tiempo agotado o una respuesta ilegible se convierten en {@code
+ * ERROR_INTERNO}.
  *
- * <p>The address of the server may still be on its way: the window opens while the server starts, and an order
- * sent before it is up waits for it, up to a limit (RNF-02). A server that fails to start is also
+ * <p>La dirección del servidor puede estar todavía en camino: la ventana abre mientras el servidor arranca, y una orden
+ * enviada antes de que esté listo lo espera, hasta un límite (RNF-02). Un servidor que no logra arrancar también es
  * {@code ERROR_INTERNO}.
  *
  * <p>Stories: HU-01, HU-02, HU-04, HU-06, HU-07, HU-10, HU-14, HU-15, HU-16, HU-17, HU-18, HU-19, HU-20, HU-22, HU-23, HU-26, HU-28, HU-29, HU-30, HU-31, HU-32, HU-33, HU-35, HU-37, HU-38, HU-45, HU-46, HU-47, HU-49.
  */
 public final class RemoteGameClient implements GameCommands {
 
+    // ===== SECCIÓN 1 · Ajustes y herramientas ===============================================================
+    // Límites de tiempo (2 s para conectar, 5 s por orden) y los ayudantes de esta clase: el cliente HTTP que
+    // habla con el servidor, el mapper de Jackson que convierte objetos <-> JSON y el decodificador que vuelve a
+    // convertir los "events" de una respuesta en objetos GameEvent. Aquí no hay reglas del juego: viven en el servidor.
     private static final Logger LOG = Logger.getLogger(RemoteGameClient.class.getName());
     private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(2);
     private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(5);
@@ -68,22 +73,27 @@ public final class RemoteGameClient implements GameCommands {
     private final ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     private final EventDecoder decoder = new EventDecoder(mapper);
 
+    // ===== SECCIÓN 2 · Constructores ========================================================================
+    // Dos formas de crear el cliente: con una dirección conocida (pruebas, "--client --url=...") o con la promesa
+    // de una dirección (el arranque normal, donde la ventana abre mientras el servidor aún arranca, RNF-02).
+    // En ambos casos, el EventBus recibido es donde se republican los eventos de cada respuesta.
+
     /**
-     * Creates the client.
+     * Crea el cliente.
      *
-     * @param baseUri address of the server, for example {@code http://127.0.0.1:8080}
-     * @param bus     the local bus where the events of every response are republished
+     * @param baseUri dirección del servidor, por ejemplo {@code http://127.0.0.1:8080}
+     * @param bus     el bus local donde se republican los eventos de cada respuesta
      */
     public RemoteGameClient(URI baseUri, EventBus bus) {
         this(CompletableFuture.completedFuture(baseUri), bus, Duration.ZERO);
     }
 
     /**
-     * Creates a client for a server that may still be starting.
+     * Crea un cliente para un servidor que quizá todavía esté arrancando.
      *
-     * @param server    completes with the address of the server once it listens, or fails if it cannot start
-     * @param bus       the local bus where the events of every response are republished
-     * @param startWait how long an order waits for the server to be up before it gives up
+     * @param server    se completa con la dirección del servidor cuando escucha, o falla si no puede arrancar
+     * @param bus       el bus local donde se republican los eventos de cada respuesta
+     * @param startWait cuánto espera una orden a que el servidor esté listo antes de rendirse
      */
     public RemoteGameClient(CompletableFuture<URI> server, EventBus bus, Duration startWait) {
         this.server = server;
@@ -91,13 +101,18 @@ public final class RemoteGameClient implements GameCommands {
         this.bus = bus;
     }
 
-    /** The address of the server, waiting for it while it starts. */
+    /** La dirección del servidor, esperándolo mientras arranca. */
     private URI baseUri() throws InterruptedException, ExecutionException, TimeoutException {
         if (server.isDone()) {
             return server.get();
         }
         return server.get(startWait.toMillis(), TimeUnit.MILLISECONDS);
     }
+
+    // ===== SECCIÓN 3 · Partida y día (HU-10, HU-28, HU-34) ==================================================
+    // Iniciar una partida nueva, pedir el HUD (día, estación, clima, dinero, energía) y terminar el día. Cada
+    // método es una línea: elige el verbo y la ruta de docs/API.md e indica en qué DTO se convierte la respuesta.
+    // hasGameInProgress() solo pregunta «¿el servidor responde con un HUD?».
 
     @Override
     public boolean hasGameInProgress() {
@@ -119,6 +134,11 @@ public final class RemoteGameClient implements GameCommands {
         return send("POST", "/api/game/days", null, HudView.class);
     }
 
+    // ===== SECCIÓN 4 · Parcelas (HU-01, HU-02, HU-04, HU-07) ================================================
+    // Sembrar, regar, cosechar e inspeccionar una parcela. La parcela va dentro de la ruta
+    // (/api/farm/plots/{col}/{row}); ver plot() al final. El servidor responde con un PlotView, una copia de solo
+    // lectura: la pantalla nunca toca los objetos del dominio (Crop, Plot).
+
     @Override
     public Result<PlotView> plant(int col, int row, String seedId) {
         return send("POST", plot(col, row) + "/crop", Map.of("seedId", seedId), PlotView.class);
@@ -138,6 +158,11 @@ public final class RemoteGameClient implements GameCommands {
     public Result<PlotView> inspect(int col, int row) {
         return send("GET", plot(col, row), null, PlotView.class);
     }
+
+    // ===== SECCIÓN 5 · Valle, avatar, vecinos y tutorial (HU-35, HU-45, HU-46, HU-47, HU-49) ================
+    // El mapa completo (48 × 24 parcelas) llega como un solo MapView; caminar envía una dirección y recibe la
+    // nueva posición; hablar y entregar encargos usan el id del vecino; el tutorial se lee y se puede saltar.
+    // Las listas (npcs) usan un TypeReference para que Jackson sepa el tipo de los elementos de la List.
 
     @Override
     public Result<MapView> map() {
@@ -174,10 +199,16 @@ public final class RemoteGameClient implements GameCommands {
         return send("POST", "/api/tutorial/skip", null, TutorialView.class);
     }
 
+    // La usa la pantalla de inicio para decidir si ofrece «Cargar» (pertenece a la SECCIÓN 9 · Partidas guardadas).
     @Override
     public Result<Boolean> hasSavedGames() {
         return send("GET", "/api/saves/any", null, Boolean.class);
     }
+
+    // ===== SECCIÓN 6 · Mercado e inventario (HU-13 a HU-16, HU-37, HU-38) ===================================
+    // Comprar, vender y cotizar (previsión de precio sin vender) van a /api/market; la respuesta es el total en
+    // dinero. El precio dinámico NO se calcula aquí: el servidor usa la Strategy PricingStrategy y solo nos dice
+    // el resultado. market() e inventory() traen lo que dibujan las ventanas de Mercado e Inventario.
 
     @Override
     public Result<Integer> buy(String itemId, int quantity) {
@@ -203,6 +234,11 @@ public final class RemoteGameClient implements GameCommands {
     public Result<InventoryView> inventory() {
         return send("GET", "/api/inventory", null, InventoryView.class);
     }
+
+    // ===== SECCIÓN 7 · Edificios y animales (HU-18 a HU-23) ==================================================
+    // Listar el catálogo, construir (el servidor usa el patrón Builder), comprar un animal, alimentar, recolectar
+    // huevos o leche y curar. El id del edificio va en la ruta. El estado del animal (sano, hambriento, enfermo)
+    // es el patrón State en el servidor; aquí solo lo recibimos dentro de un BuildingView / BuildingActionView.
 
     @Override
     public Result<BuildingsView> buildings() {
@@ -236,10 +272,18 @@ public final class RemoteGameClient implements GameCommands {
                 BuildingActionView.class);
     }
 
+    // ===== SECCIÓN 8 · Logros (HU-26, HU-27) ================================================================
+    // Lista de solo lectura con la condición, la recompensa y el progreso de cada logro; alimenta la ventana «Logros».
+
     @Override
     public Result<List<AchievementView>> achievements() {
         return send("GET", "/api/achievements", null, new TypeReference<List<AchievementView>>() { });
     }
+
+    // ===== SECCIÓN 9 · Partidas guardadas (HU-29 a HU-32) ===================================================
+    // Listar las 3 ranuras, guardar (PUT) y cargar (POST). Quien habla con MongoDB es el servidor, mediante el
+    // Memento (GameMemento) y el puerto SaveRepository; el cliente nunca ve la base de datos. Una ranura dañada o
+    // vacía vuelve como Result.fail con su código, para que la pantalla muestre el mensaje y conserve la partida.
 
     @Override
     public Result<List<SaveSlotView>> saveSlots() {
@@ -256,6 +300,11 @@ public final class RemoteGameClient implements GameCommands {
         return send("POST", "/api/saves/" + slot + "/load", null, HudView.class);
     }
 
+    // ===== SECCIÓN 10 · Ayudantes privados (el motor de la clase) ===========================================
+    // plot(): arma la ruta de una parcela. send(): las tres versiones terminan en la que hace la llamada HTTP.
+    // rebuild(): convierte la respuesta JSON en un Result y republica los eventos. codeOf(): convierte el texto
+    // del código de error del servidor en un ErrorCode. Léelos en ese orden.
+
     private static String plot(int col, int row) {
         return "/api/farm/plots/" + col + "/" + row;
     }
@@ -268,6 +317,17 @@ public final class RemoteGameClient implements GameCommands {
         return send(method, path, body, mapper.constructType(type));
     }
 
+    // GUÍA DE LECTURA: todos los métodos públicos de arriba (plant, water, sell, save...) terminan aquí.
+    // Para seguir una orden:
+    //   1. La pantalla llama a un método de GameCommands, p. ej. plant(col, row, seedId), y no sabe que habla con
+    //      un servidor: esta clase implementa la misma interfaz que el GameController interno (DT-17).
+    //   2. send() convierte la orden en una petición HTTP (verbo + ruta + cuerpo JSON) para la API REST de
+    //      Spring Boot; espera al servidor si aún arranca (baseUri) y se rinde tras REQUEST_TIMEOUT.
+    //   3. rebuild() lee la respuesta JSON: si es 2xx reconstruye el valor desde "data", republica cada elemento
+    //      de "events" en el EventBus local (esto hace que el HUD y el mapa se redibujen: patrón Observer) y
+    //      devuelve Result.ok; si es un error devuelve Result.fail con el código y el mensaje del servidor.
+    //   4. Nunca se lanza una excepción a la pantalla: cualquier fallo de red se vuelve ERROR_INTERNO (idea de Result).
+    // El lado servidor de la misma orden es GameRestController -> GameController -> un servicio -> el dominio.
     private <T> Result<T> send(String method, String path, Object body, JavaType type) {
         try {
             HttpRequest.BodyPublisher publisher = body == null

@@ -5,8 +5,8 @@ import edu.ucc.farmsim.domain.config.GameRules;
 import edu.ucc.farmsim.domain.progress.Achievement;
 
 /**
- * Catalog of buildings (RN-20): size, cost, the most that can be built, the achievement that unlocks it
- * (RN-29) and the animal it houses, if any.
+ * Catálogo de edificios (RN-20): tamaño, costo, el máximo que se puede construir, el logro que lo desbloquea (RN-29) y
+ * el animal que aloja, si lo hay.
  *
  * <p>Stories: HU-18.
  */
@@ -32,37 +32,37 @@ public enum BuildingType {
         this.housedAnimal = housedAnimal;
     }
 
-    /** Columns the building covers. */
+    /** Columnas que cubre el edificio. */
     public int width() {
         return width;
     }
 
-    /** Rows the building covers. */
+    /** Filas que cubre el edificio. */
     public int height() {
         return height;
     }
 
-    /** Cost in m. */
+    /** Costo en m. */
     public int cost() {
         return cost;
     }
 
-    /** The most buildings of this type the player can have. */
+    /** El máximo de edificios de este tipo que puede tener el jugador. */
     public int maxCount() {
         return maxCount;
     }
 
-    /** The achievement that unlocks it, or {@code null} if it is available from the start. */
+    /** El logro que lo desbloquea, o {@code null} si está disponible desde el inicio. */
     public Achievement requirement() {
         return requirement;
     }
 
-    /** The animal this building houses, or {@code null} if it houses none. */
+    /** El animal que aloja este edificio, o {@code null} si no aloja ninguno. */
     public AnimalType housedAnimal() {
         return housedAnimal;
     }
 
-    /** The building where an animal lives. */
+    /** El edificio donde vive un animal. */
     public static BuildingType housing(AnimalType animal) {
         for (BuildingType type : values()) {
             if (type.housedAnimal == animal) {

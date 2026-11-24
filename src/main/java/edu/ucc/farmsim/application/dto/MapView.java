@@ -3,49 +3,49 @@ package edu.ucc.farmsim.application.dto;
 import java.util.List;
 
 /**
- * The whole farm map as the screen draws it: its size and one {@link PlotView} per plot in row-major order.
- * Immutable.
+ * Todo el mapa de la granja tal como lo dibuja la pantalla: su tamaño y un {@link PlotView} por parcela en orden de
+ * fila. Inmutable.
  *
  * <p>Stories: HU-35, HU-45, HU-46, HU-50.
  *
- * @param cols      number of columns
- * @param rows      number of rows
- * @param plots     every plot, row by row
- * @param buildings the buildings drawn over the plots, with their animals
- * @param avatar    where the avatar stands and looks, or {@code null} if it is not drawn
- * @param npcs      the people of the valley, each on its plot
- * @param houses    the houses of the valley, drawn over their plots
+ * @param cols      número de columnas
+ * @param rows      número de filas
+ * @param plots     todas las parcelas, fila por fila
+ * @param buildings los edificios dibujados sobre las parcelas, con sus animales
+ * @param avatar    dónde está el avatar y hacia dónde mira, o {@code null} si no se dibuja
+ * @param npcs      las personas del valle, cada una en su parcela
+ * @param houses    las casas del valle, dibujadas sobre sus parcelas
  */
 public record MapView(int cols, int rows, List<PlotView> plots, List<BuildingView> buildings, AvatarView avatar,
                       List<NpcView> npcs, List<HouseView> houses) {
 
-    /** A map with the avatar and the people, without houses. */
+    /** Un mapa con el avatar y las personas, sin casas. */
     public MapView(int cols, int rows, List<PlotView> plots, List<BuildingView> buildings, AvatarView avatar,
                    List<NpcView> npcs) {
         this(cols, rows, plots, buildings, avatar, npcs, List.of());
     }
 
-    /** A map with the avatar and without people. */
+    /** Un mapa con el avatar y sin personas. */
     public MapView(int cols, int rows, List<PlotView> plots, List<BuildingView> buildings, AvatarView avatar) {
         this(cols, rows, plots, buildings, avatar, List.of());
     }
 
-    /** A map without buildings and without avatar. */
+    /** Un mapa sin edificios y sin avatar. */
     public MapView(int cols, int rows, List<PlotView> plots) {
         this(cols, rows, plots, List.of());
     }
 
-    /** A map without avatar. */
+    /** Un mapa sin avatar. */
     public MapView(int cols, int rows, List<PlotView> plots, List<BuildingView> buildings) {
         this(cols, rows, plots, buildings, null);
     }
 
-    /** The same map with the avatar somewhere else or looking elsewhere (a step changes nothing more). */
+    /** El mismo mapa con el avatar en otro lugar o mirando a otro lado (un paso no cambia nada más). */
     public MapView withAvatar(AvatarView moved) {
         return new MapView(cols, rows, plots, buildings, moved, npcs, houses);
     }
 
-    /** The building that covers the plot, or {@code null}. */
+    /** El edificio que cubre la parcela, o {@code null}. */
     public BuildingView buildingAt(int col, int row) {
         for (BuildingView building : buildings) {
             if (building.covers(col, row)) {
@@ -55,7 +55,7 @@ public record MapView(int cols, int rows, List<PlotView> plots, List<BuildingVie
         return null;
     }
 
-    /** The person standing on the plot, or {@code null}. */
+    /** La persona que está sobre la parcela, o {@code null}. */
     public NpcView npcAt(int col, int row) {
         for (NpcView npc : npcs == null ? List.<NpcView>of() : npcs) {
             if (npc.col() == col && npc.row() == row) {
@@ -66,9 +66,9 @@ public record MapView(int cols, int rows, List<PlotView> plots, List<BuildingVie
     }
 
     /**
-     * The plot at the given coordinates.
+     * La parcela en las coordenadas dadas.
      *
-     * @throws IllegalArgumentException if the coordinates are outside the map
+     * @throws IllegalArgumentException si las coordenadas están fuera del mapa
      */
     public PlotView plotAt(int col, int row) {
         if (col < 0 || col >= cols || row < 0 || row >= rows) {

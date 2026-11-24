@@ -20,7 +20,7 @@ import edu.ucc.farmsim.support.GameFixtures;
 import edu.ucc.farmsim.support.TestApp;
 import org.junit.jupiter.api.Test;
 
-/** HU-01: sow a seed from the inventory in a free soil plot (RN-02, RN-05, RN-06, RN-15). */
+/** HU-01: sembrar una semilla del inventario en una parcela de tierra libre (RN-02, RN-05, RN-06, RN-15). */
 class HU01SowCropTest {
 
     private static final int COL = GameFixtures.SOIL_COL;
@@ -28,14 +28,15 @@ class HU01SowCropTest {
 
     @Test
     void HU01_ca1_sowingPlantsTheCropInSeedStageAndConsumesOneSeedAndTwoEnergy() {
-        // Given Spring, 10 carrot seeds, 100 energy and a free soil plot
+                // Dado Primavera, 10 semillas de zanahoria, 100 de energía y una parcela de tierra libre
         TestApp app = TestApp.startedGame();
         GameState state = app.state();
 
-        // When the player sows carrot there
+                // Cuando el jugador siembra zanahoria allí
         Result<PlotView> result = app.controller.plant(COL, ROW, "CARROT_SEED");
 
-        // Then the plot holds a carrot in the Seed stage with 0 days grown, 9 seeds remain and energy is 98
+                // Entonces la parcela tiene una zanahoria en la etapa Seed con 0 días de crecimiento, quedan 9 semillas y la
+        // energía es 98
         assertTrue(result.isOk(), String.valueOf(result.message()));
         Crop crop = state.farm().plotAt(COL, ROW).crop();
         assertNotNull(crop);
@@ -50,15 +51,15 @@ class HU01SowCropTest {
 
     @Test
     void HU01_ca2_sowingOutOfSeasonIsRejectedAndNothingChanges() {
-        // Given Spring and 5 pumpkin seeds (pumpkin is only valid in Autumn)
+                // Dado Primavera y 5 semillas de calabaza (la calabaza solo es válida en Otoño)
         TestApp app = TestApp.startedGame();
         GameState state = app.state();
         state.inventory().add(ItemType.PUMPKIN_SEED, 5);
 
-        // When the player tries to sow them
+                // Cuando el jugador intenta sembrarlas
         Result<PlotView> result = app.controller.plant(COL, ROW, "PUMPKIN_SEED");
 
-        // Then it is rejected with FUERA_DE_ESTACION, the seeds are kept and energy is untouched
+                // Entonces se rechaza con FUERA_DE_ESTACION, las semillas se conservan y la energía queda intacta
         assertFalse(result.isOk());
         assertEquals(ErrorCode.FUERA_DE_ESTACION, result.code());
         assertEquals("No se puede sembrar Calabaza en Primavera: solo en Otoño.", result.message());
@@ -82,16 +83,16 @@ class HU01SowCropTest {
         TestApp app = TestApp.startedGame();
         GameState state = app.state();
 
-        // Given a grass plot, sowing is rejected with PARCELA_NO_CULTIVABLE
+                // Dada una parcela de pasto, sembrar se rechaza con PARCELA_NO_CULTIVABLE
         Result<PlotView> onGrass = app.controller.plant(1, 1, "CARROT_SEED");
         assertEquals(ErrorCode.PARCELA_NO_CULTIVABLE, onGrass.code());
 
-        // And a soil plot that already has a crop is rejected with PARCELA_OCUPADA
+                // Y una parcela de tierra que ya tiene un cultivo se rechaza con PARCELA_OCUPADA
         assertTrue(app.controller.plant(COL, ROW, "CARROT_SEED").isOk());
         Result<PlotView> onCrop = app.controller.plant(COL, ROW, "CARROT_SEED");
         assertEquals(ErrorCode.PARCELA_OCUPADA, onCrop.code());
 
-        // And neither failure spent a seed or energy (only the first successful sowing did)
+                // Y ninguno de los dos fallos gastó una semilla ni energía (solo lo hizo la primera siembra exitosa)
         assertEquals(9, state.inventory().count(ItemType.CARROT_SEED));
         assertEquals(98, state.energy().current());
     }
@@ -107,14 +108,14 @@ class HU01SowCropTest {
 
     @Test
     void HU01_ca4_sowingWithoutSeedsIsRejectedAndThePlotStaysFree() {
-        // Given Summer and 0 corn seeds
+                // Dado Verano y 0 semillas de maíz
         TestApp app = TestApp.startedGame();
         GameFixtures.setDate(1, Season.SUMMER, 1);
 
-        // When the player tries to sow corn
+                // Cuando el jugador intenta sembrar maíz
         Result<PlotView> result = app.controller.plant(COL, ROW, "CORN_SEED");
 
-        // Then it is rejected with SIN_SEMILLAS and the plot is still free
+                // Entonces se rechaza con SIN_SEMILLAS y la parcela sigue libre
         assertEquals(ErrorCode.SIN_SEMILLAS, result.code());
         assertEquals("No tienes semillas de Maíz.", result.message());
         assertNull(app.state().farm().plotAt(COL, ROW).crop());
@@ -126,10 +127,10 @@ class HU01SowCropTest {
         TestApp app = TestApp.startedGame();
         app.state().energy().set(1);
 
-        // When the player tries to sow
+                // Cuando el jugador intenta sembrar
         Result<PlotView> result = app.controller.plant(COL, ROW, "CARROT_SEED");
 
-        // Then it is rejected: "you need 2 and have 1"; the seed and the energy are untouched
+                // Entonces se rechaza: «necesitas 2 y tienes 1»; la semilla y la energía quedan intactas
         assertEquals(ErrorCode.SIN_ENERGIA, result.code());
         assertEquals("Energía insuficiente: necesitas 2 y tienes 1.", result.message());
         assertEquals(1, app.state().energy().current());

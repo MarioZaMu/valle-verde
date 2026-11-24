@@ -10,7 +10,7 @@ final class SeedState extends GrowingPhaseState {
     static final SeedState INSTANCE = new SeedState();
 
     private SeedState() {
-        // shared instance
+                // instancia compartida
     }
 
     @Override

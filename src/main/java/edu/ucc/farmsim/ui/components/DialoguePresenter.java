@@ -6,8 +6,8 @@ import edu.ucc.farmsim.application.result.Result;
 import edu.ucc.farmsim.ui.theme.Texts;
 
 /**
- * Logic of the dialogue box with a person of the valley, with no Swing (HU-46, HU-47): what it says, whether
- * its errand can still be delivered, and the delivery itself with its answer or its rejection.
+ * Lógica del cuadro de diálogo con una persona del valle, sin Swing (HU-46, HU-47): lo que dice, si su encargo todavía
+ * se puede entregar, y la entrega en sí con su respuesta o su rechazo.
  *
  * <p>Stories: HU-46, HU-47.
  */
@@ -18,32 +18,32 @@ public final class DialoguePresenter {
     private String message = "";
 
     /**
-     * Creates the presenter.
+     * Crea el presentador.
      *
-     * @param controller entry point to the game
-     * @param first      what the person said when the player started talking
+     * @param controller punto de entrada al juego
+     * @param first      lo que dijo la persona cuando el jugador empezó a hablar
      */
     public DialoguePresenter(GameCommands controller, DialogueView first) {
         this.controller = controller;
         this.view = first;
     }
 
-    /** What the person says now. */
+    /** Lo que dice ahora la persona. */
     public DialogueView view() {
         return view;
     }
 
-    /** The answer to the last delivery, or an empty text. */
+    /** La respuesta a la última entrega, o un texto vacío. */
     public String message() {
         return message;
     }
 
-    /** True while the errand is not done, so the Deliver button is offered. */
+    /** Verdadero mientras el encargo no está hecho, de modo que se ofrece el botón Entregar. */
     public boolean canDeliver() {
         return !view.errandDone();
     }
 
-    /** Delivers the errand; on success the person thanks the player, otherwise the RN-35 message is shown. */
+    /** Entrega el encargo; si tiene éxito la persona agradece al jugador, y si no se muestra el mensaje de RN-35. */
     public String deliver() {
         Result<DialogueView> result = controller.deliver(view.npcId());
         if (result.isOk()) {

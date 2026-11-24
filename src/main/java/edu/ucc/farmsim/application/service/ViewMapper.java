@@ -30,18 +30,19 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
- * Turns the domain state into the immutable views the UI draws, so the UI never sees domain objects.
+ * Convierte el estado del dominio en las vistas inmutables que dibuja la UI, de modo que la UI nunca ve objetos del
+ * dominio.
  *
  * <p>Stories: HU-01, HU-17, HU-18, HU-28, HU-34, HU-35, HU-45, HU-46, HU-50.
  */
 @Component
 public final class ViewMapper {
 
-    /** The houses never move, so their views are made once. */
+    /** Las casas nunca se mueven, así que sus vistas se hacen una sola vez. */
     private static final List<HouseView> HOUSES = java.util.Arrays.stream(House.values())
             .map(h -> new HouseView(h.name(), h.col(), h.row(), h.width(), h.height())).toList();
 
-    /** The top bar of a game state. */
+    /** La barra superior de un estado de partida. */
     public HudView hud(GameState state) {
         GameDate date = state.date();
         return new HudView(state.money(), date.year(), date.season().name(), date.day(),
@@ -49,7 +50,7 @@ public final class ViewMapper {
                 state.energy().current(), state.energy().max());
     }
 
-    /** The plot at the given coordinates, which must be inside the map. */
+    /** La parcela en las coordenadas dadas, que deben estar dentro del mapa. */
     public PlotView plot(GameState state, int col, int row) {
         Plot plot = state.farm().plotAt(col, row);
         Crop crop = plot.crop();
@@ -60,7 +61,7 @@ public final class ViewMapper {
                 crop.isWatered(), crop.daysLeft(), plot.isSheltered());
     }
 
-    /** The whole farm map, plot by plot in row-major order. */
+    /** Todo el mapa de la granja, parcela por parcela en orden de fila. */
     public MapView map(GameState state) {
         int cols = state.farm().cols();
         int rows = state.farm().rows();
@@ -73,7 +74,7 @@ public final class ViewMapper {
         return new MapView(cols, rows, List.copyOf(plots), buildingViews(state), avatar(state), npcs(state), HOUSES);
     }
 
-    /** The people of the valley, in a fixed order, with the state of their errands. */
+    /** Las personas del valle, en un orden fijo, con el estado de sus encargos. */
     public List<NpcView> npcs(GameState state) {
         List<NpcView> all = new ArrayList<>();
         for (Npc npc : Npc.values()) {
@@ -83,13 +84,13 @@ public final class ViewMapper {
         return List.copyOf(all);
     }
 
-    /** Where the avatar stands and looks. */
+    /** Dónde está el avatar y hacia dónde mira. */
     public AvatarView avatar(GameState state) {
         Avatar avatar = state.avatar();
         return new AvatarView(avatar.col(), avatar.row(), avatar.facing().name());
     }
 
-    /** One building with its animals. */
+    /** Un edificio con sus animales. */
     public BuildingView building(Building building) {
         List<AnimalView> animals = new ArrayList<>();
         int index = 0;
@@ -104,12 +105,12 @@ public final class ViewMapper {
                 product, building.pendingProducts(), List.copyOf(animals));
     }
 
-    /** Every building of the farm, in the order they were built. */
+    /** Todos los edificios de la granja, en el orden en que se construyeron. */
     public List<BuildingView> buildingViews(GameState state) {
         return state.farm().buildings().stream().map(this::building).toList();
     }
 
-    /** The buildings and the catalogue of what can still be built. */
+    /** Los edificios y el catálogo de lo que aún se puede construir. */
     public BuildingsView buildings(GameState state) {
         List<BuildingOfferView> catalog = new ArrayList<>();
         for (BuildingType type : BuildingType.values()) {
@@ -122,7 +123,7 @@ public final class ViewMapper {
         return new BuildingsView(buildingViews(state), List.copyOf(catalog));
     }
 
-    /** The summary of the day that just ended. */
+    /** El resumen del día que acaba de terminar. */
     public DaySummaryView summary(GameState state, DayReport report) {
         List<String> highlights = new ArrayList<>();
         if (report.witheredCrops() > 0) {

@@ -15,8 +15,8 @@ import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 
 /**
- * The panel of a building: its animals with their state and the buttons Alimentar, Recolectar and Curar
- * (HU-20, HU-22, HU-23). It is modal; {@code Esc} closes it. All the logic is in {@link BuildingPresenter}.
+ * El panel de un edificio: sus animales con su estado y los botones Alimentar, Recolectar y Curar (HU-20, HU-22,
+ * HU-23). Es modal; {@code Esc} lo cierra. Toda la lógica está en {@link BuildingPresenter}.
  *
  * <p>Stories: HU-20, HU-22, HU-23.
  */
@@ -42,10 +42,10 @@ public final class BuildingDialog extends JDialog {
     private final JTable table = new JTable(rows);
 
     /**
-     * Builds the dialog.
+     * Construye el diálogo.
      *
-     * @param owner     the window it belongs to
-     * @param presenter the logic of the building panel
+     * @param owner     la ventana a la que pertenece
+     * @param presenter la lógica del panel del edificio
      */
     public BuildingDialog(Window owner, BuildingPresenter presenter) {
         super(owner, Texts.BUILDING_TITLE, ModalityType.APPLICATION_MODAL);

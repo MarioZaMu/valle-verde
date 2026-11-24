@@ -6,8 +6,8 @@ import javax.swing.JComponent;
 import javax.swing.Timer;
 
 /**
- * Eases a component in and out of its hover look: a value goes from 0 to 1 in about a tenth of a second when
- * the cursor enters and back when it leaves. Its timer only runs while the value moves.
+ * Suaviza la entrada y salida de un componente de su aspecto al pasar el cursor: un valor va de 0 a 1 en una décima de
+ * segundo cuando el cursor entra y vuelve cuando sale. Su temporizador solo corre mientras el valor se mueve.
  *
  * <p>Stories: HU-48.
  */
@@ -22,9 +22,9 @@ public final class HoverAnimator {
     private float goal;
 
     /**
-     * Starts following the cursor over a component.
+     * Empieza a seguir el cursor sobre un componente.
      *
-     * @param target the component to repaint while the value moves
+     * @param target el componente que se repinta mientras el valor se mueve
      */
     public HoverAnimator(JComponent target) {
         this.target = target;
@@ -42,12 +42,12 @@ public final class HoverAnimator {
         });
     }
 
-    /** How lit the component is now, from 0 to 1. */
+    /** Qué tan iluminado está el componente ahora, de 0 a 1. */
     public float value() {
         return value;
     }
 
-    /** How many pixels the component rises now. */
+    /** Cuántos píxeles sube ahora el componente. */
     public int lift(int most) {
         return Math.round(value * most);
     }

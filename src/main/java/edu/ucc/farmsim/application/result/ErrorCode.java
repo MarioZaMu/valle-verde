@@ -1,8 +1,8 @@
 package edu.ucc.farmsim.application.result;
 
 /**
- * Every reason an operation can be rejected (RN-35). A rejection never changes the game state, with one exception
- * that RN-36 asks for: a blocked step ({@link #MOVIMIENTO_BLOQUEADO}) still turns the avatar.
+ * Toda razón por la que se puede rechazar una operación (RN-35). Un rechazo nunca cambia el estado de la partida, con
+ * una excepción que pide RN-36: un paso bloqueado ({@link #MOVIMIENTO_BLOQUEADO}) igual hace girar al avatar.
  *
  * <p>Stories: HU-08, HU-45, HU-46, HU-47.
  */

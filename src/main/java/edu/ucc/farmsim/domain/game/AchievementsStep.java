@@ -1,8 +1,8 @@
 package edu.ucc.farmsim.domain.game;
 
 /**
- * Step 8 of the end of the day: the achievements are evaluated again, now with the new date and the new day's
- * figures, and their rewards are paid (RN-03, RN-28).
+ * Paso 8 del final del día: los logros se evalúan otra vez, ahora con la fecha nueva y las cifras del día nuevo, y se
+ * pagan sus recompensas (RN-03, RN-28).
  *
  * <p>Stories: HU-26.
  */

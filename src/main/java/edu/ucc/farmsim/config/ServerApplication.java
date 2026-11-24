@@ -3,12 +3,12 @@ package edu.ucc.farmsim.config;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * The Spring Boot application of the server: it scans {@code edu.ucc.farmsim} for the controllers,
- * services and the repository, and starts the embedded web server (DT-16).
+ * La aplicación Spring Boot del servidor: escanea {@code edu.ucc.farmsim} en busca de los controladores, servicios y el
+ * repositorio, y arranca el servidor web embebido (DT-16).
  *
  * <p>Stories: none.
  */
 @SpringBootApplication(scanBasePackages = "edu.ucc.farmsim")
 public class ServerApplication {
-    // configuration lives in ServerConfig and application.properties
+        // la configuración vive en ServerConfig y application.properties
 }

@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.swing.Timer;
 import org.junit.jupiter.api.Test;
 
-/** HU-41: crops and animals move smoothly, and the movement never touches the game (RN-08, RN-25). */
+/** HU-41: los cultivos y los animales se mueven con suavidad, y el movimiento nunca toca el juego (RN-08, RN-25). */
 class HU41AnimationsTest {
 
     private static final int W = 1024;

@@ -17,14 +17,14 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * The logic of the market dialog, without any Swing (HU-38): the rows of each tab, the quantity range, the
- * forecast total of a sale, whether a purchase can be afforded and the result messages. The dialog only draws it.
+ * La lógica del diálogo del mercado, sin nada de Swing (HU-38): las filas de cada pestaña, el rango de cantidad, el
+ * total previsto de una venta, si se puede pagar una compra y los mensajes de resultado. El diálogo solo la dibuja.
  *
  * <p>Stories: HU-14, HU-15, HU-16, HU-19, HU-38.
  */
 public final class MarketPresenter {
 
-    /** Largest quantity of a purchase (RN-16). */
+    /** Mayor cantidad de una compra (RN-16). */
     public static final int MAX_BUY = 99;
 
     private final GameCommands game;
@@ -32,15 +32,15 @@ public final class MarketPresenter {
     private int money;
 
     /**
-     * Creates the presenter.
+     * Crea el presentador.
      *
-     * @param game the game the market belongs to
+     * @param game la partida a la que pertenece el mercado
      */
     public MarketPresenter(GameCommands game) {
         this.game = game;
     }
 
-    /** Loads prices, trends and the balance again. */
+    /** Carga otra vez los precios, las tendencias y el saldo. */
     public void refresh() {
         Result<MarketView> market = game.market();
         if (market.isOk()) {
@@ -52,34 +52,36 @@ public final class MarketPresenter {
         }
     }
 
-    /** The money the player has now, as text. */
+    /** El dinero que tiene ahora el jugador, como texto. */
     public String moneyText() {
         return Texts.money(money);
     }
 
-    /** The products that can be sold. */
+    /** Los productos que se pueden vender. */
     public List<SellOfferView> sells() {
         return view.sells();
     }
 
-    /** The products that can be bought: seeds, hay and medicine, then the animals (HU-19). */
+    /** Los productos que se pueden comprar: semillas, heno y medicina, y luego los animales (HU-19). */
     public List<BuyOfferView> buys() {
         List<BuyOfferView> rows = new ArrayList<>(view.buys());
         view.animals().forEach(animal -> rows.add(new BuyOfferView(animal.animalId(), animal.name(), animal.price())));
         return rows;
     }
 
-    /** True if the id is an animal and not an item. */
+    /** Verdadero si el id es un animal y no un objeto. */
     public boolean isAnimal(String id) {
         return animal(id).isPresent();
     }
 
-    /** The price of a sale row as text, with its trend as symbol and word (HU-16 · CA-4). */
+    /** El precio de una fila de venta como texto, con su tendencia como símbolo y palabra (HU-16 · CA-4). */
     public String sellPriceText(SellOfferView offer) {
         return Texts.money(offer.unitPrice()) + " " + Texts.trend(offer.trend());
     }
 
-    /** The largest quantity the selector allows: 1 to 99 when buying, 1 up to the units owned when selling. */
+    /**
+     * La mayor cantidad que permite el selector: de 1 a 99 al comprar, de 1 hasta las unidades que se tienen al vender.
+     */
     public int maxQuantity(boolean buying, String itemId) {
         if (buying) {
             return isAnimal(itemId) ? 1 : MAX_BUY;
@@ -87,24 +89,24 @@ public final class MarketPresenter {
         return sell(itemId).map(SellOfferView::owned).orElse(0);
     }
 
-    /** "Total previsto" of selling the quantity now, or the rejection message. */
+    /** El «Total previsto» de vender la cantidad ahora, o el mensaje de rechazo. */
     public String previewSale(String itemId, int quantity) {
         Result<Integer> quote = game.quote(itemId, quantity);
         return quote.isOk() ? "Total previsto: " + Texts.money(quote.value()) : quote.message();
     }
 
-    /** What buying would cost, as text. */
+    /** Lo que costaría comprar, como texto. */
     public String previewPurchase(String itemId, int quantity) {
         return buy(itemId).map(offer -> "Total: " + Texts.money(offer.price() * quantity)).orElse("");
     }
 
-    /** Whether the player can pay for the purchase (the buy button is disabled when not, HU-38 · CA-3). */
+    /** Si el jugador puede pagar la compra (el botón de comprar se deshabilita si no, HU-38 · CA-3). */
     public boolean canBuy(String itemId, int quantity) {
         return buy(itemId).map(offer -> quantity >= 1 && quantity <= maxQuantity(true, itemId)
                 && offer.price() * quantity <= money && !noRoom(itemId)).orElse(false);
     }
 
-    /** The reason a purchase is blocked, in the words of RN-35, or an empty text if it can be made. */
+    /** La razón por la que una compra está bloqueada, con las palabras de RN-35, o un texto vacío si se puede hacer. */
     public String purchaseBlock(String itemId, int quantity) {
         Optional<BuyOfferView> offer = buy(itemId);
         if (offer.isPresent() && quantity >= 1 && offer.get().price() * quantity > money) {
@@ -116,7 +118,7 @@ public final class MarketPresenter {
         return "";
     }
 
-    /** Buys and answers the message to show; the market and the balance are reloaded. */
+    /** Compra y responde el mensaje que se muestra; el mercado y el saldo se recargan. */
     public String buyUnits(String itemId, int quantity) {
         if (isAnimal(itemId)) {
             return buyAnimal(itemId);
@@ -128,7 +130,7 @@ public final class MarketPresenter {
                 : result.message();
     }
 
-    /** Sells and answers the message to show; the market and the balance are reloaded. */
+    /** Vende y responde el mensaje que se muestra; el mercado y el saldo se recargan. */
     public String sellUnits(String itemId, int quantity) {
         String name = sell(itemId).map(SellOfferView::name).orElse(itemId);
         Result<Integer> result = game.sell(itemId, quantity);

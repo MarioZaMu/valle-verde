@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * The logic of the construction dialog, without any Swing (HU-18): the catalogue, why a building cannot be
- * built and the message after trying. The corner of the building is the plot that was clicked.
+ * La lógica del diálogo de construcción, sin nada de Swing (HU-18): el catálogo, por qué no se puede construir un
+ * edificio y el mensaje después de intentarlo. La esquina del edificio es la parcela en la que se hizo clic.
  *
  * <p>Stories: HU-18.
  */
@@ -29,11 +29,11 @@ public final class ConstructionPresenter {
     private Optional<BuildingView> lastBuilt = Optional.empty();
 
     /**
-     * Creates the presenter and loads the catalogue.
+     * Crea el presentador y carga el catálogo.
      *
-     * @param game the game
-     * @param col  column of the plot that was clicked
-     * @param row  row of the plot that was clicked
+     * @param game la partida
+     * @param col  columna de la parcela en que se hizo clic
+     * @param row  fila de la parcela en que se hizo clic
      */
     public ConstructionPresenter(GameCommands game, int col, int row) {
         this.game = game;
@@ -42,7 +42,7 @@ public final class ConstructionPresenter {
         refresh();
     }
 
-    /** Loads the catalogue and the balance again. */
+    /** Carga otra vez el catálogo y el saldo. */
     public void refresh() {
         Result<BuildingsView> buildings = game.buildings();
         if (buildings.isOk()) {
@@ -54,28 +54,28 @@ public final class ConstructionPresenter {
         }
     }
 
-    /** What can be built. */
+    /** Lo que se puede construir. */
     public List<BuildingOfferView> catalog() {
         return catalog;
     }
 
-    /** The text under the title, for example {@code Esquina en (2, 7)}. */
+    /** El texto bajo el título, por ejemplo {@code Esquina en (2, 7)}. */
     public String placeText() {
         return "Esquina superior izquierda en (" + col + ", " + row + ")";
     }
 
-    /** The money the player has now, as text. */
+    /** El dinero que tiene ahora el jugador, como texto. */
     public String moneyText() {
         return Texts.money(money);
     }
 
-    /** The row of an offer as the table shows it. */
+    /** La fila de una oferta tal como la muestra la tabla. */
     public Object[] row(BuildingOfferView offer) {
         return new Object[] {offer.name(), Texts.size(offer.width(), offer.height()), Texts.money(offer.cost()),
                 state(offer)};
     }
 
-    /** What the state column says: locked (and why), the limit reached, or how many are built. */
+    /** Lo que dice la columna de estado: bloqueado (y por qué), el límite alcanzado, o cuántos hay construidos. */
     public String state(BuildingOfferView offer) {
         if (!offer.unlocked()) {
             return "Bloqueado: requiere el logro «" + offer.requirement() + "»";
@@ -83,7 +83,10 @@ public final class ConstructionPresenter {
         return offer.built() + "/" + offer.max() + " construidos";
     }
 
-    /** The reason the building cannot be built now, in the words of RN-35, or an empty text if it can. */
+    /**
+     * La razón por la que ahora no se puede construir el edificio, con las palabras de RN-35, o un texto vacío si se
+     * puede.
+     */
     public String block(BuildingOfferView offer) {
         if (!offer.unlocked()) {
             return Messages.of(ErrorCode.EDIFICIO_BLOQUEADO, offer.requirement());
@@ -97,15 +100,15 @@ public final class ConstructionPresenter {
         return "";
     }
 
-    /** Whether the build button is enabled for the offer. */
+    /** Si el botón de construir está habilitado para la oferta. */
     public boolean canBuild(BuildingOfferView offer) {
         return block(offer).isEmpty();
     }
 
     /**
-     * Builds at the clicked plot.
+     * Construye en la parcela donde se hizo clic.
      *
-     * @return the message to show; the result is available through {@link #lastBuilt()}
+     * @return el mensaje que se muestra; el resultado está disponible mediante {@link #lastBuilt()}
      */
     public String build(BuildingOfferView offer) {
         Result<BuildingView> result = game.build(offer.type(), col, row);
@@ -114,7 +117,7 @@ public final class ConstructionPresenter {
         return result.isOk() ? "Construiste: " + offer.name() + "." : result.message();
     }
 
-    /** The building the last successful {@link #build} created. */
+    /** El edificio que creó el último {@link #build} exitoso. */
     public Optional<BuildingView> lastBuilt() {
         return lastBuilt;
     }

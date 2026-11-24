@@ -11,18 +11,18 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-/** HU-13: manage the inventory (24 slots, one item type per slot, stacks of up to 99). */
+/** HU-13: administrar el inventario (24 casillas, un tipo de objeto por casilla, pilas de hasta 99). */
 class HU13InventoryManagementTest {
 
     @Test
     void HU13_ca1_stacksUpTo99PerSlot() {
-        // Given an empty inventory of 24 slots
+                // Dado un inventario vacío de 24 casillas
         Inventory inventory = new Inventory(GameRules.INVENTORY_BASE_SLOTS);
 
-        // When 120 carrots are inserted
+                // Cuando se insertan 120 zanahorias
         boolean inserted = inventory.add(ItemType.CARROT, 120);
 
-        // Then they occupy 2 slots: one of 99 and one of 21
+                // Entonces ocupan 2 casillas: una de 99 y una de 21
         assertTrue(inserted);
         assertEquals(120, inventory.count(ItemType.CARROT));
         assertEquals(List.of(99, 21), inventory.stacks().stream().map(s -> s.amount()).toList());
@@ -30,17 +30,17 @@ class HU13InventoryManagementTest {
 
     @Test
     void HU13_ca2_insertionIsAtomicWhenItDoesNotFit() {
-        // Given a carrot stack of 98 and the other 23 slots full of other items
+                // Dada una pila de 98 zanahorias y las otras 23 casillas llenas de otros objetos
         Inventory inventory = new Inventory(GameRules.INVENTORY_BASE_SLOTS);
         assertTrue(inventory.add(ItemType.MILK, GameRules.MAX_STACK * 10));
         assertTrue(inventory.add(ItemType.HAY, GameRules.MAX_STACK * 13));
         assertTrue(inventory.add(ItemType.CARROT, 98));
         assertEquals(GameRules.INVENTORY_BASE_SLOTS, inventory.usedSlots());
 
-        // When 3 more carrots are inserted (only 1 fits)
+                // Cuando se insertan 3 zanahorias más (solo cabe 1)
         boolean inserted = inventory.add(ItemType.CARROT, 3);
 
-        // Then it is rejected and the stack stays at 98: not even one carrot is inserted
+                // Entonces se rechaza y la pila queda en 98: ni siquiera se inserta una zanahoria
         assertFalse(inserted);
         assertEquals(98, inventory.count(ItemType.CARROT));
     }
@@ -51,11 +51,11 @@ class HU13InventoryManagementTest {
         Inventory inventory = new Inventory(GameRules.INVENTORY_BASE_SLOTS);
         inventory.add(ItemType.CARROT, 120);
 
-        // When 30 are removed, then 90 remain
+                // Cuando se quitan 30, entonces quedan 90
         assertTrue(inventory.remove(ItemType.CARROT, 30));
         assertEquals(90, inventory.count(ItemType.CARROT));
 
-        // And removing 130 is rejected and leaves the 90 untouched
+                // Y quitar 130 se rechaza y deja las 90 intactas
         assertFalse(inventory.remove(ItemType.CARROT, 130));
         assertEquals(90, inventory.count(ItemType.CARROT));
     }
@@ -65,16 +65,16 @@ class HU13InventoryManagementTest {
         // Given a new standard inventory
         Inventory inventory = Inventory.standard();
 
-        // Then it has 24 slots and a maximum stack of 99
+                // Entonces tiene 24 casillas y una pila máxima de 99
         assertEquals(24, inventory.capacity());
         assertEquals(99, GameRules.MAX_STACK);
 
-        // And there are 14 item types: 5 seeds, 5 crops, egg, milk, hay and medicine
+                // Y hay 14 tipos de objeto: 5 semillas, 5 cultivos, huevo, leche, heno y medicina
         assertEquals(14, ItemType.values().length);
         assertEquals(5, Arrays.stream(ItemType.values()).filter(t -> t.kind() == ItemType.Kind.SEED).count());
         assertEquals(5, Arrays.stream(ItemType.values()).filter(t -> t.kind() == ItemType.Kind.CROP).count());
 
-        // And each slot admits a single type: two types never share a slot
+                // Y cada casilla admite un solo tipo: dos tipos nunca comparten casilla
         inventory.add(ItemType.CARROT, 1);
         inventory.add(ItemType.EGG, 1);
         assertEquals(2, inventory.usedSlots());

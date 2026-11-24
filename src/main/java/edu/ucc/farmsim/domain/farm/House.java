@@ -3,40 +3,39 @@ package edu.ucc.farmsim.domain.farm;
 import edu.ucc.farmsim.domain.config.GameRules;
 
 /**
- * The houses of the valley (RN-04): yours on the farm and four in the village, where the people live. Their
- * plots are {@link Terrain#HOUSE}: nobody walks, sows or builds there. Positions come from
- * {@link GameRules#HOUSES}.
+ * Las casas del valle (RN-04): la tuya en la granja y cuatro en la aldea, donde viven las personas. Sus parcelas son
+ * {@link Terrain#HOUSE}: nadie camina, siembra ni construye allí. Las posiciones salen de {@link GameRules#HOUSES}.
  *
  * <p>Stories: HU-50.
  */
 public enum House {
-    /** Your house, on the farm. */
+    /** Tu casa, en la granja. */
     HOME,
-    /** The shop of Marta. */
+    /** La tienda de Marta. */
     SHOP,
-    /** The house of Don Tomás. */
+    /** La casa de Don Tomás. */
     FARMHOUSE,
-    /** The clinic of Dra. Lucía. */
+    /** La clínica de la Dra. Lucía. */
     CLINIC,
-    /** The house of Inés. */
+    /** La casa de Inés. */
     COTTAGE;
 
-    /** Column of the top-left plot. */
+    /** Columna de la parcela superior izquierda. */
     public int col() {
         return GameRules.HOUSES[ordinal()][0];
     }
 
-    /** Row of the top-left plot. */
+    /** Fila de la parcela superior izquierda. */
     public int row() {
         return GameRules.HOUSES[ordinal()][1];
     }
 
-    /** Width in plots. */
+    /** Ancho en parcelas. */
     public int width() {
         return GameRules.HOUSES[ordinal()][2];
     }
 
-    /** Height in plots. */
+    /** Alto en parcelas. */
     public int height() {
         return GameRules.HOUSES[ordinal()][3];
     }

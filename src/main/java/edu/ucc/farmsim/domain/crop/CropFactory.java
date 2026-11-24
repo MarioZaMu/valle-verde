@@ -3,17 +3,17 @@ package edu.ucc.farmsim.domain.crop;
 /**
  * Pattern: Factory Method — Role: Creator (declares the factory method that builds a crop).
  *
- * <p>Sowing only knows this class: each concrete creator decides which kind of crop to build, so a new crop
- * does not force changes in the code that sows.
+ * <p>Sembrar solo conoce esta clase: cada creador concreto decide qué tipo de cultivo construir, de modo que un cultivo
+ * nuevo no obliga a cambiar el código que siembra.
  *
  * <p>Stories: HU-01.
  */
 public abstract class CropFactory {
 
-    /** The factory method: builds a new crop in the Seed stage. */
+    /** El método fábrica: construye un cultivo nuevo en la etapa Semilla. */
     public abstract Crop createCrop();
 
-    /** Returns the creator of a kind of crop. */
+    /** Devuelve el creador de un tipo de cultivo. */
     public static CropFactory forType(CropType type) {
         return switch (type) {
             case CARROT -> CarrotFactory.INSTANCE;

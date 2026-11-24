@@ -29,7 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-/** HU-46 and HU-47 on the screen: E or a click opens the dialogue, which delivers the errand; the map draws them. */
+/** HU-46 y HU-47 en pantalla: E o un clic abre el diálogo, que entrega el encargo; el mapa las dibuja. */
 class HU46NpcScreenTest {
 
     private static final int W = 1024;

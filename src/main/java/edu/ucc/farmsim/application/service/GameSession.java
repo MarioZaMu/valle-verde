@@ -4,8 +4,8 @@ import edu.ucc.farmsim.domain.game.GameState;
 import org.springframework.stereotype.Component;
 
 /**
- * Holds the game currently being played. Services read the state from here; loading a game builds a new
- * state on the side and swaps it in with {@link #replace(GameState)} only when it is complete and valid.
+ * Guarda la partida que se está jugando. Los servicios leen el estado desde aquí; cargar una partida construye un
+ * estado nuevo aparte y lo cambia con {@link #replace(GameState)} solo cuando está completo y es válido.
  *
  * <p>Stories: HU-28.
  */
@@ -14,15 +14,15 @@ public class GameSession {
 
     private GameState current;
 
-    /** True if a game is in progress. */
+    /** Verdadero si hay una partida en curso. */
     public boolean hasGame() {
         return current != null;
     }
 
     /**
-     * The game in progress.
+     * La partida en curso.
      *
-     * @throws IllegalStateException if there is none (callers check {@link #hasGame()} first)
+     * @throws IllegalStateException si no hay ninguna (quien llama comprueba antes {@link #hasGame()})
      */
     public GameState current() {
         if (current == null) {
@@ -31,7 +31,7 @@ public class GameSession {
         return current;
     }
 
-    /** Makes the given state the game in progress. */
+    /** Convierte el estado dado en la partida en curso. */
     public void replace(GameState state) {
         this.current = state;
     }

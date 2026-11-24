@@ -3,11 +3,11 @@ package edu.ucc.farmsim.application.dto;
 import java.util.List;
 
 /**
- * The inventory as a grid: how many slots there are and the occupied ones in order; the rest are empty.
+ * El inventario como una grilla: cuántas casillas hay y las ocupadas en orden; el resto están vacías.
  *
  * <p>Stories: HU-37.
  *
- * @param capacity number of slots (24, or 36 with a warehouse)
- * @param slots    the occupied slots, in slot order
+ * @param capacity número de casillas (24, o 36 con un almacén)
+ * @param slots    las casillas ocupadas, en orden de casilla
  */
 public record InventoryView(int capacity, List<SlotView> slots) { }

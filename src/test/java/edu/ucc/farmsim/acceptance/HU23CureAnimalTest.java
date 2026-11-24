@@ -15,7 +15,7 @@ import edu.ucc.farmsim.support.GameFixtures;
 import edu.ucc.farmsim.support.TestApp;
 import org.junit.jupiter.api.Test;
 
-/** HU-23: curing a sick animal with medicine (RN-02, RN-16, RN-27). */
+/** HU-23: curar a un animal enfermo con medicina (RN-02, RN-16, RN-27). */
 class HU23CureAnimalTest {
 
     private static Animal sickHen(TestApp app, int medicines) {

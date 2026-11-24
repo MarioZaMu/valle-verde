@@ -10,8 +10,8 @@ import edu.ucc.farmsim.domain.game.GameState;
 import org.springframework.stereotype.Service;
 
 /**
- * Walking with the avatar (RN-36). A step costs no energy and does not move the calendar. When the way is
- * blocked the step is rejected, but the avatar still turns to look there, as the rule asks.
+ * Caminar con el avatar (RN-36). Un paso no cuesta energía ni mueve el calendario. Cuando el camino está bloqueado el
+ * paso se rechaza, pero el avatar igual gira para mirar hacia allí, como pide la regla.
  *
  * <p>Stories: HU-45.
  */
@@ -23,11 +23,11 @@ public final class AvatarService {
     private final EventBus events;
 
     /**
-     * Creates the service.
+     * Crea el servicio.
      *
-     * @param session the game in progress
-     * @param mapper  builds the views the UI draws
-     * @param events  where events are published
+     * @param session la partida en curso
+     * @param mapper  construye las vistas que dibuja la UI
+     * @param events  donde se publican los eventos
      */
     public AvatarService(GameSession session, ViewMapper mapper, EventBus events) {
         this.session = session;
@@ -36,10 +36,10 @@ public final class AvatarService {
     }
 
     /**
-     * One step of the avatar.
+     * Un paso del avatar.
      *
      * @param directionId {@code NORTH}, {@code SOUTH}, {@code EAST} or {@code WEST}
-     * @return where it stands now; {@code MOVIMIENTO_BLOQUEADO} if the plot there cannot be walked on
+     * @return dónde está ahora; {@code MOVIMIENTO_BLOQUEADO} si no se puede caminar sobre la parcela de ese lado
      */
     public Result<AvatarView> move(String directionId) {
         if (!session.hasGame()) {

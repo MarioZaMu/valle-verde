@@ -6,8 +6,8 @@ import java.util.Random;
 /**
  * Pattern: Strategy — Role: ConcreteStrategy (seasonal probability table).
  *
- * <p>Draws the weather from the percentage table of a season (RN-11); in Autumn the table changes on
- * day {@link GameRules#AUTUMN_FROST_FROM_DAY}, when frost becomes possible.
+ * <p>Sortea el clima a partir de la tabla de porcentajes de una estación (RN-11); en otoño la tabla cambia el día
+ * {@link GameRules#AUTUMN_FROST_FROM_DAY}, cuando la helada se vuelve posible.
  *
  * <p>Stories: HU-11.
  */
@@ -16,9 +16,9 @@ public final class SeasonalWeatherStrategy implements WeatherStrategy {
     private final Season season;
 
     /**
-     * Creates the strategy of a season.
+     * Crea la estrategia de una estación.
      *
-     * @param season season whose table is used
+     * @param season estación cuya tabla se usa
      */
     public SeasonalWeatherStrategy(Season season) {
         this.season = season;

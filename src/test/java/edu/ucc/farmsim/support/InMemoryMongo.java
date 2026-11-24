@@ -16,9 +16,9 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 
 /**
- * A MongoDB that lives in a map: the real {@link MongoSaveRepository} (codec, checksum, format) runs on top of
- * it, so saving, loading and damaged documents are tested end to end without a database. Tests can read and
- * change the stored documents, or make the "server" stop answering.
+ * Un MongoDB que vive en un mapa: encima de él corre el {@link MongoSaveRepository} real (codec, suma de control,
+ * formato), de modo que guardar, cargar y los documentos dañados se prueban de punta a punta sin base de datos. Las
+ * pruebas pueden leer y cambiar los documentos guardados, o hacer que el «servidor» deje de responder.
  */
 public final class InMemoryMongo {
 
@@ -27,7 +27,7 @@ public final class InMemoryMongo {
     private boolean down;
     private final MongoSaveRepository repository;
 
-    /** Creates an empty database and the repository over it. */
+    /** Crea una base de datos vacía y el repositorio sobre ella. */
     public InMemoryMongo() {
         when(template.save(any(SaveDocument.class))).thenAnswer(call -> {
             failIfDown();
@@ -54,32 +54,32 @@ public final class InMemoryMongo {
         }
     }
 
-    /** The repository the application uses. */
+    /** El repositorio que usa la aplicación. */
     public MongoSaveRepository repository() {
         return repository;
     }
 
-    /** The document stored in a slot, or {@code null}. */
+    /** El documento guardado en una ranura, o {@code null}. */
     public SaveDocument document(int slot) {
         return documents.get(SaveDocument.idOf(slot));
     }
 
-    /** Replaces the document of a slot with a changed copy (to damage it). */
+    /** Reemplaza el documento de una ranura por una copia cambiada (para dañarlo). */
     public void tamper(int slot, UnaryOperator<SaveDocument> change) {
         documents.compute(SaveDocument.idOf(slot), (id, old) -> change.apply(old));
     }
 
-    /** Stores a document as it is. */
+    /** Guarda un documento tal como está. */
     public void put(SaveDocument document) {
         documents.put(document.id(), document);
     }
 
-    /** Makes the "server" stop answering, as if it timed out. */
+    /** Hace que el «servidor» deje de responder, como si se agotara el tiempo. */
     public void goDown() {
         down = true;
     }
 
-    /** Makes the "server" answer again. */
+    /** Hace que el «servidor» vuelva a responder. */
     public void comeBack() {
         down = false;
     }

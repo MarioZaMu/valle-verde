@@ -15,7 +15,7 @@ import edu.ucc.farmsim.support.GameFixtures;
 import edu.ucc.farmsim.support.TestApp;
 import org.junit.jupiter.api.Test;
 
-/** HU-22: healthy, fed animals produce and the player collects (RN-02, RN-15, RN-26). */
+/** HU-22: los animales sanos y alimentados producen y el jugador recoge (RN-02, RN-15, RN-26). */
 class HU22ProductionTest {
 
     @Test
@@ -27,11 +27,11 @@ class HU22ProductionTest {
         app.state().inventory().add(ItemType.HAY, 1);
         app.controller.feed(coop.id());
 
-        // When the day ends the coop holds 1 egg
+                // Cuando termina el día el gallinero tiene 1 huevo
         app.controller.endDay();
         assertEquals(1, coop.pendingProducts());
 
-        // And when the player collects, the inventory gains 1 egg and the energy drops by 1
+                // Y cuando el jugador recoge, el inventario gana 1 huevo y la energía baja 1
         Result<BuildingActionView> result = app.controller.collect(coop.id());
         assertTrue(result.isOk(), String.valueOf(result.message()));
         assertEquals(1, result.value().amount());
@@ -47,10 +47,10 @@ class HU22ProductionTest {
         Building coop = GameFixtures.coop(app.state());
         GameFixtures.house(coop, AnimalType.HEN, AnimalCondition.SICK, 3, false, 0);
 
-        // When the day ends
+                // Cuando termina el día
         app.controller.endDay();
 
-        // Then the coop has no pending product
+                // Entonces el gallinero no tiene producto pendiente
         assertEquals(0, coop.pendingProducts());
     }
 

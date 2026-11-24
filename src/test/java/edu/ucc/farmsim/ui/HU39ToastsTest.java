@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.Test;
 
-/** HU-39: short notices that appear and fade without interrupting the game. */
+/** HU-39: avisos cortos que aparecen y se desvanecen sin interrumpir el juego. */
 class HU39ToastsTest {
 
     private final AtomicLong now = new AtomicLong(1_000);

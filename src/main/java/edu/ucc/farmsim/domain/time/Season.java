@@ -1,7 +1,7 @@
 package edu.ucc.farmsim.domain.time;
 
 /**
- * The four seasons, in calendar order (RN-01).
+ * Las cuatro estaciones, en orden de calendario (RN-01).
  *
  * <p>Stories: HU-09.
  */

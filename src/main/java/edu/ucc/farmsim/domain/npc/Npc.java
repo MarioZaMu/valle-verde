@@ -4,8 +4,8 @@ import edu.ucc.farmsim.domain.config.GameRules;
 import edu.ucc.farmsim.domain.economy.ItemType;
 
 /**
- * The four people of the valley (RN-37): each one stands still on a grass plot of the configuration, blocks the
- * way of the avatar and offers one errand (RN-38): bring a quantity of an item and get a reward in m.
+ * Las cuatro personas del valle (RN-37): cada una está quieta en una parcela de pasto de la configuración, bloquea el
+ * paso del avatar y ofrece un encargo (RN-38): traer una cantidad de un objeto y recibir una recompensa en m.
  *
  * <p>Stories: HU-46, HU-47.
  */
@@ -33,37 +33,37 @@ public enum Npc {
         this.errandReward = errandReward;
     }
 
-    /** Column of the plot where it stands. */
+    /** Columna de la parcela donde está. */
     public int col() {
         return col;
     }
 
-    /** Row of the plot where it stands. */
+    /** Fila de la parcela donde está. */
     public int row() {
         return row;
     }
 
-    /** What its errand asks for. */
+    /** Lo que pide su encargo. */
     public ItemType errandItem() {
         return errandItem;
     }
 
-    /** How many units its errand asks for. */
+    /** Cuántas unidades pide su encargo. */
     public int errandAmount() {
         return errandAmount;
     }
 
-    /** What it pays, in m, when the errand is delivered. */
+    /** Lo que paga, en m, cuando se entrega el encargo. */
     public int errandReward() {
         return errandReward;
     }
 
-    /** True if the plot is one of its four neighbours, the only places from where it can be talked to. */
+    /** Verdadero si la parcela es una de sus cuatro vecinas, los únicos lugares desde donde se le puede hablar. */
     public boolean isNextTo(int otherCol, int otherRow) {
         return Math.abs(otherCol - col) + Math.abs(otherRow - row) == 1;
     }
 
-    /** The person standing on the plot, or {@code null}. */
+    /** La persona que está sobre la parcela, o {@code null}. */
     public static Npc at(int col, int row) {
         for (Npc npc : values()) {
             if (npc.col == col && npc.row == row) {
@@ -73,7 +73,7 @@ public enum Npc {
         return null;
     }
 
-    /** True if someone stands on a plot of the area whose top-left plot and size are given. */
+    /** Verdadero si alguien está sobre una parcela del área cuya parcela superior izquierda y tamaño se dan. */
     public static boolean anyInside(int left, int top, int width, int height) {
         for (Npc npc : values()) {
             if (npc.col >= left && npc.col < left + width && npc.row >= top && npc.row < top + height) {

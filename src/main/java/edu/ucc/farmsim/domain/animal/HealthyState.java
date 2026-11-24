@@ -3,18 +3,18 @@ package edu.ucc.farmsim.domain.animal;
 /**
  * Pattern: State — Role: ConcreteState (healthy).
  *
- * <p>A fed animal recovers and produces; one that was not fed counts a day without food and, at the limit
- * of RN-25, falls sick.
+ * <p>Un animal alimentado se recupera y produce; uno que no fue alimentado cuenta un día sin comida y, en el límite de
+ * RN-25, se enferma.
  *
  * <p>Stories: HU-21, HU-22.
  */
 final class HealthyState implements AnimalState {
 
-    /** The only instance (the state has no data). */
+    /** La única instancia (el estado no tiene datos). */
     static final HealthyState INSTANCE = new HealthyState();
 
     private HealthyState() {
-        // shared instance
+                // instancia compartida
     }
 
     @Override

@@ -25,8 +25,8 @@ import javax.swing.JLabel;
 import org.junit.jupiter.api.Test;
 
 /**
- * HU-34: the top bar shows money, date, weather and energy and updates when it receives events.
- * The model ({@link HudModel}) is an observer with no Swing, so it is tested without a display.
+ * HU-34: la barra superior muestra dinero, fecha, clima y energía y se actualiza cuando recibe eventos. El modelo
+ * ({@link HudModel}) es un observador sin Swing, así que se prueba sin pantalla.
  */
 class HU34HudTest {
 
@@ -34,15 +34,15 @@ class HU34HudTest {
 
     @Test
     void HU34_ca1_aNewGameShowsMoneyDateWeatherForecastAndFullEnergy() {
-        // Given a HUD listening to the event bus
+                // Dado un HUD que escucha el bus de eventos
         TestApp app = TestApp.create();
         HudModel hud = new HudModel();
         app.bus.subscribe(hud);
 
-        // When a new game starts
+                // Cuando empieza una partida nueva
         app.controller.newGame(TestApp.SEED);
 
-        // Then the HUD shows 500 m, Year 1 Spring Day 1, Sunny with a forecast, and energy 100/100
+                // Entonces el HUD muestra 500 m, Año 1 Primavera Día 1, Sunny con un pronóstico, y energía 100/100
         assertEquals("500 m", hud.moneyText());
         assertEquals("Año 1 · Primavera · Día 1", hud.dateText());
         assertEquals("Soleado", hud.weatherText());
@@ -53,16 +53,16 @@ class HU34HudTest {
 
     @Test
     void HU34_ca2_energyChangesAreShownWhenTheEventArrivesWithoutAnyPolling() {
-        // Given a HUD with a game started
+                // Dado un HUD con una partida iniciada
         TestApp app = TestApp.create();
         HudModel hud = new HudModel();
         app.bus.subscribe(hud);
         app.controller.newGame(TestApp.SEED);
 
-        // When an action lowers the energy to 98 and the event is published
+                // Cuando una acción baja la energía a 98 y se publica el evento
         app.bus.publish(new GameEvent.EnergyChanged(98, 100));
 
-        // Then the HUD shows 98/100 and its bar is at 98 %
+                // Entonces el HUD muestra 98/100 y su barra está al 98 %
         assertEquals("98/100", hud.energyText());
         assertEquals(0.98, hud.energyFraction(), 0.0001);
         assertEquals("500 m", hud.moneyText());
@@ -70,17 +70,17 @@ class HU34HudTest {
 
     @Test
     void HU34_ca2_aSaleShowsTheNewMoneyAsSoonAsItsEventArrives() {
-        // Given a HUD with a game started and 3 carrots to sell
+                // Dado un HUD con una partida iniciada y 3 zanahorias para vender
         TestApp app = TestApp.create();
         HudModel hud = new HudModel();
         app.bus.subscribe(hud);
         app.controller.newGame(TestApp.SEED);
         app.state().inventory().add(edu.ucc.farmsim.domain.economy.ItemType.CARROT, 3);
 
-        // When the player sells them
+                // Cuando el jugador las vende
         int earned = app.controller.sell("CARROT", 3).value();
 
-        // Then the HUD shows the new balance without waiting for the end of the day
+                // Entonces el HUD muestra el nuevo saldo sin esperar al final del día
         assertEquals((500 + earned) + " m", hud.moneyText());
         assertEquals("100/100", hud.energyText(), "the rest of the HUD stays");
     }
@@ -105,10 +105,10 @@ class HU34HudTest {
         app.bus.subscribe(hud);
         app.controller.newGame(TestApp.SEED);
 
-        // When the day ends
+                // Cuando termina el día
         Result<HudView> result = app.controller.endDay();
 
-        // Then the HUD shows day 2 and the forecast that was drawn
+                // Entonces el HUD muestra el día 2 y el pronóstico que se sorteó
         assertEquals("Año 1 · Primavera · Día 2", hud.dateText());
         assertEquals(Texts.weather(result.value().weather()), hud.weatherText());
         assertEquals("Mañana: " + Texts.weather(result.value().forecast()), hud.forecastText());
@@ -146,7 +146,7 @@ class HU34HudTest {
         HudPanel panel = new HudPanel(app.bus);
 
         app.controller.newGame(TestApp.SEED);
-        javax.swing.SwingUtilities.invokeAndWait(() -> { }); // let the panel finish its refresh on the Swing thread
+        javax.swing.SwingUtilities.invokeAndWait(() -> { }); // deja que el panel termine su actualización en el hilo de Swing
 
         List<String> texts = new ArrayList<>();
         collectLabels(panel, texts);
@@ -160,7 +160,7 @@ class HU34HudTest {
         List<String> messages = new ArrayList<>();
         GameScreenPresenter presenter = new GameScreenPresenter(app.controller, new edu.ucc.farmsim.ui.components.ToolModel(), messages::add, NO_DIALOGS);
 
-        presenter.onEndDay(); // no game in progress
+        presenter.onEndDay(); // sin partida en curso
         assertEquals(List.of("No hay una partida en curso."), messages);
 
         messages.clear();

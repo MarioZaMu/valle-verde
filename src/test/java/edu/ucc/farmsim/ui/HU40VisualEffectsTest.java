@@ -25,7 +25,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.Test;
 
-/** HU-40: the season and the weather are seen on the map, and only on the map (RN-01, RN-11, RN-12). */
+/** HU-40: la estación y el clima se ven en el mapa, y solo en el mapa (RN-01, RN-11, RN-12). */
 class HU40VisualEffectsTest {
 
     private static final int W = 1024;

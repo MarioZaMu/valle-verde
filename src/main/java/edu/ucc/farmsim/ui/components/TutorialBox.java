@@ -15,17 +15,19 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
 /**
- * The avatar's box of the start tutorial (HU-49): the farmer's portrait, "Paso n de 5", what to do now and the
- * button "Saltar tutorial". It floats in the top left corner of the farm while the tutorial runs and hides
- * itself when it ends. It follows the game through its events; the logic is in {@link TutorialPresenter}.
+ * El cuadro del avatar del tutorial de inicio (HU-49): el retrato del granjero, «Paso n de 5», qué hacer ahora y el
+ * botón «Saltar tutorial». Flota en la esquina superior izquierda de la granja mientras corre el tutorial y se oculta
+ * solo cuando termina. Sigue la partida mediante sus eventos; la lógica está en {@link TutorialPresenter}.
  *
  * <p>Stories: HU-49.
  */
 public final class TutorialBox extends WoodBox implements GameListener {
 
-    /** Widest the box gets, so it fits next to the top bar in a window of 1024 x 768. */
+    /**
+     * Lo más ancho que llega a ser el cuadro, para que quepa junto a la barra superior en una ventana de 1024 x 768.
+     */
     public static final int MAX_WIDTH = 480;
-    /** Tallest the box gets. */
+    /** Lo más alto que llega a ser el cuadro. */
     public static final int MAX_HEIGHT = 140;
 
     private static final long serialVersionUID = 1L;
@@ -39,9 +41,9 @@ public final class TutorialBox extends WoodBox implements GameListener {
     private final WoodButton skip = new WoodButton(Texts.SKIP_TUTORIAL);
 
     /**
-     * Builds the box, hidden until {@link #refresh()} finds a tutorial running.
+     * Construye el cuadro, oculto hasta que {@link #refresh()} encuentre un tutorial en marcha.
      *
-     * @param presenter the logic of the box
+     * @param presenter la lógica del cuadro
      */
     public TutorialBox(TutorialPresenter presenter) {
         super(new BorderLayout(10, 2));
@@ -80,7 +82,7 @@ public final class TutorialBox extends WoodBox implements GameListener {
         setVisible(false);
     }
 
-    /** Asks the game for the tutorial and shows or hides the box. */
+    /** Le pide el tutorial a la partida y muestra u oculta el cuadro. */
     public void refresh() {
         presenter.reload();
         update();
@@ -98,7 +100,7 @@ public final class TutorialBox extends WoodBox implements GameListener {
         }
     }
 
-    /** On the Swing thread; a box that is not on the screen yet (or in a test) is changed right away. */
+    /** En el hilo de Swing; un cuadro que todavía no está en pantalla (o en una prueba) se cambia de inmediato. */
     private void onSwing(Runnable change) {
         if (SwingUtilities.isEventDispatchThread() || !isDisplayable()) {
             change.run();
@@ -130,22 +132,22 @@ public final class TutorialBox extends WoodBox implements GameListener {
         return new Dimension(Math.min(MAX_WIDTH, size.width), size.height);
     }
 
-    /** "Paso n de 5" as shown. */
+    /** «Paso n de 5» tal como se muestra. */
     public String stepText() {
         return step.getText();
     }
 
-    /** What the avatar says, as shown. */
+    /** Lo que dice el avatar, tal como se muestra. */
     public String messageText() {
         return message.getText();
     }
 
-    /** The button that skips the tutorial. */
+    /** El botón que salta el tutorial. */
     public WoodButton skipButton() {
         return skip;
     }
 
-    /** True if the farmer's portrait is drawn (it is missing only without sprites). */
+    /** Verdadero si se dibuja el retrato del granjero (solo falta cuando no hay sprites). */
     public boolean hasPortrait() {
         return portrait.getIcon() != null;
     }

@@ -1,11 +1,11 @@
 package edu.ucc.farmsim.ui.render;
 
 /**
- * Coordinates of a plot on the map.
+ * Coordenadas de una parcela en el mapa.
  *
  * <p>Stories: HU-35.
  *
- * @param col column
- * @param row row
+ * @param col columna
+ * @param row fila
  */
 public record CellPos(int col, int row) { }

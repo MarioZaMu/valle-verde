@@ -13,12 +13,12 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 /**
- * Hosts the screens and switches between them (a card layout). It is the real {@link ScreenNavigator}:
- * it shows dialogs with Swing and closes the window when the player exits.
+ * Aloja las pantallas y alterna entre ellas (un diseño de tarjetas). Es el {@link ScreenNavigator} real: muestra
+ * diálogos con Swing y cierra la ventana cuando el jugador sale.
  *
- * <p>The start screen asks the server nothing, so it is shown at once; the game screen, which reads the map and
- * the tutorial when it is built, is built once the server is up, or earlier if the player presses a button
- * before (RNF-02).
+ * <p>La pantalla de inicio no le pide nada al servidor, así que se muestra de inmediato; la pantalla de juego, que lee
+ * el mapa y el tutorial al construirse, se construye cuando el servidor está listo, o antes si el jugador pulsa un
+ * botón primero (RNF-02).
  *
  * <p>Stories: HU-33.
  */
@@ -34,24 +34,25 @@ public final class ScreenRouter extends JPanel implements ScreenNavigator {
     private boolean gameBuilt;
 
     /**
-     * Builds the router with its screens, showing the start screen first.
+     * Construye el enrutador con sus pantallas, mostrando primero la pantalla de inicio.
      *
-     * @param controller entry point to the game
-     * @param bus        where game events are published
-     * @param seeds      supplies the seed of each new game
+     * @param controller punto de entrada al juego
+     * @param bus        donde se publican los eventos del juego
+     * @param seeds      provee la semilla de cada partida nueva
      */
     public ScreenRouter(GameCommands controller, EventBus bus, LongSupplier seeds) {
         this(controller, bus, seeds, CompletableFuture.completedFuture(null));
     }
 
     /**
-     * Builds the router for a server that may still be starting: the start screen shows at once and the game
-     * screen is built when {@code serverReady} completes (or when the player first presses a button).
+     * Construye el enrutador para un servidor que quizá todavía esté arrancando: la pantalla de inicio se muestra de
+     * inmediato y la pantalla de juego se construye cuando se completa {@code serverReady} (o cuando el jugador pulsa
+     * un botón por primera vez).
      *
-     * @param controller  entry point to the game
-     * @param bus         where game events are published
-     * @param seeds       supplies the seed of each new game
-     * @param serverReady completes when the server answers
+     * @param controller  punto de entrada al juego
+     * @param bus         donde se publican los eventos del juego
+     * @param seeds       provee la semilla de cada partida nueva
+     * @param serverReady se completa cuando el servidor responde
      */
     public ScreenRouter(GameCommands controller, EventBus bus, LongSupplier seeds, CompletionStage<?> serverReady) {
         this.controller = controller;

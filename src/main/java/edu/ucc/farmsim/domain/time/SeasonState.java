@@ -3,22 +3,22 @@ package edu.ucc.farmsim.domain.time;
 /**
  * Pattern: State — Role: State interface (the behaviour that changes with the season).
  *
- * <p>Each season knows which season follows it. The state objects are stateless and shared.
+ * <p>Cada estación sabe qué estación le sigue. Los objetos de estado no guardan datos y se comparten.
  *
  * <p>Stories: HU-09, HU-11.
  */
 public interface SeasonState {
 
-    /** The season this state represents. */
+    /** La estación que representa este estado. */
     Season season();
 
-    /** The state that follows this one in the calendar (Winter is followed by Spring). */
+    /** El estado que sigue a este en el calendario (después del Invierno viene la Primavera). */
     SeasonState next();
 
-    /** The strategy that draws the weather of days in this season (RN-11). */
+    /** La estrategia que sortea el clima de los días de esta estación (RN-11). */
     WeatherStrategy weatherStrategy();
 
-    /** Returns the shared state object of a season. */
+    /** Devuelve el objeto de estado compartido de una estación. */
     static SeasonState of(Season season) {
         return switch (season) {
             case SPRING -> SpringState.INSTANCE;

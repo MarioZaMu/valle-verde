@@ -7,7 +7,7 @@ import java.awt.Graphics2D;
 import javax.swing.JButton;
 
 /**
- * A wooden button: it lights up and rises a little when the cursor is on it, and sinks when pressed.
+ * Un botón de madera: se ilumina y sube un poco cuando el cursor está encima, y se hunde al pulsarlo.
  *
  * <p>Stories: HU-33, HU-48.
  */
@@ -19,9 +19,9 @@ public class WoodButton extends JButton {
     private final transient HoverAnimator hover = new HoverAnimator(this);
 
     /**
-     * Creates the button.
+     * Crea el botón.
      *
-     * @param text what it says
+     * @param text lo que dice
      */
     public WoodButton(String text) {
         super(text);

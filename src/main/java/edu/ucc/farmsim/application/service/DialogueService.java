@@ -16,17 +16,16 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
- * Writes what each person of the valley says (RN-37): Marta talks about prices, Don Tomás about what to sow in
- * the season, Dra. Lucía about the animals and Inés about tomorrow's weather, and each one about its errand
- * (RN-38). The text depends only on the state of the game and uses no randomness, so the same state always
- * gives the same words.
+ * Escribe lo que dice cada persona del valle (RN-37): Marta habla de precios, Don Tomás de qué sembrar en la estación,
+ * la Dra. Lucía de los animales e Inés del clima de mañana, y cada una de su encargo (RN-38). El texto depende solo del
+ * estado de la partida y no usa azar, así que el mismo estado siempre da las mismas palabras.
  *
  * <p>Stories: HU-46, HU-47.
  */
 @Component
 public final class DialogueService {
 
-    /** What the person says to the player now. */
+    /** Lo que la persona le dice ahora al jugador. */
     public DialogueView dialogue(Npc npc, GameState state) {
         String text = switch (npc) {
             case MARTA -> prices(state);

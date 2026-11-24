@@ -16,24 +16,24 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-/** HU-30: loading a saved game and recovering it exactly (RN-32, RN-33). */
+/** HU-30: cargar una partida guardada y recuperarla exactamente (RN-32, RN-33). */
 class HU30LoadGameTest {
 
     @Test
     void HU30_ca1_theLoadedStateIsStructurallyIdenticalToTheSavedOne_criticalTest() {
-        // Given a rich game saved in slot 1
+                // Dada una partida rica guardada en la ranura 1
         InMemoryMongo mongo = new InMemoryMongo();
         TestApp app = RichGame.play();
         TestApp store = TestApp.create(app.session, DayPipeline.standard(), mongo.repository());
         GameMemento saved = app.state().createMemento();
         assertTrue(store.controller.save(1).isOk());
 
-        // When a different game is in progress and the slot is loaded
+                // Cuando hay otra partida en curso y se carga la ranura
         store.controller.newGame(99L);
         Result<HudView> result = store.controller.load(1);
 
-        // Then calendar, energy, money, inventory, crops, buildings, animals, market, weather,
-        // achievements and counters, and the generator, are identical
+                // Entonces calendario, energía, dinero, inventario, cultivos, edificios, animales, mercado, clima, logros y
+        // contadores, y el generador, son idénticos
         assertTrue(result.isOk(), String.valueOf(result.message()));
         assertEquals(saved, store.state().createMemento());
     }

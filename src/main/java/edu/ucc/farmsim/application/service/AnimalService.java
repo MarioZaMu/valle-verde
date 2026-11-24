@@ -19,9 +19,9 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 /**
- * The animal use cases: buy and house (RN-23), feed a building (RN-24), collect its products (RN-26) and cure
- * a sick animal (RN-27). Every operation checks all its rules first and only then changes the game, so a
- * rejection never leaves anything half done.
+ * Los casos de uso de animales: comprar y alojar (RN-23), alimentar un edificio (RN-24), recoger sus productos (RN-26)
+ * y curar a un animal enfermo (RN-27). Cada operación comprueba primero todas sus reglas y solo después cambia la
+ * partida, de modo que un rechazo nunca deja nada a medias.
  *
  * <p>Stories: HU-19, HU-20, HU-22, HU-23, HU-26.
  */
@@ -34,12 +34,12 @@ public final class AnimalService {
     private final AchievementService achievements;
 
     /**
-     * Creates the service.
+     * Crea el servicio.
      *
-     * @param session the game in progress
-     * @param mapper  builds the views the UI draws
-     * @param events  where events are published
-     * @param achievements evaluates the achievements after buying and curing
+     * @param session la partida en curso
+     * @param mapper  construye las vistas que dibuja la UI
+     * @param events  donde se publican los eventos
+     * @param achievements evalúa los logros después de comprar y curar
      */
     public AnimalService(GameSession session, ViewMapper mapper, EventBus events, AchievementService achievements) {
         this.session = session;
@@ -49,10 +49,10 @@ public final class AnimalService {
     }
 
     /**
-     * Buys an animal and houses it in the first building of its kind with a free place (RN-23).
+     * Compra un animal y lo aloja en el primer edificio de su tipo con un lugar libre (RN-23).
      *
-     * @param animalId animal id, for example {@code HEN}
-     * @return the building where the animal now lives
+     * @param animalId id del animal, por ejemplo {@code HEN}
+     * @return el edificio donde vive ahora el animal
      */
     public Result<BuildingView> buyAnimal(String animalId) {
         if (!session.hasGame()) {
@@ -76,10 +76,10 @@ public final class AnimalService {
     }
 
     /**
-     * Feeds every animal of a building that can eat and has not eaten today: 1 hay and 1 energy each, all or
-     * nothing (RN-24). Sick animals are skipped and the player is told.
+     * Alimenta a todos los animales de un edificio que pueden comer y no han comido hoy: 1 de heno y 1 de energía cada
+     * uno, todo o nada (RN-24). Los animales enfermos se omiten y se avisa al jugador.
      *
-     * @param buildingId id of the building
+     * @param buildingId id del edificio
      */
     public Result<BuildingActionView> feed(int buildingId) {
         if (!session.hasGame()) {
@@ -111,9 +111,9 @@ public final class AnimalService {
     }
 
     /**
-     * Moves every unit waiting in a building to the inventory: 1 energy, all or nothing (RN-26).
+     * Mueve al inventario todas las unidades que esperan en un edificio: 1 de energía, todo o nada (RN-26).
      *
-     * @param buildingId id of the building
+     * @param buildingId id del edificio
      */
     public Result<BuildingActionView> collect(int buildingId) {
         if (!session.hasGame()) {
@@ -139,10 +139,10 @@ public final class AnimalService {
     }
 
     /**
-     * Cures a sick animal with one medicine and 1 energy; it is healthy at once (RN-27).
+     * Cura a un animal enfermo con una medicina y 1 de energía; queda sano de inmediato (RN-27).
      *
-     * @param buildingId  id of the building
-     * @param animalIndex position of the animal inside the building
+     * @param buildingId  id del edificio
+     * @param animalIndex posición del animal dentro del edificio
      */
     public Result<BuildingActionView> cure(int buildingId, int animalIndex) {
         if (!session.hasGame()) {

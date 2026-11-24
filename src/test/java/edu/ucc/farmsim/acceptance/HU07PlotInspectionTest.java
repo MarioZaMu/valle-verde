@@ -12,7 +12,10 @@ import edu.ucc.farmsim.support.TestApp;
 import edu.ucc.farmsim.ui.components.PlotText;
 import org.junit.jupiter.api.Test;
 
-/** HU-07: inspect a plot: crop, stage, watered and days to mature, as the tooltip shows it (RN-05, RN-08, RN-09). */
+/**
+ * HU-07: inspeccionar una parcela: cultivo, etapa, regado y días para madurar, tal como lo muestra el tooltip (RN-05,
+ * RN-08, RN-09).
+ */
 class HU07PlotInspectionTest {
 
     private static final int COL = GameFixtures.SOIL_COL;
@@ -25,14 +28,14 @@ class HU07PlotInspectionTest {
 
     @Test
     void HU07_ca1_aPlotWithACropShowsCropStageWateredAndDaysLeft() {
-        // Given a tomato with d = 2 (T = 7), watered today
+                // Dado un tomate con d = 2 (T = 7), regado hoy
         TestApp app = TestApp.startedGame();
         GameFixtures.plant(app.state(), COL, ROW, CropType.TOMATO, 2, 0, true, false);
 
-        // When the player inspects the plot
+                // Cuando el jugador inspecciona la parcela
         String text = tooltip(app, COL, ROW);
 
-        // Then the tooltip says it is a Sprout that needs 5 more days
+                // Entonces el tooltip dice que es un Sprout al que le faltan 5 días
         assertEquals("Tomate · Brote · Regado: sí · Faltan 5 días", text);
     }
 
@@ -78,18 +81,18 @@ class HU07PlotInspectionTest {
 
     @Test
     void HU07_ca4_inspectingIsAPureQueryThatNeverChangesTheGame() {
-        // Given a game with a watered crop
+                // Dada una partida con un cultivo regado
         TestApp app = TestApp.startedGame();
         GameFixtures.plant(app.state(), COL, ROW, CropType.CARROT, 1, 0, true, false);
         GameMemento before = app.state().createMemento();
         app.events.clear();
 
-        // When the plot is inspected 10 times
+                // Cuando se inspecciona la parcela 10 veces
         for (int i = 0; i < 10; i++) {
             assertTrue(app.controller.inspect(COL, ROW).isOk());
         }
 
-        // Then the whole state is identical, no energy was spent and no event was published
+                // Entonces todo el estado es idéntico, no se gastó energía y no se publicó ningún evento
         assertEquals(before, app.state().createMemento());
         assertEquals(100, app.state().energy().current());
         assertTrue(app.events.isEmpty());

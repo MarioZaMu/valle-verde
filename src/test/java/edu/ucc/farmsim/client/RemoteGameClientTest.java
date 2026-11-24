@@ -37,8 +37,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 /**
- * The client against the real server on a free port: it must give the same results and the same events as
- * the in-process controller (DT-17, DT-19), and never throw (R-03).
+ * El cliente contra el servidor real en un puerto libre: debe dar los mismos resultados y los mismos eventos que el
+ * controlador en proceso (DT-17, DT-19), y nunca lanzar excepciones (R-03).
  */
 @SpringBootTest(classes = ServerApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("no-mongo")
@@ -367,7 +367,7 @@ class RemoteGameClientTest {
         assertTrue(events.contains(new GameEvent.AchievementUnlocked("LG-01", "Primera cosecha", 50)));
     }
 
-    /** The same sequence of orders, recording every result and then the events each one caused. */
+    /** La misma secuencia de órdenes, registrando cada resultado y luego los eventos que causó cada una. */
     private static List<Object> script(edu.ucc.farmsim.application.controller.GameCommands game, List<GameEvent> seen) {
         List<Object> log = new ArrayList<>();
         seen.clear();
@@ -399,7 +399,7 @@ class RemoteGameClientTest {
         log.add(describe(game.buildings()));
         log.add(describe(game.endDay()));
         log.add(describe(game.achievements()));
-        log.add(game.save(2).isOk()); // the time of the save differs between the two clocks
+        log.add(game.save(2).isOk()); // la hora del guardado difiere entre los dos relojes
         log.add(game.saveSlots().value().stream().map(edu.ucc.farmsim.application.dto.SaveSlotView::status).toList());
         log.add(describe(game.load(2)));
         log.add(describe(game.load(3)));

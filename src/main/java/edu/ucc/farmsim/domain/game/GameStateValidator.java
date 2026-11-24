@@ -16,22 +16,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Checks the invariants of RN-33 (step 5) on a game that was read from a save, without any I/O: money, energy,
- * inventory, crops, buildings, animals, market, achievements and the avatar must make sense together. A game that fails
- * is never loaded.
+ * Comprueba las invariantes de RN-33 (paso 5) en una partida leída de un guardado, sin ninguna entrada/salida: dinero,
+ * energía, inventario, cultivos, edificios, animales, mercado, logros y avatar deben tener sentido en conjunto. Una
+ * partida que falla nunca se carga.
  *
  * <p>Stories: HU-31, HU-45, HU-47.
  */
 public final class GameStateValidator {
 
     private GameStateValidator() {
-        // static helpers only
+                // solo métodos de utilidad estáticos
     }
 
     /**
-     * Every invariant the game breaks.
+     * Cada invariante que rompe la partida.
      *
-     * @return one Spanish-free technical line per violation; empty if the game is valid
+     * @return una línea técnica (sin texto en español) por cada violación; vacía si la partida es válida
      */
     public static List<String> violations(GameMemento memento) {
         List<String> found = new ArrayList<>();
@@ -99,7 +99,10 @@ public final class GameStateValidator {
         }
     }
 
-    /** A save of version 1 has no avatar; otherwise it must stand on a plot it can walk on (RN-36). */
+    /**
+     * Una partida de versión 1 no tiene avatar; si lo tiene, debe estar en una parcela sobre la que pueda caminar
+     * (RN-36).
+     */
     private static void checkAvatar(GameMemento memento, FarmMap map, List<String> found) {
         var avatar = memento.avatar();
         if (avatar == null) {
@@ -110,7 +113,10 @@ public final class GameStateValidator {
         }
     }
 
-    /** A save written before the errands has none; otherwise no person appears twice or empty (RN-38). */
+    /**
+     * Una partida escrita antes de los encargos no tiene ninguno; si no, ninguna persona aparece repetida ni vacía
+     * (RN-38).
+     */
     private static void checkErrands(GameMemento memento, List<String> found) {
         var done = memento.errandsDone();
         if (done != null && (done.stream().anyMatch(java.util.Objects::isNull)

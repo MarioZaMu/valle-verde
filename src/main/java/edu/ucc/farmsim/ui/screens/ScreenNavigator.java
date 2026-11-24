@@ -1,42 +1,43 @@
 package edu.ucc.farmsim.ui.screens;
 
 /**
- * What the screen logic needs from the window: switch screens, talk to the player and close the
- * application. The real one uses Swing; tests use a fake, so the presenters need no display.
+ * Lo que necesita la lógica de las pantallas de la ventana: cambiar de pantalla, hablar con el jugador y cerrar la
+ * aplicación. El real usa Swing; las pruebas usan uno falso, así que los presentadores no necesitan pantalla.
  *
  * <p>Stories: HU-33.
  */
 public interface ScreenNavigator {
 
-    /** Shows the start screen. */
+    /** Muestra la pantalla de inicio. */
     void showStart();
 
     /**
-     * Makes sure the game screen exists before the first order of a game is sent, so it hears the events of that
-     * order (RNF-02: it may still be waiting for the server to start). Nothing to do by default.
+     * Se asegura de que la pantalla de juego exista antes de enviar la primera orden de una partida, para que escuche
+     * los eventos de esa orden (RNF-02: aún puede estar esperando a que arranque el servidor). Por defecto no hay nada
+     * que hacer.
      */
     default void prepareGame() {
-        // the game screen already exists
+                // la pantalla de juego ya existe
     }
 
-    /** Shows the game screen. */
+    /** Muestra la pantalla de juego. */
     void showGame();
 
-    /** Shows an informative message to the player. */
+    /** Muestra un mensaje informativo al jugador. */
     void showMessage(String text);
 
-    /** Asks a yes/no question; returns {@code true} if the player accepts. */
+    /** Hace una pregunta de sí o no; devuelve {@code true} si el jugador acepta. */
     boolean confirm(String text);
 
     /**
-     * Asks the player to pick one of the lines (the save slots).
+     * Le pide al jugador que elija una de las líneas (las ranuras de guardado).
      *
-     * @param title   what the player is choosing
-     * @param options the lines, one per slot, in order
-     * @return the number of the line chosen, from 1, or 0 if the player cancelled
+     * @param title   lo que el jugador está eligiendo
+     * @param options las líneas, una por ranura, en orden
+     * @return el número de la línea elegida, desde 1, o 0 si el jugador canceló
      */
     int choose(String title, java.util.List<String> options);
 
-    /** Closes the application. */
+    /** Cierra la aplicación. */
     void exit();
 }

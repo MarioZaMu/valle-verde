@@ -24,14 +24,14 @@ import edu.ucc.farmsim.support.TestApp;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-/** HU-49: the start tutorial in which the avatar guides the player (RN-39). */
+/** HU-49: el tutorial de inicio en el que el avatar guía al jugador (RN-39). */
 class HU49StartTutorialTest {
 
-    /** A soil plot north of the avatar's start, two plots away from it. */
+    /** Una parcela de tierra al norte del inicio del avatar, a dos parcelas de él. */
     private static final int SOIL_COL = 8;
     private static final int SOIL_ROW = 6;
 
-    /** A new game with its tutorial, as the player gets it. */
+    /** Una partida nueva con su tutorial, como la recibe el jugador. */
     private static TestApp newGame() {
         TestApp app = TestApp.create();
         app.controller.newGame(TestApp.SEED);
@@ -50,7 +50,7 @@ class HU49StartTutorialTest {
                 .map(e -> ((GameEvent.TutorialAdvanced) e).tutorial()).toList();
     }
 
-    /** The five actions of the tutorial, in order; each one must be accepted. */
+    /** Las cinco acciones del tutorial, en orden; cada una debe ser aceptada. */
     private static void play(TestApp app, int actions) {
         Runnable[] steps = {
             () -> assertTrue(app.controller.move("EAST").isOk()),
@@ -194,7 +194,7 @@ class HU49StartTutorialTest {
         assertTrue(app.controller.endDay().isOk());
     }
 
-    /** The same document as a save written before the tutorial existed: no tutorial in the state. */
+    /** El mismo documento que una partida escrita antes de que existiera el tutorial: sin tutorial en el estado. */
     private static SaveDocument withoutTutorial(SaveDocument document) {
         try {
             ObjectMapper json = new ObjectMapper();

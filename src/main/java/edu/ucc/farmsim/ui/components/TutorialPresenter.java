@@ -6,7 +6,7 @@ import edu.ucc.farmsim.application.result.Result;
 import edu.ucc.farmsim.ui.theme.Texts;
 
 /**
- * The logic of the avatar's box of the start tutorial (HU-49), without Swing: what to show and skipping it.
+ * La lógica del cuadro del avatar del tutorial de inicio (HU-49), sin Swing: qué mostrar y saltarlo.
  *
  * <p>Stories: HU-49.
  */
@@ -16,41 +16,41 @@ public final class TutorialPresenter {
     private TutorialView view;
 
     /**
-     * Creates the presenter.
+     * Crea el presentador.
      *
-     * @param controller entry point to the game
+     * @param controller punto de entrada al juego
      */
     public TutorialPresenter(GameCommands controller) {
         this.controller = controller;
     }
 
-    /** Asks the game for the tutorial again; without a game there is nothing to show. */
+    /** Le pide otra vez el tutorial a la partida; sin partida no hay nada que mostrar. */
     public void reload() {
         Result<TutorialView> result = controller.tutorial();
         view = result.isOk() ? result.value() : null;
     }
 
-    /** Shows a tutorial that just changed, as it came in its event. */
+    /** Muestra un tutorial que acaba de cambiar, tal como llegó en su evento. */
     public void show(TutorialView changed) {
         view = changed;
     }
 
-    /** True while there is a tutorial still running. */
+    /** Verdadero mientras hay un tutorial todavía en marcha. */
     public boolean isActive() {
         return view != null && !view.finished();
     }
 
-    /** "Paso n de 5"; empty when nothing is shown. */
+    /** «Paso n de 5»; vacío cuando no se muestra nada. */
     public String stepText() {
         return isActive() ? Texts.tutorialStep(view.number(), view.total()) : "";
     }
 
-    /** What the avatar says now; empty when nothing is shown. */
+    /** Lo que dice ahora el avatar; vacío cuando no se muestra nada. */
     public String messageText() {
         return isActive() ? view.text() : "";
     }
 
-    /** Ends the tutorial. */
+    /** Termina el tutorial. */
     public void skip() {
         Result<TutorialView> result = controller.skipTutorial();
         if (result.isOk()) {

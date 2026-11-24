@@ -21,7 +21,7 @@ import javax.swing.JButton;
 import javax.swing.JTable;
 import org.junit.jupiter.api.Test;
 
-/** The construction dialog opened with the Build tool (HU-18). */
+/** El diálogo de construcción abierto con la herramienta Construir (HU-18). */
 class HU18ConstructionDialogTest {
 
     private static BuildingOfferView offer(ConstructionPresenter presenter, String type) {

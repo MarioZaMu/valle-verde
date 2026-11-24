@@ -8,8 +8,8 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 
 /**
- * A slot of the tool bar: a parchment square in a wooden frame with the icon above the text. The chosen slot
- * gets a bright frame, and a slot rises a little under the cursor.
+ * Una casilla de la barra de herramientas: un cuadrado de pergamino en un marco de madera con el ícono sobre el texto.
+ * La casilla elegida recibe un marco brillante, y una casilla sube un poco bajo el cursor.
  *
  * <p>Stories: HU-36, HU-48.
  */
@@ -21,9 +21,9 @@ public class WoodSlot extends JToggleButton {
     private final transient HoverAnimator hover = new HoverAnimator(this);
 
     /**
-     * Creates the slot.
+     * Crea la casilla.
      *
-     * @param text what it says under its icon
+     * @param text lo que dice bajo su ícono
      */
     public WoodSlot(String text) {
         super(text);

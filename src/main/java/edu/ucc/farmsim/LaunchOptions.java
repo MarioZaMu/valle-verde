@@ -4,30 +4,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * What the command line asks {@link Main} to start (DT-22): the server and the window together (default),
- * only the server ({@code --server}) or only the window ({@code --client}). Any other argument goes to
- * Spring Boot untouched, for example {@code --server.port=9000}.
+ * Lo que la línea de comandos le pide a {@link Main} que arranque (DT-22): el servidor y la ventana juntos (por
+ * defecto), solo el servidor ({@code --server}) o solo la ventana ({@code --client}). Cualquier otro argumento pasa
+ * intacto a Spring Boot, por ejemplo {@code --server.port=9000}.
  *
  * <p>Stories: none.
  *
- * @param mode        what to start
- * @param port        port requested with {@code --port}, or {@code null} to let the server pick a free one
- * @param url         server address requested with {@code --url}, or {@code null} for the default
- * @param springArgs  the arguments that are not ours
+ * @param mode        qué arrancar
+ * @param port        puerto pedido con {@code --port}, o {@code null} para que el servidor elija uno libre
+ * @param url         dirección del servidor pedida con {@code --url}, o {@code null} para la predeterminada
+ * @param springArgs  los argumentos que no son nuestros
  */
 public record LaunchOptions(Mode mode, Integer port, String url, List<String> springArgs) {
 
-    /** Address the client uses when {@code --url} is not given. */
+    /** Dirección que usa el cliente cuando no se da {@code --url}. */
     public static final String DEFAULT_URL = "http://127.0.0.1:8080";
 
-    /** What to start. */
+    /** Qué arrancar. */
     public enum Mode { BOTH, SERVER_ONLY, CLIENT_ONLY }
 
     /**
-     * Reads the command line.
+     * Lee la línea de comandos.
      *
-     * @param args the arguments of {@code main}
-     * @throws IllegalArgumentException if both {@code --server} and {@code --client} are given, or a port is not a number
+     * @param args los argumentos de {@code main}
+     * @throws IllegalArgumentException si se dan {@code --server} y {@code --client} a la vez, o un puerto no es un
+     *                                  número
      */
     public static LaunchOptions parse(String... args) {
         boolean server = false;
@@ -60,17 +61,17 @@ public record LaunchOptions(Mode mode, Integer port, String url, List<String> sp
         return new LaunchOptions(mode, port, url, List.copyOf(rest));
     }
 
-    /** True if this run opens the window. */
+    /** Verdadero si esta ejecución abre la ventana. */
     public boolean needsWindow() {
         return mode != Mode.SERVER_ONLY;
     }
 
-    /** True if this run starts the server. */
+    /** Verdadero si esta ejecución arranca el servidor. */
     public boolean needsServer() {
         return mode != Mode.CLIENT_ONLY;
     }
 
-    /** The Spring Boot arguments, with the requested port added when there is one. */
+    /** Los argumentos de Spring Boot, con el puerto pedido agregado cuando hay uno. */
     public String[] serverArguments() {
         List<String> all = new ArrayList<>(springArgs);
         if (port != null) {

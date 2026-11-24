@@ -3,9 +3,9 @@ package edu.ucc.farmsim.domain.farm;
 import edu.ucc.farmsim.domain.config.GameRules;
 
 /**
- * The player's character on the farm (RN-36): it stands on one plot and looks to one of four directions. A step
- * goes to the neighbour plot if it can be walked on; if not, the avatar stays where it is but turns to look
- * there. Walking costs no energy and does not move the calendar, so the avatar knows nothing about either.
+ * El personaje del jugador en la granja (RN-36): está en una parcela y mira hacia una de cuatro direcciones. Un paso va
+ * a la parcela vecina si se puede caminar sobre ella; si no, el avatar se queda donde está pero gira para mirar hacia
+ * allí. Caminar no cuesta energía ni mueve el calendario, así que el avatar no sabe nada de ninguno de los dos.
  *
  * <p>Stories: HU-45.
  */
@@ -21,45 +21,45 @@ public final class Avatar {
         this.facing = facing;
     }
 
-    /** The avatar of a new game: on the configured grass plot, looking south. */
+    /** El avatar de una partida nueva: en la parcela de pasto configurada, mirando al sur. */
     public static Avatar start() {
         return new Avatar(GameRules.AVATAR_START_COL, GameRules.AVATAR_START_ROW, Direction.SOUTH);
     }
 
-    /** Column of the plot it stands on. */
+    /** Columna de la parcela en que está. */
     public int col() {
         return col;
     }
 
-    /** Row of the plot it stands on. */
+    /** Fila de la parcela en que está. */
     public int row() {
         return row;
     }
 
-    /** The direction it looks to. */
+    /** La dirección hacia la que mira. */
     public Direction facing() {
         return facing;
     }
 
-    /** Column of the plot in front of it (it may be outside the map). */
+    /** Columna de la parcela que tiene enfrente (puede estar fuera del mapa). */
     public int frontCol() {
         return col + facing.dCol();
     }
 
-    /** Row of the plot in front of it (it may be outside the map). */
+    /** Fila de la parcela que tiene enfrente (puede estar fuera del mapa). */
     public int frontRow() {
         return row + facing.dRow();
     }
 
-    /** True if it stands on a plot of the area whose top-left plot and size are given. */
+    /** Verdadero si está en una parcela del área cuya parcela superior izquierda y tamaño se dan. */
     public boolean isInside(int left, int top, int width, int height) {
         return col >= left && col < left + width && row >= top && row < top + height;
     }
 
     /**
-     * Turns to the direction and steps to the neighbour plot there if the farm lets it walk on it.
+     * Gira hacia la dirección y da un paso a la parcela vecina de ese lado si la granja le deja caminar sobre ella.
      *
-     * @return {@code true} if it moved; {@code false} if the way was blocked (it only turned)
+     * @return {@code true} si se movió; {@code false} si el camino estaba bloqueado (solo giró)
      */
     public boolean step(Direction direction, FarmMap farm) {
         facing = direction;
@@ -73,12 +73,12 @@ public final class Avatar {
         return true;
     }
 
-    /** Copy of the position and the direction, for the memento. */
+    /** Copia de la posición y la dirección, para el memento. */
     public AvatarSnapshot snapshot() {
         return new AvatarSnapshot(col, row, facing);
     }
 
-    /** Puts the avatar back where the snapshot says. */
+    /** Devuelve al avatar donde dice la instantánea. */
     public void restoreFrom(AvatarSnapshot snapshot) {
         this.col = snapshot.col();
         this.row = snapshot.row();
@@ -86,8 +86,8 @@ public final class Avatar {
     }
 
     /**
-     * Puts the avatar back at its starting place, looking south. If something was built there, it goes to the
-     * nearest plot it can walk on (used when a save of version 1, without avatar, is loaded).
+     * Devuelve al avatar a su lugar de inicio, mirando al sur. Si allí se construyó algo, va a la parcela transitable
+     * más cercana (se usa al cargar una partida de versión 1, sin avatar).
      */
     public void returnToStart(FarmMap farm) {
         int[] place = farm.nearestWalkable(GameRules.AVATAR_START_COL, GameRules.AVATAR_START_ROW);

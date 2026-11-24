@@ -27,9 +27,9 @@ import org.springframework.stereotype.Service;
 /**
  * Pattern: Memento — Role: Caretaker (keeps the snapshots of the game; it never looks inside them).
  *
- * <p>Saves, loads and lists the save slots (RN-31 to RN-33). A load builds the new game on the side and only
- * replaces the game in progress when every check has passed, so a rejected slot changes nothing. When the
- * storage does not answer it reports {@code ERROR_ES}: playing never depends on it.
+ * <p>Guarda, carga y lista las ranuras de guardado (RN-31 a RN-33). Una carga construye la partida nueva aparte y solo
+ * reemplaza la partida en curso cuando pasaron todas las comprobaciones, de modo que una ranura rechazada no cambia
+ * nada. Cuando el almacenamiento no responde informa {@code ERROR_ES}: jugar nunca depende de él.
  *
  * <p>Stories: HU-27, HU-29, HU-30, HU-31, HU-32, HU-33.
  */
@@ -46,13 +46,13 @@ public final class SaveGameService {
     private final Clock clock;
 
     /**
-     * Creates the service.
+     * Crea el servicio.
      *
-     * @param repository where games are stored
-     * @param session    the game in progress
-     * @param mapper     builds the views the UI draws
-     * @param events     where events are published
-     * @param clock      tells when a game is saved
+     * @param repository donde se guardan las partidas
+     * @param session    la partida en curso
+     * @param mapper     construye las vistas que dibuja la UI
+     * @param events     donde se publican los eventos
+     * @param clock      dice cuándo se guarda una partida
      */
     public SaveGameService(SaveRepository repository, GameSession session, ViewMapper mapper, EventBus events,
                            Clock clock) {
@@ -63,7 +63,9 @@ public final class SaveGameService {
         this.clock = clock;
     }
 
-    /** Success with true if at least one slot holds a saved game; {@code ERROR_ES} if the storage fails. */
+    /**
+     * Éxito con true si al menos una ranura contiene una partida guardada; {@code ERROR_ES} si falla el almacenamiento.
+     */
     public Result<Boolean> hasAnySave() {
         try {
             for (int slot = 1; slot <= GameRules.SAVE_SLOTS; slot++) {
@@ -77,7 +79,7 @@ public final class SaveGameService {
         }
     }
 
-    /** Every slot with what it holds. A damaged slot is listed as such and does not stop the rest. */
+    /** Cada ranura con lo que contiene. Una ranura dañada se lista como tal y no detiene al resto. */
     public Result<List<SaveSlotView>> slots() {
         try {
             List<SaveSlotView> views = new ArrayList<>();
@@ -91,10 +93,10 @@ public final class SaveGameService {
     }
 
     /**
-     * Saves the game in progress in a slot, replacing what it held (RN-31). If the storage fails the previous
-     * content stays and the game goes on.
+     * Guarda la partida en curso en una ranura, reemplazando lo que tenía (RN-31). Si falla el almacenamiento queda el
+     * contenido anterior y el juego continúa.
      *
-     * @param slot slot number, 1 to 3
+     * @param slot número de ranura, de 1 a 3
      */
     public Result<SaveSlotView> save(int slot) {
         requireSlot(slot);
@@ -112,10 +114,10 @@ public final class SaveGameService {
     }
 
     /**
-     * Loads a slot and makes it the game in progress. The checks of RN-33 run in order and stop at the first
-     * failure; the game in progress is replaced only when all of them pass.
+     * Carga una ranura y la convierte en la partida en curso. Las comprobaciones de RN-33 corren en orden y se detienen
+     * en el primer fallo; la partida en curso se reemplaza solo cuando todas pasan.
      *
-     * @param slot slot number, 1 to 3
+     * @param slot número de ranura, de 1 a 3
      */
     public Result<HudView> load(int slot) {
         requireSlot(slot);

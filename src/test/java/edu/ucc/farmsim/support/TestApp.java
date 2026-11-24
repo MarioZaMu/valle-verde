@@ -25,20 +25,23 @@ import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Builds the application graph for acceptance tests: a fresh clock, a session, an event bus and a controller. */
+/**
+ * Arma el grafo de la aplicación para las pruebas de aceptación: un reloj nuevo, una sesión, un bus de eventos y un
+ * controlador.
+ */
 public final class TestApp {
 
-    /** Fixed seed used by tests that do not care about it. */
+    /** Semilla fija que usan las pruebas a las que no les importa. */
     public static final long SEED = 2026L;
 
-    /** The moment every save made through a test graph is stamped with: 2026-11-22 10:30 UTC. */
+    /** El momento con el que se sella todo guardado hecho a través de un grafo de pruebas: 2026-11-22 10:30 UTC. */
     public static final Clock FIXED_CLOCK = Clock.fixed(java.time.Instant.parse("2026-11-22T10:30:00Z"),
             java.time.ZoneOffset.UTC);
 
     public final GameSession session;
     public final EventBus bus;
     public final GameController controller;
-    /** Every event published on the bus since the app was created. */
+    /** Todo evento publicado en el bus desde que se creó la aplicación. */
     public final List<GameEvent> events = new ArrayList<>();
 
     private TestApp(GameSession session, EventBus bus, GameController controller) {
@@ -49,8 +52,8 @@ public final class TestApp {
     }
 
     /**
-     * Creates the graph and starts a new game (Year 1, Spring, day 1, 500 m, 10 carrot and 5 potato seeds) with
-     * its start tutorial already skipped, so the events of the tests are only those of the game itself.
+     * Crea el grafo e inicia una partida nueva (Año 1, Primavera, día 1, 500 m, 10 semillas de zanahoria y 5 de papa)
+     * con su tutorial de inicio ya saltado, de modo que los eventos de las pruebas sean solo los de la partida misma.
      */
     public static TestApp startedGame() {
         TestApp app = create();
@@ -60,34 +63,37 @@ public final class TestApp {
         return app;
     }
 
-    /** The game in progress. */
+    /** La partida en curso. */
     public GameState state() {
         return session.current();
     }
 
-    /** Creates the graph with the standard end-of-day pipeline. */
+    /** Crea el grafo con el pipeline estándar de fin de día. */
     public static TestApp create() {
         return create(DayPipeline.standard());
     }
 
-    /** Creates the graph with a given end-of-day pipeline (tests that need extra or failing steps). */
+    /** Crea el grafo con un pipeline de fin de día dado (pruebas que necesitan pasos extra o fallidos). */
     public static TestApp create(DayPipeline pipeline) {
         GameClock.getInstance().resetForTests();
         GameSession session = new GameSession();
         return create(session, pipeline);
     }
 
-    /** Creates the graph around a given session (tests that need a faulty session). */
+    /** Crea el grafo alrededor de una sesión dada (pruebas que necesitan una sesión defectuosa). */
     public static TestApp create(GameSession session, DayPipeline pipeline) {
         return create(session, pipeline, new FakeSaveRepository());
     }
 
-    /** Creates the graph around a given session and save repository. */
+    /** Crea el grafo alrededor de una sesión y un repositorio de partidas dados. */
     public static TestApp create(GameSession session, DayPipeline pipeline, SaveRepository repository) {
         return create(session, pipeline, repository, FIXED_CLOCK);
     }
 
-    /** Creates the graph around a given session, save repository and clock (the clock stamps the saves). */
+    /**
+     * Crea el grafo alrededor de una sesión, un repositorio de partidas y un reloj dados (el reloj sella los
+     * guardados).
+     */
     public static TestApp create(GameSession session, DayPipeline pipeline, SaveRepository repository, Clock clock) {
         GameClock.getInstance().resetForTests();
         ViewMapper mapper = new ViewMapper();

@@ -3,8 +3,9 @@ package edu.ucc.farmsim.domain.game;
 import edu.ucc.farmsim.domain.time.Weather;
 
 /**
- * Step 1 of RN-03: the weather of the day that ends acts on the crops in the open (RN-12). Rain waters them
- * before they grow; frost withers them, mature ones included. Drought acts later, when the dry days are counted.
+ * Paso 1 de RN-03: el clima del día que termina actúa sobre los cultivos a la intemperie (RN-12). La lluvia los riega
+ * antes de que crezcan; la helada los marchita, incluidos los maduros. La sequía actúa después, cuando se cuentan los
+ * días secos.
  *
  * <p>Stories: HU-12.
  */

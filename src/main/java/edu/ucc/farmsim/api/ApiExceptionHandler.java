@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
- * Answers the failures that happen before an order reaches the game (a malformed request, a wrong route or
- * verb) or outside it (a bug), always with the same {@link ApiError} body. Nothing leaks a stack trace to
- * the client (RNF-07).
+ * Responde a los fallos que ocurren antes de que una orden llegue al juego (petición mal formada, ruta o verbo
+ * equivocado) o fuera de él (un error), siempre con el mismo cuerpo {@link ApiError}. Nada filtra una traza de error al
+ * cliente (RNF-07).
  *
  * <p>Stories: none.
  */
@@ -24,7 +24,7 @@ public class ApiExceptionHandler {
 
     private static final Logger LOG = Logger.getLogger(ApiExceptionHandler.class.getName());
 
-    /** A body that is not JSON, or a path value of the wrong type. */
+    /** Un cuerpo que no es JSON, o un valor de ruta del tipo equivocado. */
     @ExceptionHandler({HttpMessageNotReadableException.class, TypeMismatchException.class})
     public ResponseEntity<ApiError> invalidRequest(Exception e) {
         LOG.log(Level.FINE, "Invalid request", e);
@@ -32,7 +32,7 @@ public class ApiExceptionHandler {
                 .body(new ApiError(ApiError.INVALID_REQUEST, "La solicitud no es válida."));
     }
 
-    /** Spring's own request errors (constraints, wrong verb, unknown route) and anything unexpected. */
+    /** Los errores propios de Spring (restricciones, verbo equivocado, ruta desconocida) y cualquier imprevisto. */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> other(Exception e) {
         if (e instanceof ErrorResponse response) {

@@ -20,7 +20,7 @@ import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/** HU-31: damaged, missing or unsupported saves are rejected without touching the game in progress (RN-33). */
+/** HU-31: las partidas dañadas, ausentes o no admitidas se rechazan sin tocar la partida en curso (RN-33). */
 class HU31RejectInvalidSavesTest {
 
     private final InMemoryMongo mongo = new InMemoryMongo();
@@ -98,7 +98,7 @@ class HU31RejectInvalidSavesTest {
         String broken = "{\"date\":";
         mongo.put(new SaveDocument("slot2", 99, Instant.now(), broken, "not-a-checksum"));
 
-        // the JSON is checked first: the wrong version and checksum are never reached
+                // primero se comprueba el JSON: la versión y la suma de control equivocadas nunca se alcanzan
         assertRejected(app.controller.load(2), ErrorCode.ARCHIVO_CORRUPTO);
     }
 

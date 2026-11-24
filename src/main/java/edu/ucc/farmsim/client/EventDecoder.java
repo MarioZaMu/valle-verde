@@ -11,8 +11,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Rebuilds the {@link GameEvent}s carried in a response (DT-19). The class of each event is found by the
- * name the server sent, among the permitted subtypes of {@link GameEvent}, so a new event needs no change here.
+ * Reconstruye los {@link GameEvent} que trae una respuesta (DT-19). La clase de cada evento se halla por el nombre que
+ * envió el servidor, entre los subtipos permitidos de {@link GameEvent}, así que un evento nuevo no pide ningún cambio
+ * aquí.
  *
  * <p>Stories: none.
  */
@@ -30,7 +31,7 @@ final class EventDecoder {
         }
     }
 
-    /** Decodes the {@code events} array of a response; an event of an unknown type is skipped. */
+    /** Decodifica el arreglo {@code events} de una respuesta; un evento de tipo desconocido se omite. */
     List<GameEvent> decode(JsonNode events) {
         List<GameEvent> decoded = new ArrayList<>();
         if (events == null || !events.isArray()) {

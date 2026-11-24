@@ -1,8 +1,8 @@
 package edu.ucc.farmsim.domain.farm;
 
 /**
- * Kind of ground of a plot (RN-04): only soil can be sown, only grass can be built on, and the avatar walks on
- * grass, soil and the path.
+ * Tipo de suelo de una parcela (RN-04): solo la tierra se puede sembrar, solo el pasto admite construcciones, y el
+ * avatar camina sobre pasto, tierra y camino.
  *
  * <p>Stories: HU-28, HU-50.
  */
@@ -11,8 +11,8 @@ public enum Terrain {
     GRASS,
     WATER,
     OBSTACLE,
-    /** The dirt path between the farm and the village. */
+    /** El camino de tierra entre la granja y la aldea. */
     PATH,
-    /** A house of the valley. */
+    /** Una casa del valle. */
     HOUSE
 }

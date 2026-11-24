@@ -3,28 +3,28 @@ package edu.ucc.farmsim.domain.animal;
 /**
  * Pattern: State — Role: State interface (what an animal does at each health state).
  *
- * <p>The states are stateless and shared; an {@link Animal} holds the current one. Whether an animal eats,
- * goes hungry, falls sick or produces is decided here, so no code needs a chain of {@code if}s on the state
+ * <p>Los estados no guardan datos y se comparten; un {@link Animal} guarda el actual. Aquí se decide si un animal come,
+ * pasa hambre, se enferma o produce, de modo que ningún código necesita una cadena de {@code if} sobre el estado
  * (RN-25).
  *
  * <p>Stories: HU-21.
  */
 public interface AnimalState {
 
-    /** The condition this state represents. */
+    /** La condición que representa este estado. */
     AnimalCondition condition();
 
-    /** True if an animal in this state can be fed (a sick animal needs medicine instead, RN-24). */
+    /** Verdadero si un animal en este estado puede ser alimentado (un animal enfermo necesita medicina, RN-24). */
     boolean canEat();
 
     /**
-     * Resolves the end of the day for the animal (step 3 of RN-03, RN-25).
+     * Resuelve el final del día del animal (paso 3 de RN-03, RN-25).
      *
-     * @param animal the animal whose day ends
+     * @param animal el animal cuyo día termina
      */
     void onDayEnd(Animal animal);
 
-    /** The shared state of a condition. */
+    /** El estado compartido de una condición. */
     static AnimalState of(AnimalCondition condition) {
         return switch (condition) {
             case HEALTHY -> HealthyState.INSTANCE;

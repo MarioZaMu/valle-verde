@@ -7,8 +7,8 @@ import edu.ucc.farmsim.ui.theme.Texts;
 import java.util.List;
 
 /**
- * The logic of the achievements dialog, without any Swing (HU-26): one row per achievement with what it asks
- * for, its reward and whether it is unlocked or how far the player is.
+ * La lógica del diálogo de logros, sin nada de Swing (HU-26): una fila por logro con lo que pide, su recompensa y si
+ * está desbloqueado o cuánto lleva el jugador.
  *
  * <p>Stories: HU-26.
  */
@@ -17,9 +17,9 @@ public final class AchievementsPresenter {
     private List<AchievementView> achievements = List.of();
 
     /**
-     * Creates the presenter and reads the achievements.
+     * Crea el presentador y lee los logros.
      *
-     * @param game the game the achievements belong to
+     * @param game la partida a la que pertenecen los logros
      */
     public AchievementsPresenter(GameCommands game) {
         Result<List<AchievementView>> result = game.achievements();
@@ -28,18 +28,18 @@ public final class AchievementsPresenter {
         }
     }
 
-    /** Every achievement. */
+    /** Todos los logros. */
     public List<AchievementView> achievements() {
         return achievements;
     }
 
-    /** The row of an achievement as the table shows it. */
+    /** La fila de un logro tal como la muestra la tabla. */
     public Object[] row(AchievementView achievement) {
         return new Object[] {achievement.name(), achievement.description(), Texts.money(achievement.reward()),
                 state(achievement)};
     }
 
-    /** {@code Desbloqueado} or {@code progress/target}, so the state never depends on a colour. */
+    /** {@code Desbloqueado} o {@code progreso/meta}, de modo que el estado nunca depende de un color. */
     public String state(AchievementView achievement) {
         return achievement.unlocked() ? Texts.UNLOCKED : achievement.progress() + "/" + achievement.target();
     }

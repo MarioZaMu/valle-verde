@@ -3,8 +3,9 @@ package edu.ucc.farmsim.application.result;
 import java.util.Map;
 
 /**
- * Spanish display names for the ids the application hands to the UI (seasons, weather, crops, growth stages, buildings, animals, achievements),
- * so messages and screens always use the same words. Unknown ids are returned unchanged.
+ * Nombres en español para mostrar de los ids que la aplicación entrega a la UI (estaciones, clima, cultivos, etapas de
+ * crecimiento, edificios, animales, logros), para que los mensajes y las pantallas usen siempre las mismas palabras.
+ * Los ids desconocidos se devuelven sin cambios.
  *
  * <p>Stories: HU-01, HU-07, HU-18, HU-46, HU-47.
  */
@@ -64,88 +65,88 @@ public final class Names {
             "SOIL", "Tierra de cultivo", "GRASS", "Hierba", "WATER", "Agua", "OBSTACLE", "Obstáculo");
 
     private Names() {
-        // static helpers only
+                // solo métodos de utilidad estáticos
     }
 
-    /** Season name, for example {@code SPRING} to {@code Primavera}. */
+    /** Nombre de la estación, por ejemplo {@code SPRING} a {@code Primavera}. */
     public static String season(String id) {
         return SEASONS.getOrDefault(id, id);
     }
 
-    /** Weather name, for example {@code RAINY} to {@code Lluvioso}. */
+    /** Nombre del clima, por ejemplo {@code RAINY} a {@code Lluvioso}. */
     public static String weather(String id) {
         return WEATHERS.getOrDefault(id, id);
     }
 
-    /** Crop name, for example {@code CARROT} to {@code Zanahoria}. */
+    /** Nombre del cultivo, por ejemplo {@code CARROT} a {@code Zanahoria}. */
     public static String crop(String id) {
         return CROPS.getOrDefault(id, id);
     }
 
-    /** Growth stage name, for example {@code SPROUT} to {@code Brote}. */
+    /** Nombre de la etapa de crecimiento, por ejemplo {@code SPROUT} a {@code Brote}. */
     public static String stage(String id) {
         return STAGES.getOrDefault(id, id);
     }
 
-    /** Spanish name of an item (seed, harvest, animal product or supply). */
+    /** Nombre en español de un objeto (semilla, cosecha, producto animal o insumo). */
     public static String item(String id) {
         return ITEMS.getOrDefault(id, id);
     }
 
     /**
-     * A quantity of an item, for example {@code 2 Zanahorias} or {@code 1 Zanahoria}. Hay is not counted in
-     * units, so it keeps its name: {@code 2 Heno}.
+     * Una cantidad de un objeto, por ejemplo {@code 2 Zanahorias} o {@code 1 Zanahoria}. El heno no se cuenta en
+     * unidades, así que conserva su nombre: {@code 2 Heno}.
      */
     public static String itemCount(String id, int amount) {
         return amount + " " + (amount == 1 ? item(id) : ITEMS_PLURAL.getOrDefault(id, item(id)));
     }
 
-    /** Name of a person of the valley, for example {@code TOMAS} to {@code Don Tomás}. */
+    /** Nombre de una persona del valle, por ejemplo {@code TOMAS} a {@code Don Tomás}. */
     public static String npc(String id) {
         return NPCS.getOrDefault(id, id);
     }
 
-    /** What a person of the valley does, for example {@code LUCIA} to {@code Veterinaria}. */
+    /** Lo que hace una persona del valle, por ejemplo {@code LUCIA} a {@code Veterinaria}. */
     public static String npcRole(String id) {
         return NPC_ROLES.getOrDefault(id, id);
     }
 
-    /** Building name, for example {@code COOP} to {@code Gallinero}. */
+    /** Nombre del edificio, por ejemplo {@code COOP} a {@code Gallinero}. */
     public static String building(String id) {
         return BUILDINGS.getOrDefault(id, id);
     }
 
-    /** Plural of a building name, for example {@code COOP} to {@code Gallineros}. */
+    /** Plural del nombre de un edificio, por ejemplo {@code COOP} a {@code Gallineros}. */
     public static String buildingPlural(String id) {
         return BUILDINGS_PLURAL.getOrDefault(id, id);
     }
 
-    /** Animal name, for example {@code HEN} to {@code Gallina}. */
+    /** Nombre del animal, por ejemplo {@code HEN} a {@code Gallina}. */
     public static String animal(String id) {
         return ANIMALS.getOrDefault(id, id);
     }
 
-    /** Plural of an animal name, for example {@code COW} to {@code Vacas}. */
+    /** Plural del nombre de un animal, por ejemplo {@code COW} a {@code Vacas}. */
     public static String animalPlural(String id) {
         return ANIMALS_PLURAL.getOrDefault(id, id);
     }
 
-    /** Name of an animal's condition, for example {@code SICK} to {@code Enferma}. */
+    /** Nombre de la condición de un animal, por ejemplo {@code SICK} a {@code Enferma}. */
     public static String condition(String id) {
         return CONDITIONS.getOrDefault(id, id);
     }
 
-    /** Name of an achievement, for example {@code GREEN_THUMB} to {@code Manos a la tierra}. */
+    /** Nombre de un logro, por ejemplo {@code GREEN_THUMB} a {@code Manos a la tierra}. */
     public static String achievement(String id) {
         return ACHIEVEMENTS.getOrDefault(id, id);
     }
 
-    /** What an achievement asks for, in Spanish. */
+    /** Lo que pide un logro, en español. */
     public static String achievementDescription(String id) {
         return ACHIEVEMENT_TEXTS.getOrDefault(id, id);
     }
 
-    /** Terrain name, for example {@code SOIL} to {@code Tierra de cultivo}. */
+    /** Nombre del terreno, por ejemplo {@code SOIL} a {@code Tierra de cultivo}. */
     public static String terrain(String id) {
         return TERRAINS.getOrDefault(id, id);
     }

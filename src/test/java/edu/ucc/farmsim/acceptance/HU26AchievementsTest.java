@@ -17,7 +17,7 @@ import edu.ucc.farmsim.support.TestApp;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-/** HU-26: achievements with a reward, evaluated after every successful action and at the end of the day (RN-28). */
+/** HU-26: logros con recompensa, evaluados después de cada acción exitosa y al final del día (RN-28). */
 class HU26AchievementsTest {
 
     private static final int COL = GameFixtures.SOIL_COL;
@@ -29,14 +29,14 @@ class HU26AchievementsTest {
 
     @Test
     void HU26_ca1_theFirstHarvestUnlocksLg01PaysFiftyAndPublishesTheEvent() {
-        // Given no harvests and a mature crop
+                // Dadas ninguna cosecha y un cultivo maduro
         TestApp app = TestApp.startedGame();
         matureCrop(app, COL);
 
-        // When the player harvests it
+                // Cuando el jugador lo cosecha
         app.controller.harvest(COL, ROW);
 
-        // Then LG-01 is unlocked, 50 m are paid and the event was published
+                // Entonces LG-01 se desbloquea, se pagan 50 m y se publicó el evento
         assertTrue(app.state().progress().has(Achievement.FIRST_HARVEST));
         assertEquals(550, app.state().money());
         assertTrue(app.events.contains(new GameEvent.AchievementUnlocked("LG-01", "Primera cosecha", 50)));
@@ -66,7 +66,7 @@ class HU26AchievementsTest {
             tracker.recordHarvest();
         }
         GameFixtures.plant(app.state(), COL, ROW, CropType.CARROT, 2, 0, false, true);
-        app.controller.harvest(COL, ROW); // clears the withered crop
+        app.controller.harvest(COL, ROW); // limpia el cultivo marchito
         assertEquals(24, tracker.harvests());
         assertTrue(!tracker.has(Achievement.GREEN_THUMB));
 

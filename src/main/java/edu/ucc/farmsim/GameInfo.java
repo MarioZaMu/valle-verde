@@ -1,20 +1,20 @@
 package edu.ucc.farmsim;
 
 /**
- * Single source of the visible game name and the application version (RNF-12).
+ * Fuente única del nombre visible del juego y de la versión de la aplicación (RNF-12).
  *
- * <p>The name is provisional: renaming the game means changing {@link #NAME} only.
+ * <p>El nombre es provisional: renombrar el juego significa cambiar solo {@link #NAME}.
  * Stories: none (technical setup, phase 5.0).
  */
 public final class GameInfo {
 
-    /** Visible name of the game, shown in the window title and the start screen. */
+    /** Nombre visible del juego, mostrado en el título de la ventana y en la pantalla de inicio. */
     public static final String NAME = "Valle Verde";
 
-    /** Application version, kept in sync with the Maven project version. */
+    /** Versión de la aplicación, sincronizada con la versión del proyecto Maven. */
     public static final String VERSION = "0.1.0";
 
     private GameInfo() {
-        // constants holder
+                // contenedor de constantes
     }
 }

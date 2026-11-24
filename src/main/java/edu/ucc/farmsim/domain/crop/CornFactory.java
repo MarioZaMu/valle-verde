@@ -10,7 +10,7 @@ final class CornFactory extends CropFactory {
     static final CornFactory INSTANCE = new CornFactory();
 
     private CornFactory() {
-        // shared instance
+                // instancia compartida
     }
 
     @Override
