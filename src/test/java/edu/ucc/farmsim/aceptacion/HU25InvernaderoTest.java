@@ -31,7 +31,7 @@ class HU25InvernaderoTest {
         DatosJuego.desbloquear(aplicacion.estado(), Logro.BUILDER);
         DatosJuego.desbloquear(aplicacion.estado(), Logro.CAPITALIST);
         DatosJuego.dineroFijar(aplicacion.estado(), 2000);
-        assertTrue(aplicacion.controlador.build("GREENHOUSE", COL_INV, FILA_INV).isOk());
+        assertTrue(aplicacion.controlador.construir("GREENHOUSE", COL_INV, FILA_INV).isOk());
         return aplicacion;
     }
 
@@ -46,7 +46,7 @@ class HU25InvernaderoTest {
         DatosJuego.desbloquear(aplicacion.estado(), Logro.CAPITALIST);
         DatosJuego.dineroFijar(aplicacion.estado(), 2000);
 
-        var construido = aplicacion.controlador.build("GREENHOUSE", COL_INV, FILA_INV);
+        var construido = aplicacion.controlador.construir("GREENHOUSE", COL_INV, FILA_INV);
 
         assertTrue(construido.isOk());
         assertEquals(500, aplicacion.estado().dinero());
@@ -171,7 +171,7 @@ class HU25InvernaderoTest {
         AplicacionTest aplicacion = AplicacionTest.juegoIniciado();
         DatosJuego.dineroFijar(aplicacion.estado(), 3000);
 
-        assertEquals(CodigoError.EDIFICIO_BLOQUEADO, aplicacion.controlador.build("GREENHOUSE", COL_INV, FILA_INV).codigo());
+        assertEquals(CodigoError.EDIFICIO_BLOQUEADO, aplicacion.controlador.construir("GREENHOUSE", COL_INV, FILA_INV).codigo());
         assertEquals(0, aplicacion.estado().granja().contarEdificios(TipoEdificio.GREENHOUSE));
     }
 

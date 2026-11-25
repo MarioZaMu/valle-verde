@@ -291,7 +291,7 @@ public final class PanelMapa extends JPanel implements OyenteJuego {
     }
 
     private void refrescar() {
-        Resultado<VistaMapa> resultado = controlador.map();
+        Resultado<VistaMapa> resultado = controlador.mapa();
         if (resultado.isOk()) {
             show(resultado.value());
         }

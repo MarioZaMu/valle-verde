@@ -62,7 +62,7 @@ class HU19AnimalComprarTest {
         assertEquals(CodigoError.SIN_ESPACIO_ANIMALES, rechazado.codigo());
         assertEquals(500, aplicacion.estado().dinero());
 
-        Edificio segundo = DatosJuego.build(aplicacion.estado(), TipoEdificio.COOP, 5, 7);
+        Edificio segundo = DatosJuego.construir(aplicacion.estado(), TipoEdificio.COOP, 5, 7);
         Resultado<VistaEdificio> aceptado = aplicacion.controlador.animalComprar("HEN");
 
         assertTrue(aceptado.isOk());
@@ -75,7 +75,7 @@ class HU19AnimalComprarTest {
     void HU19_ca3_aCowGoesToTheBarnAndAHenNeverDoes() {
         AplicacionTest aplicacion = AplicacionTest.juegoIniciado();
         DatosJuego.dineroFijar(aplicacion.estado(), 1000);
-        DatosJuego.build(aplicacion.estado(), TipoEdificio.BARN, 2, 7);
+        DatosJuego.construir(aplicacion.estado(), TipoEdificio.BARN, 2, 7);
 
         assertEquals(CodigoError.SIN_ESPACIO_ANIMALES, aplicacion.controlador.animalComprar("HEN").codigo());
         assertTrue(aplicacion.controlador.animalComprar("COW").isOk());

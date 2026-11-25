@@ -61,7 +61,7 @@ class HU50ValleTest {
     @Test
     void HU50_ca1_cada_persona_esta_en_la_aldea_en_frente_de_su_casa_y_el_mapa_muestra_los_casas() {
         AplicacionTest aplicacion = AplicacionTest.juegoIniciado();
-        VistaMapa map = aplicacion.controlador.map().value();
+        VistaMapa map = aplicacion.controlador.mapa().value();
         Map<String, Casa> hogares = Map.of("MARTA", Casa.SHOP, "TOMAS", Casa.FARMHOUSE, "LUCIA", Casa.CLINIC,
                 "INES", Casa.COTTAGE);
 
@@ -91,12 +91,12 @@ class HU50ValleTest {
         assertEquals(CodigoError.MOVIMIENTO_BLOQUEADO, aplicacion.controlador.mover("SOUTH").codigo(), "into the shop");
         aplicacion.estado().avatar().restaurarDesde(new InstantaneaAvatar(18, 7, Direccion.NORTH));
         assertTrue(aplicacion.controlador.mover("SOUTH").isOk(), "along the path");
-        assertEquals("PATH", aplicacion.controlador.map().value().parcelaEn(18, 8).terreno());
+        assertEquals("PATH", aplicacion.controlador.mapa().value().parcelaEn(18, 8).terreno());
 
         assertFalse(aplicacion.controlador.plantar(20, 12, "CARROT_SEED").isOk(), "on the path");
         assertFalse(aplicacion.controlador.plantar(tienda.col(), tienda.fila(), "CARROT_SEED").isOk(), "on a house");
-        assertEquals(CodigoError.UBICACION_INVALIDA, aplicacion.controlador.build("COOP", 20, 12).codigo());
-        assertEquals(CodigoError.UBICACION_INVALIDA, aplicacion.controlador.build("COOP", tienda.col() - 1, tienda.fila()).codigo());
+        assertEquals(CodigoError.UBICACION_INVALIDA, aplicacion.controlador.construir("COOP", 20, 12).codigo());
+        assertEquals(CodigoError.UBICACION_INVALIDA, aplicacion.controlador.construir("COOP", tienda.col() - 1, tienda.fila()).codigo());
         assertEquals(energia, aplicacion.estado().energia().actual());
     }
 
@@ -107,9 +107,9 @@ class HU50ValleTest {
         aplicacion.controlador.juegoNuevo(AplicacionTest.SEED);
         aplicacion.controlador.tutorialSaltar();
         assertTrue(aplicacion.controlador.plantar(DatosJuego.COL_TIERRA, DatosJuego.FILA_TIERRA, "CARROT_SEED").isOk());
-        DatosJuego.build(aplicacion.estado(), TipoEdificio.COOP, 9, 7);
+        DatosJuego.construir(aplicacion.estado(), TipoEdificio.COOP, 9, 7);
         aplicacion.estado().avatar().restaurarDesde(new InstantaneaAvatar(12, 3, Direccion.WEST));
-        assertTrue(aplicacion.controlador.save(1).isOk());
+        assertTrue(aplicacion.controlador.guardar(1).isOk());
         assertEquals(3, mongo.documento(1).versionEsquema());
         mongo.manipular(1, HU50ValleTest::comoDosVersion);
         assertEquals(ReglasJuego.COLS_MAPA_HEREDADOS * ReglasJuego.FILAS_MAPA_HEREDADOS,
@@ -120,10 +120,10 @@ class HU50ValleTest {
 
         assertTrue(cargado.isOk(), String.valueOf(cargado.mensaje()));
         assertNotNull(aplicacion.controlador.inspeccionar(DatosJuego.COL_TIERRA, DatosJuego.FILA_TIERRA).value().cultivo());
-        assertEquals("COOP", aplicacion.controlador.map().value().edificioEn(9, 7).tipo());
-        assertEquals(12, aplicacion.controlador.map().value().avatar().col());
+        assertEquals("COOP", aplicacion.controlador.mapa().value().edificioEn(9, 7).tipo());
+        assertEquals(12, aplicacion.controlador.mapa().value().avatar().col());
         assertEquals(48 * 24, aplicacion.estado().mementoCrear().granja().cultivos().size());
-        assertTrue(aplicacion.controlador.save(1).isOk());
+        assertTrue(aplicacion.controlador.guardar(1).isOk());
         assertEquals(CodecGuardado.VERSION_ESQUEMA, mongo.documento(1).versionEsquema());
         assertEquals(3, CodecGuardado.VERSION_ESQUEMA);
     }

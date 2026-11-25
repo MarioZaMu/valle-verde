@@ -30,7 +30,7 @@ public final class JuegoRico {
         aplicacion.estado().inventario().add(TipoArticulo.CARROT, 5);
         aplicacion.controlador.vender("CARROT", 3);
         aplicacion.controlador.comprar("HAY", 5);
-        aplicacion.controlador.build("COOP", DatosJuego.COL_HIERBA, DatosJuego.FILA_HIERBA);
+        aplicacion.controlador.construir("COOP", DatosJuego.COL_HIERBA, DatosJuego.FILA_HIERBA);
         Edificio gallinero = aplicacion.estado().granja().edificios().get(0);
         DatosJuego.casa(gallinero, TipoAnimal.HEN, CondicionAnimal.HEALTHY, 0, false, 0);
         DatosJuego.casa(gallinero, TipoAnimal.HEN, CondicionAnimal.SICK, 3, false, 1);

@@ -98,7 +98,7 @@ public final class ServicioJuegoGuardado {
      *
      * @param ranura número de ranura, de 1 a 3
      */
-    public Resultado<VistaRanuraGuardado> save(int ranura) {
+    public Resultado<VistaRanuraGuardado> guardar(int ranura) {
         ranuraExigir(ranura);
         if (!sesion.tieneJuego()) {
             return Resultado.fallarCon(CodigoError.SIN_PARTIDA);
@@ -106,7 +106,7 @@ public final class ServicioJuegoGuardado {
         EstadoJuego estado = sesion.actual();
         Instant now = reloj.instant();
         try {
-            repositorio.save(ranura, estado.mementoCrear(), now);
+            repositorio.guardar(ranura, estado.mementoCrear(), now);
         } catch (ExcepcionAlmacenamientoGuardado e) {
             return Resultado.fallarCon(CodigoError.ERROR_ES, e.getMessage());
         }

@@ -29,7 +29,7 @@ public interface RepositorioGuardado {
      * @param archivadoEn momento del guardado
      * @throws ExcepcionAlmacenamientoGuardado si falla el almacenamiento
      */
-    void save(int ranura, MementoJuego memento, Instant archivadoEn);
+    void guardar(int ranura, MementoJuego memento, Instant archivadoEn);
 
     /**
      * Lee la partida guardada en la ranura, comprobando existencia, formato, versión y suma de control en ese orden

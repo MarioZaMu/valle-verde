@@ -56,13 +56,13 @@ public final class DatosJuego {
     }
 
     /** Pone un edificio en el mapa sin pagarlo ni comprobar su desbloqueo. */
-    public static Edificio build(EstadoJuego estado, TipoEdificio tipo, int col, int fila) {
+    public static Edificio construir(EstadoJuego estado, TipoEdificio tipo, int col, int fila) {
         return estado.granja().colocar(tipo, col, fila);
     }
 
     /** Pone un gallinero sobre el pasto libre de abajo a la izquierda. */
     public static Edificio gallinero(EstadoJuego estado) {
-        return build(estado, TipoEdificio.COOP, COL_HIERBA, FILA_HIERBA);
+        return construir(estado, TipoEdificio.COOP, COL_HIERBA, FILA_HIERBA);
     }
 
     /** Aloja un animal en un edificio en la situación dada, saltándose la compra y la alimentación. */

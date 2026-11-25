@@ -47,12 +47,12 @@ class RendimientoGranjaLlenoTest {
             }
         }
         List<Edificio> hogaresAnimal = new ArrayList<>();
-        hogaresAnimal.add(DatosJuego.build(estado, TipoEdificio.COOP, 2, 7));
-        hogaresAnimal.add(DatosJuego.build(estado, TipoEdificio.COOP, 5, 7));
-        hogaresAnimal.add(DatosJuego.build(estado, TipoEdificio.BARN, 8, 7));
-        hogaresAnimal.add(DatosJuego.build(estado, TipoEdificio.BARN, 11, 7));
-        DatosJuego.build(estado, TipoEdificio.WAREHOUSE, 2, 5);
-        DatosJuego.build(estado, TipoEdificio.GREENHOUSE, 12, 2);
+        hogaresAnimal.add(DatosJuego.construir(estado, TipoEdificio.COOP, 2, 7));
+        hogaresAnimal.add(DatosJuego.construir(estado, TipoEdificio.COOP, 5, 7));
+        hogaresAnimal.add(DatosJuego.construir(estado, TipoEdificio.BARN, 8, 7));
+        hogaresAnimal.add(DatosJuego.construir(estado, TipoEdificio.BARN, 11, 7));
+        DatosJuego.construir(estado, TipoEdificio.WAREHOUSE, 2, 5);
+        DatosJuego.construir(estado, TipoEdificio.GREENHOUSE, 12, 2);
         for (int col = 12; col < 15; col++) {
             for (int fila = 2; fila < 5; fila++) {
                 DatosJuego.plantar(estado, col, fila, TipoCultivo.PUMPKIN, 3, 1, true, false);
@@ -98,7 +98,7 @@ class RendimientoGranjaLlenoTest {
         assertEquals(16, aplicacion.estado().granja().edificios().stream().mapToInt(b -> b.animales().size()).sum());
 
         long start = System.nanoTime();
-        assertTrue(aplicacion.controlador.save(1).isOk());
+        assertTrue(aplicacion.controlador.guardar(1).isOk());
         long millis = (System.nanoTime() - start) / 1_000_000;
 
         int bytes = mongo.documento(1).estado().getBytes(java.nio.charset.StandardCharsets.UTF_8).length;
@@ -111,7 +111,7 @@ class RendimientoGranjaLlenoTest {
         MongoEnMemoria mongo = new MongoEnMemoria();
         AplicacionTest aplicacion = granjaLlena(mongo);
         MementoJuego archivado = aplicacion.estado().mementoCrear();
-        aplicacion.controlador.save(2);
+        aplicacion.controlador.guardar(2);
         AplicacionTest otro = AplicacionTest.create(new SesionJuego(), SecuenciaDia.estandar(), mongo.repositorio());
 
         long start = System.nanoTime();

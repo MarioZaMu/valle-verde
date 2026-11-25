@@ -165,7 +165,7 @@ public final class ClienteJuegoRemoto implements ComandosJuego {
     // Las listas (npcs) usan un TypeReference para que Jackson sepa el tipo de los elementos de la List.
 
     @Override
-    public Resultado<VistaMapa> map() {
+    public Resultado<VistaMapa> mapa() {
         return send("GET", "/api/farm/map", null, VistaMapa.class);
     }
 
@@ -246,7 +246,7 @@ public final class ClienteJuegoRemoto implements ComandosJuego {
     }
 
     @Override
-    public Resultado<VistaEdificio> build(String idEdificio, int col, int fila) {
+    public Resultado<VistaEdificio> construir(String idEdificio, int col, int fila) {
         return send("POST", "/api/buildings", Map.of("idEdificio", idEdificio, "col", col, "fila", fila),
                 VistaEdificio.class);
     }
@@ -291,7 +291,7 @@ public final class ClienteJuegoRemoto implements ComandosJuego {
     }
 
     @Override
-    public Resultado<VistaRanuraGuardado> save(int ranura) {
+    public Resultado<VistaRanuraGuardado> guardar(int ranura) {
         return send("PUT", "/api/saves/" + ranura, null, VistaRanuraGuardado.class);
     }
 

@@ -69,8 +69,8 @@ class HU18DialogoConstruccionTest {
     @Test
     void HU18_ca4_en_el_limite_el_edificio_es_bloqueado() {
         AplicacionTest aplicacion = AplicacionTest.juegoIniciado();
-        DatosJuego.build(aplicacion.estado(), TipoEdificio.COOP, 2, 7);
-        DatosJuego.build(aplicacion.estado(), TipoEdificio.COOP, 5, 7);
+        DatosJuego.construir(aplicacion.estado(), TipoEdificio.COOP, 2, 7);
+        DatosJuego.construir(aplicacion.estado(), TipoEdificio.COOP, 5, 7);
         PresentadorConstruccion presentador = new PresentadorConstruccion(aplicacion.controlador, 8, 7);
 
         assertEquals("Ya tienes el máximo de Gallineros.", presentador.bloquear(oferta(presentador, "COOP")));
@@ -81,7 +81,7 @@ class HU18DialogoConstruccionTest {
         AplicacionTest aplicacion = AplicacionTest.juegoIniciado();
         PresentadorConstruccion presentador = new PresentadorConstruccion(aplicacion.controlador, 2, 7);
 
-        String mensaje = presentador.build(oferta(presentador, "COOP"));
+        String mensaje = presentador.construir(oferta(presentador, "COOP"));
 
         assertEquals("Construiste: Gallinero.", mensaje);
         assertEquals(0, presentador.ultimoConstruido().orElseThrow().id());
@@ -94,7 +94,7 @@ class HU18DialogoConstruccionTest {
         AplicacionTest aplicacion = AplicacionTest.juegoIniciado();
         PresentadorConstruccion presentador = new PresentadorConstruccion(aplicacion.controlador, 4, 2);
 
-        String mensaje = presentador.build(oferta(presentador, "COOP"));
+        String mensaje = presentador.construir(oferta(presentador, "COOP"));
 
         assertEquals("No se puede construir aquí: el área debe ser hierba libre dentro del mapa.", mensaje);
         assertTrue(presentador.ultimoConstruido().isEmpty());

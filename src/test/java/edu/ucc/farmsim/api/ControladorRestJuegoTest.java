@@ -391,7 +391,7 @@ class ControladorRestJuegoTest {
                 .andExpect(jsonPath("$.datos.ranuras[0].monto").value(10));
     }
 
-    private ResultActions build(String idEdificio, int col, int fila) throws Exception {
+    private ResultActions construir(String idEdificio, int col, int fila) throws Exception {
         return mvc.perform(post("/api/buildings").contentType(MediaType.APPLICATION_JSON)
                 .content("{\"idEdificio\": \"" + idEdificio + "\", \"col\": " + col + ", \"fila\": " + fila + "}"));
     }
@@ -404,7 +404,7 @@ class ControladorRestJuegoTest {
     @Test
     void despachar_edificios_construye_y_devuelve_creado_con_los_eventos_de_el_orden() throws Exception {
         juegoNuevo();
-        build("COOP", 2, 7).andExpect(status().isCreated())
+        construir("COOP", 2, 7).andExpect(status().isCreated())
                 .andExpect(jsonPath("$.datos.name").value("Gallinero"))
                 .andExpect(jsonPath("$.datos.capacidad").value(4))
                 .andExpect(jsonPath("$.eventos[?(@.tipo == 'DineroCambiado')].datos.dinero").value(org.hamcrest.Matchers.contains(100, 200)))
@@ -415,13 +415,13 @@ class ControladorRestJuegoTest {
     @Test
     void POST_buildings_rejectionsKeepTheirRn35CodesAndStatus() throws Exception {
         juegoNuevo();
-        build("COOP", 3, 2).andExpect(status().isConflict())
+        construir("COOP", 3, 2).andExpect(status().isConflict())
                 .andExpect(jsonPath("$.codigo").value("UBICACION_INVALIDA"));
-        build("BARN", 2, 7).andExpect(status().isConflict())
+        construir("BARN", 2, 7).andExpect(status().isConflict())
                 .andExpect(jsonPath("$.codigo").value("EDIFICIO_BLOQUEADO"))
                 .andExpect(jsonPath("$.mensaje").value("Edificio bloqueado: requiere el logro «Manos a la tierra»."));
-        build("COOP", 2, 7);
-        build("COOP", 8, 7).andExpect(status().isConflict())
+        construir("COOP", 2, 7);
+        construir("COOP", 8, 7).andExpect(status().isConflict())
                 .andExpect(jsonPath("$.codigo").value("SIN_FONDOS"));
     }
 
@@ -429,7 +429,7 @@ class ControladorRestJuegoTest {
     void POST_buildings_withoutBodyFieldsIsABadRequestAndWithoutAGameIsNotFound() throws Exception {
         mvc.perform(post("/api/buildings").contentType(MediaType.APPLICATION_JSON).content("{}"))
                 .andExpect(status().isBadRequest()).andExpect(jsonPath("$.codigo").value("SOLICITUD_INVALIDA"));
-        build("COOP", 2, 7).andExpect(status().isNotFound()).andExpect(jsonPath("$.codigo").value("SIN_PARTIDA"));
+        construir("COOP", 2, 7).andExpect(status().isNotFound()).andExpect(jsonPath("$.codigo").value("SIN_PARTIDA"));
     }
 
     @Test
@@ -446,7 +446,7 @@ class ControladorRestJuegoTest {
     @Test
     void POST_animals_buysAHenAndReturnsTheBuildingThatHousesIt() throws Exception {
         juegoNuevo();
-        build("COOP", 2, 7);
+        construir("COOP", 2, 7);
         sesion.actual().ganar(2000);
         animalComprar("HEN").andExpect(status().isCreated())
                 .andExpect(jsonPath("$.datos.animales", hasSize(1)))
@@ -458,7 +458,7 @@ class ControladorRestJuegoTest {
     @Test
     void POST_feeding_collection_and_treatment_workOnTheBuildingAndItsAnimals() throws Exception {
         juegoNuevo();
-        build("COOP", 2, 7);
+        construir("COOP", 2, 7);
         var gallinero = sesion.actual().granja().edificios().get(0);
         gallinero.animalAgregar(new edu.ucc.farmsim.dominio.animal.Animal(edu.ucc.farmsim.dominio.animal.TipoAnimal.HEN));
         gallinero.animalAgregar(edu.ucc.farmsim.dominio.animal.Animal.desdeInstantanea(new edu.ucc.farmsim.dominio.animal.InstantaneaAnimal(
@@ -479,7 +479,7 @@ class ControladorRestJuegoTest {
     @Test
     void despachar_alimentacion_rechazos_son_conflictos_y_un_desconocido_edificio_es_un_interno_error() throws Exception {
         juegoNuevo();
-        build("COOP", 2, 7);
+        construir("COOP", 2, 7);
         sesion.actual().granja().edificios().get(0).animalAgregar(
                 new edu.ucc.farmsim.dominio.animal.Animal(edu.ucc.farmsim.dominio.animal.TipoAnimal.HEN));
 

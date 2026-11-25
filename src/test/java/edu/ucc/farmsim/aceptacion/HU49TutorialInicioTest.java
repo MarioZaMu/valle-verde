@@ -161,7 +161,7 @@ class HU49TutorialInicioTest {
 
         assertEquals(omitido.controlador.hud().value(), guiado.controlador.hud().value());
         assertEquals(omitido.controlador.inventario().value(), guiado.controlador.inventario().value());
-        assertEquals(omitido.controlador.map().value(), guiado.controlador.map().value());
+        assertEquals(omitido.controlador.mapa().value(), guiado.controlador.mapa().value());
     }
 
     @Test
@@ -171,8 +171,8 @@ class HU49TutorialInicioTest {
         aplicacion.controlador.juegoNuevo(AplicacionTest.SEED);
         jugar(aplicacion, 2);
         assertEquals("WATER", tutorial(aplicacion).paso());
-        assertTrue(aplicacion.controlador.save(1).isOk());
-        aplicacion.controlador.save(2);
+        assertTrue(aplicacion.controlador.guardar(1).isOk());
+        aplicacion.controlador.guardar(2);
         mongo.manipular(2, HU49TutorialInicioTest::sinTutorial);
         assertEquals(CodecGuardado.VERSION_ESQUEMA, mongo.documento(2).versionEsquema(), "the version did not change");
 

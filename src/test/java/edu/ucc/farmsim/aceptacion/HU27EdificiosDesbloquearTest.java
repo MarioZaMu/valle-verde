@@ -50,7 +50,7 @@ class HU27EdificiosDesbloquearTest {
         aplicacion.controlador.cosecha(DatosJuego.COL_TIERRA, DatosJuego.FILA_TIERRA);
 
         assertTrue(aplicacion.controlador.edificios().value().catalogo().get(2).desbloqueado());
-        assertTrue(aplicacion.controlador.build("WAREHOUSE", 2, 7).isOk());
+        assertTrue(aplicacion.controlador.construir("WAREHOUSE", 2, 7).isOk());
     }
 
     @Test
@@ -58,7 +58,7 @@ class HU27EdificiosDesbloquearTest {
         AplicacionTest aplicacion = AplicacionTest.juegoIniciado();
         DatosJuego.dineroFijar(aplicacion.estado(), 3000);
 
-        var invernadero = aplicacion.controlador.build("GREENHOUSE", 2, 7);
+        var invernadero = aplicacion.controlador.construir("GREENHOUSE", 2, 7);
 
         assertEquals(CodigoError.EDIFICIO_BLOQUEADO, invernadero.codigo());
         assertEquals("Edificio bloqueado: requiere el logro «Capitalista».", invernadero.mensaje());
@@ -70,7 +70,7 @@ class HU27EdificiosDesbloquearTest {
         AplicacionTest aplicacion = AplicacionTest.create(new SesionJuego(), SecuenciaDia.estandar(), mongo.repositorio());
         aplicacion.controlador.juegoNuevo(AplicacionTest.SEED);
         DatosJuego.desbloquear(aplicacion.estado(), Logro.GREEN_THUMB);
-        aplicacion.controlador.save(1);
+        aplicacion.controlador.guardar(1);
         aplicacion.controlador.juegoNuevo(5L);
         assertFalse(desbloqueado(aplicacion).get(1));
 

@@ -207,7 +207,7 @@ class HU50CamaraYCaminarTest {
 
         assertEquals(PanelMapa.MS_RETRASO_MARCO_CAMINAR, panel.retrasoMarco(), "while it walks the map is drawn 60 times a second");
         assertEquals(llamadas, llamadasMapa.get(), "a step does not ask for the 1152 plots again (it made the walk jerk)");
-        assertEquals(aplicacion.controlador.map().value().avatar(), panel.vistaActual().avatar(), "the avatar is where it went");
+        assertEquals(aplicacion.controlador.mapa().value().avatar(), panel.vistaActual().avatar(), "the avatar is where it went");
         assertEquals(manera, panel.vistaActual().avatar().mirada());
         assertEquals(antes.parcelas(), panel.vistaActual().parcelas(), "the rest of the valley is the same");
 
@@ -220,7 +220,7 @@ class HU50CamaraYCaminarTest {
 
     @Test
     void HU50_ca5_aMovingCameraSlidesTheGroundAlreadyPaintedInsteadOfPaintingItAgainOnEveryRow() {
-        VistaMapa valle = AplicacionTest.juegoIniciado().controlador.map().value();
+        VistaMapa valle = AplicacionTest.juegoIniciado().controlador.mapa().value();
         DibujanteMapa dibujante = new DibujanteMapa(GestorRecurso.desdeClasspath());
         Rectangle libre = new Rectangle(0, 120, 1920, 760);
         BufferedImage imagen = new BufferedImage(1920, 1080, BufferedImage.TYPE_INT_ARGB);

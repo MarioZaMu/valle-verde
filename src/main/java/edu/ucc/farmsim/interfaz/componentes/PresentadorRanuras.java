@@ -82,11 +82,11 @@ public final class PresentadorRanuras {
      * @param confirmado se le pregunta cuando la ranura está ocupada; el guardado sigue solo si responde {@code true}
      * @return el mensaje que se muestra, o un texto vacío si el jugador canceló
      */
-    public String save(int ranura, BooleanSupplier confirmado) {
+    public String guardar(int ranura, BooleanSupplier confirmado) {
         if (confirmacionNecesita(ranura) && !confirmado.getAsBoolean()) {
             return "";
         }
-        Resultado<VistaRanuraGuardado> resultado = juego.save(ranura);
+        Resultado<VistaRanuraGuardado> resultado = juego.guardar(ranura);
         refrescar();
         return resultado.isOk() ? Textos.ARCHIVADO_EN_RANURA + ranura + "." : resultado.mensaje();
     }

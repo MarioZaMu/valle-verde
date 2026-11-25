@@ -22,7 +22,7 @@ class HU24AlmacenTest {
         DatosJuego.desbloquear(aplicacion.estado(), Logro.FIRST_HARVEST);
         assertEquals(24, aplicacion.estado().inventario().capacidad());
 
-        Resultado<VistaEdificio> resultado = aplicacion.controlador.build("WAREHOUSE", 2, 7);
+        Resultado<VistaEdificio> resultado = aplicacion.controlador.construir("WAREHOUSE", 2, 7);
 
         assertTrue(resultado.isOk(), String.valueOf(resultado.mensaje()));
         assertEquals(300, aplicacion.estado().dinero()); // 500 - 300 + 100 of LG-06
@@ -34,10 +34,10 @@ class HU24AlmacenTest {
     void HU24_ca2_aSecondWarehouseIsRejectedByTheLimit() {
         AplicacionTest aplicacion = AplicacionTest.juegoIniciado();
         DatosJuego.desbloquear(aplicacion.estado(), Logro.FIRST_HARVEST);
-        DatosJuego.build(aplicacion.estado(), TipoEdificio.WAREHOUSE, 2, 7);
+        DatosJuego.construir(aplicacion.estado(), TipoEdificio.WAREHOUSE, 2, 7);
 
                 // (9, 7): pasto libre lejos del avatar, que está en (7, 7) y sobre el que nunca se construye (RN-36)
-        Resultado<VistaEdificio> resultado = aplicacion.controlador.build("WAREHOUSE", 9, 7);
+        Resultado<VistaEdificio> resultado = aplicacion.controlador.construir("WAREHOUSE", 9, 7);
 
         assertEquals(CodigoError.LIMITE_EDIFICIOS, resultado.codigo());
         assertEquals("Ya tienes el máximo de Almacenes.", resultado.mensaje());
@@ -47,7 +47,7 @@ class HU24AlmacenTest {
     void HU24_ca3_sin_el_logro_eso_es_bloqueado() {
         AplicacionTest aplicacion = AplicacionTest.juegoIniciado();
 
-        Resultado<VistaEdificio> resultado = aplicacion.controlador.build("WAREHOUSE", 2, 7);
+        Resultado<VistaEdificio> resultado = aplicacion.controlador.construir("WAREHOUSE", 2, 7);
 
         assertEquals(CodigoError.EDIFICIO_BLOQUEADO, resultado.codigo());
         assertEquals("Edificio bloqueado: requiere el logro «Primera cosecha».", resultado.mensaje());
@@ -61,7 +61,7 @@ class HU24AlmacenTest {
         DatosJuego.salvoInventarioRellenar(aplicacion.estado(), TipoArticulo.CARROT, 5);
         assertEquals(false, aplicacion.estado().inventario().add(TipoArticulo.MEDICINE, 1));
 
-        aplicacion.controlador.build("WAREHOUSE", 2, 7);
+        aplicacion.controlador.construir("WAREHOUSE", 2, 7);
 
         assertTrue(aplicacion.estado().inventario().add(TipoArticulo.MEDICINE, 1));
         assertEquals(25, aplicacion.estado().inventario().ranurasUsados());
@@ -71,7 +71,7 @@ class HU24AlmacenTest {
     void HU24_theWidenedInventorySurvivesAMementoRestore() {
         AplicacionTest aplicacion = AplicacionTest.juegoIniciado();
         DatosJuego.desbloquear(aplicacion.estado(), Logro.FIRST_HARVEST);
-        aplicacion.controlador.build("WAREHOUSE", 2, 7);
+        aplicacion.controlador.construir("WAREHOUSE", 2, 7);
         var archivado = aplicacion.estado().mementoCrear();
 
         aplicacion.estado().inventario().ranurasAgregar(1);

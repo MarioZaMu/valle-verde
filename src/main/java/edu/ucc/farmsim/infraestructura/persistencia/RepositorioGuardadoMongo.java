@@ -57,7 +57,7 @@ public class RepositorioGuardadoMongo implements RepositorioGuardado {
     }
 
     @Override
-    public void save(int ranura, MementoJuego memento, Instant archivadoEn) {
+    public void guardar(int ranura, MementoJuego memento, Instant archivadoEn) {
         ranuraExigir(ranura);
         DocumentoGuardado documento = codec.codificar(ranura, memento, archivadoEn);
         protegido("saving slot " + ranura, () -> mongo.save(documento));

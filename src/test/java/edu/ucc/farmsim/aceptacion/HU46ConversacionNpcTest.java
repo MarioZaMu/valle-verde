@@ -136,11 +136,11 @@ class HU46ConversacionNpcTest {
         aplicacion.estado().avatar().restaurarDesde(new InstantaneaAvatar(Npc.MARTA.col() - 1, Npc.MARTA.fila(), Direccion.NORTH));
 
         assertEquals(CodigoError.MOVIMIENTO_BLOQUEADO, aplicacion.controlador.mover("EAST").codigo());
-        assertEquals("EAST", aplicacion.controlador.map().value().avatar().mirada());
+        assertEquals("EAST", aplicacion.controlador.mapa().value().avatar().mirada());
         DatosJuego.dineroFijar(aplicacion.estado(), 5_000);
         assertEquals(CodigoError.UBICACION_INVALIDA,
-                aplicacion.controlador.build("COOP", Npc.INES.col(), Npc.INES.fila()).codigo());
-        List<VistaNpc> dibujado = aplicacion.controlador.map().value().npcs();
+                aplicacion.controlador.construir("COOP", Npc.INES.col(), Npc.INES.fila()).codigo());
+        List<VistaNpc> dibujado = aplicacion.controlador.mapa().value().npcs();
         assertEquals(4, dibujado.size());
         assertEquals(new VistaNpc("INES", "Inés", "Vecina", 37, 17, "EGG", 4, 80, false), dibujado.get(3));
     }

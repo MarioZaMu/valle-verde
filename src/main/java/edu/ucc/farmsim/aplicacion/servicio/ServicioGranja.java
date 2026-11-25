@@ -187,7 +187,7 @@ public final class ServicioGranja {
     }
 
     /** Todo el mapa de la granja, para dibujarlo. Una consulta pura. */
-    public Resultado<VistaMapa> map() {
+    public Resultado<VistaMapa> mapa() {
         if (!sesion.tieneJuego()) {
             return Resultado.fallarCon(CodigoError.SIN_PARTIDA);
         }

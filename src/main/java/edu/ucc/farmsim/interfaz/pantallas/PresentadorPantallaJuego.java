@@ -94,7 +94,7 @@ public final class PresentadorPantallaJuego {
      * edificio bajo el clic (HU-36 · CA-4).
      */
     public void onParcelaClicada(int col, int fila) {
-        Resultado<VistaMapa> map = controlador.map();
+        Resultado<VistaMapa> map = controlador.mapa();
         VistaNpc npc = map.isOk() ? map.value().npcEn(col, fila) : null;
         if (npc != null) {
             onHablar(npc.id());
@@ -161,7 +161,7 @@ public final class PresentadorPantallaJuego {
      * que un clic allí (RN-36).
      */
     public void onHerramientaUsar() {
-        Resultado<VistaMapa> map = controlador.map();
+        Resultado<VistaMapa> map = controlador.mapa();
         if (!map.isOk()) {
             show(false, LIMPIAR, map.mensaje());
             return;
@@ -180,7 +180,7 @@ public final class PresentadorPantallaJuego {
      * E: hablar con la persona que está frente al avatar, o si no con cualquier persona a su lado (RN-37).
      */
     public void onClaveHablar() {
-        Resultado<VistaMapa> map = controlador.map();
+        Resultado<VistaMapa> map = controlador.mapa();
         if (!map.isOk()) {
             show(false, LIMPIAR, map.mensaje());
             return;
@@ -245,7 +245,7 @@ public final class PresentadorPantallaJuego {
     }
 
     private VistaEdificio edificioEn(int col, int fila) {
-        Resultado<VistaMapa> map = controlador.map();
+        Resultado<VistaMapa> map = controlador.mapa();
         return map.isOk() ? map.value().edificioEn(col, fila) : null;
     }
 
@@ -285,7 +285,7 @@ public final class PresentadorPantallaJuego {
             dialogos.ranurasMostrar(true);
             return;
         }
-        Resultado<VistaRanuraGuardado> resultado = controlador.save(ranuraUltima);
+        Resultado<VistaRanuraGuardado> resultado = controlador.guardar(ranuraUltima);
         show(resultado.isOk(), Textos.ARCHIVADO_EN_RANURA + ranuraUltima + ".", resultado.mensaje());
     }
 

@@ -36,7 +36,7 @@ class HU29JuegoGuardadoTest {
         AplicacionTest aplicacion = aplicacionCon(mongo);
 
                 // Cuando el jugador guarda en la ranura 2
-        Resultado<VistaRanuraGuardado> resultado = aplicacion.controlador.save(2);
+        Resultado<VistaRanuraGuardado> resultado = aplicacion.controlador.guardar(2);
 
                 // Entonces existe el documento slot2 con schemaVersion 3 (1 antes del avatar, 2 antes del valle), savedAt,
         // state y el SHA-256 del estado
@@ -57,29 +57,29 @@ class HU29JuegoGuardadoTest {
     @Test
     void HU29_ca2_aFailedWriteLeavesThePreviousDocumentAndTheGameInPlay() {
         AplicacionTest aplicacion = aplicacionCon(mongo);
-        aplicacion.controlador.save(1);
+        aplicacion.controlador.guardar(1);
         DocumentoGuardado antes = mongo.documento(1);
         aplicacion.controlador.diaFin();
         mongo.abajoIr();
 
-        Resultado<VistaRanuraGuardado> resultado = aplicacion.controlador.save(1);
+        Resultado<VistaRanuraGuardado> resultado = aplicacion.controlador.guardar(1);
 
         assertEquals(CodigoError.ERROR_ES, resultado.codigo());
         assertEquals("No se pudo acceder a las partidas guardadas: MongoDB no respondió.", resultado.mensaje());
         assertEquals(antes, mongo.documento(1));
         assertEquals(2, aplicacion.controlador.hud().value().dia());
         mongo.atrasVenir();
-        assertTrue(aplicacion.controlador.save(1).isOk());
+        assertTrue(aplicacion.controlador.guardar(1).isOk());
     }
 
     @Test
     void HU29_ca3_guardando_en_un_ocupado_ranura_reemplaza_su_documento() {
         AplicacionTest aplicacion = aplicacionCon(mongo);
-        aplicacion.controlador.save(3);
+        aplicacion.controlador.guardar(3);
         String first = mongo.documento(3).estado();
         aplicacion.controlador.diaFin();
 
-        aplicacion.controlador.save(3);
+        aplicacion.controlador.guardar(3);
 
         assertTrue(!first.equals(mongo.documento(3).estado()));
         assertEquals(Checksum.of(mongo.documento(3).estado()), mongo.documento(3).checksum());
@@ -89,15 +89,15 @@ class HU29JuegoGuardadoTest {
     void HU29_withoutAGameThereIsNothingToSave() {
         AplicacionTest aplicacion = AplicacionTest.create(new SesionJuego(), SecuenciaDia.estandar(), mongo.repositorio());
 
-        assertEquals(CodigoError.SIN_PARTIDA, aplicacion.controlador.save(1).codigo());
+        assertEquals(CodigoError.SIN_PARTIDA, aplicacion.controlador.guardar(1).codigo());
     }
 
     @Test
     void HU29_aSlotOutsideTheThreeIsAnInternalErrorAndWritesNothing() {
         AplicacionTest aplicacion = aplicacionCon(mongo);
 
-        assertEquals(CodigoError.ERROR_INTERNO, aplicacion.controlador.save(4).codigo());
-        assertEquals(CodigoError.ERROR_INTERNO, aplicacion.controlador.save(0).codigo());
+        assertEquals(CodigoError.ERROR_INTERNO, aplicacion.controlador.guardar(4).codigo());
+        assertEquals(CodigoError.ERROR_INTERNO, aplicacion.controlador.guardar(0).codigo());
     }
 
     @Test
@@ -106,7 +106,7 @@ class HU29JuegoGuardadoTest {
         MongoEnMemoria basedatos = new MongoEnMemoria();
         AplicacionTest guardando = AplicacionTest.create(aplicacion.sesion, SecuenciaDia.estandar(), basedatos.repositorio());
 
-        assertTrue(guardando.controlador.save(1).isOk());
+        assertTrue(guardando.controlador.guardar(1).isOk());
 
         assertTrue(basedatos.documento(1).estado().contains("\"edificios\""));
         assertTrue(basedatos.documento(1).estado().length() < 200 * 1024);

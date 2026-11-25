@@ -163,7 +163,7 @@ class HU37GrillaInventarioTest {
         ModeloInventario modelo = modeloDe(aplicacion, new ModeloHerramienta());
         assertEquals(24, modelo.conteoRanura());
 
-        aplicacion.controlador.build("WAREHOUSE", 2, 7);
+        aplicacion.controlador.construir("WAREHOUSE", 2, 7);
 
         assertEquals(36, modelo.conteoRanura());
     }

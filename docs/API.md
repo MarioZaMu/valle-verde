@@ -23,7 +23,7 @@ Las columnas de tipo usan los *records* de `application.dto` (`VistaHud`, `Vista
 | `POST /api/game` | `juegoNuevo(semilla)` | `{ "semilla": 2026 }` | `VistaHud` | `201` |
 | `GET /api/game` | `hud()` | — | `VistaHud` | `200` |
 | `POST /api/game/days` | `diaFin()` | — | `VistaHud` | `200` |
-| `GET /api/farm/map` | `map()` | — | `VistaMapa` (48 × 24 parcelas, edificios, avatar, `npcs` y `casas`: id, columna, fila, ancho y alto de cada casa del valle) | `200` |
+| `GET /api/farm/map` | `mapa()` | — | `VistaMapa` (48 × 24 parcelas, edificios, avatar, `npcs` y `casas`: id, columna, fila, ancho y alto de cada casa del valle) | `200` |
 | `POST /api/avatar/moves` | `mover(direccion)` | `{ "direccion": "EAST" }` (`NORTH`, `SOUTH`, `EAST` o `WEST`; otro valor es `400`) | `VistaAvatar` (`col`, `fila`, `mirada`); evento `AvatarMovido` | `200` |
 | `GET /api/npcs` | `npcs()` | — | lista de `VistaNpc` (id, nombre, rol, parcela, encargo y si está cumplido) | `200` |
 | `POST /api/npcs/{id}/talk` | `hablar(id)` | — | `VistaConversacion` (nombre, rol, texto, línea del encargo); sin eventos | `200` |
@@ -40,7 +40,7 @@ Las columnas de tipo usan los *records* de `application.dto` (`VistaHud`, `Vista
 | `GET /api/market/quotes?idArticulo=CARROT&cantidad=3` | `cotizar(idArticulo, cantidad)` | — | total previsto (m), sin vender | `200` |
 | `GET /api/inventory` | `inventario()` | — | `VistaInventario` (capacidad y casillas ocupadas) | `200` |
 | `GET /api/buildings` | `edificios()` | — | `VistaEdificios` (los edificios y el catálogo de construcción) | `200` |
-| `POST /api/buildings` | `build(idEdificio, col, fila)` | `{ "idEdificio": "COOP", "col": 2, "fila": 7 }` | `VistaEdificio` | `201` |
+| `POST /api/buildings` | `construir(idEdificio, col, fila)` | `{ "idEdificio": "COOP", "col": 2, "fila": 7 }` | `VistaEdificio` | `201` |
 | `POST /api/animals` | `animalComprar(animalId)` | `{ "animalId": "HEN" }` | `VistaEdificio` donde vive el animal | `201` |
 | `POST /api/buildings/{id}/feeding` | `alimentar(id)` | — | `VistaAccionEdificio` (cantidad alimentada y aviso opcional) | `200` |
 | `POST /api/buildings/{id}/collection` | `collect(id)` | — | `VistaAccionEdificio` (unidades recogidas y aviso opcional) | `200` |
@@ -48,7 +48,7 @@ Las columnas de tipo usan los *records* de `application.dto` (`VistaHud`, `Vista
 | `GET /api/achievements` | `logros()` | — | lista de `VistaLogro` (nombre, condición, recompensa, progreso) | `200` |
 | `GET /api/saves/any` | `tieneJuegosArchivados()` | — | `true` / `false` | `200` |
 | `GET /api/saves` | `guardarRanuras()` | — | las 3 ranuras (`VistaRanuraGuardado`: `EMPTY`, `OK` o `DAMAGED`; una dañada no impide listar las demás) | `200` |
-| `PUT /api/saves/{ranura}` | `save(ranura)` | — | la ranura como queda (`VistaRanuraGuardado`) | `200` |
+| `PUT /api/saves/{ranura}` | `guardar(ranura)` | — | la ranura como queda (`VistaRanuraGuardado`) | `200` |
 | `POST /api/saves/{ranura}/load` | `cargar(ranura)` | — | `VistaHud` de la partida cargada; evento `JuegoIniciado` | `200` |
 
 `tieneJuegoEnProgreso()` no tiene ruta propia: el cliente lo deduce de `GET /api/game` (`404 SIN_PARTIDA` = no hay partida).

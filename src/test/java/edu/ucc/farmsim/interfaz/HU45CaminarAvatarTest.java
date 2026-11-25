@@ -109,7 +109,7 @@ class HU45CaminarAvatarTest {
         assertFalse(presentador.onMover("SOUTH"));
 
         assertEquals("No puedes pasar por ahí.", mensajes.get(mensajes.size() - 1));
-        assertEquals("SOUTH", aplicacion.controlador.map().value().avatar().mirada());
+        assertEquals("SOUTH", aplicacion.controlador.mapa().value().avatar().mirada());
     }
 
     @Test
@@ -150,7 +150,7 @@ class HU45CaminarAvatarTest {
     @Test
     void HU45_ca5_el_avatar_es_dibujado_y_su_caminar_cambia_el_imagen_pero_no_el_juego() {
         AplicacionTest aplicacion = AplicacionTest.juegoIniciado();
-        VistaAvatar antes = aplicacion.controlador.map().value().avatar();
+        VistaAvatar antes = aplicacion.controlador.mapa().value().avatar();
         for (GestorRecurso recursos : List.of(GestorRecurso.desdeClasspath(), GestorRecurso.soloVector())) {
             DibujanteMapa dibujante = new DibujanteMapa(recursos);
             assertFalse(Arrays.equals(celdaPintar(dibujante, campo(null), null, 7, 7),
@@ -175,6 +175,6 @@ class HU45CaminarAvatarTest {
         assertFalse(Arrays.equals(leaving, arriving), "it moves across the plot");
         assertTrue(Arrays.equals(resto, celdaPintar(dibujante, campo(new VistaAvatar(8, 7, "EAST")), fx, 8, 7)),
                 "at rest the picture stays still");
-        assertEquals(antes, aplicacion.controlador.map().value().avatar(), "drawing never touches the game");
+        assertEquals(antes, aplicacion.controlador.mapa().value().avatar(), "drawing never touches the game");
     }
 }

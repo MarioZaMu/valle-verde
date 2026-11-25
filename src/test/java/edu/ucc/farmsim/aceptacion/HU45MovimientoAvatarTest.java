@@ -39,7 +39,7 @@ class HU45MovimientoAvatarTest {
     }
 
     private static VistaAvatar avatar(AplicacionTest aplicacion) {
-        return aplicacion.controlador.map().value().avatar();
+        return aplicacion.controlador.mapa().value().avatar();
     }
 
     @Test
@@ -107,7 +107,7 @@ class HU45MovimientoAvatarTest {
         AplicacionTest aplicacion = AplicacionTest.juegoIniciado();
         colocar(aplicacion, DatosJuego.COL_HIERBA + 1, DatosJuego.FILA_HIERBA + 1, Direccion.SOUTH);
 
-        Resultado<?> build = aplicacion.controlador.build("COOP", DatosJuego.COL_HIERBA, DatosJuego.FILA_HIERBA);
+        Resultado<?> build = aplicacion.controlador.construir("COOP", DatosJuego.COL_HIERBA, DatosJuego.FILA_HIERBA);
 
         assertEquals(CodigoError.UBICACION_INVALIDA, build.codigo());
         assertEquals(CodigoError.SIN_PARTIDA, AplicacionTest.create().controlador.mover("EAST").codigo());
@@ -120,7 +120,7 @@ class HU45MovimientoAvatarTest {
         AplicacionTest aplicacion = AplicacionTest.create(new SesionJuego(), SecuenciaDia.estandar(), mongo.repositorio());
         aplicacion.controlador.juegoNuevo(AplicacionTest.SEED);
         colocar(aplicacion, 12, 3, Direccion.WEST);
-        assertTrue(aplicacion.controlador.save(1).isOk());
+        assertTrue(aplicacion.controlador.guardar(1).isOk());
         assertEquals(CodecGuardado.VERSION_ESQUEMA, mongo.documento(1).versionEsquema());
 
         aplicacion.controlador.juegoNuevo(AplicacionTest.SEED + 1);
@@ -137,7 +137,7 @@ class HU45MovimientoAvatarTest {
         AplicacionTest aplicacion = AplicacionTest.create(new SesionJuego(), SecuenciaDia.estandar(), mongo.repositorio());
         aplicacion.controlador.juegoNuevo(AplicacionTest.SEED);
         colocar(aplicacion, 12, 3, Direccion.WEST);
-        aplicacion.controlador.save(2);
+        aplicacion.controlador.guardar(2);
         mongo.manipular(2, HU45MovimientoAvatarTest::comoUnoVersion);
         assertFalse(mongo.documento(2).estado().contains("avatar"));
         colocar(aplicacion, 1, 1, Direccion.EAST);
@@ -157,7 +157,7 @@ class HU45MovimientoAvatarTest {
         assertArrayEquals(new int[] {12, 1}, granja.cercanoTransitable(13, 1), "next to the pond");
 
         AplicacionTest aplicacion = AplicacionTest.juegoIniciado();
-        DatosJuego.build(aplicacion.estado(), TipoEdificio.COOP, ReglasJuego.COL_INICIO_AVATAR, ReglasJuego.FILA_INICIO_AVATAR);
+        DatosJuego.construir(aplicacion.estado(), TipoEdificio.COOP, ReglasJuego.COL_INICIO_AVATAR, ReglasJuego.FILA_INICIO_AVATAR);
         MementoJuego bueno = aplicacion.estado().mementoCrear();
         MementoJuego v1 = new MementoJuego(bueno.fecha(), bueno.dinero(), bueno.energia(), bueno.inventario(), bueno.granja(),
                 bueno.hoy(), bueno.pronostico(), bueno.estadoAzar(), bueno.mercado(), bueno.libro(), bueno.progreso());
@@ -184,7 +184,7 @@ class HU45MovimientoAvatarTest {
         MongoEnMemoria mongo = new MongoEnMemoria();
         AplicacionTest aplicacion = AplicacionTest.create(new SesionJuego(), SecuenciaDia.estandar(), mongo.repositorio());
         aplicacion.controlador.juegoNuevo(AplicacionTest.SEED);
-        aplicacion.controlador.save(1);
+        aplicacion.controlador.guardar(1);
         for (int version : new int[] {0, CodecGuardado.VERSION_ESQUEMA + 1}) {
             mongo.manipular(1, d -> new DocumentoGuardado(d.id(), version, d.archivadoEn(), d.estado(), d.checksum()));
             assertEquals(CodigoError.VERSION_NO_SOPORTADA, aplicacion.controlador.cargar(1).codigo(), "version " + version);

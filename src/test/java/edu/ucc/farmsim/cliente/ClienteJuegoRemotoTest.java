@@ -133,7 +133,7 @@ class ClienteJuegoRemotoTest {
         assertTrue(remoto.isOk(), String.valueOf(remoto.mensaje()));
         assertEquals(aqui.value(), remoto.value());
         assertEquals(local.eventos, eventos);
-        assertEquals(aqui.value(), cliente.map().value().avatar());
+        assertEquals(aqui.value(), cliente.mapa().value().avatar());
         cliente.mover("SOUTH");
         cliente.mover("WEST");
         Resultado<VistaAvatar> bloqueado = cliente.mover("SOUTH");
@@ -175,7 +175,7 @@ class ClienteJuegoRemotoTest {
         assertEquals(local.controlador.entregar("MARTA").value(), cliente.entregar("MARTA").value());
         assertEquals(local.eventos, eventos);
         assertEquals(CodigoError.NPC_LEJOS, cliente.hablar("INES").codigo());
-        assertEquals(local.controlador.map().value(), cliente.map().value());
+        assertEquals(local.controlador.mapa().value(), cliente.mapa().value());
     }
 
     @Test
@@ -218,7 +218,7 @@ class ClienteJuegoRemotoTest {
         cliente.juegoNuevo(AplicacionTest.SEED);
         cliente.plantar(COL, FILA, "CARROT_SEED");
 
-        Resultado<VistaMapa> map = cliente.map();
+        Resultado<VistaMapa> map = cliente.mapa();
         Resultado<VistaParcela> parcela = cliente.inspeccionar(COL, FILA);
 
         assertTrue(map.isOk());
@@ -312,11 +312,11 @@ class ClienteJuegoRemotoTest {
         sesion.actual().ganar(500);
         eventos.clear();
 
-        Resultado<VistaEdificio> construido = cliente.build("COOP", 2, 7);
+        Resultado<VistaEdificio> construido = cliente.construir("COOP", 2, 7);
         Resultado<VistaEdificio> bought = cliente.animalComprar("HEN");
         Resultado<VistaAccionEdificio> fed = cliente.alimentar(0);
         Resultado<VistaEdificios> todo = cliente.edificios();
-        Resultado<VistaMapa> map = cliente.map();
+        Resultado<VistaMapa> map = cliente.mapa();
         cliente.diaFin();
         Resultado<VistaAccionEdificio> recolectado = cliente.collect(0);
 
@@ -329,7 +329,7 @@ class ClienteJuegoRemotoTest {
         assertEquals(0, map.value().edificioEn(3, 8).id());
         assertEquals(1, recolectado.value().monto());
         assertEquals(1, eventos.stream().filter(EventoJuego.ResumenDiaListo.class::isInstance).count());
-        assertEquals(CodigoError.UBICACION_INVALIDA, cliente.build("COOP", 3, 2).codigo());
+        assertEquals(CodigoError.UBICACION_INVALIDA, cliente.construir("COOP", 3, 2).codigo());
     }
 
     @Test
@@ -338,7 +338,7 @@ class ClienteJuegoRemotoTest {
         eventos.clear();
 
         Resultado<java.util.List<edu.ucc.farmsim.aplicacion.dto.VistaLogro>> logros = cliente.logros();
-        Resultado<edu.ucc.farmsim.aplicacion.dto.VistaRanuraGuardado> archivado = cliente.save(1);
+        Resultado<edu.ucc.farmsim.aplicacion.dto.VistaRanuraGuardado> archivado = cliente.guardar(1);
         cliente.diaFin();
         Resultado<java.util.List<edu.ucc.farmsim.aplicacion.dto.VistaRanuraGuardado>> ranuras = cliente.guardarRanuras();
         eventos.clear();
@@ -380,7 +380,7 @@ class ClienteJuegoRemotoTest {
         log.add(describir(juego.cosecha(COL, FILA)));
         log.add(describir(juego.diaFin()));
         log.add(describir(juego.inspeccionar(COL, FILA)));
-        log.add(describir(juego.map()));
+        log.add(describir(juego.mapa()));
         log.add(describir(juego.comprar("CORN_SEED", 5)));
         log.add(describir(juego.comprar("MEDICINE", 99)));
         log.add(describir(juego.comprar("HAY", 0)));
@@ -388,9 +388,9 @@ class ClienteJuegoRemotoTest {
         log.add(describir(juego.cotizar("CARROT", 1)));
         log.add(describir(juego.mercado()));
         log.add(describir(juego.inventario()));
-        log.add(describir(juego.build("COOP", 2, 7)));
-        log.add(describir(juego.build("COOP", 3, 2)));
-        log.add(describir(juego.build("BARN", 8, 7)));
+        log.add(describir(juego.construir("COOP", 2, 7)));
+        log.add(describir(juego.construir("COOP", 3, 2)));
+        log.add(describir(juego.construir("BARN", 8, 7)));
         log.add(describir(juego.animalComprar("HEN")));
         log.add(describir(juego.animalComprar("COW")));
         log.add(describir(juego.alimentar(0)));
@@ -399,7 +399,7 @@ class ClienteJuegoRemotoTest {
         log.add(describir(juego.edificios()));
         log.add(describir(juego.diaFin()));
         log.add(describir(juego.logros()));
-        log.add(juego.save(2).isOk()); // la hora del guardado difiere entre los dos relojes
+        log.add(juego.guardar(2).isOk()); // la hora del guardado difiere entre los dos relojes
         log.add(juego.guardarRanuras().value().stream().map(edu.ucc.farmsim.aplicacion.dto.VistaRanuraGuardado::status).toList());
         log.add(describir(juego.cargar(2)));
         log.add(describir(juego.cargar(3)));

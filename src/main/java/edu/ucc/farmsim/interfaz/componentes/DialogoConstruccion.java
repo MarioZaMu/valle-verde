@@ -81,7 +81,7 @@ public final class DialogoConstruccion extends JDialog {
         if (oferta == null) {
             return;
         }
-        mensaje.setText(presentador.build(oferta));
+        mensaje.setText(presentador.construir(oferta));
         if (presentador.ultimoConstruido().isPresent()) {
             dispose();
             return;

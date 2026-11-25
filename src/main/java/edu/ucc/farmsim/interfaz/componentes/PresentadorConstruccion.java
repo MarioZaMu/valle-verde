@@ -110,8 +110,8 @@ public final class PresentadorConstruccion {
      *
      * @return el mensaje que se muestra; el resultado está disponible mediante {@link #ultimoConstruido()}
      */
-    public String build(VistaOfertaEdificio oferta) {
-        Resultado<VistaEdificio> resultado = juego.build(oferta.tipo(), col, fila);
+    public String construir(VistaOfertaEdificio oferta) {
+        Resultado<VistaEdificio> resultado = juego.construir(oferta.tipo(), col, fila);
         refrescar();
         ultimoConstruido = resultado.isOk() ? Optional.of(resultado.value()) : Optional.empty();
         return resultado.isOk() ? "Construiste: " + oferta.name() + "." : resultado.mensaje();

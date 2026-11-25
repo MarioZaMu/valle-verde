@@ -101,7 +101,7 @@ class HU26LogrosTest {
         AplicacionTest aplicacion = AplicacionTest.juegoIniciado();
         DatosJuego.dineroFijar(aplicacion.estado(), 2000);
 
-        aplicacion.controlador.build("COOP", 2, 7);
+        aplicacion.controlador.construir("COOP", 2, 7);
         assertTrue(aplicacion.estado().progreso().has(Logro.BUILDER));
         long construirDespues = aplicacion.estado().dinero();
         for (int i = 0; i < 4; i++) {

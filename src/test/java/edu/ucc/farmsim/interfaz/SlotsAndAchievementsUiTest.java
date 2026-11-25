@@ -42,21 +42,21 @@ class SlotsAndAchievementsUiTest {
         AplicacionTest aplicacion = aplicacion(mongo);
         PresentadorRanuras presentador = new PresentadorRanuras(aplicacion.controlador);
         assertFalse(presentador.confirmacionNecesita(2));
-        assertEquals("Partida guardada en la ranura 2.", presentador.save(2, () -> {
+        assertEquals("Partida guardada en la ranura 2.", presentador.guardar(2, () -> {
             throw new AssertionError("an empty slot must not ask");
         }));
         String first = mongo.documento(2).estado();
         aplicacion.controlador.diaFin();
         List<String> pedido = new ArrayList<>();
 
-        String cancelado = presentador.save(2, () -> {
+        String cancelado = presentador.guardar(2, () -> {
             pedido.add("asked");
             return false;
         });
         assertEquals("", cancelado);
         assertEquals(first, mongo.documento(2).estado());
 
-        String aceptado = presentador.save(2, () -> {
+        String aceptado = presentador.guardar(2, () -> {
             pedido.add("asked");
             return true;
         });
@@ -71,7 +71,7 @@ class SlotsAndAchievementsUiTest {
         MongoEnMemoria mongo = new MongoEnMemoria();
         AplicacionTest aplicacion = aplicacion(mongo);
         PresentadorRanuras presentador = new PresentadorRanuras(aplicacion.controlador);
-        presentador.save(1, () -> true);
+        presentador.guardar(1, () -> true);
         aplicacion.controlador.diaFin();
 
         assertTrue(presentador.cargar(1).isOk());

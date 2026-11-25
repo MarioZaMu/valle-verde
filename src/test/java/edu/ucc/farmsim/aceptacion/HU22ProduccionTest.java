@@ -82,7 +82,7 @@ class HU22ProduccionTest {
     @Test
     void HU22_ca3_aCowFollowsTheSameRuleAndGivesMilk() {
         AplicacionTest aplicacion = AplicacionTest.juegoIniciado();
-        Edificio establo = DatosJuego.build(aplicacion.estado(), TipoEdificio.BARN, 2, 7);
+        Edificio establo = DatosJuego.construir(aplicacion.estado(), TipoEdificio.BARN, 2, 7);
         DatosJuego.casa(establo, TipoAnimal.COW, CondicionAnimal.HEALTHY, 0, false, 0);
         aplicacion.estado().inventario().add(TipoArticulo.HAY, 3);
         for (int dia = 0; dia < 3; dia++) {

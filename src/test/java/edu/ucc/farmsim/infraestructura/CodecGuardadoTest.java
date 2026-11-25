@@ -70,7 +70,7 @@ class CodecGuardadoTest {
         var repositorio = mongo.repositorio();
         assertEquals(false, repositorio.existeRanura(1));
 
-        repositorio.save(1, memento, Instant.parse("2026-11-22T10:30:00Z"));
+        repositorio.guardar(1, memento, Instant.parse("2026-11-22T10:30:00Z"));
 
         assertTrue(repositorio.existeRanura(1));
         assertEquals(memento, repositorio.cargar(1));
@@ -88,10 +88,10 @@ class CodecGuardadoTest {
         var repositorio = mongo.repositorio();
         mongo.abajoIr();
 
-        assertThrows(ExcepcionAlmacenamientoGuardado.class, () -> repositorio.save(1, memento, Instant.EPOCH));
+        assertThrows(ExcepcionAlmacenamientoGuardado.class, () -> repositorio.guardar(1, memento, Instant.EPOCH));
         assertThrows(ExcepcionAlmacenamientoGuardado.class, () -> repositorio.cargar(1));
         assertThrows(ExcepcionAlmacenamientoGuardado.class, repositorio::ranuras);
-        assertThrows(IllegalArgumentException.class, () -> repositorio.save(4, memento, Instant.EPOCH));
+        assertThrows(IllegalArgumentException.class, () -> repositorio.guardar(4, memento, Instant.EPOCH));
         assertThrows(IllegalArgumentException.class, () -> repositorio.cargar(0));
     }
 }

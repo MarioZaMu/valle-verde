@@ -32,7 +32,7 @@ class HU31GuardadosRechazarInvalidosTest {
         aplicacion = AplicacionTest.create(new SesionJuego(), SecuenciaDia.estandar(), mongo.repositorio());
         aplicacion.controlador.juegoNuevo(AplicacionTest.SEED);
         aplicacion.controlador.diaFin();
-        aplicacion.controlador.save(1);
+        aplicacion.controlador.guardar(1);
         aplicacion.controlador.diaFin();
         antes = aplicacion.estado().mementoCrear();
         aplicacion.eventos.clear();

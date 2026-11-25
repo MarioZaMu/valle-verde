@@ -177,8 +177,8 @@ public final class ControladorJuego implements ComandosJuego {
 
     /** Todo el mapa de la granja, para dibujarlo. Una consulta pura. */
     @Override
-    public Resultado<VistaMapa> map() {
-        return guardia(granja::map);
+    public Resultado<VistaMapa> mapa() {
+        return guardia(granja::mapa);
     }
 
     @Override
@@ -259,8 +259,8 @@ public final class ControladorJuego implements ComandosJuego {
     }
 
     @Override
-    public Resultado<VistaEdificio> build(String idEdificio, int col, int fila) {
-        return guardia(() -> edificios.build(idEdificio, col, fila));
+    public Resultado<VistaEdificio> construir(String idEdificio, int col, int fila) {
+        return guardia(() -> edificios.construir(idEdificio, col, fila));
     }
 
     @Override
@@ -294,8 +294,8 @@ public final class ControladorJuego implements ComandosJuego {
     }
 
     @Override
-    public Resultado<VistaRanuraGuardado> save(int ranura) {
-        return guardia(() -> guardados.save(ranura));
+    public Resultado<VistaRanuraGuardado> guardar(int ranura) {
+        return guardia(() -> guardados.guardar(ranura));
     }
 
     @Override

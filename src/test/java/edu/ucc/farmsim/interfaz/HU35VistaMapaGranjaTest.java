@@ -72,7 +72,7 @@ class HU35VistaMapaGranjaTest {
     void HU35_ca1_theMapShowsThe48x24ValleyAndTheFourTerrainsLookDifferent() {
         // Given a new game
         AplicacionTest aplicacion = AplicacionTest.juegoIniciado();
-        VistaMapa map = aplicacion.controlador.map().value();
+        VistaMapa map = aplicacion.controlador.mapa().value();
         assertEquals(48 * 24, map.parcelas().size());
         GeometriaMapa geometria = VALLE;
 
@@ -125,7 +125,7 @@ class HU35VistaMapaGranjaTest {
 
     @Test
     void HU35_el_sobrevolado_parcela_es_resaltado() {
-        VistaMapa map = AplicacionTest.juegoIniciado().controlador.map().value();
+        VistaMapa map = AplicacionTest.juegoIniciado().controlador.mapa().value();
         GeometriaMapa geometria = VALLE;
 
         int[] sencillo = pixelesCelda(paint(map, null), geometria, 5, 3);
@@ -224,7 +224,7 @@ class HU35VistaMapaGranjaTest {
         AplicacionTest aplicacion = AplicacionTest.juegoIniciado();
         var gallinero = DatosJuego.gallinero(aplicacion.estado());
         GeometriaMapa geometria = VALLE;
-        VistaMapa empty = aplicacion.controlador.map().value();
+        VistaMapa empty = aplicacion.controlador.mapa().value();
         VistaMapa noEdificios = new VistaMapa(empty.cols(), empty.filas(), empty.parcelas());
         int[] hierba = pixelesCelda(paint(noEdificios, null), geometria, 2, 8);
         int[] coopEmpty = pixelesCelda(paint(empty, null), geometria, 2, 8);
@@ -232,7 +232,7 @@ class HU35VistaMapaGranjaTest {
                 // Cuando se mudan dos gallinas
         DatosJuego.gallina(gallinero);
         DatosJuego.gallina(gallinero);
-        VistaMapa conGallinas = aplicacion.controlador.map().value();
+        VistaMapa conGallinas = aplicacion.controlador.mapa().value();
         int[] gallineroConGallinas = pixelesCelda(paint(conGallinas, null), geometria, 2, 8);
 
                 // Entonces el edificio reemplaza al pasto, las gallinas cambian su aspecto y la parcela de al lado queda
@@ -264,7 +264,7 @@ class HU35VistaMapaGranjaTest {
         AplicacionTest aplicacion = AplicacionTest.juegoIniciado();
         DatosJuego.casa(DatosJuego.gallinero(aplicacion.estado()), edu.ucc.farmsim.dominio.animal.TipoAnimal.HEN, condicion, 0,
                 false, pendiente);
-        return pixelesCelda(paint(aplicacion.controlador.map().value(), null), geometria, col, fila);
+        return pixelesCelda(paint(aplicacion.controlador.mapa().value(), null), geometria, col, fila);
     }
 
     @Test
@@ -273,8 +273,8 @@ class HU35VistaMapaGranjaTest {
         Set<Integer> mira = new HashSet<>();
         for (var tipo : edu.ucc.farmsim.dominio.edificio.TipoEdificio.values()) {
             AplicacionTest aplicacion = AplicacionTest.juegoIniciado();
-            DatosJuego.build(aplicacion.estado(), tipo, 2, 7);
-            mira.add(Arrays.hashCode(pixelesCelda(paint(aplicacion.controlador.map().value(), null), geometria, 2, 7)));
+            DatosJuego.construir(aplicacion.estado(), tipo, 2, 7);
+            mira.add(Arrays.hashCode(pixelesCelda(paint(aplicacion.controlador.mapa().value(), null), geometria, 2, 7)));
         }
         assertEquals(4, mira.size());
     }

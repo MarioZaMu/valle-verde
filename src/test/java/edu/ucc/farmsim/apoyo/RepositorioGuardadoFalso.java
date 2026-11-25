@@ -71,7 +71,7 @@ public final class RepositorioGuardadoFalso implements RepositorioGuardado {
     }
 
     @Override
-    public void save(int ranura, MementoJuego memento, Instant archivadoEn) {
+    public void guardar(int ranura, MementoJuego memento, Instant archivadoEn) {
         arribaComprobar();
         almacenado.put(ranura, new Almacenado(memento, archivadoEn));
         danado.remove(ranura);

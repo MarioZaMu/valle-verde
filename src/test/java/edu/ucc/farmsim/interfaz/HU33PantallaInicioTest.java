@@ -140,7 +140,7 @@ class HU33PantallaInicioTest {
         AplicacionTest aplicacion = AplicacionTest.create(new SesionJuego(), SecuenciaDia.estandar(), repositorio);
         aplicacion.controlador.juegoNuevo(1L);
         aplicacion.controlador.diaFin();
-        aplicacion.controlador.save(3);
+        aplicacion.controlador.guardar(3);
         aplicacion.controlador.juegoNuevo(2L);
         NavegadorFalso navegador = new NavegadorFalso();
         navegador.ranuraElegida = 3;

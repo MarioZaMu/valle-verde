@@ -101,7 +101,7 @@ class HU47EncargosTest {
         assertEquals(5, aplicacion.estado().inventario().count(TipoArticulo.CARROT));
         assertEquals("¡Gracias otra vez por traerme 5 Zanahorias!", aplicacion.controlador.hablar("MARTA").value().encargo());
 
-        assertTrue(aplicacion.controlador.save(1).isOk());
+        assertTrue(aplicacion.controlador.guardar(1).isOk());
         aplicacion.controlador.juegoNuevo(AplicacionTest.SEED);
         assertFalse(aplicacion.estado().encargos().isDone(Npc.MARTA));
         assertTrue(aplicacion.controlador.cargar(1).isOk());
@@ -114,7 +114,7 @@ class HU47EncargosTest {
         AplicacionTest aplicacion = AplicacionTest.create(new SesionJuego(), SecuenciaDia.estandar(), mongo.repositorio());
         aplicacion.controlador.juegoNuevo(AplicacionTest.SEED);
         aplicacion.estado().encargos().complete(Npc.INES);
-        aplicacion.controlador.save(2);
+        aplicacion.controlador.guardar(2);
         mongo.manipular(2, d -> {
             try {
                 ObjectMapper json = new ObjectMapper();

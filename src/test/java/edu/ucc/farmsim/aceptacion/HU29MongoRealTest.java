@@ -78,7 +78,7 @@ class HU29MongoRealTest {
     void HU29_ca1_guardando_escribe_la_ranura_documento_en_los_real_partidas_coleccion() {
         AplicacionTest aplicacion = aplicacion();
 
-        assertTrue(aplicacion.controlador.save(2).isOk());
+        assertTrue(aplicacion.controlador.guardar(2).isOk());
 
         Document almacenado = mongo.getCollection("partidas").find(new Document("_id", "slot2")).first();
         assertNotNull(almacenado, "the document is really in MongoDB");
@@ -91,14 +91,14 @@ class HU29MongoRealTest {
     @Test
     void HU29_ca2_whenTheRealMongoRejectsTheWriteThePreviousDocumentStaysAndTheGameGoesOn() {
         AplicacionTest aplicacion = aplicacion();
-        assertTrue(aplicacion.controlador.save(1).isOk());
+        assertTrue(aplicacion.controlador.guardar(1).isOk());
         DocumentoGuardado antes = mongo.findById("slot1", DocumentoGuardado.class);
         aplicacion.controlador.diaFin();
         mongo.getDb().runCommand(new Document("collMod", "partidas")
                 .append("validator", new Document("versionEsquema", new Document("$gt", 1000)))
                 .append("validationLevel", "strict").append("validationAction", "error"));
 
-        Resultado<?> resultado = aplicacion.controlador.save(1);
+        Resultado<?> resultado = aplicacion.controlador.guardar(1);
 
         assertEquals(CodigoError.ERROR_ES, resultado.codigo());
         assertEquals(antes, mongo.findById("slot1", DocumentoGuardado.class), "the old document is intact");
@@ -114,7 +114,7 @@ class HU29MongoRealTest {
             aplicacion.controlador.juegoNuevo(AplicacionTest.SEED);
             long start = System.nanoTime();
 
-            Resultado<?> resultado = aplicacion.controlador.save(1);
+            Resultado<?> resultado = aplicacion.controlador.guardar(1);
 
             assertEquals(CodigoError.ERROR_ES, resultado.codigo());
             assertTrue((System.nanoTime() - start) / 1_000_000 < 3_000, "gives up within the 2 s of RN-31");
@@ -127,9 +127,9 @@ class HU29MongoRealTest {
         AplicacionTest first = aplicacion();
         assertTrue(first.controlador.plantar(DatosJuego.COL_TIERRA, DatosJuego.FILA_TIERRA, "CARROT_SEED").isOk());
         first.controlador.diaFin();
-        assertTrue(first.controlador.save(3).isOk());
+        assertTrue(first.controlador.guardar(3).isOk());
         VistaHud hud = first.controlador.hud().value();
-        VistaMapa map = first.controlador.map().value();
+        VistaMapa map = first.controlador.mapa().value();
 
         AplicacionTest segundo = AplicacionTest.create(new SesionJuego(), SecuenciaDia.estandar(), new RepositorioGuardadoMongo(mongo));
         segundo.controlador.juegoNuevo(AplicacionTest.SEED + 7);
@@ -137,7 +137,7 @@ class HU29MongoRealTest {
 
         assertTrue(cargado.isOk(), String.valueOf(cargado.mensaje()));
         assertEquals(hud, segundo.controlador.hud().value());
-        assertEquals(map, segundo.controlador.map().value());
+        assertEquals(map, segundo.controlador.mapa().value());
         assertEquals("OK", segundo.controlador.guardarRanuras().value().get(2).status());
     }
 }

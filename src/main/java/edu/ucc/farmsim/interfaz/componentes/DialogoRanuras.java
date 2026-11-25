@@ -79,7 +79,7 @@ public final class DialogoRanuras extends JDialog {
         if (ranura < 1) {
             return;
         }
-        String texto = presentador.save(ranura, () -> JOptionPane.showConfirmDialog(this, Textos.SOBRESCRIBIR_CONFIRMAR,
+        String texto = presentador.guardar(ranura, () -> JOptionPane.showConfirmDialog(this, Textos.SOBRESCRIBIR_CONFIRMAR,
                 Textos.TITULO_RANURAS, JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION);
         if (!texto.isEmpty()) {
             mensaje.setText(texto);

@@ -26,7 +26,7 @@ class HU18ConstruirTest {
         AplicacionTest aplicacion = AplicacionTest.juegoIniciado();
 
                 // Cuando el jugador construye un gallinero allí
-        Resultado<VistaEdificio> resultado = aplicacion.controlador.build("COOP", 2, 7);
+        Resultado<VistaEdificio> resultado = aplicacion.controlador.construir("COOP", 2, 7);
 
                 // Entonces se cobran 400 m (el primer edificio paga entonces LG-06: 100 m) y las cuatro parcelas quedan
         // ocupadas
@@ -47,11 +47,11 @@ class HU18ConstruirTest {
         AplicacionTest aplicacion = AplicacionTest.juegoIniciado();
 
                 // Cuando el área incluye tierra (4,2)
-        Resultado<VistaEdificio> onTierra = aplicacion.controlador.build("COOP", 3, 2);
+        Resultado<VistaEdificio> onTierra = aplicacion.controlador.construir("COOP", 3, 2);
                 // Cuando sobresale del mapa (columna 15, ancho 2)
-        Resultado<VistaEdificio> afuera = aplicacion.controlador.build("COOP", 15, 3);
+        Resultado<VistaEdificio> afuera = aplicacion.controlador.construir("COOP", 15, 3);
                 // Cuando cubre el estanque
-        Resultado<VistaEdificio> onAgua = aplicacion.controlador.build("COOP", 13, 0);
+        Resultado<VistaEdificio> onAgua = aplicacion.controlador.construir("COOP", 13, 0);
 
         for (Resultado<VistaEdificio> resultado : List.of(onTierra, afuera, onAgua)) {
             assertEquals(CodigoError.UBICACION_INVALIDA, resultado.codigo());
@@ -67,7 +67,7 @@ class HU18ConstruirTest {
         AplicacionTest aplicacion = AplicacionTest.juegoIniciado();
         DatosJuego.dineroFijar(aplicacion.estado(), 399);
 
-        Resultado<VistaEdificio> resultado = aplicacion.controlador.build("COOP", 2, 7);
+        Resultado<VistaEdificio> resultado = aplicacion.controlador.construir("COOP", 2, 7);
 
         assertEquals(CodigoError.SIN_FONDOS, resultado.codigo());
         assertEquals("Fondos insuficientes: faltan 1 m.", resultado.mensaje());
@@ -78,10 +78,10 @@ class HU18ConstruirTest {
     @Test
     void HU18_ca4_aThirdCoopIsRejectedByTheLimit() {
         AplicacionTest aplicacion = AplicacionTest.juegoIniciado();
-        DatosJuego.build(aplicacion.estado(), TipoEdificio.COOP, 2, 7);
-        DatosJuego.build(aplicacion.estado(), TipoEdificio.COOP, 5, 7);
+        DatosJuego.construir(aplicacion.estado(), TipoEdificio.COOP, 2, 7);
+        DatosJuego.construir(aplicacion.estado(), TipoEdificio.COOP, 5, 7);
 
-        Resultado<VistaEdificio> resultado = aplicacion.controlador.build("COOP", 8, 7);
+        Resultado<VistaEdificio> resultado = aplicacion.controlador.construir("COOP", 8, 7);
 
         assertEquals(CodigoError.LIMITE_EDIFICIOS, resultado.codigo());
         assertEquals("Ya tienes el máximo de Gallineros.", resultado.mensaje());
@@ -94,7 +94,7 @@ class HU18ConstruirTest {
         AplicacionTest aplicacion = AplicacionTest.juegoIniciado();
         DatosJuego.dineroFijar(aplicacion.estado(), 1000);
 
-        Resultado<VistaEdificio> resultado = aplicacion.controlador.build("BARN", 2, 7);
+        Resultado<VistaEdificio> resultado = aplicacion.controlador.construir("BARN", 2, 7);
 
         assertEquals(CodigoError.EDIFICIO_BLOQUEADO, resultado.codigo());
         assertEquals("Edificio bloqueado: requiere el logro «Manos a la tierra».", resultado.mensaje());
@@ -107,7 +107,7 @@ class HU18ConstruirTest {
         DatosJuego.dineroFijar(aplicacion.estado(), 1000);
         DatosJuego.desbloquear(aplicacion.estado(), Logro.GREEN_THUMB);
 
-        Resultado<VistaEdificio> resultado = aplicacion.controlador.build("BARN", 2, 7);
+        Resultado<VistaEdificio> resultado = aplicacion.controlador.construir("BARN", 2, 7);
 
         assertTrue(resultado.isOk(), String.valueOf(resultado.mensaje()));
         assertEquals(100, aplicacion.estado().dinero()); // 1000 - 1000 + 100 of LG-06
@@ -118,10 +118,10 @@ class HU18ConstruirTest {
     @Test
     void HU18_ca6_aBuildingThatTouchesAnotherIsRejected() {
         AplicacionTest aplicacion = AplicacionTest.juegoIniciado();
-        DatosJuego.build(aplicacion.estado(), TipoEdificio.COOP, 2, 7);
+        DatosJuego.construir(aplicacion.estado(), TipoEdificio.COOP, 2, 7);
 
                 // El área nueva (3,8)-(4,9) comparte la parcela (3,8) con el primer gallinero
-        Resultado<VistaEdificio> resultado = aplicacion.controlador.build("COOP", 3, 8);
+        Resultado<VistaEdificio> resultado = aplicacion.controlador.construir("COOP", 3, 8);
 
         assertEquals(CodigoError.UBICACION_INVALIDA, resultado.codigo());
         assertEquals(500, aplicacion.estado().dinero());
@@ -148,7 +148,7 @@ class HU18ConstruirTest {
     void HU18_withoutAGameEveryOrderAnswersSinPartida() {
         AplicacionTest aplicacion = AplicacionTest.create();
 
-        assertEquals(CodigoError.SIN_PARTIDA, aplicacion.controlador.build("COOP", 2, 7).codigo());
+        assertEquals(CodigoError.SIN_PARTIDA, aplicacion.controlador.construir("COOP", 2, 7).codigo());
         assertEquals(CodigoError.SIN_PARTIDA, aplicacion.controlador.edificios().codigo());
         assertEquals(CodigoError.SIN_PARTIDA, aplicacion.controlador.animalComprar("HEN").codigo());
         assertEquals(CodigoError.SIN_PARTIDA, aplicacion.controlador.alimentar(0).codigo());
@@ -160,7 +160,7 @@ class HU18ConstruirTest {
     void HU18_un_desconocido_edificio_es_un_interno_error_y_nunca_lanza() {
         AplicacionTest aplicacion = AplicacionTest.juegoIniciado();
 
-        assertEquals(CodigoError.ERROR_INTERNO, aplicacion.controlador.build("CASTLE", 2, 7).codigo());
+        assertEquals(CodigoError.ERROR_INTERNO, aplicacion.controlador.construir("CASTLE", 2, 7).codigo());
         assertEquals(CodigoError.ERROR_INTERNO, aplicacion.controlador.alimentar(7).codigo());
         assertEquals(CodigoError.ERROR_INTERNO, aplicacion.controlador.collect(-1).codigo());
         assertEquals(CodigoError.ERROR_INTERNO, aplicacion.controlador.curar(0, 0).codigo());

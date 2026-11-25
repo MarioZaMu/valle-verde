@@ -79,8 +79,8 @@ public class ControladorRestJuego {
 
     /** Guarda la partida en curso en una ranura, reemplazando lo que tenía (RN-31). */
     @PutMapping("/saves/{ranura}")
-    public ResponseEntity<?> save(@PathVariable int ranura) {
-        return run(() -> juego.save(ranura), HttpStatus.OK);
+    public ResponseEntity<?> guardar(@PathVariable int ranura) {
+        return run(() -> juego.guardar(ranura), HttpStatus.OK);
     }
 
     /** Carga una ranura y la convierte en la partida en curso (RN-33). */
@@ -109,8 +109,8 @@ public class ControladorRestJuego {
 
     /** Todo el mapa de la granja. */
     @GetMapping("/farm/map")
-    public ResponseEntity<?> map() {
-        return run(juego::map, HttpStatus.OK);
+    public ResponseEntity<?> mapa() {
+        return run(juego::mapa, HttpStatus.OK);
     }
 
     /** Un paso del avatar (RN-36). */
@@ -218,8 +218,8 @@ public class ControladorRestJuego {
 
     /** Construye un edificio sobre pasto libre (RN-20, RN-21). */
     @PostMapping("/buildings")
-    public ResponseEntity<?> build(@Valid @RequestBody PeticionConstruir peticion) {
-        return run(() -> juego.build(peticion.idEdificio(), peticion.col(), peticion.fila()), HttpStatus.CREATED);
+    public ResponseEntity<?> construir(@Valid @RequestBody PeticionConstruir peticion) {
+        return run(() -> juego.construir(peticion.idEdificio(), peticion.col(), peticion.fila()), HttpStatus.CREATED);
     }
 
     /** Compra un animal y lo aloja en el primer edificio compatible con espacio (RN-23). */

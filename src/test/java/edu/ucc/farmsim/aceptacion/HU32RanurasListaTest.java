@@ -31,8 +31,8 @@ class HU32RanurasListaTest {
         AplicacionTest aplicacion = aplicacion();
         DatosJuego.fechaFijar(1, Estacion.SUMMER, 5);
         DatosJuego.dineroFijar(aplicacion.estado(), 1250);
-        aplicacion.controlador.save(1);
-        aplicacion.controlador.save(3);
+        aplicacion.controlador.guardar(1);
+        aplicacion.controlador.guardar(3);
 
         List<String> lineas = new PresentadorRanuras(aplicacion.controlador).lineas();
 
@@ -43,8 +43,8 @@ class HU32RanurasListaTest {
     @Test
     void HU32_ca2_aDamagedSlotIsListedAsSuchAndTheRestStillWorks() {
         AplicacionTest aplicacion = aplicacion();
-        aplicacion.controlador.save(1);
-        aplicacion.controlador.save(3);
+        aplicacion.controlador.guardar(1);
+        aplicacion.controlador.guardar(3);
         mongo.manipular(1, d -> new DocumentoGuardado(d.id(), d.versionEsquema(), d.archivadoEn(), "{truncated", d.checksum()));
 
         List<VistaRanuraGuardado> ranuras = aplicacion.controlador.guardarRanuras().value();
@@ -61,7 +61,7 @@ class HU32RanurasListaTest {
         PresentadorRanuras presentador = new PresentadorRanuras(aplicacion.controlador);
         assertEquals("Ranura 2: Vacía", presentador.lineas().get(1));
 
-        aplicacion.controlador.save(2);
+        aplicacion.controlador.guardar(2);
         presentador.refrescar();
 
         assertEquals("Ranura 2: Año 1 · Primavera · día 1 · 500 m · 2026-11-22 10:30", presentador.lineas().get(1));

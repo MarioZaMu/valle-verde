@@ -53,7 +53,7 @@ public final class ServicioEdificio {
      * @param col    columna de la parcela superior izquierda
      * @param fila    fila de la parcela superior izquierda
      */
-    public Resultado<VistaEdificio> build(String idTipo, int col, int fila) {
+    public Resultado<VistaEdificio> construir(String idTipo, int col, int fila) {
         if (!sesion.tieneJuego()) {
             return Resultado.fallarCon(CodigoError.SIN_PARTIDA);
         }

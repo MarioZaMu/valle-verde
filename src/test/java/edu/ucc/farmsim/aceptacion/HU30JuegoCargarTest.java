@@ -26,7 +26,7 @@ class HU30JuegoCargarTest {
         AplicacionTest aplicacion = JuegoRico.jugar();
         AplicacionTest almacenar = AplicacionTest.create(aplicacion.sesion, SecuenciaDia.estandar(), mongo.repositorio());
         MementoJuego archivado = aplicacion.estado().mementoCrear();
-        assertTrue(almacenar.controlador.save(1).isOk());
+        assertTrue(almacenar.controlador.guardar(1).isOk());
 
                 // Cuando hay otra partida en curso y se carga la ranura
         almacenar.controlador.juegoNuevo(99L);
@@ -43,7 +43,7 @@ class HU30JuegoCargarTest {
         MongoEnMemoria mongo = new MongoEnMemoria();
         AplicacionTest original = JuegoRico.jugar();
         AplicacionTest almacenar = AplicacionTest.create(original.sesion, SecuenciaDia.estandar(), mongo.repositorio());
-        almacenar.controlador.save(2);
+        almacenar.controlador.guardar(2);
         MementoJuego archivado = original.estado().mementoCrear();
 
         List<String> climaOriginal = new ArrayList<>();
@@ -68,7 +68,7 @@ class HU30JuegoCargarTest {
         aplicacion.controlador.juegoNuevo(1L);
         aplicacion.controlador.diaFin();
         aplicacion.controlador.diaFin();
-        aplicacion.controlador.save(1);
+        aplicacion.controlador.guardar(1);
         aplicacion.controlador.juegoNuevo(2L);
         aplicacion.eventos.clear();
 
@@ -86,7 +86,7 @@ class HU30JuegoCargarTest {
         MongoEnMemoria mongo = new MongoEnMemoria();
         AplicacionTest first = AplicacionTest.create(new SesionJuego(), SecuenciaDia.estandar(), mongo.repositorio());
         first.controlador.juegoNuevo(1L);
-        first.controlador.save(3);
+        first.controlador.guardar(3);
         AplicacionTest segundo = AplicacionTest.create(new SesionJuego(), SecuenciaDia.estandar(), mongo.repositorio());
 
         assertTrue(segundo.controlador.cargar(3).isOk());
