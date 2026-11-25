@@ -57,7 +57,7 @@ class HU33PantallaInicioTest {
         List<String> etiquetas = new ArrayList<>();
         botonesRecolectar(pantalla, etiquetas);
 
-        assertEquals(List.of("Nueva partida", "Cargar", "Salir"), etiquetas);
+        assertEquals(List.of("Nueva partida", "Granja de demostración", "Cargar", "Salir"), etiquetas);
         assertEquals("Nueva partida", Textos.JUEGO_INICIO_NUEVO);
         assertEquals("Cargar", Textos.CARGAR_INICIO);
         assertEquals("Salir", Textos.SALIR_INICIO);
@@ -96,6 +96,19 @@ class HU33PantallaInicioTest {
         orden.clear();
         presentador.onCargar();
         assertEquals("preparar", orden.get(0), String.valueOf(orden));
+    }
+
+    @Test
+    void HU33_ca2_demoFarmStartsAGameWithBuildingsAndShowsTheGameScreen() {
+        AplicacionTest aplicacion = AplicacionTest.create();
+        NavegadorFalso navegador = new NavegadorFalso();
+        PresentadorPantallaInicio presentador = new PresentadorPantallaInicio(aplicacion.controlador, navegador, () -> AplicacionTest.SEED);
+
+        presentador.onJuegoDemostracion();
+
+        assertTrue(aplicacion.controlador.tieneJuegoEnProgreso());
+        assertEquals(List.of("game"), navegador.llamadas);
+        assertEquals(4, aplicacion.sesion.actual().granja().edificios().size());
     }
 
     @Test

@@ -1,6 +1,13 @@
 package edu.ucc.farmsim.dominio.juego;
 
+import edu.ucc.farmsim.dominio.animal.Animal;
+import edu.ucc.farmsim.dominio.animal.TipoAnimal;
 import edu.ucc.farmsim.dominio.configuracion.ReglasJuego;
+import edu.ucc.farmsim.dominio.cultivo.Cultivo;
+import edu.ucc.farmsim.dominio.cultivo.InstantaneaCultivo;
+import edu.ucc.farmsim.dominio.cultivo.TipoCultivo;
+import edu.ucc.farmsim.dominio.edificio.Edificio;
+import edu.ucc.farmsim.dominio.edificio.TipoEdificio;
 import edu.ucc.farmsim.dominio.economia.Inventario;
 import edu.ucc.farmsim.dominio.economia.Mercado;
 import edu.ucc.farmsim.dominio.economia.TipoArticulo;
@@ -30,6 +37,8 @@ import java.util.List;
  * <p>Stories: HU-01, HU-10, HU-14, HU-15, HU-17, HU-18, HU-26, HU-28, HU-45, HU-47, HU-49.
  */
 public final class EstadoJuego {
+
+    private static final int DINERO_DEMOSTRACION = 5000;
 
     private int dinero;
     private final Energia energia;
@@ -70,6 +79,39 @@ public final class EstadoJuego {
         inventario.add(TipoArticulo.POTATO_SEED, ReglasJuego.SEMILLAS_PAPA_INICIO);
         return new EstadoJuego(ReglasJuego.DINERO_INICIO, new Energia(), inventario, MapaGranja.inicial(),
                 CicloClima.iniciarJuegoNuevo(reloj, azar), azar, Mercado.estandar());
+    }
+
+    /**
+     * Crea una granja de demostración para mostrar el juego: parte de una partida nueva y le suma un edificio de cada
+     * tipo, dos gallinas, dos vacas, cultivos sembrados (uno ya maduro), provisiones y dinero para seguir jugando.
+     *
+     * @param semilla semilla del generador aleatorio
+     */
+    public static EstadoJuego juegoDemostracion(long semilla) {
+        EstadoJuego estado = juegoNuevo(semilla);
+        MapaGranja mapa = estado.granja;
+        Edificio gallinero = mapa.colocar(TipoEdificio.COOP, 1, 3);
+        gallinero.animalAgregar(new Animal(TipoAnimal.HEN));
+        gallinero.animalAgregar(new Animal(TipoAnimal.HEN));
+        Edificio establo = mapa.colocar(TipoEdificio.BARN, 1, 11);
+        establo.animalAgregar(new Animal(TipoAnimal.COW));
+        establo.animalAgregar(new Animal(TipoAnimal.COW));
+        estado.inventario.ranurasAgregar(mapa.colocar(TipoEdificio.WAREHOUSE, 13, 3).ranurasInventarioExtra());
+        mapa.colocar(TipoEdificio.GREENHOUSE, 9, 10);
+        for (int col = ReglasJuego.COL_TIERRA; col < ReglasJuego.COL_TIERRA + ReglasJuego.ANCHO_TIERRA; col++) {
+            sembrar(mapa, col, ReglasJuego.FILA_TIERRA, TipoCultivo.CARROT, TipoCultivo.CARROT.diasAMaduro());
+            sembrar(mapa, col, ReglasJuego.FILA_TIERRA + 1, TipoCultivo.CARROT, 2);
+            sembrar(mapa, col, ReglasJuego.FILA_TIERRA + 2, TipoCultivo.POTATO, 1);
+        }
+        estado.inventario.add(TipoArticulo.HAY, 10);
+        estado.inventario.add(TipoArticulo.MEDICINE, 3);
+        estado.inventario.add(TipoArticulo.CARROT, 4);
+        estado.dinero = DINERO_DEMOSTRACION;
+        return estado;
+    }
+
+    private static void sembrar(MapaGranja mapa, int col, int fila, TipoCultivo tipo, int diasCrecidos) {
+        mapa.parcelaEn(col, fila).plantar(Cultivo.desdeInstantanea(new InstantaneaCultivo(tipo, diasCrecidos, 0, false, false)));
     }
 
     /**

@@ -66,6 +66,7 @@ public final class PantallaInicio extends JPanel {
         add(new Banner(), c);
         c.fill = GridBagConstraints.NONE;
         add(boton(Textos.JUEGO_INICIO_NUEVO, presentador::onJuegoNuevo), c);
+        add(boton(Textos.DEMOSTRACION_INICIO, presentador::onJuegoDemostracion), c);
         add(boton(Textos.CARGAR_INICIO, presentador::onCargar), c);
         add(boton(Textos.SALIR_INICIO, presentador::onSalir), c);
         c.weighty = 1;

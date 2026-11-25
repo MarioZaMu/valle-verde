@@ -79,6 +79,14 @@ class ClienteJuegoRemotoTest {
     }
 
     @Test
+    void HU28_ca4_la_granja_de_demostracion_llega_por_http_con_dinero_de_sobra() {
+        Resultado<VistaHud> resultado = cliente.juegoDemostracion(AplicacionTest.SEED);
+
+        assertTrue(resultado.isOk(), String.valueOf(resultado.mensaje()));
+        assertEquals(5000, resultado.value().dinero());
+    }
+
+    @Test
     void RNF02_la_ventana_puede_abrir_antes_el_servidor_es_arriba_y_un_orden_espera_para_eso() throws Exception {
         java.util.concurrent.CompletableFuture<URI> servidor = new java.util.concurrent.CompletableFuture<>();
         ClienteJuegoRemoto early = new ClienteJuegoRemoto(servidor, bus, java.time.Duration.ofSeconds(5));

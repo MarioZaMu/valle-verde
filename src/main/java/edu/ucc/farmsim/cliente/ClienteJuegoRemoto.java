@@ -125,6 +125,11 @@ public final class ClienteJuegoRemoto implements ComandosJuego {
     }
 
     @Override
+    public Resultado<VistaHud> juegoDemostracion(long semilla) {
+        return send("POST", "/api/game/demo", Map.of("semilla", semilla), VistaHud.class);
+    }
+
+    @Override
     public Resultado<VistaHud> hud() {
         return send("GET", "/api/game", null, VistaHud.class);
     }

@@ -45,6 +45,20 @@ public final class PresentadorPantallaInicio {
         }
     }
 
+    /** «Granja de demostración»: igual que «Nueva partida», pero la granja ya trae edificios, animales y cultivos. */
+    public void onJuegoDemostracion() {
+        navegador.juegoPreparar();
+        if (controlador.tieneJuegoEnProgreso() && !navegador.confirmar(Textos.JUEGO_DESCARTAR_CONFIRMAR)) {
+            return;
+        }
+        Resultado<VistaHud> resultado = controlador.juegoDemostracion(semillas.getAsLong());
+        if (resultado.isOk()) {
+            navegador.juegoMostrar();
+        } else {
+            navegador.mensajeMostrar(resultado.mensaje());
+        }
+    }
+
     /** «Cargar»: avisa al jugador cuando no hay nada que cargar, o le deja elegir una ranura y la carga. */
     public void onCargar() {
         navegador.juegoPreparar();

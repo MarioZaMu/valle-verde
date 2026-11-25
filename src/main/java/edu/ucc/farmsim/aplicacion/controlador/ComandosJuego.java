@@ -38,6 +38,9 @@ public interface ComandosJuego {
      */
     Resultado<VistaHud> juegoNuevo(long semilla);
 
+    /** Inicia una granja de demostración con edificios, animales y cultivos ya puestos. */
+    Resultado<VistaHud> juegoDemostracion(long semilla);
+
     /** La barra superior de la partida en curso. */
     Resultado<VistaHud> hud();
 

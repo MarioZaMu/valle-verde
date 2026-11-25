@@ -95,6 +95,12 @@ public class ControladorRestJuego {
         return run(() -> juego.juegoNuevo(peticion.semilla()), HttpStatus.CREATED);
     }
 
+    /** Inicia la granja de demostración: edificios, animales y cultivos ya puestos. */
+    @PostMapping("/game/demo")
+    public ResponseEntity<?> juegoDemostracion(@Valid @RequestBody PeticionJuegoNueva peticion) {
+        return run(() -> juego.juegoDemostracion(peticion.semilla()), HttpStatus.CREATED);
+    }
+
     /** La barra superior de la partida en curso. */
     @GetMapping("/game")
     public ResponseEntity<?> hud() {

@@ -15,6 +15,9 @@ public final class Textos {
     /** Pantalla de inicio: empezar una partida nueva. */
     public static final String JUEGO_INICIO_NUEVO = "Nueva partida";
 
+    /** Pantalla de inicio: empezar con una granja de demostración ya construida. */
+    public static final String DEMOSTRACION_INICIO = "Granja de demostración";
+
     /** Pantalla de inicio: cargar una partida guardada. */
     public static final String CARGAR_INICIO = "Cargar";
 

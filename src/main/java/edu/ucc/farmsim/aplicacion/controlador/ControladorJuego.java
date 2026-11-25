@@ -124,6 +124,12 @@ public final class ControladorJuego implements ComandosJuego {
         return guardia(() -> progreso.juegoNuevo(semilla));
     }
 
+    /** Inicia la granja de demostración, reemplazando cualquier partida en curso. */
+    @Override
+    public Resultado<VistaHud> juegoDemostracion(long semilla) {
+        return guardia(() -> progreso.juegoDemostracion(semilla));
+    }
+
     /** Termina el día: los efectos se resuelven en el orden de RN-03 y se devuelve la nueva barra superior. */
     @Override
     public Resultado<VistaHud> diaFin() {

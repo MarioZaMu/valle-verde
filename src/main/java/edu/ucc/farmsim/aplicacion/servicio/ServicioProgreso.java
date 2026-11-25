@@ -34,7 +34,15 @@ public final class ServicioProgreso {
 
     /** Crea el estado inicial de RN-30, lo convierte en la partida en curso y lo anuncia. */
     public Resultado<VistaHud> juegoNuevo(long semilla) {
-        EstadoJuego estado = EstadoJuego.juegoNuevo(semilla);
+        return iniciar(EstadoJuego.juegoNuevo(semilla));
+    }
+
+    /** Crea la granja de demostración (edificios, animales y cultivos ya puestos), la convierte en la partida en curso y la anuncia. */
+    public Resultado<VistaHud> juegoDemostracion(long semilla) {
+        return iniciar(EstadoJuego.juegoDemostracion(semilla));
+    }
+
+    private Resultado<VistaHud> iniciar(EstadoJuego estado) {
         sesion.replace(estado);
         VistaHud hud = mapeador.hud(estado);
         eventos.publish(new EventoJuego.JuegoIniciado(hud));
