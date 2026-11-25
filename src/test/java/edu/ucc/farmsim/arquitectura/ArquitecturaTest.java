@@ -98,7 +98,7 @@ class ArquitecturaTest {
             .that().doNotHaveFullyQualifiedName(RAIZ + ".Main")
             .and().doNotHaveFullyQualifiedName(RAIZ + ".domain.time.StateRandom")
             .should().callConstructor(java.util.Random.class)
-            .orShould().callMethod(Math.class, "azar")
+            .orShould().callMethod(Math.class, "random")
             .allowEmptyShould(true);
 
     /** AR-11: los controladores REST solo traducen HTTP; nunca importan domain ni infrastructure. */

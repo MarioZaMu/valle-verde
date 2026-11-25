@@ -9,12 +9,12 @@ import org.junit.jupiter.api.Test;
 class InfoJuegoTest {
 
     @Test
-    void RNF12_juego_nombre_es_definido_en_uno_no_en_blanco_constante() {
+    void RNF12_gameNameIsDefinedInOneNonBlankConstant() {
         assertFalse(InfoJuego.NOMBRE.isBlank());
     }
 
     @Test
-    void RNF12_version_mira_como_semantico_version() {
+    void RNF12_versionLooksLikeSemanticVersion() {
         assertTrue(InfoJuego.VERSION.matches("\\d+\\.\\d+\\.\\d+"));
     }
 }
