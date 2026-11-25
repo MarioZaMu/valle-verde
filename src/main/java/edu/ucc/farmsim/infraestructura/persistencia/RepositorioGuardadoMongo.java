@@ -17,6 +17,8 @@ import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.mapping.MappingException;
+import org.springframework.data.mapping.model.MappingInstantiationException;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -78,8 +80,14 @@ public class RepositorioGuardadoMongo implements RepositorioGuardado {
         List<InfoRanura> ranuras = new ArrayList<>();
         for (int ranura = 1; ranura <= ReglasJuego.RANURAS_GUARDADO; ranura++) {
             int numero = ranura;
-            DocumentoGuardado documento = protegido("reading slot " + numero,
-                    () -> mongo.findById(DocumentoGuardado.idDe(numero), DocumentoGuardado.class));
+            DocumentoGuardado documento;
+            try {
+                documento = protegido("reading slot " + numero,
+                        () -> mongo.findById(DocumentoGuardado.idDe(numero), DocumentoGuardado.class));
+            } catch (ExcepcionCargarGuardado e) {
+                ranuras.add(InfoRanura.danado(ranura));
+                continue;
+            }
             ranuras.add(documento == null ? InfoRanura.empty(ranura) : describir(ranura, documento));
         }
         return ranuras;
@@ -104,6 +112,10 @@ public class RepositorioGuardadoMongo implements RepositorioGuardado {
     private <T> T protegido(String que, Supplier<T> operacion) {
         try {
             return operacion.get();
+        } catch (MappingException | MappingInstantiationException e) {
+            // el documento existe pero no tiene la forma esperada (por ejemplo, lo guardó una versión anterior): está dañado
+            BITACORA.log(Level.WARNING, "A document could not be read while " + que, e);
+            throw new ExcepcionCargarGuardado(Motivo.CORRUPT, "the document cannot be read: " + e.getMessage());
         } catch (RuntimeException e) {
             BITACORA.log(Level.WARNING, "MongoDB failed while " + que, e);
             throw new ExcepcionAlmacenamientoGuardado(INALCANZABLE, e);
