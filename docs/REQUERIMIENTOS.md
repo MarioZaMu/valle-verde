@@ -87,7 +87,7 @@ Los requerimientos se agrupan en las **6 épicas** que también organizarán las
 | RF-39 | El sistema mostrará **notificaciones** (*toasts*) para logros, errores y eventos de estación | Should | RN-35 |
 | RF-40 | El sistema aplicará **efectos visuales**: tinte día/noche, paleta por estación, partículas de lluvia y nieve, indicadores de sequía y helada | Could | RN-01, RN-11, RN-12 |
 | RF-41 | El sistema aplicará **animaciones** suaves (crecimiento, animales de 2 a 3 cuadros y transición de día) sin que el estado del juego dependa de ellas | Could | RN-08, RN-25 |
-| RF-42 | El sistema cargará **sprites** mediante un `AssetManager` con caché y usará **gráficos vectoriales de respaldo** si faltan | Should | RN-08, RN-25 |
+| RF-42 | El sistema cargará **sprites** mediante un `GestorRecurso` con caché y usará **gráficos vectoriales de respaldo** si faltan | Should | RN-08, RN-25 |
 | RF-43 | La interfaz usará el tema visual **FlatLaf** con una tipografía única y, si el tema no se puede instalar, el aspecto por defecto de Swing | Should | RN-34 |
 | RF-44 | El sistema incluirá **sprites pixel-art propios de 32 × 32 px** (terrenos, cultivos por etapa, animales, edificios, ítems, avatar y NPC) y los ampliará por factor entero sin desenfocarlos | Should | RN-08, RN-25 |
 | RF-45 | El jugador podrá mover un **avatar** con el teclado por el mapa, con colisiones, y usar la herramienta elegida sobre la parcela que tiene enfrente | Should | RN-36 |
@@ -110,8 +110,8 @@ Referencia de hardware: equipo de desarrollo con Windows 11, ≥ 8 GB de RAM y J
 | RNF-03 | Rendimiento | Guardar y cargar son rápidos y ligeros | ≤ 1 s por operación; documento ≤ 200 KB |
 | RNF-04 | Rendimiento | La interfaz es fluida | ≥ 30 FPS en el mapa con animaciones; la respuesta visible a un clic llega en ≤ 100 ms |
 | RNF-05 | Calidad | Pruebas suficientes y verdes | Cobertura de líneas ≥ 70 % (JaCoCo) en dominio y aplicación; las 7 pruebas críticas en verde con `mvn test` |
-| RNF-06 | Arquitectura | Dependencias en un solo sentido: servidor `api → application → domain` e `infrastructure → domain`; cliente `ui → application` y `client → application` | 0 violaciones en una prueba automática que revisa los `import`: el dominio no importa Swing, AWT, Spring, Jackson, MongoDB ni E/S; la UI no importa `domain`, `infrastructure` ni `api`; los controladores REST no importan `domain` |
-| RNF-07 | Arquitectura | Ninguna excepción llega a la interfaz: `GameController` devuelve siempre un `Result` | 0 excepciones no controladas en las pruebas de aceptación; todo rechazo trae código y mensaje (RN-35) |
+| RNF-06 | Arquitectura | Dependencias en un solo sentido: servidor `api → application → domain` e `infrastructure → domain`; cliente `ui → application` y `cliente → application` | 0 violaciones en una prueba automática que revisa los `import`: el dominio no importa Swing, AWT, Spring, Jackson, MongoDB ni E/S; la UI no importa `domain`, `infrastructure` ni `api`; los controladores REST no importan `domain` |
+| RNF-07 | Arquitectura | Ninguna excepción llega a la interfaz: `ControladorJuego` devuelve siempre un `Resultado` | 0 excepciones no controladas en las pruebas de aceptación; todo rechazo trae código y mensaje (RN-35) |
 | RNF-08 | Determinismo | Toda aleatoriedad usa un `Random` inyectado | Misma semilla + mismas acciones → mismo estado final tras simular 112 días (prueba automática) |
 | RNF-09 | Fiabilidad | La persistencia no pierde ni daña datos | Una carga fallida deja la partida actual con 0 diferencias; el guardado es atómico (el documento previo sobrevive a un fallo) |
 | RNF-10 | Usabilidad | Interfaz clara y en español | Toda acción de juego alcanzable en ≤ 2 clics o 1 atajo; 100 % de los textos visibles en español; todo error indica causa y qué hacer |

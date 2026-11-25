@@ -51,7 +51,7 @@
 
 ### 4.2 Alcance incremental (prioridades *Should* y *Could*)
 
-Limpiar parcelas marchitas, tendencia de precios, curar animales, Almacén, desbloqueo por logros, ranuras con metadatos, *toasts*, resumen del día, Invernadero, efectos visuales (tinte día/noche, partículas), animaciones y sprites con `AssetManager`.
+Limpiar parcelas marchitas, tendencia de precios, curar animales, Almacén, desbloqueo por logros, ranuras con metadatos, *toasts*, resumen del día, Invernadero, efectos visuales (tinte día/noche, partículas), animaciones y sprites con `GestorRecurso`.
 
 > Si el tiempo se agota, estas capacidades se recortan **sin afectar el diseño base**: la interfaz visual avanzada es la última fase.
 
@@ -92,8 +92,8 @@ Limpiar parcelas marchitas, tendencia de precios, curar animales, Almacén, desb
 | ID | Tipo | Descripción |
 |---|---|---|
 | R-01 | Tecnología | Java 17, Maven, **Spring Boot 3.5** (API REST), **Spring Data MongoDB**, Swing + Java2D (cliente) y JUnit 5; todo gratuito. Spring Boot es obligatorio |
-| R-02 | Arquitectura | Servidor: `api → application → domain` e `infrastructure → domain`. Cliente: `ui → application` y `client → application`. El dominio no importa Swing, Spring, Jackson, MongoDB ni E/S |
-| R-03 | Arquitectura | `GameController` solo orquesta y devuelve un `Result`; nunca lanza excepciones hacia la UI |
+| R-02 | Arquitectura | Servidor: `api → application → domain` e `infrastructure → domain`. Cliente: `ui → application` y `cliente → application`. El dominio no importa Swing, Spring, Jackson, MongoDB ni E/S |
+| R-03 | Arquitectura | `ControladorJuego` solo orquesta y devuelve un `Resultado`; nunca lanza excepciones hacia la UI |
 | R-04 | Arquitectura | La UI se actualiza por eventos (Observer); toda aleatoriedad recibe un `Random` inyectado |
 | R-05 | Licencias | Solo assets CC0 o CC-BY registrados en `docs/ASSETS.md`; respaldo vectorial dibujado por código |
 | R-06 | Convenciones | Código, comentarios, pruebas y commits en inglés; documentación y textos del jugador en español |
@@ -122,7 +122,7 @@ Limpiar parcelas marchitas, tendencia de precios, curar animales, Almacén, desb
 | Riesgo | Prob. | Impacto | Mitigación |
 |---|---|---|---|
 | La interfaz visual consume demasiado tiempo | Alta | Alto | UI mínima funcional desde cada historia; UI visual es la última fase y recortable |
-| Assets con licencia incompatible | Media | Medio | Solo CC0 / CC-BY, registro en `ASSETS.md`, respaldo vectorial |
+| Assets con licencia incompatible | Media | Medio | Solo CC0 / CC-BY, registro en `RECURSOS.md`, respaldo vectorial |
 | Reglas de negocio incoherentes entre documentos | Media | Alto | Valores únicos en `REGLAS_DE_NEGOCIO.md`; constantes en una sola clase de configuración |
 | Aleatoriedad que vuelve las pruebas frágiles | Media | Medio | `Random` inyectado con semilla fija en todas las pruebas |
 | Alcance excesivo (50 RF) | Media | Medio | MoSCoW: 30 *Must* forman el MVP; el resto se recorta sin afectar el diseño |

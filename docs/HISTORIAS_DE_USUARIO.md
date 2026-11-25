@@ -20,14 +20,14 @@
 Una historia está **terminada** solo si se cumple todo lo siguiente:
 
 1. Existe una prueba `HUxx_descripcion` por **cada criterio de aceptación**, escrita **antes** que el código, y todas pasan en verde con `mvn test`.
-2. El código respeta las capas: servidor `api → application → domain` e `infrastructure → domain`, cliente `ui → application` y `client → application`; el dominio no importa Swing, Spring, Jackson, MongoDB ni E/S (verificado por la prueba de arquitectura, RNF-06).
-3. Todo rechazo devuelve un `Result` con **código y mensaje en español** (RN-35); ninguna excepción llega a la UI (RNF-07).
+2. El código respeta las capas: servidor `api → application → domain` e `infrastructure → domain`, cliente `ui → application` y `cliente → application`; el dominio no importa Swing, Spring, Jackson, MongoDB ni E/S (verificado por la prueba de arquitectura, RNF-06).
+3. Todo rechazo devuelve un `Resultado` con **código y mensaje en español** (RN-35); ninguna excepción llega a la UI (RNF-07).
 4. No hay números mágicos: los valores de las RN están en constantes o en la clase de configuración (RNF-12). Toda aleatoriedad usa un `Random` inyectado (RNF-08).
 5. Cada clase que implemente un patrón lleva el Javadoc `Pattern: <nombre> — Role: <rol>` (RNF-13).
 6. La cobertura de dominio y aplicación se mantiene **≥ 70 %** (JaCoCo, RNF-05).
 7. Hay una **interfaz funcional mínima** que permite demostrar la historia (botón o panel simple), salvo las historias puramente de dominio, que se demuestran por la capa de aplicación.
 8. Los diagramas y documentos afectados se actualizan **en el mismo commit** si el código cambia el diseño.
-9. Un commit en inglés `feat(area): description (HUxx)` por historia o fase, sin errores de compilación (`mvn clean package` en verde).
+9. Un commit en inglés `feat(area): descripcion (HUxx)` por historia o fase, sin errores de compilación (`mvn clean package` en verde).
 10. Cada clase de producción creada o modificada declara en su Javadoc la línea `Stories: HU-xx, …` y `python tools/traceability.py` termina sin errores (así la matriz de trazabilidad se mantiene al día).
 11. Cada orden nueva que el cliente envía tiene su endpoint en la API ([`API.md`](API.md)) y una prueba de integración que verifica su código HTTP de éxito y el de cada rechazo (RNF-15).
 
@@ -170,7 +170,7 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 - **CA-1 · Orden de resolución.** **Dado** una partida con pasos registrados, **Cuando** termino el día, **Entonces** se ejecutan exactamente en este orden: clima del día, crecimiento y marchitamiento, animales, mercado, calendario, pronóstico, energía, logros y publicación de eventos (RN-03).
 - **CA-2 · Reinicio diario.** **Dado** cultivos regados y energía en 40, **Cuando** termino el día, **Entonces** la energía es 100 y ninguna parcela queda marcada como regada.
 - **CA-3 · Rendimiento (borde).** **Dado** una granja a plena carga (40 cultivos al aire libre, 9 en invernadero, 6 edificios y 16 animales), **Cuando** termino el día 100 veces, **Entonces** el percentil 95 es ≤ 200 ms (RNF-01).
-- **CA-4 · Falla interna (negativo).** **Dado** un paso que falla internamente, **Cuando** termino el día, **Entonces** se devuelve un `Result` de error y el estado completo queda **idéntico** al de antes (no hay un día a medias).
+- **CA-4 · Falla interna (negativo).** **Dado** un paso que falla internamente, **Cuando** termino el día, **Entonces** se devuelve un `Resultado` de error y el estado completo queda **idéntico** al de antes (no hay un día a medias).
 
 ### HU-11 · Sorteo de clima y pronóstico
 **Épica:** Tiempo y clima · **Prioridad:** Must · **Puntos:** 3 · **RF:** RF-10 · **RN:** RN-11, RN-13 · **Depende de:** —
@@ -395,7 +395,7 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 **Como** jugador **quiero** guardar mi partida en una de 3 ranuras **para** continuarla más tarde.
 
 **Criterios de aceptación**
-- **CA-1 · Guardado correcto.** **Dado** una partida en curso, **Cuando** guardo en la ranura 2, **Entonces** se crea o reemplaza el documento `slot2` de la colección `partidas` con `schemaVersion = 3` (1 antes del avatar, RN-36; 2 antes del valle de 48 × 24, RN-40), `savedAt`, `state` y un `checksum` SHA-256 del `state`.
+- **CA-1 · Guardado correcto.** **Dado** una partida en curso, **Cuando** guardo en la ranura 2, **Entonces** se crea o reemplaza el documento `slot2` de la colección `partidas` con `versionEsquema = 3` (1 antes del avatar, RN-36; 2 antes del valle de 48 × 24, RN-40), `archivadoEn`, `estado` y un `checksum` SHA-256 del `estado`.
 - **CA-2 · Escritura atómica (negativo).** **Dado** un documento previo en la ranura y una falla de escritura (MongoDB rechaza la operación o no responde en 2 s), **Cuando** guardo, **Entonces** se informa `ERROR_ES`, el documento previo **queda intacto** y la partida sigue en juego.
 - **CA-3 · Sobrescritura.** **Dado** una ranura ocupada, **Cuando** elijo guardar en ella, **Entonces** se pide confirmación y, al aceptar, el documento se reemplaza.
 - **CA-4 · Tamaño y tiempo (borde).** **Dado** una granja a plena carga, **Cuando** guardo, **Entonces** el documento pesa ≤ 200 KB y la operación toma ≤ 1 s.
@@ -418,8 +418,8 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 
 **Criterios de aceptación**
 - **CA-1 · Partida inexistente (prueba crítica).** **Dado** una ranura 3 sin documento, **Cuando** intento cargarla, **Entonces** se rechaza con `ARCHIVO_INEXISTENTE` («No existe una partida en la ranura 3.») y mi partida actual no cambia.
-- **CA-2 · Partida dañada (prueba crítica).** **Dado** un documento con un carácter del `state` alterado o con JSON truncado, **Cuando** intento cargarlo, **Entonces** se rechaza con `ARCHIVO_CORRUPTO` y mi partida actual tiene **0 diferencias** respecto a antes.
-- **CA-3 · Versión no soportada.** **Dado** un documento con `schemaVersion = 99`, **Cuando** intento cargarlo, **Entonces** se rechaza con `VERSION_NO_SOPORTADA`.
+- **CA-2 · Partida dañada (prueba crítica).** **Dado** un documento con un carácter del `estado` alterado o con JSON truncado, **Cuando** intento cargarlo, **Entonces** se rechaza con `ARCHIVO_CORRUPTO` y mi partida actual tiene **0 diferencias** respecto a antes.
+- **CA-3 · Versión no soportada.** **Dado** un documento con `versionEsquema = 99`, **Cuando** intento cargarlo, **Entonces** se rechaza con `VERSION_NO_SOPORTADA`.
 - **CA-4 · Invariante violada (borde).** **Dado** un documento con dinero −5 y un checksum recalculado de forma válida, **Cuando** intento cargarlo, **Entonces** se rechaza con `ARCHIVO_CORRUPTO`; y la verificación se detiene en el primer fallo según el orden de RN-33 (un JSON mal formado se detecta antes que el checksum).
 - **CA-5 · MongoDB no responde (negativo).** **Dado** que MongoDB no responde en 2 s, **Cuando** intento cargar, **Entonces** se informa `ERROR_ES` y mi partida no cambia.
 
@@ -544,7 +544,7 @@ Una historia está **terminada** solo si se cumple todo lo siguiente:
 **Como** jugador **quiero** ver sprites en lugar de formas básicas **para** que el juego tenga aspecto de videojuego, sin que falle si faltan imágenes.
 
 **Criterios de aceptación**
-- **CA-1 · Caché.** **Dado** que se piden 2 veces los mismos sprites a través del `AssetManager`, **Entonces** el archivo se lee una sola vez y ambas veces se obtiene el mismo recurso.
+- **CA-1 · Caché.** **Dado** que se piden 2 veces los mismos sprites a través del `GestorRecurso`, **Entonces** el archivo se lee una sola vez y ambas veces se obtiene el mismo recurso.
 - **CA-2 · Sprite faltante (negativo).** **Dado** un archivo de imagen inexistente, **Cuando** se dibuja el elemento, **Entonces** se usa el gráfico vectorial de respaldo, no se lanza ninguna excepción y se registra un aviso.
 - **CA-3 · Sin imágenes (borde).** **Dado** una instalación sin ninguna imagen, **Entonces** el juego ejecuta y se juega completo con gráficos vectoriales.
 - **CA-4 · Licencias.** **Entonces** el 100 % de los paquetes de imágenes aparece en `docs/ASSETS.md` con su fuente y licencia (CC0 o CC-BY).

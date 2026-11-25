@@ -6,11 +6,11 @@ package edu.ucc.farmsim.api;
  *
  * <p>Stories: none.
  *
- * @param code    nombre del {@code ErrorCode}, o {@code SOLICITUD_INVALIDA} si la petición está mal formada
- * @param message texto para el jugador
+ * @param codigo    nombre del {@code CodigoError}, o {@code SOLICITUD_INVALIDA} si la petición está mal formada
+ * @param mensaje texto para el jugador
  */
-public record ApiError(String code, String message) {
+public record ApiError(String codigo, String mensaje) {
 
     /** Código para las peticiones mal formadas (nunca llegan al juego). */
-    public static final String INVALID_REQUEST = "SOLICITUD_INVALIDA";
+    public static final String PETICION_INVALIDA = "SOLICITUD_INVALIDA";
 }

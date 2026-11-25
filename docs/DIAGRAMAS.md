@@ -30,12 +30,12 @@
 ![Vista funcional](diagramas/02_vista_funcional.png)
 
 - **Cubre:** los **50 RF** agrupados por componente (el verificador confirma que cada RF aparece **exactamente una vez**), HU-10, HU-29, HU-30, HU-35, HU-42 y las RN-01 a RN-40 (en el dominio).
-- **Componentes:** Interfaz de usuario (RF-33 a RF-41, RF-43 y RF-48), Gestor de assets (RF-42 y RF-44), Cliente HTTP (`RemoteGameClient`) con el bus de eventos del cliente, Controlador REST (`GameRestController` y `EventCollector`), Controlador del juego, Servicios de aplicación (6 bloques: cultivo RF-01–07, tiempo y clima RF-08–12 y RF-17, economía RF-13–16, construcción y animales RF-18–25, progreso RF-26–28, guardado RF-29–32, avatar, personajes, tutorial y valle RF-45–47, RF-49 y RF-50), Bus de eventos, Dominio del juego, Repositorio de partidas, los sprites pixel-art propios (recursos del jar) y un externo (MongoDB).
+- **Componentes:** Interfaz de usuario (RF-33 a RF-41, RF-43 y RF-48), Gestor de assets (RF-42 y RF-44), Cliente HTTP (`ClienteJuegoRemoto`) con el bus de eventos del cliente, Controlador REST (`ControladorRestJuego` y `RecolectorEvento`), Controlador del juego, Servicios de aplicación (6 bloques: cultivo RF-01–07, tiempo y clima RF-08–12 y RF-17, economía RF-13–16, construcción y animales RF-18–25, progreso RF-26–28, guardado RF-29–32, avatar, personajes, tutorial y valle RF-45–47, RF-49 y RF-50), Bus de eventos, Dominio del juego, Repositorio de partidas, los sprites pixel-art propios (recursos del jar) y un externo (MongoDB).
 - **Interfaces:** `IGameCommands` (la provee el cliente a la UI y el controlador del juego a la API), `IApiRest` (HTTP/JSON), `IServicios`, `IGameRules`, `IEventPublisher`, `IEventSubscription`, `IAssetProvider`, `ISaveRepository`, `IGameSnapshot`, `IMongoDB` e `IAssetFiles` (lectura del classpath); más 2 puertos en los componentes de entrada.
 - **Decisiones:**
   - La interfaz `ISaveRepository` la define el **dominio** y la implementa la infraestructura (inversión de dependencias); el repositorio requiere `IGameSnapshot` del dominio.
-  - RF-17 (resumen del día) está en *Tiempo y clima* porque lo produce `DayService` al terminar el día, aunque su épica sea Economía; RF-28 (nueva partida) está en *Progreso* porque crea el estado inicial y los logros.
-  - Cliente y servidor tienen cada uno su `EventBus`: el servidor devuelve los eventos de cada orden en la respuesta HTTP (DT-19) y el cliente los republica.
+  - RF-17 (resumen del día) está en *Tiempo y clima* porque lo produce `ServicioDia` al terminar el día, aunque su épica sea Economía; RF-28 (nueva partida) está en *Progreso* porque crea el estado inicial y los logros.
+  - Cliente y servidor tienen cada uno su `BusEvento`: el servidor devuelve los eventos de cada orden en la respuesta HTTP (DT-19) y el cliente los republica.
 \1: se muestran agrupadas como `IServicios` para que el diagrama sea legible.
 
 ## 3. Vista lógica
@@ -43,24 +43,24 @@
 ![Vista lógica](diagramas/03_vista_logica.png)
 
 - **Cubre:** modelo de dominio y capa de aplicación para RF-01 a RF-32; HU-01 a HU-32.
-- **Contenido:** 103 clases en 6 paquetes (`ui`, `client`, `api`, `application`, `domain` con 10 subpaquetes —incluido `npc`— e `infrastructure`), con el avatar, los vecinos, los encargos, el tutorial y las casas de la fase 5.7. Cada clase de patrón lleva su **estereotipo** y su **color**; la leyenda enumera los 7 colores.
+- **Contenido:** 103 clases en 6 paquetes (`ui`, `cliente`, `api`, `application`, `domain` con 10 subpaquetes —incluido `npc`— e `infrastructure`), con el avatar, los vecinos, los encargos, el tutorial y las casas de la fase 5.7. Cada clase de patrón lleva su **estereotipo** y su **color**; la leyenda enumera los 7 colores.
 - **Relaciones (justificadas, sin rombos de adorno):**
-  - **Composición (◆)** donde la parte no existe sin el todo: `GameState` → `FarmMap`, `Inventory`, `Market`, `AchievementTracker`; `FarmMap` → 1152 `Plot` (valle de 48 × 24) y → `Building`; `Plot` → `Crop` (0..1); `Building` → `Animal` (0..4).
-  - **Agregación (◇)** donde la parte tiene ciclo de vida independiente: un estado o una estrategia es compartible y reemplazable (`Crop` → `CropState`, `Animal` → `AnimalState`, `GameClock` → `SeasonState`, `Market` → `PricingStrategy`), `EventBus` → `GameListener` y `BuildingDirector` → `BuildingBuilder`.
-  - **Dependencia (- - ->)** para uso puntual sin referencia mantenida (`GameState` → `GameClock`, `SeasonState` → `WeatherStrategy`, `MapPanel` → `GameController`).
-- **Se muestra un subconjunto representativo:** de las 5 fábricas de cultivo solo `CarrotFactory` y `PumpkinFactory`; de las 4 construcciones solo `CoopBuilder` y `GreenhouseBuilder`; los servicios `FarmService`, `BuildingService`, `AnimalService` y `ProgressService` se indican en una nota. No se dibujan los enumerados (`Terrain`, `Weather`, `CropType`, `AnimalType`, `BuildingType`, `ItemType`), que aparecen como tipos de atributos.
+  - **Composición (◆)** donde la parte no existe sin el todo: `EstadoJuego` → `MapaGranja`, `Inventario`, `Mercado`, `SeguidorLogro`; `MapaGranja` → 1152 `Parcela` (valle de 48 × 24) y → `Edificio`; `Parcela` → `Cultivo` (0..1); `Edificio` → `Animal` (0..4).
+  - **Agregación (◇)** donde la parte tiene ciclo de vida independiente: un estado o una estrategia es compartible y reemplazable (`Cultivo` → `EstadoCultivo`, `Animal` → `EstadoAnimal`, `RelojJuego` → `EstadoEstacion`, `Mercado` → `EstrategiaPrecios`), `BusEvento` → `OyenteJuego` y `DirectorEdificio` → `ConstructorEdificio`.
+  - **Dependencia (- - ->)** para uso puntual sin referencia mantenida (`EstadoJuego` → `RelojJuego`, `EstadoEstacion` → `EstrategiaClima`, `PanelMapa` → `ControladorJuego`).
+- **Se muestra un subconjunto representativo:** de las 5 fábricas de cultivo solo `FabricaZanahoria` y `FabricaCalabaza`; de las 4 construcciones solo `ConstructorGallinero` y `ConstructorInvernadero`; los servicios `ServicioGranja`, `ServicioEdificio`, `ServicioAnimal` y `ServicioProgreso` se indican en una nota. No se dibujan los enumerados (`Terreno`, `Clima`, `TipoCultivo`, `TipoAnimal`, `TipoEdificio`, `TipoArticulo`), que aparecen como tipos de atributos.
 
 ### 3.1 Patrones de diseño aplicados y su justificación
 
 | Patrón | Rol → clases | Historias | Por qué se aplica (y no «por adorno») |
 |---|---|---|---|
-| **Singleton** | `GameClock` | HU-09 | Hay un único calendario por partida y varios servicios lo consultan. *Riesgo:* el estado global estorba a las pruebas; *mitigación:* `GameClock` expone un método para restaurar su fecha (lo usa el *Memento* al cargar) y las pruebas lo reinician |
-| **State** | Contexto `Crop` → `CropState` (`SeedState`, `SproutState`, `GrowingState`, `MatureState`, `WitheredState`); `Animal` → `AnimalState` (`HealthyState`, `HungryState`, `SickState`); `GameClock` → `SeasonState` (4 estaciones) | HU-03, HU-05, HU-09, HU-21 | El comportamiento cambia con el estado (un cultivo marchito no crece, un animal enfermo no produce) y las transiciones están en RN-08, RN-09 y RN-25; evita cadenas de `if` repartidas por el código |
-| **Strategy** | `WeatherStrategy` (`SeasonalWeatherStrategy`, `FixedWeatherStrategy`) y `PricingStrategy` (`CropPricing`, `FlatPricing`) | HU-11, HU-15 | El clima y el precio son algoritmos intercambiables: el día 1 y las pruebas usan clima fijo (RN-13); las cosechas tienen factor de temporada (RN-17) y los productos animales no |
-| **Factory Method** | Creador `CropFactory` → `CarrotFactory`, `PumpkinFactory` (y 3 más) | HU-01 | Cada cultivo se crea con sus propios valores (RN-05); sembrar solo conoce `CropFactory`, así que un cultivo nuevo no obliga a tocar `FarmService` |
-| **Builder** | `BuildingBuilder` (`CoopBuilder`, `GreenhouseBuilder`…) + `BuildingDirector` | HU-18 | Un edificio tiene muchos parámetros (tipo, posición, tamaño, capacidad, costo) y validaciones de colocación (RN-20, RN-21); se construye paso a paso y se valida al final |
-| **Memento** | Originador `GameState`; recuerdo `GameMemento`; cuidador `SaveGameService` | HU-29, HU-30, HU-31 | Guardar y cargar requieren una instantánea inmutable que no exponga el estado interno; así «cargar un archivo inválido sin alterar la partida» es natural (se construye aparte y solo reemplaza al actual si todo es válido, RN-33) |
-| **Observer** | Sujeto `EventBus`; observador `GameListener`; concretos `HudPanel`, `MapPanel`, `ToastPresenter` | HU-34, HU-35, HU-39 | La UI debe actualizarse por eventos y no consultando en bucle (R-04); el bus desacopla `application` de `ui` |
+| **Singleton** | `RelojJuego` | HU-09 | Hay un único calendario por partida y varios servicios lo consultan. *Riesgo:* el estado global estorba a las pruebas; *mitigación:* `RelojJuego` expone un método para restaurar su fecha (lo usa el *Memento* al cargar) y las pruebas lo reinician |
+| **State** | Contexto `Cultivo` → `EstadoCultivo` (`EstadoSemilla`, `EstadoBrote`, `EstadoCreciendo`, `EstadoMaduro`, `EstadoMarchito`); `Animal` → `EstadoAnimal` (`EstadoSano`, `EstadoHambriento`, `EstadoEnfermo`); `RelojJuego` → `EstadoEstacion` (4 estaciones) | HU-03, HU-05, HU-09, HU-21 | El comportamiento cambia con el estado (un cultivo marchito no crece, un animal enfermo no produce) y las transiciones están en RN-08, RN-09 y RN-25; evita cadenas de `if` repartidas por el código |
+| **Strategy** | `EstrategiaClima` (`EstrategiaClimaEstacional`, `EstrategiaClimaFija`) y `EstrategiaPrecios` (`PreciosCultivo`, `PreciosFijos`) | HU-11, HU-15 | El clima y el precio son algoritmos intercambiables: el día 1 y las pruebas usan clima fijo (RN-13); las cosechas tienen factor de temporada (RN-17) y los productos animales no |
+| **Factory Method** | Creador `FabricaCultivo` → `FabricaZanahoria`, `FabricaCalabaza` (y 3 más) | HU-01 | Cada cultivo se crea con sus propios valores (RN-05); sembrar solo conoce `FabricaCultivo`, así que un cultivo nuevo no obliga a tocar `ServicioGranja` |
+| **Builder** | `ConstructorEdificio` (`ConstructorGallinero`, `ConstructorInvernadero`…) + `DirectorEdificio` | HU-18 | Un edificio tiene muchos parámetros (tipo, posición, tamaño, capacidad, costo) y validaciones de colocación (RN-20, RN-21); se construye paso a paso y se valida al final |
+| **Memento** | Originador `EstadoJuego`; recuerdo `MementoJuego`; cuidador `ServicioJuegoGuardado` | HU-29, HU-30, HU-31 | Guardar y cargar requieren una instantánea inmutable que no exponga el estado interno; así «cargar un archivo inválido sin alterar la partida» es natural (se construye aparte y solo reemplaza al actual si todo es válido, RN-33) |
+| **Observer** | Sujeto `BusEvento`; observador `OyenteJuego`; concretos `HudPanel`, `PanelMapa`, `PresentadorAviso` | HU-34, HU-35, HU-39 | La UI debe actualizarse por eventos y no consultando en bucle (R-04); el bus desacopla `application` de `ui` |
 
 Cada clase que implemente un patrón llevará el Javadoc `Pattern: <nombre> — Role: <rol>` (RNF-13).
 
@@ -69,18 +69,18 @@ Cada clase que implemente un patrón llevará el Javadoc `Pattern: <nombre> — 
 ![Vista de desarrollo](diagramas/04_vista_desarrollo.png)
 
 - **Cubre:** RNF-06 (sentido de las dependencias), RNF-12, R-02 y la estructura de paquetes en la que se escribirán las HU-01 a HU-42.
-- **Contenido:** el paquete raíz `edu.ucc.farmsim` con `Main` y `LaunchOptions` (raíz de composición) y las capas: `ui` (screens, components, render, assets, theme), `client` (cliente HTTP), `api` (capa REST del servidor), `config` (Spring), `application` (controller, service, event, dto, result), `domain` (game, save, farm, crop, building, animal, economy, time, progress, config) e `infrastructure` (persistence).
+- **Contenido:** el paquete raíz `edu.ucc.farmsim` con `Main` y `OpcionesLanzamiento` (raíz de composición) y las capas: `ui` (screens, components, render, assets, theme), `cliente` (cliente HTTP), `api` (capa REST del servidor), `configuracion` (Spring), `application` (controller, service, event, dto, result), `domain` (game, save, farm, crop, building, animal, economy, time, progress, config) e `infrastructure` (persistence).
 - **Cómo se lee:** la flecha punteada `A ..> B` significa «A importa clases de B» y apunta a quien se usa.
-- **Reglas verificadas visualmente:** servidor `api → application → domain`, cliente `ui → application` y `client → application`; `infrastructure → domain` (la flecha sube hacia el dominio); `domain` no depende de ninguna otra capa; no hay ciclos; el controlador solo conoce los servicios (nunca el repositorio); la UI no importa `domain`, `infrastructure`, `api` ni `client`; la capa `api` no importa `domain`.
-- **Dentro de `domain`:** `game` → `farm`, `economy`, `time`, `progress`; `farm` → `crop`, `building`; `building` → `animal`; `crop` y `economy` → `time`; `economy` → `crop`; `save` → `game`. `config` (constantes de las RN) la usan todos y no depende de nadie (se indica con una nota para no saturar el diagrama).
-- **Verificación:** la prueba ArchUnit `ArchitectureTest` y `tools/check_imports.py` comprueban los `import` reales contra este diagrama.
+- **Reglas verificadas visualmente:** servidor `api → application → domain`, cliente `ui → application` y `cliente → application`; `infrastructure → domain` (la flecha sube hacia el dominio); `domain` no depende de ninguna otra capa; no hay ciclos; el controlador solo conoce los servicios (nunca el repositorio); la UI no importa `domain`, `infrastructure`, `api` ni `cliente`; la capa `api` no importa `domain`.
+- **Dentro de `domain`:** `juego` → `granja`, `economy`, `tiempo`, `progreso`; `granja` → `cultivo`, `edificio`; `edificio` → `animal`; `cultivo` y `economy` → `tiempo`; `economy` → `cultivo`; `save` → `juego`. `configuracion` (constantes de las RN) la usan todos y no depende de nadie (se indica con una nota para no saturar el diagrama).
+- **Verificación:** la prueba ArchUnit `ArquitecturaTest` y `tools/check_imports.py` comprueban los `import` reales contra este diagrama.
 
 ## 5. Vista de despliegue
 
 ![Vista de despliegue](diagramas/05_vista_despliegue.png)
 
 - **Cubre:** RNF-02, RNF-03, RNF-11, RNF-15, RNF-16, R-07, R-09, W-01 y W-03; HU-29, HU-30 y HU-33; RN-31 y RN-32.
-- **Contenido:** un nodo `«device»` (el equipo del jugador, Windows 10 o superior) con dos entornos de ejecución `«executionEnvironment»` al mismo nivel: la **JVM** (JRE 17+), que contiene a su vez el entorno del **Cliente** (Swing + Java2D) y el del **Servidor** (Spring Boot con Tomcat embebido en 127.0.0.1) además del artefacto `farmsim.jar`, y **MongoDB Community 8.0** (servicio de Windows que arranca solo, puerto 27017) con el artefacto *colección partidas* de la base `valleverde`. La leyenda explica el arranque en paralelo (pantalla de inicio en unos 2 s, RNF-02), el contenido del jar (incluidos los 122 sprites propios) y el documento con `schemaVersion` 3. Dos rutas de comunicación con protocolo: **HTTP / JSON** entre cliente y servidor, y **protocolo MongoDB (TCP)** entre servidor y MongoDB.
+- **Contenido:** un nodo `«dispositivo»` (el equipo del jugador, Windows 10 o superior) con dos entornos de ejecución `«executionEnvironment»` al mismo nivel: la **JVM** (JRE 17+), que contiene a su vez el entorno del **Cliente** (Swing + Java2D) y el del **Servidor** (Spring Boot con Tomcat embebido en 127.0.0.1) además del artefacto `farmsim.jar`, y **MongoDB Community 8.0** (servicio de Windows que arranca solo, puerto 27017) con el artefacto *colección partidas* de la base `valleverde`. La leyenda explica el arranque en paralelo (pantalla de inicio en unos 2 s, RNF-02), el contenido del jar (incluidos los 122 sprites propios) y el documento con `versionEsquema` 3. Dos rutas de comunicación con protocolo: **HTTP / JSON** entre cliente y servidor, y **protocolo MongoDB (TCP)** entre servidor y MongoDB.
 - **Decisiones (según el PDF de despliegue, p. 14 y p. 17):** no se dibujan las capas como servidores (son agrupaciones lógicas dentro del mismo proceso); no se confunde una clase con un artefacto; no se agrega internet, nube ni más nodos de los que el escenario tiene (servidor, cliente y MongoDB corren en el mismo equipo; W-01 y W-03).
 
 ## 6. Anexo A1 · Secuencia «Vender cosecha»
@@ -88,10 +88,10 @@ Cada clase que implemente un patrón llevará el Javadoc `Pattern: <nombre> — 
 ![Secuencia Vender cosecha](diagramas/A1_secuencia_vender_cosecha.png)
 
 - **Cubre:** HU-15 (CA-1 y CA-6), HU-26 (LG-04), HU-34, HU-38 y HU-39; RF-15, RF-26, RF-34, RF-38 y RF-39; RN-14, RN-15, RN-17, RN-18 y RN-28.
-- **Camino exitoso:** 3 Zanahorias en Primavera con demanda 100 → `MarketPresenter.sellUnits` → `sell` viaja por HTTP (`POST /api/market/sales`) → `sellUnit` ×3 (27 + 26 + 26) → `remove` → `earn(79)` → `recordSale(3)` → `publish(MoneyChanged)` y `publish(InventoryChanged)` → `AchievementService.check` → `evaluateAchievements` (y `AchievementUnlocked` solo si hay logro) → el servidor devuelve `200 {data: 79, events}` → el cliente republica los eventos → `HudPanel` muestra «579 m» al instante y, si hubo logro, `ToastPresenter` avisa → el presentador recarga el mercado y muestra «Vendiste 3 × Zanahoria por 79 m.».
-- **Camino de error:** cantidad fuera de rango → `Result.fail(CANTIDAD_INVALIDA)` → respuesta HTTP `400` y el mismo `Result` en el cliente, sin modificar inventario, saldo ni demanda.
+- **Camino exitoso:** 3 Zanahorias en Primavera con demanda 100 → `PresentadorMercado.unidadesVender` → `vender` viaja por HTTP (`POST /api/market/sales`) → `unidadVender` ×3 (27 + 26 + 26) → `remove` → `ganar(79)` → `ventaRegistro(3)` → `publish(DineroCambiado)` y `publish(InventarioCambiado)` → `ServicioLogro.comprobar` → `logrosEvaluar` (y `LogroDesbloqueado` solo si hay logro) → el servidor devuelve `200 {datos: 79, eventos}` → el cliente republica los eventos → `HudPanel` muestra «579 m» al instante y, si hubo logro, `PresentadorAviso` avisa → el presentador recarga el mercado y muestra «Vendiste 3 × Zanahoria por 79 m.».
+- **Camino de error:** cantidad fuera de rango → `Resultado.fallar(CANTIDAD_INVALIDA)` → respuesta HTTP `400` y el mismo `Resultado` en el cliente, sin modificar inventario, saldo ni demanda.
 - **Regla del taller:** cada mensaje sólido corresponde a una operación del diagrama de clases (verificado por script).
-- **Demuestra la regla de capas:** `MarketDialog` → `MarketPresenter` → `RemoteGameClient` → HTTP → `GameRestController` → `GameController` → `MarketService` → dominio; el controlador nunca llama a un repositorio y la UI recibe solo un `Result` (nunca una excepción).
+- **Demuestra la regla de capas:** `DialogoMercado` → `PresentadorMercado` → `ClienteJuegoRemoto` → HTTP → `ControladorRestJuego` → `ControladorJuego` → `ServicioMercado` → dominio; el controlador nunca llama a un repositorio y la UI recibe solo un `Resultado` (nunca una excepción).
 
 ## 7. Notación: errores de la plantilla que NO se replicaron
 
@@ -100,7 +100,7 @@ Tomados de la revisión de la guía de estudio y del PDF de despliegue:
 | En la plantilla | En estos diagramas |
 |---|---|
 | Ruta `https:80` (HTTPS en el puerto de HTTP) | Las dos rutas (cliente–servidor y servidor–MongoDB) llevan su protocolo coherente: HTTP/JSON y protocolo MongoDB |
-| El navegador como «device» | La JVM, el servidor, el cliente y MongoDB son `«executionEnvironment»`; solo el equipo es `«device»` |
+| El navegador como «device» | La JVM, el servidor, el cliente y MongoDB son `«executionEnvironment»`; solo el equipo es `«dispositivo»` |
 | Nombres con `:` (instancias) | Nombres simples de nodos y artefactos |
 | Multiplicidad `1,2` y atributos públicos `+` | Multiplicidades con `..` (`0..4`, `0..1`) y atributos privados `-` |
 | Subclases que repiten atributos heredados | Las subclases de patrón no repiten lo heredado |

@@ -356,16 +356,16 @@ Después se pone `alimentadoHoy = falso`.
 - Metadatos visibles por ranura: Año, estación y día, dinero, fecha y hora real del guardado.
 
 ### RN-32 · Formato e integridad del documento
-- Documento con los campos `_id`, `schemaVersion` (= **3** desde la Fase 5.7g, que agrandó el mapa; se siguen leyendo documentos de versión **1** y **2**, RN-36 y RN-40), `savedAt`, `state` (el estado como texto JSON UTF-8) y `checksum` (**SHA-256** en hexadecimal de `state`).
-- `state` incluye: calendario, energía, dinero, inventario, parcelas y cultivos, edificios y animales (con pendientes), mercado (demanda y precio anterior), clima y pronóstico, logros y contadores, y el **estado interno del generador aleatorio** (un entero de 64 bits que expone `StateRandom`), para continuar exactamente la misma secuencia al cargar.
+- Documento con los campos `_id`, `versionEsquema` (= **3** desde la Fase 5.7g, que agrandó el mapa; se siguen leyendo documentos de versión **1** y **2**, RN-36 y RN-40), `archivadoEn`, `estado` (el estado como texto JSON UTF-8) y `checksum` (**SHA-256** en hexadecimal de `estado`).
+- `estado` incluye: calendario, energía, dinero, inventario, parcelas y cultivos, edificios y animales (con pendientes), mercado (demanda y precio anterior), clima y pronóstico, logros y contadores, y el **estado interno del generador aleatorio** (un entero de 64 bits que expone `AzarEstado`), para continuar exactamente la misma secuencia al cargar.
 - Tamaño típico ≤ 200 KB (el límite de un documento de MongoDB es 16 MB).
 - **Guardar → cargar devuelve un estado idéntico** al original (igualdad estructural, incluida la secuencia futura de sorteos).
 
 ### RN-33 · Validación de carga
 La carga verifica **en este orden** y se detiene en el primer fallo:
 1. El documento **existe** (y MongoDB responde).
-2. El JSON de `state` está **bien formado**.
-3. `schemaVersion` es **soportada**.
+2. El JSON de `estado` está **bien formado**.
+3. `versionEsquema` es **soportada**.
 4. El **checksum** coincide.
 5. **Invariantes:** dinero ≥ 0; energía 0–100; día 1–28; inventario dentro de su capacidad y pilas ≤ 99; cultivos solo en parcelas de TIERRA o de invernadero; edificios dentro del mapa y sin solapar; animales ≤ capacidad; logros coherentes con sus contadores.
 
@@ -420,7 +420,7 @@ El *tooltip* de una parcela aparece tras **300 ms** de reposo del cursor y muest
 | `ENCARGO_INCOMPLETO` | «Te faltan {cantidad y artículo} para el encargo.» (RN-38) |
 
 - **Toasts:** duración **3 s** (desvanecimiento de 0,4 s; los logros duran **5 s**), máximo **4 visibles** a la vez, tres tipos: éxito, información y error.
-- La interfaz **nunca** recibe excepciones: solo recibe un `Result` con código y mensaje.
+- La interfaz **nunca** recibe excepciones: solo recibe un `Resultado` con código y mensaje.
 
 ---
 
@@ -437,7 +437,7 @@ Cada RN se usa por al menos un requerimiento funcional; la tabla completa RF ↔
 - Dar **un paso** (flechas o `W` `A` `S` `D`) lo mueve a la parcela vecina en esa dirección. Moverse **no cuesta energía y no avanza el día**.
 - El paso se **rechaza** (`MOVIMIENTO_BLOQUEADO`, «No puedes pasar por ahí.») si el destino está fuera del mapa, es agua u obstáculo, está cubierto por un edificio o lo ocupa un NPC. Aun así, el avatar **cambia su mirada** hacia esa dirección.
 - La **parcela frente al avatar** es la vecina en la dirección que mira. La tecla `Espacio` aplica la herramienta elegida a esa parcela con las mismas reglas de siempre (RN-06 a RN-10, RN-24, RN-26); el **clic** sobre una parcela sigue aplicándola a la parcela clicada, sin exigir cercanía.
-- Posición y mirada forman parte de la partida guardada (RN-32), que pasó a **`schemaVersion` 2** (hoy 3, RN-40). Un documento de versión 1 (sin avatar) se acepta y deja al avatar en su posición inicial, o en la parcela transitable más cercana si allí se construyó (RN-33); una versión menor que 1 o mayor que la actual se rechaza con `VERSION_NO_SOPORTADA`. Un documento cuyo avatar no está en una parcela transitable se rechaza con `ARCHIVO_CORRUPTO`.
+- Posición y mirada forman parte de la partida guardada (RN-32), que pasó a **`versionEsquema` 2** (hoy 3, RN-40). Un documento de versión 1 (sin avatar) se acepta y deja al avatar en su posición inicial, o en la parcela transitable más cercana si allí se construyó (RN-33); una versión menor que 1 o mayor que la actual se rechaza con `VERSION_NO_SOPORTADA`. Un documento cuyo avatar no está en una parcela transitable se rechaza con `ARCHIVO_CORRUPTO`.
 - Posición inicial: parcela **(7, 7)**, la hierba justo al sur de la tierra de cultivo. No se puede **construir** sobre la parcela del avatar (`UBICACION_INVALIDA`, RN-21).
 
 ### RN-37 · Personajes (NPC) y diálogos
@@ -481,11 +481,11 @@ Cada RN se usa por al menos un requerimiento funcional; la tabla completa RF ↔
 - Al terminar el paso 5 se muestra el aviso «¡Listo! Ya sabes lo básico. ¡Buena suerte en el valle!» y el cuadro desaparece.
 - «Saltar tutorial» lo da por terminado en cualquier paso; un tutorial terminado o saltado **no vuelve**.
 - El tutorial **no cambia** la energía, el dinero, el inventario ni el día: solo guía.
-- El paso actual se guarda con la partida (RN-32) sin subir la `schemaVersion`; un documento escrito antes del tutorial se carga con el tutorial **terminado** (una partida que ya se jugaba no lo repite).
+- El paso actual se guarda con la partida (RN-32) sin subir la `versionEsquema`; un documento escrito antes del tutorial se carga con el tutorial **terminado** (una partida que ya se jugaba no lo repite).
 
 ### RN-40 · Vista del valle, cámara y caminata
 - La parcela se dibuja de **48 px** (los sprites de 32 px ampliados sin desenfocar); si la ventana es tan chica que no caben 12 × 8 parcelas, se usa la parcela que quepa.
 - La **cámara** sigue al avatar (también durante el paso, sin saltos) y nunca muestra fuera del valle; en un eje donde el valle cabe entero se centra. Las barras flotan sobre el paisaje.
 - El avatar y los NPC ocupan **una parcela** (la de sus pies), pero se dibujan de **1 parcela de ancho por 2 de alto** (sprites de 32 × 64). Las reglas solo usan la parcela de los pies.
 - **Caminar sin pausas:** mientras se mantiene una flecha o `W` `A` `S` `D`, el avatar da un paso cada **180 ms**, sin la pausa de repetición del teclado después del primero, y la animación sigue sin reiniciarse; al soltar la tecla se detiene. Una tecla pulsada a mitad de un paso espera a que ese paso termine (nunca hay un paso extra). Si se mantienen dos **perpendiculares** (por ejemplo `W` y `D`), los pasos se alternan entre ambas y el avatar avanza **en diagonal**; si una de las dos está bloqueada, sigue por la otra. Con dos opuestas manda la última pulsada.
-- El mapa más grande sube el documento a **`schemaVersion` 3**. Un documento de versión 1 o 2 (mapa de 16 × 10) se acepta: sus cultivos, edificios, avatar y encargos quedan en las **mismas coordenadas**, que ahora son la esquina noroeste de la granja.
+- El mapa más grande sube el documento a **`versionEsquema` 3**. Un documento de versión 1 o 2 (mapa de 16 × 10) se acepta: sus cultivos, edificios, avatar y encargos quedan en las **mismas coordenadas**, que ahora son la esquina noroeste de la granja.

@@ -2,7 +2,7 @@
 
 Simulador de granja 2D **por turnos** (un turno = un día), hecho en Java con Swing y Java2D. El jugador camina con su granjero por un valle con su granja y una aldea; siembra, riega y cosecha cultivos, cría animales, construye edificios, comercia en un mercado con precios dinámicos y cumple encargos de los vecinos, a lo largo de un ciclo de estaciones y clima cambiante, con logros y guardado en 3 ranuras de MongoDB.
 
-> **Nombre provisional.** El nombre visible vive en una sola constante ([`GameInfo.NAME`](src/main/java/edu/ucc/farmsim/GameInfo.java)).
+> **Nombre provisional.** El nombre visible vive en una sola constante ([`InfoJuego.NOMBRE`](src/main/java/edu/ucc/farmsim/GameInfo.java)).
 > Proyecto final de *Diseño de Software* — Ingeniería de Software, UCC Pasto. El valor del proyecto está en la calidad del diseño y en la coherencia entre documentos, diagramas y código.
 
 ## Estado
@@ -36,7 +36,7 @@ Simulador de granja 2D **por turnos** (un turno = un día), hecho en Java con Sw
 - **MongoDB Community Server 8.0** para guardar y cargar partidas (colección `partidas` de la base `valleverde`). En Windows se instala como servicio que arranca solo con:
 
   ```powershell
-  winget install MongoDB.Server --version 8.0.23
+  winget instalar MongoDB.Server --version 8.0.23
   ```
 
   Se usa la **8.0** y no la 9 porque el *driver* de Java del proyecto admite servidores hasta la 8.x. Por defecto se busca en `localhost:27017`; otra dirección se indica con la variable de entorno `VALLEVERDE_MONGO_URI`. Sin MongoDB el juego funciona igual, pero guardar y cargar responden «No se pudo acceder a las partidas guardadas».
@@ -52,10 +52,10 @@ En PowerShell (Windows), desde la carpeta del proyecto:
 .\mvnw.cmd clean verify
 ```
 
-Compila, ejecuta las 581 pruebas, mide la cobertura (JaCoCo exige ≥ 70 % en dominio y aplicación; hoy 97 % y 96 %) y genera `target\farmsim.jar`. Las pruebas contra MongoDB real (`HU29RealMongoTest`, base `valleverde_test`) se omiten solas si no hay MongoDB, y las de ventanas, si no hay pantalla.
+Compila, ejecuta las 581 pruebas, mide la cobertura (JaCoCo exige ≥ 70 % en dominio y aplicación; hoy 97 % y 96 %) y genera `objetivo\farmsim.jar`. Las pruebas contra MongoDB real (`HU29MongoRealTest`, base `valleverde_test`) se omiten solas si no hay MongoDB, y las de ventanas, si no hay pantalla.
 
 ```powershell
-java -jar target\farmsim.jar
+java -jar objetivo\farmsim.jar
 ```
 
 Con un solo comando arranca el **servidor** (Spring Boot, solo en 127.0.0.1, puerto libre) y la **ventana** que lo usa por HTTP. Los dos arrancan a la vez: la pantalla de inicio aparece en unos **2,2 s** y el servidor queda listo a los 3,8–4,9 s, antes de que haga falta (RNF-02 pide ≤ 5 s hasta la pantalla de inicio; medido en la Fase 5.7i, 5 arranques). También se pueden separar: `--server --port 8080` (solo servidor; la API está en [`docs/API.md`](docs/API.md)) y `--client --url=http://127.0.0.1:8080` (solo ventana).
@@ -64,7 +64,7 @@ Con un solo comando arranca el **servidor** (Spring Boot, solo en 127.0.0.1, pue
 |---|---|
 | Solo las pruebas de una historia | `.\mvnw.cmd test "-Dtest=HU01*"` |
 | Incluir pruebas de rendimiento | `.\mvnw.cmd verify -Pperf` |
-| Informe de cobertura | abrir `target\site\jacoco\index.html` |
+| Informe de cobertura | abrir `objetivo\site\jacoco\indice.html` |
 | Comprobar diagramas | `python tools/check_diagrams.py` |
 | Comprobar historias de usuario | `python tools/check_hu.py` |
 | Comprobar el código contra el diagrama de desarrollo | `python tools/check_imports.py` |
@@ -73,39 +73,39 @@ Con un solo comando arranca el **servidor** (Spring Boot, solo en 127.0.0.1, pue
 
 ## Arquitectura
 
-Servidor Spring Boot (API REST) y cliente Swing por HTTP en el mismo equipo, con partidas en MongoDB. Capas con dependencias en un solo sentido: servidor `api → application → domain` e `infrastructure → domain`, cliente `ui → application` y `client → application`. El dominio no conoce Swing, Spring, Jackson, MongoDB ni E/S; la UI dibuja con DTO inmutables y se actualiza por eventos (Observer); el controlador siempre devuelve un `Result` y nunca lanza excepciones hacia la UI. Detalle en [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md).
+Servidor Spring Boot (API REST) y cliente Swing por HTTP en el mismo equipo, con partidas en MongoDB. Capas con dependencias en un solo sentido: servidor `api → application → domain` e `infrastructure → domain`, cliente `ui → application` y `cliente → application`. El dominio no conoce Swing, Spring, Jackson, MongoDB ni E/S; la UI dibuja con DTO inmutables y se actualiza por eventos (Observer); el controlador siempre devuelve un `Resultado` y nunca lanza excepciones hacia la UI. Detalle en [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md).
 
 ```
 edu.ucc.farmsim
-├─ Main, LaunchOptions, GameInfo  raíz de composición y datos del juego
-├─ ui            screens · components · render · assets · theme   (cliente)
-├─ client        RemoteGameClient, EventDecoder                   (cliente HTTP)
-├─ api           GameRestController, ApiResponse, EventCollector… (servidor REST)
-├─ config        ServerApplication, ServerConfig                  (Spring)
-├─ application   controller · service · event · dto · result
-├─ domain        game · save · farm · npc · crop · building · animal · economy · time · progress · config
-└─ infrastructure persistence
+├─ Main, OpcionesLanzamiento, InfoJuego  raíz de composición y datos del juego
+├─ interfaz            pantallas · componentes · dibujo · recursos · tema   (cliente)
+├─ cliente        ClienteJuegoRemoto, DecodificadorEvento                   (cliente HTTP)
+├─ api           ControladorRestJuego, RespuestaApi, RecolectorEvento… (servidor REST)
+├─ configuracion        AplicacionServidor, ConfiguracionServidor                  (Spring)
+├─ aplicacion   controlador · servicio · evento · dto · resultado
+├─ dominio        juego · guardado · granja · npc · cultivo · edificio · animal · economia · tiempo · progreso · configuracion
+└─ infraestructura persistencia
 ```
 
 ## Patrones de diseño
 
 | Patrón | Clases | Historias | Estado |
 |---|---|---|---|
-| Singleton | `GameClock` | HU-09 | hecho (5.1) |
-| State | `SeasonState` con `SpringState`, `SummerState`, `AutumnState`, `WinterState` | HU-09 | hecho (5.1) |
-| State | `CropState` con `SeedState`, `SproutState`, `GrowingState`, `MatureState`, `WitheredState` (contexto `Crop`) | HU-03, HU-05 | hecho (5.2) |
-| State | `AnimalState` con `HealthyState`, `HungryState`, `SickState` (contexto `Animal`) | HU-21 | hecho (5.4) |
-| Strategy | `WeatherStrategy` con `SeasonalWeatherStrategy` y `FixedWeatherStrategy` | HU-11 | hecho (5.1) |
-| Strategy | `PricingStrategy` con `CropPricing` y `FlatPricing` | HU-15 | hecho (5.3) |
-| Observer | `EventBus`, `GameListener`, `HudModel`, `HudPanel` | HU-10, HU-34 | hecho (5.1) |
-| Observer | `MapPanel` | HU-35 | hecho (5.2) |
-| Observer | `ToastPresenter` (y `ToastQueue`/`ToastLayer` que dibujan lo que recibe) | HU-39 | hecho (5.6) |
-| Memento | `GameState` (originador), `GameMemento`, `SaveGameService` (*caretaker*) | HU-10, HU-29, HU-30 | hecho (5.5): guardado en MongoDB |
-| Observer | `InventoryModel` | HU-37 | hecho (5.3) |
-| Observer | `EventCollector` (el servidor guarda los eventos para la respuesta) | RNF-15 | hecho (5.2b) |
-| Controller (GRASP) | `GameController` (único punto de entrada de la interfaz) | todas | hecho (5.1) |
-| Factory Method | `CropFactory` con `CarrotFactory`, `PotatoFactory`, `TomatoFactory`, `CornFactory`, `PumpkinFactory` | HU-01 | hecho (5.2) |
-| Builder | `BuildingBuilder` con `CoopBuilder`, `BarnBuilder`, `WarehouseBuilder`, `GreenhouseBuilder` y `BuildingDirector` | HU-18 | hecho (5.4) |
+| Singleton | `RelojJuego` | HU-09 | hecho (5.1) |
+| State | `EstadoEstacion` con `EstadoPrimavera`, `EstadoVerano`, `EstadoOtonio`, `EstadoInvierno` | HU-09 | hecho (5.1) |
+| State | `EstadoCultivo` con `EstadoSemilla`, `EstadoBrote`, `EstadoCreciendo`, `EstadoMaduro`, `EstadoMarchito` (contexto `Cultivo`) | HU-03, HU-05 | hecho (5.2) |
+| State | `EstadoAnimal` con `EstadoSano`, `EstadoHambriento`, `EstadoEnfermo` (contexto `Animal`) | HU-21 | hecho (5.4) |
+| Strategy | `EstrategiaClima` con `EstrategiaClimaEstacional` y `EstrategiaClimaFija` | HU-11 | hecho (5.1) |
+| Strategy | `EstrategiaPrecios` con `PreciosCultivo` y `PreciosFijos` | HU-15 | hecho (5.3) |
+| Observer | `BusEvento`, `OyenteJuego`, `ModeloHud`, `HudPanel` | HU-10, HU-34 | hecho (5.1) |
+| Observer | `PanelMapa` | HU-35 | hecho (5.2) |
+| Observer | `PresentadorAviso` (y `ColaAviso`/`CapaAviso` que dibujan lo que recibe) | HU-39 | hecho (5.6) |
+| Memento | `EstadoJuego` (originador), `MementoJuego`, `ServicioJuegoGuardado` (*caretaker*) | HU-10, HU-29, HU-30 | hecho (5.5): guardado en MongoDB |
+| Observer | `ModeloInventario` | HU-37 | hecho (5.3) |
+| Observer | `RecolectorEvento` (el servidor guarda los eventos para la respuesta) | RNF-15 | hecho (5.2b) |
+| Controller (GRASP) | `ControladorJuego` (único punto de entrada de la interfaz) | todas | hecho (5.1) |
+| Factory Method | `FabricaCultivo` con `FabricaZanahoria`, `FabricaPapa`, `FabricaTomate`, `FabricaMaiz`, `FabricaCalabaza` | HU-01 | hecho (5.2) |
+| Builder | `ConstructorEdificio` con `ConstructorGallinero`, `ConstructorEstablo`, `ConstructorAlmacen`, `ConstructorInvernadero` y `DirectorEdificio` | HU-18 | hecho (5.4) |
 
 > Cada clase de patrón lleva el Javadoc `Pattern: <nombre> — Role: <rol>` y está registrada en `src/test/resources/patterns.txt` (una prueba lo verifica). La tabla se actualiza al cerrar cada fase.
 
@@ -127,8 +127,8 @@ edu.ucc.farmsim
 
 ## Assets gráficos
 
-Los 122 sprites (32 × 32 px; personajes de 32 × 64, árboles de 64 × 64 y casas del valle de hasta 160 × 128; estilo pixel-art de granja) son **trabajo propio**, generados por `tools/gen_sprites.py`, y constan en [`docs/ASSETS.md`](docs/ASSETS.md); no hay ningún sprite de otro juego. Si falta alguno, el `AssetManager` lo avisa y el mapa dibuja el gráfico vectorial de respaldo. No se usan sprites ni nombres de juegos comerciales.
+Los 122 sprites (32 × 32 px; personajes de 32 × 64, árboles de 64 × 64 y casas del valle de hasta 160 × 128; estilo pixel-art de granja) son **trabajo propio**, generados por `tools/gen_sprites.py`, y constan en [`docs/ASSETS.md`](docs/ASSETS.md); no hay ningún sprite de otro juego. Si falta alguno, el `GestorRecurso` lo avisa y el mapa dibuja el gráfico vectorial de respaldo. No se usan sprites ni nombres de juegos comerciales.
 
 ## Convenciones
 
-Código, nombres de pruebas y commits en inglés; comentarios, documentación y textos visibles al jugador en español (las líneas `Stories:` y `Pattern:` del Javadoc se dejan tal cual: las leen las pruebas y los scripts). Commits: `feat(area): description (HUxx)`.
+Clases, métodos, variables y paquetes, comentarios, documentación y textos visibles al jugador en español. Siguen en inglés los valores de las enumeraciones (identificadores de datos como `CARROT_SEED`, que también dan nombre a los sprites), las rutas de la API (`/api/...`), los nombres de los métodos de prueba y los commits. Las líneas `Stories:` y `Pattern:` del Javadoc se dejan tal cual: las leen las pruebas y los scripts. Commits: `feat(area): description (HUxx)`.

@@ -317,7 +317,7 @@
 | RF-39 | El sistema mostrará notificaciones (*toasts*) para logros, errores y eventos de estación | Should | CU-18 | HU-39 |
 | RF-40 | El sistema aplicará efectos visuales: tinte día/noche, paleta por estación, partículas de … | Could | CU-18 | HU-40 |
 | RF-41 | El sistema aplicará animaciones suaves (crecimiento, animales de 2 a 3 cuadros y transició… | Could | CU-18 | HU-41 |
-| RF-42 | El sistema cargará sprites mediante un `AssetManager` con caché y usará gráficos vectorial… | Should | CU-18 | HU-42 |
+| RF-42 | El sistema cargará sprites mediante un `GestorRecurso` con caché y usará gráficos vectorial… | Should | CU-18 | HU-42 |
 | RF-43 | La interfaz usará el tema visual FlatLaf con una tipografía única y, si el tema no se puede instalar, … | Should | CU-18 | HU-43 |
 | RF-44 | El sistema incluirá sprites pixel-art propios de 32 × 32 px y los ampliará por factor entero … | Should | CU-18 | HU-44 |
 | RF-45 | El jugador podrá mover un avatar con el teclado por el mapa, con colisiones, y usar la herramienta … | Should | CU-19 | HU-45 |

@@ -9,11 +9,11 @@ Las pruebas se escriben **antes** que el código, historia por historia (DoD 1).
 
 | Nivel | Qué verifica | Dónde | Herramienta | Velocidad |
 |---|---|---|---|---|
-| **Unitarias de dominio** | Reglas de cultivos, animales, mercado, tiempo (RN-01 a RN-35) con `StateRandom` de semilla fija | `src/test/.../domain/**` | JUnit 5 | milisegundos |
-| **Aceptación** (aplicación) | Cada criterio de cada historia, **a través de `GameController`** con un repositorio en memoria | `src/test/.../acceptance/**` | JUnit 5 | milisegundos |
+| **Unitarias de dominio** | Reglas de cultivos, animales, mercado, tiempo (RN-01 a RN-35) con `AzarEstado` de semilla fija | `src/test/.../domain/**` | JUnit 5 | milisegundos |
+| **Aceptación** (aplicación) | Cada criterio de cada historia, **a través de `ControladorJuego`** con un repositorio en memoria | `src/test/.../acceptance/**` | JUnit 5 | milisegundos |
 | **API REST** | Cada endpoint: código HTTP de éxito y de cada rechazo, cuerpo JSON y eventos de la respuesta | `src/test/.../api/**` | Spring Boot Test + MockMvc | decenas de ms |
-| **Cliente HTTP** | `RemoteGameClient` contra el servidor real en un puerto libre: mismos resultados que el controlador en proceso | `src/test/.../client/**` | Spring Boot Test (`RANDOM_PORT`) | cientos de ms |
-| **Infraestructura** | `MongoSaveRepository`: reemplazo atómico, documentos dañados, MongoDB que no responde | `src/test/.../infrastructure/**` | JUnit 5 + MongoDB de pruebas | decenas de ms |
+| **Cliente HTTP** | `ClienteJuegoRemoto` contra el servidor real en un puerto libre: mismos resultados que el controlador en proceso | `src/test/.../client/**` | Spring Boot Test (`RANDOM_PORT`) | cientos de ms |
+| **Infraestructura** | `RepositorioGuardadoMongo`: reemplazo atómico, documentos dañados, MongoDB que no responde | `src/test/.../infrastructure/**` | JUnit 5 + MongoDB de pruebas | decenas de ms |
 | **Arquitectura** | Capas, ciclos, imports prohibidos, Javadoc de patrones (AR-1 a AR-9) | `src/test/.../architecture/**` | ArchUnit | ~1 s |
 | **Rendimiento** | Fin de día, guardado y carga a plena carga (RNF-01, RNF-03) | `src/test/.../perf/**` con `@Tag("perf")` | JUnit 5 | segundos |
 | **Interfaz** | Presentadores y componentes sin pantalla; el resto con lista de comprobación visual | `src/test/.../ui/**` | JUnit 5 (omitidas si `GraphicsEnvironment.isHeadless()`) | decenas de ms |
@@ -34,10 +34,10 @@ Las pruebas se escriben **antes** que el código, historia por historia (DoD 1).
 
 - **Nombres:** clases `HUxxNombreDeLaHistoriaTest`; métodos `HUxx_caN_descripcionEnIngles` (por ejemplo `HU01_ca2_rejectsSowingOutOfSeason`). El prefijo `HUxx_` permite filtrar por historia y trazar cada criterio.
 - **Estructura Dado/Cuando/Entonces** en comentarios `// Given`, `// When`, `// Then`; una sola aserción de comportamiento por prueba cuando sea posible.
-- **Datos de prueba** (clase `GameFixtures`): partida nueva con semilla fija; constructores de estado (`aGame().inSeason(SPRING).withMoney(500)…`); `fullLoadGame()` (40 cultivos al aire libre, 9 en invernadero, 6 edificios y 16 animales, para RNF-01).
-- **Aleatoriedad:** nunca `new Random()` en pruebas; siempre `StateRandom` con semilla fija o `FixedWeatherStrategy` para controlar el clima del día.
-- **Reloj:** toda prueba que lo use llama a `GameClock.resetForTests()` en `@BeforeEach` (DT-09).
-- **Repositorios:** `FakeSaveRepository` en memoria para aceptación, API y cliente; MongoDB real solo en las pruebas de `MongoSaveRepository` (se omiten con un aviso si no hay un MongoDB al que conectarse).
+- **Datos de prueba** (clase `DatosJuego`): partida nueva con semilla fija; constructores de estado (`aGame().inSeason(SPRING).withMoney(500)…`); `fullLoadGame()` (40 cultivos al aire libre, 9 en invernadero, 6 edificios y 16 animales, para RNF-01).
+- **Aleatoriedad:** nunca `new Random()` en pruebas; siempre `AzarEstado` con semilla fija o `EstrategiaClimaFija` para controlar el clima del día.
+- **Reloj:** toda prueba que lo use llama a `RelojJuego.reiniciarParaTests()` en `@BeforeEach` (DT-09).
+- **Repositorios:** `RepositorioGuardadoFalso` en memoria para aceptación, API y cliente; MongoDB real solo en las pruebas de `RepositorioGuardadoMongo` (se omiten con un aviso si no hay un MongoDB al que conectarse).
 - **Fallas inyectadas:** servicios y repositorios de prueba que lanzan excepciones para verificar que el controlador devuelve `ERROR_INTERNO` y que el estado no cambia (RNF-07, HU-10 · CA-4).
 - **Trazabilidad:** cada clase de producción lleva `Stories: HU-xx` en su Javadoc y cada método de prueba el prefijo `HUxx_`; `python tools/traceability.py` (con `--upto 5.x` al cerrar una fase) comprueba que cada historia tenga clases y al menos tantas pruebas como criterios.
 - **Mensajes:** las pruebas comparan el **código** de error y, en pocas pruebas dedicadas, el texto en español de RN-35.
@@ -130,12 +130,12 @@ Total: **220 criterios** → **161** de dominio/aplicación y **59** de interfaz
 | AR-1 | `layersAreRespected` | `ui → application → domain`; `infrastructure → domain` |
 | AR-2 | `domainHasNoFrameworkOrIoImports` | el dominio no importa Swing, AWT, Spring, Jackson, MongoDB, `java.io` ni `java.nio.file` |
 | AR-3 | `uiDoesNotImportDomainOrInfrastructure` | la UI solo conoce `application` |
-| AR-4 | `controllerNeverTouchesRepositories` y `controllerNeverThrows` | el controlador no usa repositorios y siempre devuelve `Result` (inyección de fallas) |
+| AR-4 | `controllerNeverTouchesRepositories` y `controllerNeverThrows` | el controlador no usa repositorios y siempre devuelve `Resultado` (inyección de fallas) |
 | AR-5 | `domainPackagesHaveNoCycles` | sin ciclos entre subpaquetes de `domain` |
 | AR-7 | `noUnseededRandomnessOutsideMain` | no hay `new Random()` ni `Math.random()` fuera de `Main` |
-| AR-8 | `noMagicNumbersInDomain` | revisión automática simple de literales numéricos fuera de `GameRules` y catálogos (se acepta 0, 1 y −1) |
+| AR-8 | `noMagicNumbersInDomain` | revisión automática simple de literales numéricos fuera de `ReglasJuego` y catálogos (se acepta 0, 1 y −1) |
 | AR-9 | `patternClassesHavePatternJavadoc` | las clases listadas como patrón llevan `Pattern: … — Role: …` |
-| Q-1 | `everyErrorCodeHasSpanishMessage` | cada `ErrorCode` tiene su plantilla de RN-35 |
+| Q-1 | `everyErrorCodeHasSpanishMessage` | cada `CodigoError` tiene su plantilla de RN-35 |
 | Q-2 | `assetsAreRegisteredInAssetsMd` | todo archivo de `resources/assets` figura en `docs/ASSETS.md` con licencia CC0 o CC-BY |
 | Q-3 | `gameRunsWithoutAnyImage` | el juego arranca y se puede jugar con respaldo vectorial |
 
@@ -146,8 +146,8 @@ Total: **220 criterios** → **161** de dominio/aplicación y **59** de interfaz
 | RNF-01 (fin de día ≤ 200 ms p95) | prueba `perf` con `fullLoadGame()`: 20 ejecuciones de calentamiento y 100 medidas | 5.5 |
 | RNF-02 (arranque ≤ 5 s) | medición manual con cronómetro sobre `java -jar farmsim.jar` y registro en el README | 5.1 y 5.6 |
 | RNF-03 (guardar/cargar ≤ 1 s, ≤ 200 KB) | prueba `perf` + comprobación del tamaño del documento | 5.5 |
-| RNF-04 (≥ 30 FPS, clic ≤ 100 ms) | contador de cuadros de `MapPanel` en modo de depuración; comprobación manual | 5.6 |
-| RNF-05 (cobertura ≥ 70 %) | `jacoco:check` en `mvn verify`: **dominio** y **aplicación** por separado | cada fase |
+| RNF-04 (≥ 30 FPS, clic ≤ 100 ms) | contador de cuadros de `PanelMapa` en modo de depuración; comprobación manual | 5.6 |
+| RNF-05 (cobertura ≥ 70 %) | `jacoco:comprobar` en `mvn verify`: **dominio** y **aplicación** por separado | cada fase |
 | RNF-06 y RNF-07 | pruebas AR-1 a AR-5 y `controllerNeverThrows` | cada fase |
 | RNF-08 (determinismo) | misma semilla + mismas acciones → mismo estado tras 112 días | 5.1 |
 | RNF-09 (persistencia fiable) | pruebas de HU-29, HU-30 y HU-31 | 5.5 |
@@ -171,7 +171,7 @@ Total: **220 criterios** → **161** de dominio/aplicación y **59** de interfaz
 
 ## 8. Cobertura
 
-- `jacoco:check` con **dos reglas**: `edu/ucc/farmsim/domain/**` y `edu/ucc/farmsim/application/**`, cobertura de líneas **≥ 70 %** cada una (RNF-05); la construcción falla si no se cumple.
+- `jacoco:comprobar` con **dos reglas**: `edu/ucc/farmsim/domain/**` y `edu/ucc/farmsim/application/**`, cobertura de líneas **≥ 70 %** cada una (RNF-05); la construcción falla si no se cumple.
 - Se excluyen del cálculo `ui` e `infrastructure`, que se prueban con sus propios niveles.
 - El informe se revisa al cerrar cada fase; si una clase de dominio queda sin cubrir, falta una prueba de una regla.
 

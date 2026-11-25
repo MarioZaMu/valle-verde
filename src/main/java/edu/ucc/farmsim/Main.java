@@ -1,11 +1,11 @@
 package edu.ucc.farmsim;
 
-import edu.ucc.farmsim.application.event.EventBus;
-import edu.ucc.farmsim.client.RemoteGameClient;
-import edu.ucc.farmsim.config.ServerApplication;
-import edu.ucc.farmsim.ui.screens.MainWindow;
-import edu.ucc.farmsim.ui.screens.ScreenRouter;
-import edu.ucc.farmsim.ui.theme.UiTheme;
+import edu.ucc.farmsim.aplicacion.evento.BusEvento;
+import edu.ucc.farmsim.cliente.ClienteJuegoRemoto;
+import edu.ucc.farmsim.configuracion.AplicacionServidor;
+import edu.ucc.farmsim.interfaz.pantallas.EnrutadorPantalla;
+import edu.ucc.farmsim.interfaz.pantallas.VentanaPrincipal;
+import edu.ucc.farmsim.interfaz.tema.UiTheme;
 import java.awt.GraphicsEnvironment;
 import java.net.URI;
 import java.time.Duration;
@@ -17,8 +17,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * Raíz de composición: el único lugar que arranca el servidor y la ventana y los une (DT-22). Sin argumentos arranca el
- * servidor Spring Boot en esta máquina y una ventana que le habla por HTTP; {@code --server} arranca solo el servidor y
- * {@code --client --url=...} solo la ventana. Con ambos, el servidor arranca en un hilo propio mientras se abre la
+ * servidor Spring Boot en esta máquina y una ventana que le habla por HTTP; {@code --servidor} arranca solo el servidor y
+ * {@code --cliente --url=...} solo la ventana. Con ambos, el servidor arranca en un hilo propio mientras se abre la
  * ventana, de modo que la pantalla de inicio aparece sin esperar a Spring (RNF-02); una orden enviada antes de que el
  * servidor esté listo lo espera.
  *
@@ -26,10 +26,10 @@ import org.springframework.context.ConfigurableApplicationContext;
  */
 public final class Main {
 
-    private static final int EXIT_NO_DISPLAY = 1;
-    private static final int EXIT_BAD_ARGUMENTS = 2;
-    private static final int EXIT_SERVER_FAILED = 3;
-    private static final Duration SERVER_START_WAIT = Duration.ofSeconds(30);
+    private static final int SALIR_NO_MOSTRAR = 1;
+    private static final int ARGUMENTOS_SALIR_MALOS = 2;
+    private static final int SERVIDOR_SALIR_FALLIDO = 3;
+    private static final Duration ESPERAR_INICIO_SERVIDOR = Duration.ofSeconds(30);
 
     private Main() {
                 // solo punto de entrada
@@ -38,61 +38,61 @@ public final class Main {
     /**
      * Arranca la aplicación.
      *
-     * @param args véase {@link LaunchOptions}
+     * @param args véase {@link OpcionesLanzamiento}
      */
     public static void main(String[] args) {
-        LaunchOptions options;
+        OpcionesLanzamiento opciones;
         try {
-            options = LaunchOptions.parse(args);
+            opciones = OpcionesLanzamiento.parse(args);
         } catch (IllegalArgumentException e) {
-            System.err.println(GameInfo.NAME + ": " + e.getMessage());
-            System.exit(EXIT_BAD_ARGUMENTS);
+            System.err.println(InfoJuego.NOMBRE + ": " + e.getMessage());
+            System.exit(ARGUMENTOS_SALIR_MALOS);
             return;
         }
-        if (options.needsWindow() && GraphicsEnvironment.isHeadless()) {
-            System.err.println(GameInfo.NAME + " necesita una pantalla para ejecutarse.");
-            System.exit(EXIT_NO_DISPLAY);
+        if (opciones.ventanaNecesita() && GraphicsEnvironment.isHeadless()) {
+            System.err.println(InfoJuego.NOMBRE + " necesita una pantalla para ejecutarse.");
+            System.exit(SALIR_NO_MOSTRAR);
             return;
         }
-        if (!options.needsWindow()) {
-            startServer(options);
+        if (!opciones.ventanaNecesita()) {
+            iniciarServidor(opciones);
             return;
         }
-        if (!options.needsServer()) {
-            String url = options.url() != null ? options.url() : LaunchOptions.DEFAULT_URL;
-            openWindow(CompletableFuture.completedFuture(URI.create(url)));
+        if (!opciones.servidorNecesita()) {
+            String url = opciones.url() != null ? opciones.url() : OpcionesLanzamiento.URL_PREDETERMINADO;
+            ventanaAbrir(CompletableFuture.completedFuture(URI.create(url)));
             return;
         }
-        CompletableFuture<URI> server = new CompletableFuture<>();
-        Thread starter = new Thread(() -> {
+        CompletableFuture<URI> servidor = new CompletableFuture<>();
+        Thread arranque = new Thread(() -> {
             try {
-                server.complete(URI.create("http://127.0.0.1:" + startServer(options)));
+                servidor.complete(URI.create("http://127.0.0.1:" + iniciarServidor(opciones)));
             } catch (RuntimeException e) {
-                server.completeExceptionally(e);
-                System.err.println(GameInfo.NAME + ": el servidor no pudo arrancar: " + e.getMessage());
-                System.exit(EXIT_SERVER_FAILED);
+                servidor.completeExceptionally(e);
+                System.err.println(InfoJuego.NOMBRE + ": el servidor no pudo arrancar: " + e.getMessage());
+                System.exit(SERVIDOR_SALIR_FALLIDO);
             }
         }, "server-start");
-        starter.start();
-        openWindow(server);
+        arranque.start();
+        ventanaAbrir(servidor);
     }
 
     /** Arranca el servidor Spring Boot y devuelve el puerto en el que escucha. */
-    private static int startServer(LaunchOptions options) {
-        ConfigurableApplicationContext context = new SpringApplicationBuilder(ServerApplication.class)
+    private static int iniciarServidor(OpcionesLanzamiento opciones) {
+        ConfigurableApplicationContext contexto = new SpringApplicationBuilder(AplicacionServidor.class)
                 .headless(false)
-                .run(options.serverArguments());
-        return ((WebServerApplicationContext) context).getWebServer().getPort();
+                .run(opciones.argumentosServidor());
+        return ((WebServerApplicationContext) contexto).getWebServer().getPort();
     }
 
-    private static void openWindow(CompletableFuture<URI> server) {
-        EventBus bus = new EventBus();
-        RemoteGameClient client = new RemoteGameClient(server, bus, SERVER_START_WAIT);
+    private static void ventanaAbrir(CompletableFuture<URI> servidor) {
+        BusEvento bus = new BusEvento();
+        ClienteJuegoRemoto cliente = new ClienteJuegoRemoto(servidor, bus, ESPERAR_INICIO_SERVIDOR);
         SwingUtilities.invokeLater(() -> {
-            UiTheme.install();
-            MainWindow window = new MainWindow(GameInfo.NAME);
-            window.setContentPane(new ScreenRouter(client, bus, System::currentTimeMillis, server));
-            window.setVisible(true);
+            UiTheme.instalar();
+            VentanaPrincipal ventana = new VentanaPrincipal(InfoJuego.NOMBRE);
+            ventana.setContentPane(new EnrutadorPantalla(cliente, bus, System::currentTimeMillis, servidor));
+            ventana.setVisible(true);
         });
     }
 }
